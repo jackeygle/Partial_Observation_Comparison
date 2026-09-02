@@ -18,6 +18,10 @@ EnKF 的估计取自 `4dvarnet_enkf/check_outputs/enkf_k1_full/`（全天 k=1 �
 
 本脚本只读 4dvarnet_enkf，不写入它的任何目录。
 
+**这个口径把 DINCAE 排除在外**：它在所有格子上打分，其中速度通道有 88% 的格子是
+空格子的占位符 0，而 DINCAE 从未在那些格子上训练过。四方（含 DINCAE）的对比见
+`compare4.py`，它把同样三方搬到「有定义格子」口径上，并把本脚本的口径并排列出。
+
 用法（GPU 节点）:
     sbatch sbatch/submit_eval.sbatch --help   # 见下方 argparse
     srun -p gpu-debug --gres=gpu:1 -t 00:14:00 --mem=64G bash -c \

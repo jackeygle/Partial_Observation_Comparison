@@ -1,0 +1,221 @@
+{
+  "protocol": {
+    "cells": "blind ∩ channel-defined ∩ walkable（'defined'）与 blind（'allcells'）并列",
+    "channel_defined": "density: 全部; vx/vy: density>0; var: var>0（dincae_crowd/state.py:channel_valid）",
+    "walkable_cells": 290,
+    "grid_cells": 432,
+    "frame_range": "[1, T-1)  （对齐 DINCAE 的 FRESH_OFFSETS）",
+    "obs_every_k": 1,
+    "seed": 0,
+    "clip": "EnKF 物理界",
+    "pooling": "逐通道累加平方误差与格数，最后一次相除",
+    "n_days": 7
+  },
+  "per_day": [
+    {
+      "day": "atc-20130811",
+      "frames_total": 39821,
+      "frames_scored": 39819
+    },
+    {
+      "day": "atc-20130818",
+      "frames_total": 38885,
+      "frames_scored": 38883
+    },
+    {
+      "day": "atc-20130825",
+      "frames_total": 42890,
+      "frames_scored": 42888
+    },
+    {
+      "day": "atc-20130901",
+      "frames_total": 39758,
+      "frames_scored": 39756
+    },
+    {
+      "day": "atc-20130915",
+      "frames_total": 39383,
+      "frames_scored": 39381
+    },
+    {
+      "day": "atc-20130922",
+      "frames_total": 38842,
+      "frames_scored": 38840
+    },
+    {
+      "day": "atc-20130929",
+      "frames_total": 37964,
+      "frames_scored": 37962
+    }
+  ],
+  "channels": [
+    "density",
+    "vx",
+    "vy",
+    "var"
+  ],
+  "results": {
+    "Senseiver": {
+      "defined": {
+        "per_channel": {
+          "density": 0.024211267162390252,
+          "vx": 0.6334477673335193,
+          "vy": 0.11083666061524998,
+          "var": 0.054320319409419594
+        },
+        "n_per_channel": {
+          "density": 35251500,
+          "vx": 7395238,
+          "vy": 7395238,
+          "var": 7136996
+        },
+        "overall": 0.11796868035846728
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.0139119536109758,
+          "vx": 0.07879041249022153,
+          "vy": 0.014414679203539301,
+          "var": 0.006443840554951573
+        },
+        "n_per_channel": {
+          "density": 63694819,
+          "vx": 63694819,
+          "vy": 63694819,
+          "var": 63694819
+        },
+        "overall": 0.028390221464922052
+      }
+    },
+    "4DVarNet a4_k1": {
+      "defined": {
+        "per_channel": {
+          "density": 0.03094292769789432,
+          "vx": 0.5075409305265192,
+          "vy": 0.12756579214865627,
+          "var": 0.07703320664486647
+        },
+        "n_per_channel": {
+          "density": 35161431,
+          "vx": 7390633,
+          "vy": 7390633,
+          "var": 7132506
+        },
+        "overall": 0.11092870101410326
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.017706879064992694,
+          "vx": 0.0752930464661844,
+          "vy": 0.020726588308942577,
+          "var": 0.011125247372530263
+        },
+        "n_per_channel": {
+          "density": 63529942,
+          "vx": 63529942,
+          "vy": 63529942,
+          "var": 63529942
+        },
+        "overall": 0.031212940303162483
+      }
+    },
+    "4DVarNet b0_k1": {
+      "defined": {
+        "per_channel": {
+          "density": 0.03280027953427152,
+          "vx": 0.6258846924884512,
+          "vy": 0.13454154146877542,
+          "var": 0.07796986682783723
+        },
+        "n_per_channel": {
+          "density": 35161431,
+          "vx": 7390633,
+          "vy": 7390633,
+          "var": 7132506
+        },
+        "overall": 0.1284175288407428
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.018875960684805914,
+          "vx": 0.09317001363703432,
+          "vy": 0.022906853314929834,
+          "var": 0.011251202498933495
+        },
+        "n_per_channel": {
+          "density": 63529942,
+          "vx": 63529942,
+          "vy": 63529942,
+          "var": 63529942
+        },
+        "overall": 0.03655100753392589
+      }
+    },
+    "EnKF k1": {
+      "defined": {
+        "per_channel": {
+          "density": 0.02462717965015673,
+          "vx": 0.7435344626501541,
+          "vy": 0.12066098206541831,
+          "var": 0.0661451670939356
+        },
+        "n_per_channel": {
+          "density": 35251500,
+          "vx": 7395238,
+          "vy": 7395238,
+          "var": 7136996
+        },
+        "overall": 0.13520973774403902
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.014267654392149226,
+          "vx": 0.11034011749841066,
+          "vy": 0.020894497714170443,
+          "var": 0.039382920120237724
+        },
+        "n_per_channel": {
+          "density": 63694819,
+          "vx": 63694819,
+          "vy": 63694819,
+          "var": 63694819
+        },
+        "overall": 0.046221297431242016
+      }
+    },
+    "DINCAE": {
+      "defined": {
+        "per_channel": {
+          "density": 0.022961628627505212,
+          "vx": 0.5456784360760262,
+          "vy": 0.10261896637910775,
+          "var": 0.05385622140165835
+        },
+        "n_per_channel": {
+          "density": 35251500,
+          "vx": 7395238,
+          "vy": 7395238,
+          "var": 7136996
+        },
+        "overall": 0.10472586100741282,
+        "source": "check_outputs/eval/dincae_metrics_test.json"
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.01344357968895398,
+          "vx": 0.5712793139423161,
+          "vy": 1.6489051173848221,
+          "var": 0.02389324828758835
+        },
+        "n_per_channel": {
+          "density": 63694819,
+          "vx": 63694819,
+          "vy": 63694819,
+          "var": 63694819
+        },
+        "overall": 0.5643803148259201,
+        "source": "check_outputs/eval/dincae_metrics_test.json"
+      }
+    }
+  }
+}
