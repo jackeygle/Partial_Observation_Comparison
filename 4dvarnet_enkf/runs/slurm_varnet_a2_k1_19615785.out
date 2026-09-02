@@ -1,0 +1,30 @@
+Submitted batch job 19616412
+[chain] submitted successor (afterany:19615785)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,074,198 (GENN prior 32,076 = 1.55%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  bilinear=False  amp=True
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_a2_k1/varnet_last.pt: continuing from epoch 85 (step 16745)
+[best] previous best blind MSE = 0.0264
+[schedule] epoch 85: n_iter -> 20, lr -> 0.0003
+[epoch  85] loss=0.0254  盲区MSE=0.0265  density=0.0159 vx=0.0596 vy=0.0218 var=0.0087
+[epoch  86] loss=0.0284  盲区MSE=0.0265  density=0.0159 vx=0.0597 vy=0.0217 var=0.0087
+[epoch  87] loss=0.0277  盲区MSE=0.0264  density=0.0159 vx=0.0594 vy=0.0217 var=0.0087
+[epoch  88] loss=0.0268  盲区MSE=0.0265  density=0.0159 vx=0.0596 vy=0.0218 var=0.0087
+[epoch  89] loss=0.0250  盲区MSE=0.0264  density=0.0159 vx=0.0594 vy=0.0217 var=0.0087
+[epoch  90] loss=0.0282  盲区MSE=0.0265  density=0.0159 vx=0.0595 vy=0.0218 var=0.0087
+[epoch  91] loss=0.0261  盲区MSE=0.0264  density=0.0159 vx=0.0593 vy=0.0218 var=0.0087
+           ↑ new best (0.0264) -> varnet_best.pt
+[epoch  92] loss=0.0258  盲区MSE=0.0264  density=0.0159 vx=0.0593 vy=0.0217 var=0.0087
+[epoch  93] loss=0.0269  盲区MSE=0.0264  density=0.0159 vx=0.0592 vy=0.0218 var=0.0087
+           ↑ new best (0.0264) -> varnet_best.pt
+[epoch  94] loss=0.0274  盲区MSE=0.0266  density=0.0159 vx=0.0601 vy=0.0218 var=0.0087
+[epoch  95] loss=0.0266  盲区MSE=0.0264  density=0.0159 vx=0.0592 vy=0.0217 var=0.0087
+           ↑ new best (0.0264) -> varnet_best.pt
+[epoch  96] loss=0.0271  盲区MSE=0.0263  density=0.0159 vx=0.0591 vy=0.0217 var=0.0087
+           ↑ new best (0.0263) -> varnet_best.pt
+[epoch  97] loss=0.0266  盲区MSE=0.0264  density=0.0159 vx=0.0592 vy=0.0217 var=0.0087
+[epoch  98] loss=0.0261  盲区MSE=0.0263  density=0.0159 vx=0.0591 vy=0.0217 var=0.0087
+[epoch  99] loss=0.0266  盲区MSE=0.0269  density=0.0159 vx=0.0612 vy=0.0219 var=0.0087
+[done] checkpoints + metrics in runs/varnet_a2_k1

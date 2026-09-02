@@ -1,0 +1,58 @@
+Submitted batch job 19748725
+[chain] submitted successor (afterany:19746009)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,051,542 (GENN prior 9,420 = 0.46%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var-head] 548 params   sigma^2 = obs_var + softplus(head),  obs_var = [0.003239, 0.099055, 0.007424, 4.2e-05]   beta=1.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_ml5_s0/varnet_last.pt: continuing from epoch 54 (step 10638)
+[best] previous best blind MSE = 0.0303
+[epoch  54] loss=-0.0312  盲区MSE=0.0302  density=0.0225 vx=0.0665 vy=0.0227 var=0.0091
+           ↑ new best (0.0302) -> varnet_best.pt
+[epoch  55] loss=-0.0312  盲区MSE=0.0301  density=0.0225 vx=0.0661 vy=0.0227 var=0.0091
+           ↑ new best (0.0301) -> varnet_best.pt
+[epoch  56] loss=-0.0312  盲区MSE=0.0301  density=0.0225 vx=0.0660 vy=0.0227 var=0.0091
+           ↑ new best (0.0301) -> varnet_best.pt
+[epoch  57] loss=-0.0305  盲区MSE=0.0300  density=0.0225 vx=0.0656 vy=0.0227 var=0.0091
+           ↑ new best (0.0300) -> varnet_best.pt
+[epoch  58] loss=-0.0312  盲区MSE=0.0299  density=0.0225 vx=0.0654 vy=0.0227 var=0.0090
+           ↑ new best (0.0299) -> varnet_best.pt
+[epoch  59] loss=-0.0313  盲区MSE=0.0299  density=0.0225 vx=0.0655 vy=0.0227 var=0.0090
+[epoch  60] loss=-0.0308  盲区MSE=0.0298  density=0.0225 vx=0.0651 vy=0.0227 var=0.0090
+           ↑ new best (0.0298) -> varnet_best.pt
+[epoch  61] loss=-0.0307  盲区MSE=0.0299  density=0.0225 vx=0.0651 vy=0.0227 var=0.0090
+[epoch  62] loss=-0.0312  盲区MSE=0.0298  density=0.0225 vx=0.0648 vy=0.0227 var=0.0091
+           ↑ new best (0.0298) -> varnet_best.pt
+[epoch  63] loss=-0.0311  盲区MSE=0.0298  density=0.0225 vx=0.0650 vy=0.0227 var=0.0090
+[epoch  64] loss=-0.0310  盲区MSE=0.0298  density=0.0225 vx=0.0648 vy=0.0227 var=0.0091
+           ↑ new best (0.0298) -> varnet_best.pt
+[epoch  65] loss=-0.0311  盲区MSE=0.0299  density=0.0225 vx=0.0653 vy=0.0227 var=0.0090
+[epoch  66] loss=-0.0305  盲区MSE=0.0297  density=0.0225 vx=0.0647 vy=0.0227 var=0.0090
+           ↑ new best (0.0297) -> varnet_best.pt
+[epoch  67] loss=-0.0311  盲区MSE=0.0298  density=0.0225 vx=0.0649 vy=0.0227 var=0.0090
+[epoch  68] loss=-0.0300  盲区MSE=0.0296  density=0.0225 vx=0.0642 vy=0.0227 var=0.0090
+           ↑ new best (0.0296) -> varnet_best.pt
+[epoch  69] loss=-0.0314  盲区MSE=0.0296  density=0.0225 vx=0.0642 vy=0.0227 var=0.0090
+           ↑ new best (0.0296) -> varnet_best.pt
+[epoch  70] loss=-0.0307  盲区MSE=0.0296  density=0.0225 vx=0.0643 vy=0.0228 var=0.0090
+[epoch  71] loss=-0.0312  盲区MSE=0.0297  density=0.0225 vx=0.0646 vy=0.0227 var=0.0090
+[epoch  72] loss=-0.0301  盲区MSE=0.0295  density=0.0225 vx=0.0639 vy=0.0227 var=0.0091
+           ↑ new best (0.0295) -> varnet_best.pt
+[epoch  73] loss=-0.0314  盲区MSE=0.0295  density=0.0225 vx=0.0638 vy=0.0227 var=0.0090
+           ↑ new best (0.0295) -> varnet_best.pt
+[epoch  74] loss=-0.0308  盲区MSE=0.0295  density=0.0225 vx=0.0639 vy=0.0227 var=0.0090
+[schedule] epoch 75: n_iter -> 20, lr -> 0.0003
+[epoch  75] loss=-0.0312  盲区MSE=0.0293  density=0.0225 vx=0.0632 vy=0.0226 var=0.0090
+           ↑ new best (0.0293) -> varnet_best.pt
+[epoch  76] loss=-0.0306  盲区MSE=0.0294  density=0.0225 vx=0.0633 vy=0.0226 var=0.0090
+[epoch  77] loss=-0.0313  盲区MSE=0.0292  density=0.0225 vx=0.0626 vy=0.0226 var=0.0090
+           ↑ new best (0.0292) -> varnet_best.pt
+[epoch  78] loss=-0.0312  盲区MSE=0.0292  density=0.0225 vx=0.0627 vy=0.0226 var=0.0090
+[epoch  79] loss=-0.0311  盲区MSE=0.0292  density=0.0225 vx=0.0625 vy=0.0226 var=0.0090
+           ↑ new best (0.0292) -> varnet_best.pt
+[epoch  80] loss=-0.0310  盲区MSE=0.0292  density=0.0225 vx=0.0624 vy=0.0226 var=0.0090
+           ↑ new best (0.0292) -> varnet_best.pt
+[epoch  81] loss=-0.0301  盲区MSE=0.0292  density=0.0225 vx=0.0625 vy=0.0226 var=0.0090
+[2026-08-15T05:59:12.006] error: *** JOB 19746009 ON gpu61 CANCELLED AT 2026-08-15T05:59:12 DUE TO TIME LIMIT ***

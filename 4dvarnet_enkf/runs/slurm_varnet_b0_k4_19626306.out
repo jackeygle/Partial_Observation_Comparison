@@ -1,0 +1,37 @@
+Submitted batch job 19626879
+[chain] submitted successor (afterany:19626306)
+NVIDIA H200
+[obs] obs_every_k = 4  (每 4 帧观测)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,051,542 (GENN prior 9,420 = 0.46%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  bilinear=False  amp=True
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_b0_k4/varnet_last.pt: continuing from epoch 128 (step 25216)
+[best] previous best blind MSE = 0.0354
+[schedule] epoch 128: n_iter -> 20, lr -> 0.0003
+[epoch 128] loss=0.0334  盲区MSE=0.0355  density=0.0248 vx=0.0732 vy=0.0313 var=0.0126
+[epoch 129] loss=0.0312  盲区MSE=0.0355  density=0.0248 vx=0.0731 vy=0.0313 var=0.0126
+[epoch 130] loss=0.0376  盲区MSE=0.0355  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+[epoch 131] loss=0.0377  盲区MSE=0.0355  density=0.0248 vx=0.0731 vy=0.0314 var=0.0126
+[epoch 132] loss=0.0330  盲区MSE=0.0355  density=0.0248 vx=0.0731 vy=0.0313 var=0.0126
+[epoch 133] loss=0.0384  盲区MSE=0.0355  density=0.0248 vx=0.0732 vy=0.0313 var=0.0126
+[epoch 134] loss=0.0319  盲区MSE=0.0355  density=0.0249 vx=0.0731 vy=0.0313 var=0.0126
+[epoch 135] loss=0.0356  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+           ↑ new best (0.0354) -> varnet_best.pt
+[epoch 136] loss=0.0339  盲区MSE=0.0355  density=0.0248 vx=0.0732 vy=0.0313 var=0.0126
+[epoch 137] loss=0.0384  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+           ↑ new best (0.0354) -> varnet_best.pt
+[epoch 138] loss=0.0349  盲区MSE=0.0355  density=0.0249 vx=0.0732 vy=0.0314 var=0.0126
+[epoch 139] loss=0.0359  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+[epoch 140] loss=0.0354  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+[epoch 141] loss=0.0365  盲区MSE=0.0355  density=0.0248 vx=0.0731 vy=0.0314 var=0.0126
+[epoch 142] loss=0.0388  盲区MSE=0.0354  density=0.0248 vx=0.0729 vy=0.0313 var=0.0126
+           ↑ new best (0.0354) -> varnet_best.pt
+[epoch 143] loss=0.0351  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0313 var=0.0126
+[epoch 144] loss=0.0339  盲区MSE=0.0355  density=0.0248 vx=0.0732 vy=0.0313 var=0.0126
+[epoch 145] loss=0.0362  盲区MSE=0.0354  density=0.0248 vx=0.0729 vy=0.0314 var=0.0126
+[epoch 146] loss=0.0402  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0314 var=0.0126
+[epoch 147] loss=0.0347  盲区MSE=0.0354  density=0.0248 vx=0.0730 vy=0.0314 var=0.0126
+[epoch 148] loss=0.0408  盲区MSE=0.0354  density=0.0248 vx=0.0729 vy=0.0313 var=0.0126
+[epoch 149] loss=0.0341  盲区MSE=0.0354  density=0.0248 vx=0.0729 vy=0.0313 var=0.0126
+           ↑ new best (0.0354) -> varnet_best.pt
+[done] checkpoints + metrics in runs/varnet_b0_k4

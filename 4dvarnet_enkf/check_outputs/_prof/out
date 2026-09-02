@@ -1,0 +1,21 @@
+  未插桩实测: 60 帧 12.30s = 205.0 ms/帧
+  硬件: 4 cores, node=csl20
+
+  cProfile 总计 12.39s(插桩有额外开销,看相对占比)
+  函数                                                     cumtime      占比      调用
+  --------------------------------------------------------------------------------
+  ENKF.py:step                                             12.38   99.9%      60
+  ENKF.py:update                                           10.05   81.2%      60
+  _linalg.py:pinv                                           6.73   54.4%      60
+  _linalg.py:svd                                            6.31   51.0%      60
+  ENKF.py:forecast                                          2.31   18.6%      60
+  ENKF.py:_f_model                                          1.75   14.1%      60
+  module.py:_wrapped_call_impl                              1.73   13.9%    1680
+  module.py:_call_impl                                      1.73   13.9%    1680
+  models.py:forward                                         1.73   13.9%      60
+  models.py:forward                                         1.68   13.6%      60
+  models.py:forward                                         1.68   13.6%     120
+  models.py:forward                                         1.66   13.4%     120
+  grid.py:__torch_function__                                1.63   13.1%    3720
+  _tensor.py:__torch_function__                             1.60   12.9%    3600
+  models.py:forward                                         1.36   11.0%      60

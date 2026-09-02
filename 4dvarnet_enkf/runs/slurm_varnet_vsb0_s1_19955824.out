@@ -1,0 +1,36 @@
+Submitted batch job 19957934
+[chain] submitted successor (afterany:19955824)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,743,542 (GENN prior 9,420 = 0.34%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=1  data=0
+[var read-out] 692,000 params on the last hidden state   sigma^2 = softplus(out_var(h)) + 1e-06   beta=0.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_vsb0_s1/varnet_last.pt: continuing from epoch 104 (step 20488)
+[best] previous best blind MSE = 0.0411
+[schedule] epoch 104: n_iter -> 20, lr -> 0.0003
+[epoch 104] loss=-2.3987  盲区MSE=0.0412  density=0.0174 vx=0.1170 vy=0.0216 var=0.0087
+[epoch 105] loss=-2.4297  盲区MSE=0.0412  density=0.0175 vx=0.1170 vy=0.0216 var=0.0087
+[epoch 106] loss=-2.4625  盲区MSE=0.0411  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 107] loss=-2.4433  盲区MSE=0.0412  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 108] loss=-2.3799  盲区MSE=0.0411  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 109] loss=-2.4160  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 110] loss=-2.3602  盲区MSE=0.0411  density=0.0175 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 111] loss=-2.4004  盲区MSE=0.0411  density=0.0174 vx=0.1167 vy=0.0216 var=0.0087
+[epoch 112] loss=-2.3761  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 113] loss=-2.3801  盲区MSE=0.0412  density=0.0174 vx=0.1171 vy=0.0216 var=0.0087
+[epoch 114] loss=-2.3817  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 115] loss=-2.3948  盲区MSE=0.0411  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 116] loss=-2.4547  盲区MSE=0.0412  density=0.0175 vx=0.1170 vy=0.0216 var=0.0087
+[epoch 117] loss=-2.4008  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 118] loss=-2.3874  盲区MSE=0.0413  density=0.0175 vx=0.1172 vy=0.0216 var=0.0087
+[epoch 119] loss=-2.3492  盲区MSE=0.0411  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 120] loss=-2.4287  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0087
+[epoch 121] loss=-2.4088  盲区MSE=0.0411  density=0.0174 vx=0.1167 vy=0.0216 var=0.0088
+[epoch 122] loss=-2.3323  盲区MSE=0.0411  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 123] loss=-2.4366  盲区MSE=0.0412  density=0.0175 vx=0.1169 vy=0.0216 var=0.0088
+[epoch 124] loss=-2.4032  盲区MSE=0.0411  density=0.0174 vx=0.1168 vy=0.0216 var=0.0087
+[epoch 125] loss=-2.4321  盲区MSE=0.0412  density=0.0174 vx=0.1169 vy=0.0216 var=0.0088
+[epoch 126] loss=-2.4939  盲区MSE=0.0412  density=0.0175 vx=0.1170 vy=0.0216 var=0.0088
+[2026-08-27T01:57:34.003] error: *** JOB 19955824 ON gpu50 CANCELLED AT 2026-08-27T01:57:34 DUE TO TIME LIMIT ***

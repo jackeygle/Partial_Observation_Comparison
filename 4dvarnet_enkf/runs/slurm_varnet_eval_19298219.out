@@ -1,0 +1,7 @@
+[model] runs/varnet_full100/varnet_last.pt  epoch=99  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE    fullMSE   baseline   gain   wins
+--------------------------------------------------------------
+/var/spool/slurmd/job19298219/slurm_script: line 4: 1772240 Killed                  python3 -u checks/eval_test_days.py
+[2026-07-21T14:12:32.699] error: Detected 1 oom_kill event in StepId=19298219.batch. Some of the step tasks have been OOM Killed.

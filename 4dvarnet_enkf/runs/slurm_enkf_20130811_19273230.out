@@ -1,0 +1,2 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+[2026-07-19T18:23:36.470] error: *** JOB 19273230 ON dgx2 CANCELLED AT 2026-07-19T18:23:36 DUE to SIGNAL Terminated ***

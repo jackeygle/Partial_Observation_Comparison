@@ -1,0 +1,4 @@
+[enkf] src=opt (/scratch/work/zhangx29/Thesis_Project/enkf_opt); ORIGINAL random init; ensemble=100 radius=7 frames=0 dir=check_outputs/enkf_k4_opt_full
+  atc-20130929: 37964 frames in 3096.4s, 6 SVD-skips -> est_atc-20130929.npz
+  timing -> check_outputs/enkf_k4_opt_full/timing_atc-20130929.json  (Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores)
+[done]

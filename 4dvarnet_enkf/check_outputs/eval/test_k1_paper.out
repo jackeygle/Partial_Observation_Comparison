@@ -1,0 +1,20 @@
+[model] runs/varnet_k1_paper/varnet_best.pt  epoch=99  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE    fullMSE   baseline   gain   wins
+--------------------------------------------------------------
+/scratch/work/zhangx29/Thesis_Project/checks/eval_test_days.py:87: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /home/conda/feedstock_root/build_artifacts/libtorch_1769685314817/work/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  se_base += float(((x0b - xb)[unobs] ** 2).sum())
+atc-20130811         0.0270     0.0252     0.0697  2.58x    199
+atc-20130818         0.0381     0.0314     0.0893  2.34x    194
+atc-20130825         0.0332     0.0286     0.0819  2.47x    214
+atc-20130901         0.0371     0.0309     0.0875  2.36x    198
+atc-20130915         0.0323     0.0281     0.0810  2.51x    196
+atc-20130922         0.0313     0.0274     0.0803  2.57x    194
+atc-20130929         0.0385     0.0315     0.0929  2.41x    189
+--------------------------------------------------------------
+MEAN                 0.0339     0.0290     0.0832  2.45x
+STD                  0.0039     0.0022     0.0070
+
+[out] check_outputs/eval/test_metrics_k1_paper.json

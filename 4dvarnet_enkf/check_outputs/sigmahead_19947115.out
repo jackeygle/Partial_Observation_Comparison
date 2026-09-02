@@ -1,0 +1,9 @@
+[device] cuda  ck runs/varnet_vrb0_s0/varnet_best.pt  dT 200  windows/day 12
+[fit ] atc-20121028_corridor_1.0s.h5
+[score] atc-20130811_corridor_1.0s.h5
+[density ] err2 occ/empty   19.3x | learnt occ/empty  1.10 nll   9.3164 | lookup occ/empty   2.77 nll  -2.3056
+[vx      ] err2 occ/empty   23.6x | learnt occ/empty  1.21 nll  38.1352 | lookup occ/empty   1.90 nll  -0.8970
+[vy      ] err2 occ/empty   27.2x | learnt occ/empty  1.11 nll   0.7227 | lookup occ/empty   2.14 nll  -1.8945
+[var     ] err2 occ/empty   29.6x | learnt occ/empty  0.96 nll  -0.0106 | lookup occ/empty   1.89 nll  -2.5226
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/sigma_headroom.json

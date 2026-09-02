@@ -1,0 +1,120 @@
+{
+  "old_h_only": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03459810093045235,
+      "sigma2_median_occupied": 0.027334414422512054,
+      "sigma2_ratio_occ_over_empty": 0.7900553345680237,
+      "grad_weight_share_empty": 0.9029715657234192,
+      "mse_empty": 0.004888866096735001,
+      "mse_occupied": 0.08390263468027115,
+      "grad_share_if_beta0": 0.3390136659145355,
+      "grad_share_if_beta1": 0.14769627153873444
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.0655987411737442,
+      "sigma2_median_occupied": 0.06870026141405106,
+      "sigma2_ratio_occ_over_empty": 1.047280192375183,
+      "grad_weight_share_empty": 0.918480396270752,
+      "mse_empty": 0.04634750634431839,
+      "mse_occupied": 0.9083282351493835,
+      "grad_share_if_beta0": 0.4417072534561157,
+      "grad_share_if_beta1": 0.5815569758415222
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.055884696543216705,
+      "sigma2_median_occupied": 0.051111094653606415,
+      "sigma2_ratio_occ_over_empty": 0.9145812392234802,
+      "grad_weight_share_empty": 0.9197946786880493,
+      "mse_empty": 0.006146153900772333,
+      "mse_occupied": 0.1437271684408188,
+      "grad_share_if_beta0": 0.06820691376924515,
+      "grad_share_if_beta1": 0.2156727910041809
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03262552618980408,
+      "sigma2_median_occupied": 0.02092066965997219,
+      "sigma2_ratio_occ_over_empty": 0.6412362456321716,
+      "grad_weight_share_empty": 0.8924993872642517,
+      "mse_empty": 0.0015148126985877752,
+      "mse_occupied": 0.04220728948712349,
+      "grad_share_if_beta0": 0.15107226371765137,
+      "grad_share_if_beta1": 0.05507395789027214
+    }
+  },
+  "new_h_plus_xhat": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03355197235941887,
+      "sigma2_median_occupied": 0.036676209419965744,
+      "sigma2_ratio_occ_over_empty": 1.0931164026260376,
+      "grad_weight_share_empty": 0.9391161799430847,
+      "mse_empty": 0.0041047194972634315,
+      "mse_occupied": 0.08617120236158371,
+      "grad_share_if_beta0": 0.346553236246109,
+      "grad_share_if_beta1": 0.1504138708114624
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.09255046397447586,
+      "sigma2_median_occupied": 0.12167268991470337,
+      "sigma2_ratio_occ_over_empty": 1.3146631717681885,
+      "grad_weight_share_empty": 0.9377824068069458,
+      "mse_empty": 0.04370627552270889,
+      "mse_occupied": 0.9224171042442322,
+      "grad_share_if_beta0": 0.47088247537612915,
+      "grad_share_if_beta1": 0.5968299508094788
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06603066623210907,
+      "sigma2_median_occupied": 0.07402250915765762,
+      "sigma2_ratio_occ_over_empty": 1.1210322380065918,
+      "grad_weight_share_empty": 0.9297215342521667,
+      "mse_empty": 0.004278609994798899,
+      "mse_occupied": 0.13823483884334564,
+      "grad_share_if_beta0": 0.06350253522396088,
+      "grad_share_if_beta1": 0.20470140874385834
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.022173289209604263,
+      "sigma2_median_occupied": 0.0186103917658329,
+      "sigma2_ratio_occ_over_empty": 0.8393157720565796,
+      "grad_weight_share_empty": 0.9084005951881409,
+      "mse_empty": 0.0014252656837925315,
+      "mse_occupied": 0.042578235268592834,
+      "grad_share_if_beta0": 0.11906178295612335,
+      "grad_share_if_beta1": 0.0480547733604908
+    }
+  },
+  "old_h_only_vs_new_h_plus_xhat_mse_pct": {
+    "density": {
+      "empty_pct": 19.103536794520327,
+      "occupied_pct": -2.632628557036265
+    },
+    "vx": {
+      "empty_pct": 6.043138634032474,
+      "occupied_pct": -1.5273859331123463
+    },
+    "vy": {
+      "empty_pct": 43.648378988588135,
+      "occupied_pct": 3.973187688016422
+    },
+    "var": {
+      "empty_pct": 6.282829637556797,
+      "occupied_pct": -0.8712098543524394
+    }
+  }
+}

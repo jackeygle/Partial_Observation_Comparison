@@ -1,0 +1,27 @@
+[model] runs/varnet_full100/varnet_last.pt  epoch=99  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE    fullMSE   baseline   gain   wins
+--------------------------------------------------------------
+/scratch/work/zhangx29/Thesis_Project/checks/eval_test_days.py:101: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /home/conda/feedstock_root/build_artifacts/libtorch_1769685314817/work/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  se_base += float(((x0b - xb)[unobs] ** 2).sum())
+atc-20130811         0.0309     0.0293     0.0818  2.64x    199
+atc-20130818         0.0434     0.0406     0.1035  2.39x    194
+atc-20130825         0.0379     0.0356     0.0952  2.51x    214
+atc-20130901         0.0419     0.0393     0.1018  2.43x    198
+atc-20130915         0.0362     0.0341     0.0945  2.61x    196
+atc-20130922         0.0354     0.0335     0.0942  2.66x    194
+atc-20130929         0.0441     0.0414     0.1101  2.50x    189
+--------------------------------------------------------------
+MEAN                 0.0385     0.0363     0.0973  2.52x
+STD                  0.0045     0.0041     0.0083
+
+[out] check_outputs/eval/test_metrics.json
+channel   baseline      EnKF  4DVarNet
+density     0.0061    0.0062    0.0127
+vx          0.1728    0.0779    0.0700
+vy          0.0165    0.0111    0.0161
+var         0.0027    0.0617    0.0030
+ALL         0.0495    0.0392    0.0255
+[figure] /scratch/work/zhangx29/Thesis_Project/check_outputs/eval/compare_channels.png

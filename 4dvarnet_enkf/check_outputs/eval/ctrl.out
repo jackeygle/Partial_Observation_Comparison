@@ -1,0 +1,30 @@
+[model] 4DVarNet-MSE: runs/probe_plainmse/varnet_last.pt (epoch 14, dT=200)
+  atc-20130811: done
+  atc-20130818: done
+  atc-20130825: done
+  atc-20130901: done
+  atc-20130915: done
+  atc-20130922: done
+  atc-20130929: done
+
+=== UNWEIGHTED blind MSE  (what we have been reporting) ===
+channel      4DVarNet-MSE           EnKF
+density            0.0154         0.0063
+vx                 0.0846         0.0779
+vy                 0.0198         0.0110
+var                0.0088         0.0617
+ALL                0.0322         0.0392
+
+=== DENSITY-WEIGHTED blind MSE  (teacher's convention) ===
+channel      4DVarNet-MSE           EnKF
+density            0.0154         0.0063
+vx                 0.8739         1.0399
+vy                 0.1364         0.1154
+var                0.0369         0.0509
+ALL                0.2656         0.3031
+
+=== teacher's 'total weighted square error' ===
+  4DVarNet-MSE   0.0230
+  EnKF           0.0150
+
+[out] /scratch/work/zhangx29/Thesis_Project/check_outputs/eval/weighted_metrics.json

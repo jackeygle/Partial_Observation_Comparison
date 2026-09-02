@@ -1,0 +1,64 @@
+[hw] Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz · 4 cores · node=pe77 · OMP=unset torch=4
+[gpu] none
+[cfg] 1000 frames, 5 timed repeats (+1 warm-up each), 4DVarNet = runs/varnet_a2_k*
+
+[setup] preparing + warming up ...
+        enkf_k1: ready (1000 frames)
+        enkf_k4: ready (1000 frames)
+        varnet_k1: ready (1000 frames)
+        varnet_k4: ready (1000 frames)
+        varnet_single: ready (1000 frames)
+        varnet_ens5: ready (1000 frames)
+
+[round 1/5]
+  enkf_k1            212.89 s     212.89 ms/frame
+  enkf_k4             89.00 s      89.00 ms/frame
+  varnet_k1           10.94 s      10.94 ms/frame
+  varnet_k4           10.94 s      10.94 ms/frame
+  varnet_single        5.07 s       5.07 ms/frame
+  varnet_ens5         23.29 s      23.29 ms/frame
+
+[round 2/5]
+  enkf_k1            210.51 s     210.51 ms/frame
+  enkf_k4             89.18 s      89.18 ms/frame
+  varnet_k1           11.23 s      11.23 ms/frame
+  varnet_k4           11.36 s      11.36 ms/frame
+  varnet_single        5.16 s       5.16 ms/frame
+  varnet_ens5         24.18 s      24.18 ms/frame
+
+[round 3/5]
+  enkf_k1            210.22 s     210.22 ms/frame
+  enkf_k4             88.26 s      88.26 ms/frame
+  varnet_k1           11.04 s      11.04 ms/frame
+  varnet_k4           11.03 s      11.03 ms/frame
+  varnet_single        5.24 s       5.24 ms/frame
+  varnet_ens5         23.34 s      23.34 ms/frame
+
+[round 4/5]
+  enkf_k1            208.69 s     208.69 ms/frame
+  enkf_k4             88.37 s      88.37 ms/frame
+  varnet_k1           10.14 s      10.14 ms/frame
+  varnet_k4           11.09 s      11.09 ms/frame
+  varnet_single        5.17 s       5.17 ms/frame
+  varnet_ens5         23.36 s      23.36 ms/frame
+
+[round 5/5]
+  enkf_k1            209.12 s     209.12 ms/frame
+  enkf_k4             88.61 s      88.61 ms/frame
+  varnet_k1           11.14 s      11.14 ms/frame
+  varnet_k4           11.11 s      11.11 ms/frame
+  varnet_single        5.21 s       5.21 ms/frame
+  varnet_ens5         23.47 s      23.47 ms/frame
+
+==============================================================================
+method                   s/window    ms/frame   cores  vs fastest
+enkf_k1              210.29±1.46       210.29    4.0      40.7x
+enkf_k4               88.68±0.35        88.68    4.0      17.2x
+varnet_k1             10.90±0.39        10.90    4.0       2.1x
+varnet_k4             11.11±0.14        11.11    4.0       2.1x
+varnet_single          5.17±0.06         5.17    4.0       1.0x
+varnet_ens5           23.53±0.33        23.53    4.0       4.6x
+
+largest run-to-run spread: 3.6% of the mean (node was shared — see hw/node above)
+
+[out] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/bench_speed_vsb0.json

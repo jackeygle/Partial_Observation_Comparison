@@ -1,0 +1,18 @@
+  atc-20130811_corridor_1.0s.h5: done
+  atc-20130818_corridor_1.0s.h5: done
+  atc-20130825_corridor_1.0s.h5: done
+  atc-20130901_corridor_1.0s.h5: done
+  atc-20130915_corridor_1.0s.h5: done
+  atc-20130922_corridor_1.0s.h5: done
+  atc-20130929_corridor_1.0s.h5: done
+
+runs/varnet_full100/varnet_last.pt   blind cells, split by TRUE density > 0.0
+occupied cells = 3.8% of blind cells
+
+channel   MSE_empty    MSE_occ  %err_empty  %err_occ
+density      0.0108     0.0681       10.1%      2.5%
+vx           0.0438     0.7437       41.0%     27.8%
+vy           0.0109     0.1475       10.2%      5.5%
+var          0.0011     0.0491        1.0%      1.8%
+
+total error share:  empty cells 62.3%   occupied cells 37.7%

@@ -1,0 +1,25 @@
+[atc-20130811] frames 39821  observed 46.9%
+
+########## first_2400_frames  (2400 frames) ##########
+/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_sparsification_enkf.py:57: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  a = np.trapz(np.array(out["sigma"]) - np.array(out["oracle"]), FRACS)
+/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_sparsification_enkf.py:58: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  b = np.trapz(np.array(out["random"]) - np.array(out["oracle"]), FRACS)
+  blind            (   2,267,120 cells)  AUSE 0.500   Spearman 0.717
+  blind_empty      (   2,166,844 cells)  AUSE 0.323   Spearman 0.746
+  blind_occupied   (     100,276 cells)  AUSE 0.626   Spearman 0.267
+    [density ] AUSE 0.603   Spearman 0.578
+    [vx      ] AUSE 0.966   Spearman -0.011
+    [vy      ] AUSE 1.058   Spearman -0.105
+    [var     ] AUSE 1.023   Spearman -0.024
+
+########## whole_day  (39821 frames) ##########
+  blind            (  36,547,904 cells)  AUSE 0.760   Spearman 0.620
+  blind_empty      (  31,968,316 cells)  AUSE 0.404   Spearman 0.706
+  blind_occupied   (   4,579,588 cells)  AUSE 0.755   Spearman 0.200
+    [density ] AUSE 0.679   Spearman 0.595
+    [vx      ] AUSE 1.054   Spearman -0.053
+    [vy      ] AUSE 1.120   Spearman -0.094
+    [var     ] AUSE 1.019   Spearman -0.015
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/sparsification_enkf.json

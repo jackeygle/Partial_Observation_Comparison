@@ -1,0 +1,18 @@
+Submitted batch job 19947266
+[chain] submitted successor (afterany:19945596)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,743,542 (GENN prior 9,420 = 0.34%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var read-out] 692,000 params on the last hidden state   sigma^2 = softplus(out_var(h)) + 1e-06   beta=0.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/train_varnet.py", line 381, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/train_varnet.py", line 276, in main
+    solver.load_state_dict(ck["solver"])
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 2635, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for GradSolver:
+	size mismatch for grad_net.out_var.weight: copying a param with shape torch.Size([800, 64, 1, 1]) from checkpoint, the shape in current model is torch.Size([800, 864, 1, 1]).

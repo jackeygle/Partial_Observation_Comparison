@@ -1,0 +1,3 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+  atc-20130811: 400 frames in 429.1s (1073 ms/frame) -> est_atc-20130811.npz
+[done]

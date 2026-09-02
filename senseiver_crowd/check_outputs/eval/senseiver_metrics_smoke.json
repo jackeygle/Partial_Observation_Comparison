@@ -1,0 +1,58 @@
+{
+  "method": "Senseiver (per-frame, faithful port)",
+  "ckpt": "runs/smoke/best.pt",
+  "epoch": 1,
+  "split": "test",
+  "obs_every_k": 1,
+  "clip": true,
+  "frames_per_day": 400,
+  "n_params": 65892,
+  "device": "cuda",
+  "gpu": "Tesla V100-SXM2-16GB",
+  "node": "dgx8",
+  "solve_total_s": 0.8660258420277387,
+  "n_frames": 800,
+  "per_frame_ms": 1.0825323025346734,
+  "blind_mse_mean": 0.012327140899029997,
+  "blind_mse_std": 0.003141727751575559,
+  "blind_rmse_mean": 0.11010723385363703,
+  "blind_rmse_std": 0.014266672777157333,
+  "full_mse_mean": 0.014624228830690736,
+  "full_mse_std": 0.005081723001268175,
+  "blind_mse_per_channel": {
+    "density": 0.0030281580559075607,
+    "vx": 0.039638350938967136,
+    "vy": 0.005496528821113782,
+    "var": 0.0011455277973964832
+  },
+  "per_day": [
+    {
+      "day": "atc-20130811",
+      "blind_mse": 0.009185413147454437,
+      "full_mse": 0.009542505829422562,
+      "n_frames": 400,
+      "solve_s": 0.8419841279974207,
+      "per_frame_ms": 2.104960319993552,
+      "blind_mse_per_channel": {
+        "density": 0.0022071207417783947,
+        "vx": 0.03000258663358355,
+        "vy": 0.003930854885926134,
+        "var": 0.0006010911354356608
+      }
+    },
+    {
+      "day": "atc-20130818",
+      "blind_mse": 0.015468868650605556,
+      "full_mse": 0.01970595183195891,
+      "n_frames": 400,
+      "solve_s": 0.024041714030317962,
+      "per_frame_ms": 0.060104285075794905,
+      "blind_mse_per_channel": {
+        "density": 0.0038491953700367267,
+        "vx": 0.04927411524435072,
+        "vy": 0.00706220275630143,
+        "var": 0.0016899644593573056
+      }
+    }
+  ]
+}

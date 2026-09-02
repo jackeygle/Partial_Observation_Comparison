@@ -1,0 +1,6 @@
+[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=0 dir=check_outputs/enkf_k1_full
+
+Intel oneMKL ERROR: Parameter 4 was incorrect on entry to DLASCL.
+  atc-20130818: 38885 frames in 194096.3s, 34 SVD-skips -> est_atc-20130818.npz
+  timing -> check_outputs/enkf_k1_full/timing_atc-20130818.json  (Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores)
+[done]

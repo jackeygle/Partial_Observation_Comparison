@@ -1,0 +1,18 @@
+[model] runs/varnet_k4_paper/varnet_best.pt  epoch=98  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0311      0.1763     0.0294      199      0.049
+atc-20130818         0.0436      0.2087     0.0408      194      0.042
+atc-20130825         0.0381      0.1953     0.0359      214      0.042
+atc-20130901         0.0422      0.2053     0.0396      198      0.042
+atc-20130915         0.0363      0.1905     0.0343      196      0.042
+atc-20130922         0.0357      0.1888     0.0337      194      0.042
+atc-20130929         0.0443      0.2106     0.0417      189      0.042
+------------------------------------------------------------
+MEAN                 0.0387      0.1965     0.0365               0.043
+STD                  0.0045      0.0115     0.0041
+[time] solver forward: 11.9s for 276,800 frames = 0.043 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_k4_timed.json

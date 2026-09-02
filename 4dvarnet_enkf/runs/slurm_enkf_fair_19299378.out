@@ -1,0 +1,18 @@
+[export] 7 test days, first 400 frames each, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130818: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130825: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130901: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130915: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130922: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130929: exported 400 frames, observed cells/frame mean 47.6
+[done] -> check_outputs/enkf/obs_*.npz
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+  atc-20130811: 400 frames in 466.2s (1165 ms/frame), 0 SVD-skips -> est_atc-20130811.npz
+  atc-20130818: 400 frames in 469.8s (1174 ms/frame), 0 SVD-skips -> est_atc-20130818.npz
+  atc-20130825: 400 frames in 470.4s (1176 ms/frame), 0 SVD-skips -> est_atc-20130825.npz
+  atc-20130901: 400 frames in 469.9s (1175 ms/frame), 0 SVD-skips -> est_atc-20130901.npz
+  atc-20130915: 400 frames in 471.3s (1178 ms/frame), 0 SVD-skips -> est_atc-20130915.npz
+  atc-20130922: 400 frames in 464.7s (1162 ms/frame), 0 SVD-skips -> est_atc-20130922.npz
+  atc-20130929: 400 frames in 470.6s (1177 ms/frame), 0 SVD-skips -> est_atc-20130929.npz
+[done]

@@ -1,0 +1,41 @@
+[members] 5  dT=200  windows=12
+/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_sparsification.py:105: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  a = np.trapz(np.array(out["sigma"]) - np.array(out["oracle"]), FRACS)
+/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_sparsification.py:106: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  b = np.trapz(np.array(out["random"]) - np.array(out["oracle"]), FRACS)
+
+=== blind  (2,267,120 cells) ===
+  AUSE = 0.769   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.192
+  dropped      sigma    oracle    random
+       0%    0.1519    0.1517    0.1520
+      20%    0.1364    0.0249    0.1521
+      45%    0.1217    0.0000    0.1519
+      70%    0.1043    0.0000    0.1519
+      90%    0.0783    0.0000    0.1504
+
+=== blind_empty  (2,166,844 cells) ===
+  AUSE = 0.746   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.194
+  dropped      sigma    oracle    random
+       0%    0.0990    0.0989    0.0991
+      20%    0.0887    0.0255    0.0989
+      45%    0.0791    0.0000    0.0990
+      70%    0.0664    0.0000    0.0987
+      90%    0.0464    0.0000    0.0978
+
+=== blind_occupied  (100,276 cells) ===
+  AUSE = 0.724   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.280
+  dropped      sigma    oracle    random
+       0%    0.5583    0.5583    0.5583
+      20%    0.5077    0.2408    0.5578
+      45%    0.4506    0.0866    0.5570
+      70%    0.3815    0.0158    0.5593
+      90%    0.2810    0.0000    0.5532
+[density ] AUSE 0.934   Spearman 0.036
+[vx      ] AUSE 0.953   Spearman 0.035
+[vy      ] AUSE 1.004   Spearman 0.002
+[var     ] AUSE 0.799   Spearman 0.040
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/sparsification.json

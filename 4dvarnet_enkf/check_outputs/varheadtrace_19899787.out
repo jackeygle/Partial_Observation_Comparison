@@ -1,0 +1,13 @@
+[device] cuda  Tesla V100-SXM2-32GB
+[window] atc-20130811_corridor_1.0s.h5  window 60  (1, 4, 200, 36, 12)
+[member 0] sigma at the voxel 0.05732
+[member 1] sigma at the voxel 0.06588
+[member 2] sigma at the voxel 0.09679
+[member 3] sigma at the voxel 0.07245
+[member 4] sigma at the voxel 0.05691
+[json] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/varhead_trace.json
+
+  layer 1 weight mass: $\hat{x}$ 23.3%  $\Omega$ 47.5%  $|\hat{x}-\Phi(\hat{x})|$ 29.2%
+  16/32 hidden units dead at the voxel; loudest is 10
+  density: v -9.9673 -> softplus 0.000047 + floor 0.003239 = sigma^2 0.003286 (sigma 0.05732)
+  sigma^2 on its floor: density 47.9%  vx 54.9%  vy 22.9%  var 0.0%

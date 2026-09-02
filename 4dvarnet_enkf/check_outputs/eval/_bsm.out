@@ -1,0 +1,26 @@
+[hw] Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores · node=csl2 · OMP=unset torch=4
+[gpu] none
+[cfg] 200 frames, 1 timed repeats (+1 warm-up each)
+
+[setup] preparing + warming up ...
+        enkf_k1: ready (200 frames)
+        enkf_k4: ready (200 frames)
+        varnet_k1: ready (200 frames)
+        varnet_k4: ready (200 frames)
+
+[round 1/1]
+  enkf_k1             51.71 s     258.56 ms/frame
+  enkf_k4             18.90 s      94.50 ms/frame
+  varnet_k1            1.49 s       7.44 ms/frame
+  varnet_k4            1.54 s       7.68 ms/frame
+
+==============================================================================
+method                   s/window    ms/frame   cores  vs fastest
+enkf_k1               51.71±0.00       258.56    3.7      34.7x
+enkf_k4               18.90±0.00        94.50    3.9      12.7x
+varnet_k1              1.49±0.00         7.44    4.0       1.0x
+varnet_k4              1.54±0.00         7.68    3.9       1.0x
+
+largest run-to-run spread: 0.0% of the mean (node was shared — see hw/node above)
+
+[out] /scratch/work/zhangx29/Thesis_Project/check_outputs/eval/_bsm.json

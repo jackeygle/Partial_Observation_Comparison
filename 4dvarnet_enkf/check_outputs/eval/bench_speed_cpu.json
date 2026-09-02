@@ -1,0 +1,93 @@
+{
+  "hw": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8562Y+",
+    "cores_avail": 16,
+    "node": "gpu52",
+    "omp_threads": "unset",
+    "torch_threads": 16,
+    "gpu": "NVIDIA H200"
+  },
+  "frames": 200,
+  "repeats": 3,
+  "day": "atc-20130811",
+  "runs": {
+    "enkf_orig": {
+      "wall_mean": 526.144780553334,
+      "wall_std": 1.1090183748084699,
+      "wall_all": [
+        527.7019160918426,
+        525.2037956682034,
+        525.5286298999563
+      ],
+      "n_frames": 200,
+      "per_frame_s": 2.63072390276667,
+      "cores_used": 3.745929007236951,
+      "desc": "EnKF k=1, untouched original"
+    },
+    "enkf_opt": {
+      "wall_mean": 26.283161095964413,
+      "wall_std": 0.16231982539950568,
+      "wall_all": [
+        26.511274480028078,
+        26.146860267966986,
+        26.191348539898172
+      ],
+      "n_frames": 200,
+      "per_frame_s": 0.13141580547982207,
+      "cores_used": 15.641151100195344,
+      "desc": "EnKF k=1, vectorised localization"
+    },
+    "varnet_k1_cpu": {
+      "wall_mean": 0.5018569380044937,
+      "wall_std": 0.002789487344048539,
+      "wall_all": [
+        0.5058001568540931,
+        0.4999859679955989,
+        0.49978468916378915
+      ],
+      "n_frames": 200,
+      "per_frame_s": 0.0025092846900224685,
+      "cores_used": 15.628491062710046,
+      "desc": "4DVarNet k=1, CPU (same silicon as the EnKF rows)"
+    },
+    "varnet_k4_cpu": {
+      "wall_mean": 0.5014341812736044,
+      "wall_std": 0.007629991054938577,
+      "wall_all": [
+        0.5030025630258024,
+        0.4914044358301908,
+        0.5098955449648201
+      ],
+      "n_frames": 200,
+      "per_frame_s": 0.002507170906368022,
+      "cores_used": 15.627303083426796,
+      "desc": "4DVarNet k=4, CPU"
+    },
+    "varnet_k1_gpu": {
+      "wall_mean": 0.034936128028978906,
+      "wall_std": 0.00018245842283306287,
+      "wall_all": [
+        0.035156270023435354,
+        0.03494263207539916,
+        0.0347094819881022
+      ],
+      "n_frames": 200,
+      "per_frame_s": 0.00017468064014489453,
+      "cores_used": 15.645128519694701,
+      "desc": "4DVarNet k=1, GPU"
+    },
+    "varnet_k4_gpu": {
+      "wall_mean": 0.03394385466041664,
+      "wall_std": 0.0006680340958151085,
+      "wall_all": [
+        0.033395434031262994,
+        0.034884270979091525,
+        0.03355185897089541
+      ],
+      "n_frames": 200,
+      "per_frame_s": 0.0001697192733020832,
+      "cores_used": 15.652634183265862,
+      "desc": "4DVarNet k=4, GPU"
+    }
+  }
+}

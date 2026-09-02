@@ -1,0 +1,67 @@
+{
+  "hw": {
+    "cpu": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+    "cores_avail": 4,
+    "node": "csl18",
+    "omp_threads": "unset",
+    "torch_threads": 4,
+    "gpu": null
+  },
+  "frames": 1000,
+  "repeats": 3,
+  "day": "atc-20130811",
+  "runs": {
+    "enkf_k1": {
+      "wall_mean": 170.57034932472743,
+      "wall_std": 0.6064851896632307,
+      "wall_all": [
+        169.9645518930629,
+        170.3474215180613,
+        171.3990745630581
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.17057034932472742,
+      "cores_used": 3.9778130757775965,
+      "desc": "EnKF k=1, optimised (bit-identical to the original)"
+    },
+    "enkf_k4": {
+      "wall_mean": 68.97141707261714,
+      "wall_std": 0.2913330495067544,
+      "wall_all": [
+        69.24597263196483,
+        69.10017848596908,
+        68.5681000999175
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.06897141707261714,
+      "cores_used": 3.9776180635371006,
+      "desc": "EnKF k=4, optimised"
+    },
+    "varnet_k1": {
+      "wall_mean": 7.031493035377935,
+      "wall_std": 0.06780983822989434,
+      "wall_all": [
+        6.935660111019388,
+        7.082458956167102,
+        7.076360038947314
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.007031493035377935,
+      "cores_used": 3.974209907593623,
+      "desc": "4DVarNet k=1"
+    },
+    "varnet_k4": {
+      "wall_mean": 7.037992605008185,
+      "wall_std": 0.1623839295931915,
+      "wall_all": [
+        6.909991462947801,
+        6.936873245052993,
+        7.267113107023761
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.007037992605008185,
+      "cores_used": 3.9741042555119637,
+      "desc": "4DVarNet k=4"
+    }
+  }
+}

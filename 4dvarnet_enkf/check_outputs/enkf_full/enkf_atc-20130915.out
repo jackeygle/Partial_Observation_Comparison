@@ -1,0 +1,2 @@
+[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=0 dir=check_outputs/enkf_full
+[2026-08-01T20:23:08.274] error: *** JOB 19528931 ON csl15 CANCELLED AT 2026-08-01T20:23:08 DUE to SIGNAL Terminated ***

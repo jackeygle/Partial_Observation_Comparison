@@ -1,0 +1,8 @@
+[device] cuda   windows 24
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_beta_gradient_share.py", line 57, in <module>
+    S0, A0, _ = load_solver(os.path.join(ROOT, RUNS["beta0"]), DEV)
+                                               ~~~~^^^^^^^^^
+KeyError: 'beta0'
+srun: error: dgx6: task 0: Exited with exit code 1
+srun: Terminating StepId=19948824.0

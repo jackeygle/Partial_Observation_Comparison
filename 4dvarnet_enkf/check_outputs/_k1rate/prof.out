@@ -1,0 +1,26 @@
+[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=20 dir=check_outputs/_k1rate
+  atc-20130811: 20 frames in 110.3s, 0 SVD-skips -> est_atc-20130811.npz
+  timing -> check_outputs/_k1rate/timing_atc-20130811.json  (Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores)
+[done]
+         2707249 function calls (2661194 primitive calls) in 118.352 seconds
+   Ordered by: cumulative time
+   List reduced from 7700 to 18 due to restriction <18>
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.014    0.014  112.480  112.480 checks/run_enkf_baseline.py:56(run_day)
+       20    0.004    0.000  110.242    5.512 /scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py:381(step)
+       20    1.068    0.053  109.503    5.475 /scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py:317(update)
+       40  105.188    2.630  105.257    2.631 /scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py:297(_localization_matrix)
+       12    0.000    0.000    6.668    0.556 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/_jit_internal.py:1023(_overload)
+     1176    0.016    0.000    2.673    0.002 <frozen importlib._bootstrap_external>:1066(get_code)
+       20    0.039    0.002    2.535    0.127 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2153(pinv)
+       20    2.367    0.118    2.369    0.118 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/linalg/_linalg.py:1668(svd)
+   223/89    0.002    0.000    2.224    0.025 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/_ops.py:349(fallthrough)
+      817    0.002    0.000    2.115    0.003 <frozen importlib._bootstrap_external>:1058(source_to_code)
+        4    0.000    0.000    2.110    0.528 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/lib/_npyio_impl.py:239(__getitem__)
+        4    0.175    0.044    2.108    0.527 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/lib/_format_impl.py:780(read_array)
+     1019    2.013    0.002    2.013    0.002 {built-in method builtins.compile}
+     2179    0.003    0.000    1.926    0.001 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/lib/_format_impl.py:998(_read_bytes)
+     2183    0.006    0.000    1.922    0.001 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/zipfile/__init__.py:983(read)
+     2170    0.044    0.000    1.915    0.001 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/zipfile/__init__.py:1065(_read1)
+        1    0.000    0.000    1.659    1.659 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/__init__.py:1(<module>)
+   188/64    0.081    0.000    1.482    0.023 /appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-p

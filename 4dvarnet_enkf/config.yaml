@@ -1,0 +1,121 @@
+# =============================================================================
+# config.yaml — single source of truth for all experiment parameters
+# =============================================================================
+# Usage:
+#   - Code reads this via config.py; module constants and training defaults all
+#     come from here
+#   - One-off experiment tweaks: override on the command line (train_varnet.py's
+#     argparse defaults = this file)
+#   - Long-term changes: edit here so the whole project (training / check
+#     scripts / figures) picks them up together
+# Provenance: structure mirrors the original project's
+# Partial_observation/Parameters.yaml, but every value carries a source note.
+# =============================================================================
+
+data:
+  root: /scratch/work/zhangx29/data          # data root directory (Triton)
+  grid_cache: grid_cache                     # pre-gridded data subdir: atc-*_corridor_1.0s.h5
+  split_list: "sunday_atc_{split}.lst"       # train/valid/test split filename template
+
+grid:                                        # grid conventions (determined by the data, rarely changed)
+  state_shape: [4, 36, 12]                   # (C, H, W); channel order in `channels`
+  channels: [density, vx, vy, var]
+  period: 1.0                                # seconds/frame (T window unit = 1 s, confirmed with supervisor)
+
+navigation:                                  # walkable area (valid mask) — straight from the REAL ATC map
+  map_dir: /scratch/work/zhangx29/project_analysis/partial_observation_experiments/shared_workspace/robot_exploration/atc_map
+  # Supervisor's rule (Maryam, 2026-07): keep the map at the SAME 1 m resolution as the
+  #   state; a 1 m cell is an OBSTACLE iff >=50% of it is obstacle (uniform 50%
+  #   occupancy threshold). Obstacle pixels follow ROS semantics (as in the original
+  #   robot_exploration project): OCCUPIED laser points + enclosed-UNKNOWN interiors
+  #   (pillar/stall insides the laser never saw). Same definition for driving AND
+  #   line-of-sight. See navigation._obstacle_pixels / build_valid_mask_from_map.
+  robot_radius_m: 0.3                        # kept for reference only; NOT used (no inflation)
+  keep_largest_component: true               # keep only the largest connected component (no unreachable islands)
+  visited_tau: 0.5                           # data criterion: a cell is "walked" iff its per-frame peak
+                                             #   density exceeds this on some training day. 0.5 rejects both
+                                             #   cross-wall kernel spill AND weak-evidence edge cells that were
+                                             #   only brushed once or twice (cleaner boundary).
+  obstacle_rule: per_cell                    # map wall rule (supervisor's requirement): a 1 m cell is a WALL
+                                             #   iff its obstacle fraction >= occupancy_thresh (0.5). At 50% this is
+                                             #   identical to the "footprint" variant (verified: same 290/142 mask).
+  footprint_overlap: 0.50                    # footprint rule: a cell is WALL if a connected obstacle covers > this
+                                             #   (0.50 = supervisor's 50%; connected-obstacle version of the per-cell rule)
+  footprint_min_px: 30                       # footprint rule: drop connected components smaller than this (laser noise)
+  occupancy_thresh: 0.5                      # per_cell baseline threshold (Maryam's 0.5); reference/fallback rule
+  closing_kernel: 7                          # px kernel to bridge laser-scan gaps in obstacle outlines
+                                             #   before hole-filling, so enclosed booth/room outlines close
+                                             #   up and their interiors count as obstacle (~0.35 m at 0.05 m/px).
+
+observation:                                 # Component 1: multi-robot partial observation
+  num_agents: 3                              # number of robots (original Parameters.yaml)
+  sensing_range: 7                           # sensing radius (cells). Was 5 (~46% coverage); supervisor asked
+                                             #   to match the paper's ">50%" setting -> 7 (~62% coverage).
+                                             #   Source: paper's L96 observes 20/40 components = 50%
+  line_of_sight: true                        # line-of-sight occlusion: obstacles (stalls/pillars) block sight,
+                                             #   robots cannot see through obstacles to the far side. Visibility
+                                             #   precomputed from the real map (navigation.cell_visibility).
+                                             #   false = plain disk (sees through obstacles)
+  add_noise: true                            # add Gaussian noise to observations (standard practice in the
+                                             #   paper; false = clean variant, matching 4dvarnet-core's design
+                                             #   of treating no_noise as the official experiment config)
+  # Per-channel observation-noise std [density, vx, vy, var]. Source: calibrated by
+  #   the original project's inspect_data.py — robust std (1.4826*MAD) over active
+  #   cells * 0.25 (assumption: "sensors are usually more accurate than the field's
+  #   natural fluctuation"). EnKF/PF baselines use the same values for noise
+  #   injection and the R matrix; replace this line directly once real sensor
+  #   specs are available.
+  # Alignment with the paper (arXiv:2007.12941 Sec. 4.1/4.2): the paper adds Gaussian
+  #   observation noise with variance=2, which converts to noise/signal ratios of
+  #   ~0.16 (L63) and ~0.39 (L96) — this set's 0.25 factor falls within that range.
+  obs_std: [0.05690936, 0.31472941, 0.08616199, 0.00644609]
+  obs_every_k: 1                             # TEMPORAL observation sparsity: observe only every
+                                             #   k-th frame (the solver still reconstructs ALL
+                                             #   frames). Two defensible settings — ask before
+                                             #   switching, they are not interchangeable:
+                                             #     k = 1  faithful to the Partial_observation (EnKF)
+                                             #            project: its loop observes and updates on
+                                             #            EVERY step and has no notion of temporal
+                                             #            subsampling, so the filter runs in the
+                                             #            regime it was designed for. Also matches
+                                             #            the paper's SSH reference code, which uses
+                                             #            the real sensor mask as-is.
+                                             #     k = 4  faithful to the paper's Lorenz-96
+                                             #            experiments (coarse time grid; Lorenz-63
+                                             #            uses 8). But then the EnKF gets NO
+                                             #            observation on 75% of frames and must
+                                             #            forecast blind between updates, so its
+                                             #            score no longer reflects its capability.
+                                             #   Changing k changes the observations, so a model
+                                             #   trained under one k must be re-evaluated under the
+                                             #   other (evaluation only — denser observations do not
+                                             #   require retraining).
+  init_method: prev                          # X0 fill method: zeros / prev / interp
+
+prior:                                       # Component 2: GENN dynamical prior Phi
+  hidden: 32                                 # hidden channels
+  kt: 3                                      # psi temporal kernel (odd; centre slice zeroed = zero-centre)
+  kh: 3                                      # psi spatial kernel (height)
+  kw: 3                                      # psi spatial kernel (width)
+  n_phi_layers: 2                            # number of phi pointwise conv layers
+  two_scale: true                            # paper's GENN experiments use the TWO-SCALE form (Eq.10,
+                                             #   Table 1/2 "two-scale GENN"): Phi = Up(Phi1(Dw(x))) + Phi2(x).
+                                             #   Each branch's psi is still zero-centre (excludes identity).
+  scale: 2                                   # spatial downsampling factor for the two-scale branch
+
+solver:                                      # Component 3: variational solver
+  n_iter: 15                                 # learned gradient-descent iterations (paper: 5~20)
+  lstm_hidden: 64                            # GradUpdateLSTM hidden channels
+
+training:                                    # train_varnet.py defaults (command-line overridable)
+  split: train
+  days: 8                                    # max number of days to use
+  dT: 7                                      # time-window length (seconds)
+  loss: supervised                           # supervised(Eq.14) / unsupervised(Eq.13)
+  batch: 64
+  epochs: 30
+  lr: 1.0e-3
+  max_windows: 0                             # >0: randomly subsample training windows (speedup); 0 = all
+  n_eval: 1024                               # fixed number of evaluation windows per epoch
+  seed: 0
+  outdir: runs/varnet

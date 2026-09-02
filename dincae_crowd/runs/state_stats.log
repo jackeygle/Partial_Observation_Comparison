@@ -1,0 +1,41 @@
+train days 32, walkable 290/432, channels ('density', 'vx', 'vy', 'var')
+  1/32 atc-20121028_corridor_1.0s.h5
+  2/32 atc-20121104_corridor_1.0s.h5
+  3/32 atc-20121111_corridor_1.0s.h5
+  4/32 atc-20121118_corridor_1.0s.h5
+  5/32 atc-20121125_corridor_1.0s.h5
+  6/32 atc-20121202_corridor_1.0s.h5
+  7/32 atc-20121209_corridor_1.0s.h5
+  8/32 atc-20121216_corridor_1.0s.h5
+  9/32 atc-20121223_corridor_1.0s.h5
+  10/32 atc-20130106_corridor_1.0s.h5
+  11/32 atc-20130113_corridor_1.0s.h5
+  12/32 atc-20130120_corridor_1.0s.h5
+  13/32 atc-20130127_corridor_1.0s.h5
+  14/32 atc-20130203_corridor_1.0s.h5
+  15/32 atc-20130210_corridor_1.0s.h5
+  16/32 atc-20130217_corridor_1.0s.h5
+  17/32 atc-20130224_corridor_1.0s.h5
+  18/32 atc-20130303_corridor_1.0s.h5
+  19/32 atc-20130310_corridor_1.0s.h5
+  20/32 atc-20130317_corridor_1.0s.h5
+  21/32 atc-20130324_corridor_1.0s.h5
+  22/32 atc-20130331_corridor_1.0s.h5
+  23/32 atc-20130407_corridor_1.0s.h5
+  24/32 atc-20130414_corridor_1.0s.h5
+  25/32 atc-20130421_corridor_1.0s.h5
+  26/32 atc-20130428_corridor_1.0s.h5
+  27/32 atc-20130505_corridor_1.0s.h5
+  28/32 atc-20130512_corridor_1.0s.h5
+  29/32 atc-20130519_corridor_1.0s.h5
+  30/32 atc-20130526_corridor_1.0s.h5
+  31/32 atc-20130602_corridor_1.0s.h5
+  32/32 atc-20130609_corridor_1.0s.h5
+
+逐格均值 + anomaly 标准差（归一化用）:
+  density  mean   0.07716   anom_std  0.19491   每格样本数中位数 1262518
+  vx       mean   0.01780   anom_std  0.84916   每格样本数中位数 382846
+  vy       mean  -0.00388   anom_std  0.33664   每格样本数中位数 382846
+  var      mean   0.06516   anom_std  0.14897   每格样本数中位数 370286
+
+wrote /scratch/work/zhangx29/Thesis_Project/dincae_crowd/climatology.npz / .json

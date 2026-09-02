@@ -1,0 +1,48 @@
+{
+  "method": "enkf",
+  "obs_every_k": 4,
+  "split": "test",
+  "clip": true,
+  "note": "full-state MSE over the same frames 4DVarNet was scored on (n_windows*dT per day)",
+  "mse_mean": 0.0591252792094435,
+  "mse_std": 0.005418014375546735,
+  "rmse_mean": 0.24289437531625252,
+  "rmse_std": 0.011296089994814431,
+  "per_day": [
+    {
+      "day": "atc-20130811",
+      "frames": 39800,
+      "full_mse": 0.048826709389686584
+    },
+    {
+      "day": "atc-20130818",
+      "frames": 38800,
+      "full_mse": 0.06316307932138443
+    },
+    {
+      "day": "atc-20130825",
+      "frames": 42800,
+      "full_mse": 0.05838092043995857
+    },
+    {
+      "day": "atc-20130901",
+      "frames": 39600,
+      "full_mse": 0.06248950585722923
+    },
+    {
+      "day": "atc-20130915",
+      "frames": 39200,
+      "full_mse": 0.05709094926714897
+    },
+    {
+      "day": "atc-20130922",
+      "frames": 38800,
+      "full_mse": 0.05691289156675339
+    },
+    {
+      "day": "atc-20130929",
+      "frames": 37800,
+      "full_mse": 0.06701289862394333
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+[runs] 2: ['old_h_only', 'new_h_plus_xhat']
+[device] cuda   windows 24
+[data] 24 windows of dT=200
+[old_h_only] done
+[new_h_plus_xhat] done
+{
+  "old_h_only": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.034935273230075836,
+      "sigma2_median_occupied": 0.027301063761115074,
+      "sigma2_ratio_occ_over_empty": 0.7814756035804749,
+      "grad_weight_share_empty": 0.9019241333007812,
+      "mse_empty": 0.004905513022094965,
+      "mse_occupied": 0.08393318206071854,
+      "grad_share_if_beta0": 0.3486884534358978,
+      "grad_share_if_beta1": 0.14785237610340118
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06585445255041122,
+      "sigma2_median_occupied": 0.0681135505437851,
+      "sigma2_ratio_occ_over_empty": 1.0343043804168701,
+      "grad_weight_share_empty": 0.9170003533363342,
+      "mse_empty": 0.04644637554883957,
+      "mse_occupied": 0.9073649048805237,
+      "grad_share_if_beta0": 0.4422362148761749,
+      "grad_share_if_beta1": 0.5812973976135254
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.05698616802692413,
+      "sigma2_median_occupied": 0.0539088100194931,
+      "sigma2_ratio_occ_over_empty": 0.9459981322288513,
+      "grad_weight_share_empty": 0.916497528553009,
+      "mse_empty": 0.006154255475848913,
+      "mse_occupied": 0.14402718842029572,
+      "grad_share_if_beta0": 0.06935366243124008,
+      "grad_share_if_beta1": 0.21574829518795013
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.032798755913972855,
+      "sigma2_median_occupied": 0.02250003069639206,
+      "sigma2_ratio_occ_over_empty": 0.6860025525093079,
+      "grad_weight_share_empty": 0.8963059782981873,
+      "mse_empty": 0.0015182654606178403,
+      "mse_occupied": 0.04226778447628021,
+      "grad_share_if_beta0": 0.13972163200378418,
+      "grad_share_if_beta1": 0.05510195717215538
+    }
+  },
+  "new_h_plus_xhat": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.025421995669603348,
+      "sigma2_median_occupied": 0.030952829867601395,
+      "sigma2_ratio_occ_over_empty": 1.2175610065460205,
+      "grad_weight_share_empty": 0.9569098949432373,
+      "mse_empty": 0.00521343108266592,
+      "mse_occupied": 0.08369659632444382,
+      "grad_share_if_beta0": 0.33949950337409973,
+      "grad_share_if_beta1": 0.16068655252456665
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.10059500485658646,
+      "sigma2_median_occupied": 0.12313461303710938,
+      "sigma2_ratio_occ_over_empty": 1.2240629196166992,
+      "grad_weight_share_empty": 0.9519713521003723,
+      "mse_empty": 0.047699589282274246,
+      "mse_occupied": 0.9171503186225891,
+      "grad_share_if_beta0": 0.32591351866722107,
+      "grad_share_if_beta1": 0.5730296969413757
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06962870061397552,
+      "sigma2_median_occupied": 0.07691746950149536,
+      "sigma2_ratio_occ_over_empty": 1.1046805381774902,
+      "grad_weight_share_empty": 0.950893759727478,
+      "mse_empty": 0.0052331192418932915,
+      "mse_occupied": 0.13810597360134125,
+      "grad_share_if_beta0": 0.08794721215963364,
+      "grad_share_if_beta1": 0.20355670154094696
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.017189448699355125,
+      "sigma2_median_occupied": 0.017983730882406235,
+      "sigma2_ratio_occ_over_empty": 1.0462075471878052,
+      "grad_weight_share_empty": 0.9382941126823425,
+      "mse_empty": 0.0017410649452358484,
+      "mse_occupied": 0.04274030774831772,
+      "grad_share_if_beta0": 0.24663972854614258,
+      "grad_share_if_beta1": 0.06272711604833603
+    }
+  },
+  "old_h_only_vs_new_h_plus_xhat_mse_pct": {
+    "density": {
+      "empty_pct": -5.906245919213326,
+      "occupied_pct": 0.282670677977892
+    },
+    "vx": {
+      "empty_pct": -2.6273050822690935,
+      "occupied_pct": -1.066936743451341
+    },
+    "vy": {
+      "empty_pct": 17.602049396878705,
+      "occupied_pct": 4.287442942943742
+    },
+    "var": {
+      "empty_pct": -12.796735999289632,
+      "occupied_pct": -1.105568249110478
+    }
+  }
+}
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/beta_gradient_share.json

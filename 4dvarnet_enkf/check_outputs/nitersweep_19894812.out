@@ -1,0 +1,133 @@
+[override] n_iter 20 -> 5
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=5  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0627      0.2504     0.0554      199      0.028
+atc-20130818         0.0740      0.2720     0.0613      194      0.023
+atc-20130825         0.0706      0.2656     0.0600      214      0.022
+atc-20130901         0.0735      0.2710     0.0614      198      0.022
+atc-20130915         0.0690      0.2627     0.0588      196      0.022
+atc-20130922         0.0676      0.2601     0.0580      194      0.022
+atc-20130929         0.0750      0.2739     0.0621      189      0.022
+------------------------------------------------------------
+MEAN                 0.0703      0.2651     0.0596               0.023
+STD                  0.0040      0.0076     0.0022
+[time] solver forward: 6.4s for 276,800 frames = 0.023 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it5.json
+[override] n_iter 20 -> 8
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=8  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0325      0.1803     0.0304      199      0.041
+atc-20130818         0.0443      0.2105     0.0370      194      0.035
+atc-20130825         0.0397      0.1992     0.0345      214      0.035
+atc-20130901         0.0432      0.2080     0.0365      198      0.035
+atc-20130915         0.0385      0.1963     0.0337      196      0.035
+atc-20130922         0.0374      0.1933     0.0330      194      0.035
+atc-20130929         0.0450      0.2122     0.0373      189      0.035
+------------------------------------------------------------
+MEAN                 0.0401      0.2000     0.0346               0.036
+STD                  0.0041      0.0105     0.0023
+[time] solver forward: 9.9s for 276,800 frames = 0.036 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it8.json
+[override] n_iter 20 -> 10
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=10  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0286      0.1690     0.0272      199      0.050
+atc-20130818         0.0405      0.2013     0.0338      194      0.044
+atc-20130825         0.0356      0.1886     0.0311      214      0.044
+atc-20130901         0.0392      0.1979     0.0332      198      0.044
+atc-20130915         0.0345      0.1858     0.0304      196      0.044
+atc-20130922         0.0335      0.1830     0.0298      194      0.044
+atc-20130929         0.0411      0.2026     0.0341      189      0.044
+------------------------------------------------------------
+MEAN                 0.0361      0.1897     0.0314               0.045
+STD                  0.0041      0.0111     0.0023
+[time] solver forward: 12.4s for 276,800 frames = 0.045 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it10.json
+[override] n_iter 20 -> 12
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=12  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0273      0.1654     0.0261      199      0.058
+atc-20130818         0.0393      0.1983     0.0328      194      0.053
+atc-20130825         0.0343      0.1853     0.0300      214      0.052
+atc-20130901         0.0379      0.1947     0.0322      198      0.053
+atc-20130915         0.0332      0.1822     0.0293      196      0.052
+atc-20130922         0.0323      0.1797     0.0288      194      0.053
+atc-20130929         0.0398      0.1994     0.0330      189      0.052
+------------------------------------------------------------
+MEAN                 0.0349      0.1864     0.0303               0.053
+STD                  0.0041      0.0112     0.0023
+[time] solver forward: 14.8s for 276,800 frames = 0.053 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it12.json
+[override] n_iter 20 -> 15
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=15  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0269      0.1640     0.0255      199      0.072
+atc-20130818         0.0387      0.1967     0.0321      194      0.066
+atc-20130825         0.0337      0.1835     0.0293      214      0.065
+atc-20130901         0.0373      0.1932     0.0315      198      0.065
+atc-20130915         0.0325      0.1803     0.0286      196      0.065
+atc-20130922         0.0317      0.1780     0.0281      194      0.066
+atc-20130929         0.0391      0.1977     0.0323      189      0.065
+------------------------------------------------------------
+MEAN                 0.0343      0.1848     0.0296               0.066
+STD                  0.0041      0.0112     0.0023
+[time] solver forward: 18.4s for 276,800 frames = 0.066 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it15.json
+[override] n_iter 20 -> 20
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0267      0.1634     0.0251      199      0.093
+atc-20130818         0.0382      0.1953     0.0314      194      0.088
+atc-20130825         0.0332      0.1821     0.0286      214      0.088
+atc-20130901         0.0369      0.1921     0.0309      198      0.087
+atc-20130915         0.0321      0.1793     0.0280      196      0.087
+atc-20130922         0.0313      0.1768     0.0275      194      0.087
+atc-20130929         0.0385      0.1963     0.0316      189      0.087
+------------------------------------------------------------
+MEAN                 0.0338      0.1836     0.0290               0.088
+STD                  0.0040      0.0110     0.0022
+[time] solver forward: 24.4s for 276,800 frames = 0.088 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it20.json
+[override] n_iter 20 -> 25
+[model] runs/varnet_b0_k1/varnet_best.pt  epoch=145  dT=200  n_iter=25  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE   blindRMSE    fullMSE  windows   ms/frame
+------------------------------------------------------------------------
+atc-20130811         0.0262      0.1620     0.0249      199      0.115
+atc-20130818         0.0375      0.1938     0.0311      194      0.110
+atc-20130825         0.0327      0.1807     0.0283      214      0.109
+atc-20130901         0.0363      0.1906     0.0305      198      0.109
+atc-20130915         0.0317      0.1779     0.0278      196      0.109
+atc-20130922         0.0308      0.1754     0.0272      194      0.109
+atc-20130929         0.0379      0.1948     0.0312      189      0.109
+------------------------------------------------------------
+MEAN                 0.0333      0.1822     0.0287               0.110
+STD                  0.0039      0.0109     0.0022
+[time] solver forward: 30.5s for 276,800 frames = 0.110 ms/frame  on cuda
+
+[out] check_outputs/eval/test_metrics_b0_k1_it25.json

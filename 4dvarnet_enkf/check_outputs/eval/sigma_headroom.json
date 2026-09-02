@@ -1,0 +1,64 @@
+{
+  "fit_day": "atc-20121028_corridor_1.0s.h5",
+  "score_day": "atc-20130811_corridor_1.0s.h5",
+  "checkpoint": "runs/varnet_vrb0_s0/varnet_best.pt",
+  "n_bins": 24,
+  "per_channel": {
+    "density": {
+      "n_scored": 566780,
+      "err2_occ_over_empty": 19.25146484375,
+      "learnt": {
+        "spread_skill": 41.742958068847656,
+        "occ_over_empty": 1.0993804931640625,
+        "nll": 9.316437721252441
+      },
+      "lookup": {
+        "spread_skill": 0.8832105994224548,
+        "occ_over_empty": 2.7691993713378906,
+        "nll": -2.3056023120880127
+      }
+    },
+    "vx": {
+      "n_scored": 566780,
+      "err2_occ_over_empty": 23.599794387817383,
+      "learnt": {
+        "spread_skill": 3.9683265686035156,
+        "occ_over_empty": 1.2121503353118896,
+        "nll": 38.135231018066406
+      },
+      "lookup": {
+        "spread_skill": 1.0704247951507568,
+        "occ_over_empty": 1.9014688730239868,
+        "nll": -0.8970313668251038
+      }
+    },
+    "vy": {
+      "n_scored": 566780,
+      "err2_occ_over_empty": 27.22891616821289,
+      "learnt": {
+        "spread_skill": 19.360048294067383,
+        "occ_over_empty": 1.106797218322754,
+        "nll": 0.722707211971283
+      },
+      "lookup": {
+        "spread_skill": 0.9035604000091553,
+        "occ_over_empty": 2.137279987335205,
+        "nll": -1.8944950103759766
+      }
+    },
+    "var": {
+      "n_scored": 566780,
+      "err2_occ_over_empty": 29.61601448059082,
+      "learnt": {
+        "spread_skill": 131.4884490966797,
+        "occ_over_empty": 0.9583238363265991,
+        "nll": -0.01060701347887516
+      },
+      "lookup": {
+        "spread_skill": 0.5305553674697876,
+        "occ_over_empty": 1.8902981281280518,
+        "nll": -2.522576332092285
+      }
+    }
+  }
+}

@@ -1,0 +1,110 @@
+[device] cuda   windows 24
+[data] 24 windows of dT=200
+[beta0] done
+[beta1] done
+{
+  "beta0": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.035180721431970596,
+      "sigma2_median_occupied": 0.026515457779169083,
+      "sigma2_ratio_occ_over_empty": 0.7536928653717041,
+      "grad_weight_share_empty": 0.9087652564048767,
+      "mse_empty": 0.004875151440501213,
+      "mse_occupied": 0.08394253998994827
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06754986941814423,
+      "sigma2_median_occupied": 0.06559675931930542,
+      "sigma2_ratio_occ_over_empty": 0.9710863828659058,
+      "grad_weight_share_empty": 0.9152804613113403,
+      "mse_empty": 0.04635659232735634,
+      "mse_occupied": 0.9076645374298096
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.05825769156217575,
+      "sigma2_median_occupied": 0.05262017250061035,
+      "sigma2_ratio_occ_over_empty": 0.9032313227653503,
+      "grad_weight_share_empty": 0.9222683310508728,
+      "mse_empty": 0.00614762119948864,
+      "mse_occupied": 0.14368268847465515
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03361494094133377,
+      "sigma2_median_occupied": 0.022357339039444923,
+      "sigma2_ratio_occ_over_empty": 0.6651012301445007,
+      "grad_weight_share_empty": 0.8991053700447083,
+      "mse_empty": 0.0015165251679718494,
+      "mse_occupied": 0.04228223115205765
+    }
+  },
+  "beta1": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.014315974898636341,
+      "sigma2_median_occupied": 0.017369717359542847,
+      "sigma2_ratio_occ_over_empty": 1.2133101224899292,
+      "grad_weight_share_empty": 0.9537045359611511,
+      "mse_empty": 0.00972689688205719,
+      "mse_occupied": 0.08068235963582993
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.07297272235155106,
+      "sigma2_median_occupied": 0.0774078369140625,
+      "sigma2_ratio_occ_over_empty": 1.0607776641845703,
+      "grad_weight_share_empty": 0.9451733231544495,
+      "mse_empty": 0.02970142662525177,
+      "mse_occupied": 0.6808043718338013
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.02602212131023407,
+      "sigma2_median_occupied": 0.03126389533281326,
+      "sigma2_ratio_occ_over_empty": 1.2014353275299072,
+      "grad_weight_share_empty": 0.9499785900115967,
+      "mse_empty": 0.009886234998703003,
+      "mse_occupied": 0.1404557228088379
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.005248926114290953,
+      "sigma2_median_occupied": 0.009073182940483093,
+      "sigma2_ratio_occ_over_empty": 1.7285789251327515,
+      "grad_weight_share_empty": 0.955211877822876,
+      "mse_empty": 0.0035597914829850197,
+      "mse_occupied": 0.047161512076854706
+    }
+  },
+  "beta0_vs_beta1_mse_pct": {
+    "density": {
+      "empty_pct": -49.879684141669,
+      "occupied_pct": 4.0407598003251
+    },
+    "vx": {
+      "empty_pct": 56.07530544658943,
+      "occupied_pct": 33.32237203250359
+    },
+    "vy": {
+      "empty_pct": -37.81635576844815,
+      "occupied_pct": 2.2974967493558207
+    },
+    "var": {
+      "empty_pct": -57.39848316339625,
+      "occupied_pct": -10.345895858567367
+    }
+  }
+}
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/beta_gradient_share.json

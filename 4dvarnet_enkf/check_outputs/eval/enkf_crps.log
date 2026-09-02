@@ -1,0 +1,9 @@
+done est_atc-20130811.npz
+done est_atc-20130818.npz
+done est_atc-20130825.npz
+done est_atc-20130901.npz
+done est_atc-20130915.npz
+done est_atc-20130922.npz
+done est_atc-20130929.npz
+
+EnKF k=1  RMSE 0.2388  CRPS 0.1472  NLL 1672821892988660992.0  sigma 0.0025  sp/sk 0.011  90%cov 2.24%

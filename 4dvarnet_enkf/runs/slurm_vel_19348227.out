@@ -1,0 +1,8 @@
+[figure] /scratch/work/zhangx29/Thesis_Project/check_outputs/eval/velocity_enkf_atc-20130811.png  (frame 184)
+channel   baseline      EnKF  4DVarNet
+density     0.0061    0.0063    0.0129
+vx          0.1728    0.0779    0.0703
+vy          0.0165    0.0110    0.0162
+var         0.0027    0.0617    0.0030
+ALL         0.0495    0.0392    0.0256
+[figure] /scratch/work/zhangx29/Thesis_Project/check_outputs/eval/compare_channels.png

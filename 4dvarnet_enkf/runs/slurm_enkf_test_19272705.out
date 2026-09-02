@@ -1,0 +1,17 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 106, in <module>
+    main()
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 99, in main
+    Est, Spread, T, dt = run_day(npz, model, args.ensemble, args.radius, args.frames, dev)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 68, in run_day
+    est = enkf.step(C, y_obs, observed_cells=cells, model=model)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py", line 383, in step
+    X_a = self.update(X_f, C, y_obs, observed_cells=observed_cells)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py", line 365, in update
+    K = (P_xy @ np.linalg.pinv(P_yy)) * Loc.T
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+ValueError: operands could not be broadcast together with shapes (1728,1008) (1728,252) 

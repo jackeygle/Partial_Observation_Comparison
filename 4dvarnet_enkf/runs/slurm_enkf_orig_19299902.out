@@ -1,0 +1,2 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+[2026-07-21T17:19:42.027] error: *** JOB 19299902 ON csl3 CANCELLED AT 2026-07-21T17:19:42 DUE to SIGNAL Terminated ***

@@ -1,0 +1,15 @@
+[export] 7 test days, first 400 frames each, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130818: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130825: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130901: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130915: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130922: exported 400 frames, observed cells/frame mean 47.6
+  atc-20130929: exported 400 frames, observed cells/frame mean 47.6
+[done] -> check_outputs/enkf/obs_*.npz
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 26, in <module>
+    from utils import load_model
+  File "/scratch/work/zhangx29/Partial_observation/utils.py", line 10, in <module>
+    from .models import PedPred3
+ImportError: attempted relative import with no known parent package

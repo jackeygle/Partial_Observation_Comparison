@@ -1,0 +1,94 @@
+{
+ "ckpt": "runs/varnet_ml5_s0/varnet_best.pt",
+ "day": "atc-20130811_corridor_1.0s.h5",
+ "windows": 24,
+ "n_pert": 20,
+ "obs_std": [
+  0.056909359991550446,
+  0.3147294223308563,
+  0.08616199344396591,
+  0.0064460900612175465
+ ],
+ "results": {
+  "perturbed_obs": {
+   "tag": "perturbed observations",
+   "rmse": 0.18552462756633759,
+   "sigma_mean": 0.09200809895992279,
+   "spread_skill": 0.49593469500541687,
+   "cov90": 0.7327302694320679,
+   "n": 8294400
+  },
+  "head": {
+   "tag": "the trained head, same windows",
+   "rmse": 0.18552462756633759,
+   "sigma_mean": 0.10303821414709091,
+   "spread_skill": 0.555388331413269,
+   "cov90": 0.5690701007843018,
+   "n": 8294400
+  },
+  "perturbed_obs_blind": {
+   "tag": "blind",
+   "rmse": 0.19492140412330627,
+   "sigma_mean": 0.08734380453824997,
+   "spread_skill": 0.4480975568294525,
+   "cov90": 0.729573667049408,
+   "n": 4414304
+  },
+  "head_blind": {
+   "tag": "blind",
+   "rmse": 0.19492140412330627,
+   "sigma_mean": 0.15336643159389496,
+   "spread_skill": 0.7868116497993469,
+   "cov90": 0.7775323390960693,
+   "n": 4414304
+  },
+  "perturbed_obs_observed": {
+   "tag": "observed",
+   "rmse": 0.17421884834766388,
+   "sigma_mean": 0.09731457382440567,
+   "spread_skill": 0.5585765838623047,
+   "cov90": 0.7363214492797852,
+   "n": 3880096
+  },
+  "head_observed": {
+   "tag": "observed",
+   "rmse": 0.17421884834766388,
+   "sigma_mean": 0.045780882239341736,
+   "spread_skill": 0.26277801394462585,
+   "cov90": 0.3319070041179657,
+   "n": 3880096
+  },
+  "perturbed_obs_channel_density": {
+   "tag": "density",
+   "rmse": 0.11352279782295227,
+   "sigma_mean": 0.026758059859275818,
+   "spread_skill": 0.23570649325847626,
+   "cov90": 0.48054927587509155,
+   "n": 2073600
+  },
+  "perturbed_obs_channel_vx": {
+   "tag": "vx",
+   "rmse": 0.31639063358306885,
+   "sigma_mean": 0.23146125674247742,
+   "spread_skill": 0.7315679788589478,
+   "cov90": 0.8330709934234619,
+   "n": 2073600
+  },
+  "perturbed_obs_channel_vy": {
+   "tag": "vy",
+   "rmse": 0.13901470601558685,
+   "sigma_mean": 0.07877714186906815,
+   "spread_skill": 0.5666821002960205,
+   "cov90": 0.7314752340316772,
+   "n": 2073600
+  },
+  "perturbed_obs_channel_var": {
+   "tag": "var",
+   "rmse": 0.07322563230991364,
+   "sigma_mean": 0.03103593923151493,
+   "spread_skill": 0.42383983731269836,
+   "cov90": 0.8858256340026855,
+   "n": 2073600
+  }
+ }
+}

@@ -1,0 +1,21 @@
+Tesla V100-SXM2-16GB
+[model] runs/varnet_full100/varnet_last.pt  epoch=99  dT=200  n_iter=20  device=cuda
+[data] 7 test days (held out)
+
+day                blindMSE    fullMSE   baseline   gain   wins
+--------------------------------------------------------------
+/scratch/work/zhangx29/Thesis_Project/checks/eval_test_days.py:87: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /home/conda/feedstock_root/build_artifacts/libtorch_1769685314817/work/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  se_base += float(((x0b - xb)[unobs] ** 2).sum())
+atc-20130811         0.0212     0.0205     0.0364  1.72x      2
+atc-20130818         0.0288     0.0276     0.0528  1.83x      2
+atc-20130825         0.0189     0.0185     0.0346  1.82x      2
+atc-20130901         0.0236     0.0228     0.0433  1.83x      2
+atc-20130915         0.0275     0.0265     0.0584  2.13x      2
+atc-20130922         0.0290     0.0277     0.0545  1.88x      2
+atc-20130929         0.0350     0.0334     0.0719  2.05x      2
+--------------------------------------------------------------
+MEAN                 0.0263     0.0253     0.0503  1.91x
+STD                  0.0050     0.0047     0.0122
+
+[out] check_outputs/eval/test_metrics_matched.json

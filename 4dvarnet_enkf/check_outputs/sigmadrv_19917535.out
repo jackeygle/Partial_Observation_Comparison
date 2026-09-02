@@ -1,0 +1,152 @@
+[device] cuda   windows 24   bins 32
+[data] atc-20130811_corridor_1.0s.h5  24 windows
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[shapes] xhat (24, 4, 200, 36, 12)  sigma (24, 4, 200, 36, 12)
+
+  head_alone:  R^2 of a 1-D lookup, per output channel
+           sigma of  distance_to  |xhat_densi    |xhat_vx|    |xhat_vy|   |xhat_var|  resid_densi     resid_vx     resid_vy    resid_var
+            density        0.292        0.081        0.010        0.006        0.030        0.182        0.002        0.001        0.026   <- distance_to_obs 0.292
+                 vx        0.125        0.010        0.099        0.010        0.015        0.131        0.112        0.005        0.034   <- resid_density 0.131
+                 vy        0.400        0.009        0.005        0.034        0.015        0.103        0.006        0.035        0.005   <- distance_to_obs 0.400
+                var        0.216        0.018        0.005        0.003        0.043        0.133        0.001        0.000        0.015   <- distance_to_obs 0.216
+
+  combined:  R^2 of a 1-D lookup, per output channel
+           sigma of  distance_to  |xhat_densi    |xhat_vx|    |xhat_vy|   |xhat_var|  resid_densi     resid_vx     resid_vy    resid_var
+            density        0.165        0.111        0.026        0.017        0.047        0.229        0.002        0.007        0.045   <- resid_density 0.229
+                 vx        0.047        0.031        0.159        0.031        0.033        0.215        0.133        0.020        0.069   <- resid_density 0.215
+                 vy        0.243        0.020        0.012        0.072        0.028        0.153        0.002        0.066        0.016   <- distance_to_obs 0.243
+                var        0.166        0.027        0.010        0.006        0.061        0.155        0.001        0.002        0.024   <- distance_to_obs 0.166
+
+  TRUE_ERROR:  R^2 of a 1-D lookup, per output channel
+           sigma of  distance_to  |xhat_densi    |xhat_vx|    |xhat_vy|   |xhat_var|  resid_densi     resid_vx     resid_vy    resid_var
+            density        0.028        0.221        0.010        0.006        0.043        0.107        0.001        0.003        0.025   <- |xhat_density| 0.221
+                 vx        0.013        0.024        0.446        0.031        0.026        0.113        0.379        0.023        0.046   <- |xhat_vx| 0.446
+                 vy        0.001        0.018        0.027        0.411        0.017        0.059        0.015        0.350        0.022   <- |xhat_vy| 0.411
+                var        0.006        0.028        0.007        0.005        0.208        0.055        0.003        0.004        0.029   <- |xhat_var| 0.208
+
+  does sigma predict the TRUE error?  R^2 of a lookup on sigma
+      density   head +0.314   combined +0.303
+      vx        head +0.204   combined +0.258
+      vy        head +0.150   combined +0.172
+      var       head +0.104   combined +0.114
+
+[json] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/sigma_drivers.json

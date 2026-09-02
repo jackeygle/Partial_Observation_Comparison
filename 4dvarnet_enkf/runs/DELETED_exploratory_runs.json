@@ -1,0 +1,652 @@
+{
+  "why": "Exploratory runs from before the model of record was settled. Deleted to leave only the lineage the thesis reports: b0 (model of record), a2 (larger prior) and a4 (widest prior, capacity control). Everything measurable about these runs that was ever used is in check_outputs/eval/*.json; the weights were not.",
+  "runs": {
+    "probe_chan10": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "chan_mse",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_chan10",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 3,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_chan25": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "chan_mse",
+        "w_density": 25.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_chan25",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 3,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_g357": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 128,
+        "n_phi_layers": 2,
+        "kt": 9,
+        "kh": 7,
+        "kw": 5,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_g357",
+        "no_noise": false,
+        "resume": false,
+        "amp": true,
+        "clip_grad": 1.0
+      },
+      "epoch": 29,
+      "prior_params": 356872,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_g80c": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 128,
+        "n_phi_layers": 2,
+        "kt": 5,
+        "kh": 3,
+        "kw": 3,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_g80c",
+        "no_noise": false,
+        "resume": false,
+        "amp": true,
+        "clip_grad": 1.0
+      },
+      "epoch": 29,
+      "prior_params": 80392,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_genn128": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 128,
+        "n_phi_layers": 2,
+        "kt": 5,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_genn128",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 14,
+      "prior_params": 80392,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_genn128c": {
+      "note": "no checkpoint on disk"
+    },
+    "probe_h64": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 64,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_h64",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 14,
+      "prior_params": 22792,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_lstm128": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "n_phi_layers": 2,
+        "kt": 3,
+        "lstm_hidden": 128,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_lstm128",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 14,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_normmse": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "norm_mse",
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_normmse",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 4,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_plainmse": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_plainmse",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 14,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_pyramid": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "n_phi_layers": 2,
+        "kt": 3,
+        "lstm_hidden": 64,
+        "loss": "pyramid",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_pyramid",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 14,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "probe_wse": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "weighted_se",
+        "batch": 32,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 128,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/probe_wse",
+        "no_noise": false,
+        "resume": false,
+        "amp": true
+      },
+      "epoch": 2,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_align200": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 8,
+        "epochs": 15,
+        "max_windows": 0,
+        "n_eval": 200,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_align200",
+        "no_noise": false
+      },
+      "epoch": 14,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_align7": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 7,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 64,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_align7",
+        "no_noise": false
+      },
+      "epoch": 29,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_dt200_noisy": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 8,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 200,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_dt200_noisy",
+        "no_noise": false
+      },
+      "epoch": 29,
+      "prior_params": 4676,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_dt200_nonoise": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 8,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 200,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_dt200_nonoise",
+        "no_noise": true
+      },
+      "epoch": 29,
+      "prior_params": 4676,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_full100": {
+      "args": {
+        "split": "train",
+        "days": 32,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 32,
+        "epochs": 100,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_full100",
+        "no_noise": false,
+        "resume": true,
+        "amp": true
+      },
+      "epoch": 99,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_genn80_full": {
+      "args": {
+        "split": "train",
+        "days": 32,
+        "dT": 200,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 128,
+        "n_phi_layers": 2,
+        "kt": 5,
+        "kh": 3,
+        "kw": 3,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "w_density": 10.0,
+        "batch": 32,
+        "epochs": 100,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_genn80_full",
+        "no_noise": false,
+        "resume": true,
+        "amp": true,
+        "clip_grad": 1.0
+      },
+      "epoch": 32,
+      "prior_params": 80392,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_noisy": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 7,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 64,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_noisy",
+        "no_noise": false
+      },
+      "epoch": 29,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_nonoise": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 7,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 64,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_nonoise",
+        "no_noise": true
+      },
+      "epoch": 29,
+      "prior_params": 9352,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_strict_noisy": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 7,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 64,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_strict_noisy",
+        "no_noise": false
+      },
+      "epoch": 29,
+      "prior_params": 4676,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    },
+    "varnet_strict_nonoise": {
+      "args": {
+        "split": "train",
+        "days": 8,
+        "dT": 7,
+        "sensing_range": 7,
+        "num_agents": 3,
+        "n_iter": 20,
+        "hidden": 32,
+        "lstm_hidden": 64,
+        "loss": "supervised",
+        "batch": 64,
+        "epochs": 30,
+        "max_windows": 0,
+        "n_eval": 1024,
+        "steps": 0,
+        "lr": 0.001,
+        "seed": 0,
+        "outdir": "runs/varnet_strict_nonoise",
+        "no_noise": true
+      },
+      "epoch": 29,
+      "prior_params": 4676,
+      "eq10": false,
+      "files": [
+        "varnet_last.pt"
+      ]
+    }
+  }
+}

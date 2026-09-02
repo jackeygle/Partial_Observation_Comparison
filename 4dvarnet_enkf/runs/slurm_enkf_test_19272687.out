@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 26, in <module>
+    from .utils import load_model
+  File "/scratch/work/zhangx29/Partial_observation/utils.py", line 10, in <module>
+    from .models import PedPred3
+  File "/scratch/work/zhangx29/Partial_observation/models.py", line 12, in <module>
+    from .grid import GridData
+  File "/scratch/work/zhangx29/Partial_observation/grid.py", line 16, in <module>
+    from pedpred.tools import decorator_dict
+ModuleNotFoundError: No module named 'pedpred'

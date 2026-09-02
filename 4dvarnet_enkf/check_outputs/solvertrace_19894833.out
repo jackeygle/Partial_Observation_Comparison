@@ -1,0 +1,11 @@
+[device] cuda  Tesla V100-SXM2-32GB
+[window] atc-20130811_corridor_1.0s.h5  window 60  (1, 4, 200, 36, 12)
+[check] x rebuilt from the captured updates vs solver output: 0.00e+00
+[check] recomputed J matches the hooked J at all 20 steps
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_solver_trace.py", line 194, in <module>
+    assert bool(_mid[_kk]), "no unsaturated hidden channel at this voxel"
+           ^^^^^^^^^^^^^^^
+AssertionError: no unsaturated hidden channel at this voxel
+srun: error: dgx3: task 0: Exited with exit code 1
+srun: Terminating StepId=19894833.0

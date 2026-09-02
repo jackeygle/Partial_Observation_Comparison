@@ -1,0 +1,51 @@
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[members] 5 x runs/varnet_ml5_s{}  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1832   0.0727   -0.926  0.1593   0.87   93.8%
+all_aleatoric_only              0.1832   0.0738  400.763  0.1184   0.65   76.9%
+all_epistemic_only              0.1832   0.0730    1.324  0.0890   0.49   78.9%
+all_constant_sigma_baseline     0.1832   0.0861   -0.278  0.1832   1.00   92.6%
+blind                           0.1975   0.0752   -0.876  0.1960   0.99   97.7%
+observed                        0.1655   0.0698   -0.983  0.1177   0.71   89.4%
+channel_density                 0.1227   0.0517   -1.055  0.1108   0.90   91.6%
+channel_vx                      0.3079   0.1508    0.093  0.3052   0.99   89.8%
+channel_vy                      0.1326   0.0646   -0.805  0.1507   1.14   94.9%
+channel_var                     0.0825   0.0236   -1.938  0.0706   0.86   99.0%
+
+[out] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/uncertainty_ml5.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%
+[device] cuda  NVIDIA A100-SXM4-80GB
+[window] atc-20130811_corridor_1.0s.h5  window 60  (1, 4, 200, 36, 12)
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[member 0] sigma at the voxel 0.00762
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[member 1] sigma at the voxel 0.03407
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[member 2] sigma at the voxel 0.07866
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[member 3] sigma at the voxel 0.04542
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[member 4] sigma at the voxel 0.00036
+[json] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/varhead_trace.json
+
+  layer 1 weight mass: $\hat{x}$ 23.3%  $\Omega$ 47.5%  $|\hat{x}-\Phi(\hat{x})|$ 29.2%
+  16/32 hidden units dead at the voxel; loudest is 10
+  density: v -9.7552 -> sigma^2 0.000058 (sigma 0.00762)
+  sigma across the field (5th / median / 95th):
+     density   0.00220  0.01531  0.29011
+     vx        0.00018  0.04316  0.66723
+     vy        0.00211  0.07868  0.31360
+     var       0.00854  0.01643  0.19471

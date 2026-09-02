@@ -1,0 +1,126 @@
+[device] cuda   windows 24
+[data] 24 windows of dT=200
+[beta0] done
+[beta1] done
+{
+  "beta0": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.034553058445453644,
+      "sigma2_median_occupied": 0.028063368052244186,
+      "sigma2_ratio_occ_over_empty": 0.8121818900108337,
+      "grad_weight_share_empty": 0.9027602672576904,
+      "mse_empty": 0.004890465643256903,
+      "mse_occupied": 0.08409244567155838,
+      "grad_share_if_beta0": 0.34649866819381714,
+      "grad_share_if_beta1": 0.1479274183511734
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06522025913000107,
+      "sigma2_median_occupied": 0.06922786682844162,
+      "sigma2_ratio_occ_over_empty": 1.061447262763977,
+      "grad_weight_share_empty": 0.9144442677497864,
+      "mse_empty": 0.046251118183135986,
+      "mse_occupied": 0.9069336652755737,
+      "grad_share_if_beta0": 0.45105549693107605,
+      "grad_share_if_beta1": 0.5811316967010498
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.05688759684562683,
+      "sigma2_median_occupied": 0.055237602442502975,
+      "sigma2_ratio_occ_over_empty": 0.9709955453872681,
+      "grad_weight_share_empty": 0.9120681285858154,
+      "mse_empty": 0.006166927050799131,
+      "mse_occupied": 0.1436949074268341,
+      "grad_share_if_beta0": 0.06868181377649307,
+      "grad_share_if_beta1": 0.2162044644355774
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03335556387901306,
+      "sigma2_median_occupied": 0.022352518513798714,
+      "sigma2_ratio_occ_over_empty": 0.6701286435127258,
+      "grad_weight_share_empty": 0.8916099667549133,
+      "mse_empty": 0.0015131719410419464,
+      "mse_occupied": 0.04228001460433006,
+      "grad_share_if_beta0": 0.13376399874687195,
+      "grad_share_if_beta1": 0.05473639816045761
+    }
+  },
+  "beta1": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.014660864137113094,
+      "sigma2_median_occupied": 0.018025623634457588,
+      "sigma2_ratio_occ_over_empty": 1.229506254196167,
+      "grad_weight_share_empty": 0.9525973200798035,
+      "mse_empty": 0.009704451076686382,
+      "mse_occupied": 0.08077769726514816,
+      "grad_share_if_beta0": 0.06255429238080978,
+      "grad_share_if_beta1": 0.21800534427165985
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.07355857640504837,
+      "sigma2_median_occupied": 0.07757464796304703,
+      "sigma2_ratio_occ_over_empty": 1.0545969009399414,
+      "grad_weight_share_empty": 0.9458539485931396,
+      "mse_empty": 0.029730798676609993,
+      "mse_occupied": 0.6813183426856995,
+      "grad_share_if_beta0": 0.015314430929720402,
+      "grad_share_if_beta1": 0.4233064353466034
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.02605171501636505,
+      "sigma2_median_occupied": 0.03092634305357933,
+      "sigma2_ratio_occ_over_empty": 1.1871135234832764,
+      "grad_weight_share_empty": 0.9484142065048218,
+      "mse_empty": 0.009941053576767445,
+      "mse_occupied": 0.14033980667591095,
+      "grad_share_if_beta0": 0.01991906948387623,
+      "grad_share_if_beta1": 0.24019289016723633
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.005374228581786156,
+      "sigma2_median_occupied": 0.009248541668057442,
+      "sigma2_ratio_occ_over_empty": 1.7209059000015259,
+      "grad_weight_share_empty": 0.9553635716438293,
+      "mse_empty": 0.0035649363417178392,
+      "mse_occupied": 0.047245144844055176,
+      "grad_share_if_beta0": 0.9022122025489807,
+      "grad_share_if_beta1": 0.11849528551101685
+    }
+  },
+  "beta0_vs_beta1_mse_pct": {
+    "density": {
+      "empty_pct": -49.60595293220058,
+      "occupied_pct": 4.103544070499732
+    },
+    "vx": {
+      "empty_pct": 55.56634951594142,
+      "occupied_pct": 33.11452348406145
+    },
+    "vy": {
+      "empty_pct": -37.96505568372115,
+      "occupied_pct": 2.3906978571455184
+    },
+    "var": {
+      "empty_pct": -57.55402632764004,
+      "occupied_pct": -10.509292025908291
+    }
+  }
+}
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/beta_gradient_share.json

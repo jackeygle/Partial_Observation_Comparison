@@ -1,0 +1,24 @@
+[members] 5  dT=200  var_eps=1e-06
+
+=== (a) per-cell: is sigma^2 sitting on the floor? ===
+  quantile 0.001  sigma^2 = 3.553e-06   (4x the floor)
+  quantile 0.01   sigma^2 = 4.451e-05   (45x the floor)
+  quantile 0.1    sigma^2 = 1.322e-03   (1,322x the floor)
+  quantile 0.5    sigma^2 = 4.448e-02   (44,482x the floor)
+  quantile 0.9    sigma^2 = 9.005e-01   (900,492x the floor)
+  quantile 0.99   sigma^2 = 3.714e+00   (3,713,876x the floor)
+  fraction below  1.01x floor: 0.0005%
+  fraction below     2x floor: 0.0437%
+  fraction below    10x floor: 0.2881%
+  fraction below   100x floor: 1.8359%
+
+=== (b) across members: has the ensemble collapsed? ===
+  epistemic_share_of_variance        0.0255
+  aleatoric_share_of_variance        0.9745
+  epistemic_spread_skill             0.5650
+  aleatoric_spread_skill             3.4932
+  total_spread_skill                 3.5386
+  pairwise RMS difference between members: mean 0.13977 (min 0.09667, max 0.18871)
+  for scale: the ensemble's own error RMS is 0.16040  -> members differ from each other by 87.1% of the error they make
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/collapse.json

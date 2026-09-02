@@ -1,0 +1,99 @@
+train days 32, dev days 7, channels ('density', 'vx', 'vy', 'var')
+walkable cells 290/432
+Pass A: climatology
+  [clim] 1/32 atc-20121028_corridor_1.0s.h5
+  [clim] 2/32 atc-20121104_corridor_1.0s.h5
+  [clim] 3/32 atc-20121111_corridor_1.0s.h5
+  [clim] 4/32 atc-20121118_corridor_1.0s.h5
+  [clim] 5/32 atc-20121125_corridor_1.0s.h5
+  [clim] 6/32 atc-20121202_corridor_1.0s.h5
+  [clim] 7/32 atc-20121209_corridor_1.0s.h5
+  [clim] 8/32 atc-20121216_corridor_1.0s.h5
+  [clim] 9/32 atc-20121223_corridor_1.0s.h5
+  [clim] 10/32 atc-20130106_corridor_1.0s.h5
+  [clim] 11/32 atc-20130113_corridor_1.0s.h5
+  [clim] 12/32 atc-20130120_corridor_1.0s.h5
+  [clim] 13/32 atc-20130127_corridor_1.0s.h5
+  [clim] 14/32 atc-20130203_corridor_1.0s.h5
+  [clim] 15/32 atc-20130210_corridor_1.0s.h5
+  [clim] 16/32 atc-20130217_corridor_1.0s.h5
+  [clim] 17/32 atc-20130224_corridor_1.0s.h5
+  [clim] 18/32 atc-20130303_corridor_1.0s.h5
+  [clim] 19/32 atc-20130310_corridor_1.0s.h5
+  [clim] 20/32 atc-20130317_corridor_1.0s.h5
+  [clim] 21/32 atc-20130324_corridor_1.0s.h5
+  [clim] 22/32 atc-20130331_corridor_1.0s.h5
+  [clim] 23/32 atc-20130407_corridor_1.0s.h5
+  [clim] 24/32 atc-20130414_corridor_1.0s.h5
+  [clim] 25/32 atc-20130421_corridor_1.0s.h5
+  [clim] 26/32 atc-20130428_corridor_1.0s.h5
+  [clim] 27/32 atc-20130505_corridor_1.0s.h5
+  [clim] 28/32 atc-20130512_corridor_1.0s.h5
+  [clim] 29/32 atc-20130519_corridor_1.0s.h5
+  [clim] 30/32 atc-20130526_corridor_1.0s.h5
+  [clim] 31/32 atc-20130602_corridor_1.0s.h5
+  [clim] 32/32 atc-20130609_corridor_1.0s.h5
+
+箱宽选择(dev 日 MSE，越小越好):
+  [score] atc-20130616_corridor_1.0s.h5
+  [score] atc-20130623_corridor_1.0s.h5
+  [score] atc-20130630_corridor_1.0s.h5
+  [score] atc-20130707_corridor_1.0s.h5
+  [score] atc-20130714_corridor_1.0s.h5
+  [score] atc-20130721_corridor_1.0s.h5
+  [score] atc-20130728_corridor_1.0s.h5
+  bin    300s : density 0.03267  vx 0.73320  vy 0.10768  var 0.04917
+  bin    900s : density 0.03265  vx 0.73268  vy 0.10752  var 0.04915
+  bin   1800s : density 0.03265  vx 0.73322  vy 0.10753  var 0.04914
+  bin   3600s : density 0.03265  vx 0.73317  vy 0.10756  var 0.04914
+  bin   7200s : density 0.03269  vx 0.73590  vy 0.10787  var 0.04916
+  bin  14400s : density 0.03303  vx 0.73739  vy 0.10810  var 0.04921
+  bin  86400s : density 0.03402  vx 0.74954  vy 0.10936  var 0.04926  (= 无 time-of-day 分箱)
+  -> 选 bin_width = 1800 s  (按 density 的 dev MSE)
+
+Pass B: anomaly autocorrelation
+  [ac] 1/32 atc-20121028_corridor_1.0s.h5
+  [ac] 2/32 atc-20121104_corridor_1.0s.h5
+  [ac] 3/32 atc-20121111_corridor_1.0s.h5
+  [ac] 4/32 atc-20121118_corridor_1.0s.h5
+  [ac] 5/32 atc-20121125_corridor_1.0s.h5
+  [ac] 6/32 atc-20121202_corridor_1.0s.h5
+  [ac] 7/32 atc-20121209_corridor_1.0s.h5
+  [ac] 8/32 atc-20121216_corridor_1.0s.h5
+  [ac] 9/32 atc-20121223_corridor_1.0s.h5
+  [ac] 10/32 atc-20130106_corridor_1.0s.h5
+  [ac] 11/32 atc-20130113_corridor_1.0s.h5
+  [ac] 12/32 atc-20130120_corridor_1.0s.h5
+  [ac] 13/32 atc-20130127_corridor_1.0s.h5
+  [ac] 14/32 atc-20130203_corridor_1.0s.h5
+  [ac] 15/32 atc-20130210_corridor_1.0s.h5
+  [ac] 16/32 atc-20130217_corridor_1.0s.h5
+  [ac] 17/32 atc-20130224_corridor_1.0s.h5
+  [ac] 18/32 atc-20130303_corridor_1.0s.h5
+  [ac] 19/32 atc-20130310_corridor_1.0s.h5
+  [ac] 20/32 atc-20130317_corridor_1.0s.h5
+  [ac] 21/32 atc-20130324_corridor_1.0s.h5
+  [ac] 22/32 atc-20130331_corridor_1.0s.h5
+  [ac] 23/32 atc-20130407_corridor_1.0s.h5
+  [ac] 24/32 atc-20130414_corridor_1.0s.h5
+  [ac] 25/32 atc-20130421_corridor_1.0s.h5
+  [ac] 26/32 atc-20130428_corridor_1.0s.h5
+  [ac] 27/32 atc-20130505_corridor_1.0s.h5
+  [ac] 28/32 atc-20130512_corridor_1.0s.h5
+  [ac] 29/32 atc-20130519_corridor_1.0s.h5
+  [ac] 30/32 atc-20130526_corridor_1.0s.h5
+  [ac] 31/32 atc-20130602_corridor_1.0s.h5
+  [ac] 32/32 atc-20130609_corridor_1.0s.h5
+
+=== AC(lag) ===
+lag(s)        0      1      2      3      4      5      6      8     10     12     16     20     24     32     48     64     96    128    192    256    384    512
+density   1.000  0.651  0.389  0.320  0.292  0.276  0.266  0.252  0.241  0.234  0.223  0.216  0.210  0.202  0.193  0.187  0.179  0.175  0.169  0.166  0.162  0.159
+vx        1.000  0.816  0.528  0.330  0.256  0.214  0.186  0.148  0.123  0.106  0.085  0.072  0.063  0.053  0.043  0.039  0.032  0.031  0.030  0.031  0.030  0.028
+vy        1.000  0.641  0.287  0.150  0.122  0.115  0.109  0.092  0.080  0.074  0.067  0.061  0.057  0.053  0.049  0.047  0.044  0.042  0.041  0.040  0.040  0.037
+var       1.000  0.304  0.114  0.067  0.054  0.046  0.042  0.037  0.034  0.032  0.030  0.028  0.027  0.025  0.024  0.023  0.022  0.022  0.021  0.020  0.020  0.019
+P(occ|occ) 1.000  0.812  0.682  0.614  0.593  0.584  0.578  0.571  0.566  0.562  0.557  0.554  0.551  0.547  0.542  0.539  0.535  0.532  0.529  0.528  0.525  0.523
+
+Var_anom (mean over cells): density 0.03577  vx 0.52977  vy 0.12636  var 0.03729
+σ²_obs                    : density 0.00324  vx 0.09905  vy 0.00742  var 0.00004
+
+wrote /scratch/work/zhangx29/Thesis_Project/dincae_crowd/decay_tables.npz / .json

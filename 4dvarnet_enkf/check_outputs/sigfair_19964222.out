@@ -1,0 +1,42 @@
+[members] 5 x runs/varnet_vsb0_s{}  dT=200  k=1  dev=cuda
+  atc-20130616_corridor_1.0s.h5  175 windows
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+[valid] 60,480,000 cells
+[test] 478,310,400 cells
+[fit on valid] scale s = 0.4467   constant sigma = 0.1849   lookup bins = 24
+
+=== all cells  (478,310,400 cells) ===
+                  NLL    sp/sk   90%cov
+  raw         -0.7686     2.49    98.6%
+  scaled      -1.1396     1.11    93.6%
+  constant    -1.1301     0.95    92.0%
+  lookup      -1.4961     0.79    96.8%
+
+=== blind cells  (254,124,808 cells) ===
+                  NLL    sp/sk   90%cov
+  raw         -0.7323     2.30    98.1%
+  scaled      -1.0000     1.03    93.7%
+  constant    -1.0248     0.87    92.7%
+  lookup      -1.2976     0.60    94.9%
+
+=== blind AND truly empty  (222,056,492 cells) ===
+                  NLL    sp/sk   90%cov
+  raw         -0.8361     4.26    99.7%
+  scaled      -1.5091     1.90    97.8%
+  constant    -1.4967     1.62    97.2%
+  lookup      -2.1480     1.05    99.7%
+
+=== blind AND occupied  (32,068,316 cells) ===
+                  NLL    sp/sk   90%cov
+  raw         -0.0135     0.98    87.4%
+  scaled       2.5249     0.44    65.1%
+  constant     2.2424     0.36    61.6%
+  lookup       4.5906     0.36    61.2%
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/sigma_fair.json

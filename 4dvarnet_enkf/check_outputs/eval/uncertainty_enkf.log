@@ -1,0 +1,38 @@
+  [k=1] est_atc-20130811.npz
+  [k=1] est_atc-20130818.npz
+  [k=1] est_atc-20130825.npz
+  [k=1] est_atc-20130901.npz
+  [k=1] est_atc-20130915.npz
+  [k=1] est_atc-20130922.npz
+  [k=1] est_atc-20130929.npz
+
+[k=1] 7 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2388   0.1472   1.673e+18   0.0025   0.011    2.24%
+blind                   0.2150   0.1326   2.572e+18   0.0025   0.012    2.78%
+observed                0.2632   0.1638   6.540e+17   0.0025   0.010    1.63%
+channel_density         0.1428   0.0743   6.223e+18   0.0006   0.004    4.76%
+channel_vx              0.3809   0.2371   5.746e+03   0.0037   0.010    1.95%
+channel_vy              0.1539   0.0978   5.602e+03   0.0016   0.010    2.13%
+channel_var             0.1973   0.1798   4.685e+17   0.0043   0.022    0.14%
+[out] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/uncertainty_enkf_k1.json
+
+  [k=4] est_atc-20130811.npz
+  [k=4] est_atc-20130818.npz
+  [k=4] est_atc-20130825.npz
+  [k=4] est_atc-20130901.npz
+  [k=4] est_atc-20130915.npz
+  [k=4] est_atc-20130922.npz
+  [k=4] est_atc-20130929.npz
+
+[k=4] 7 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2428   0.1475   5.278e+17   0.0025   0.010    1.99%
+blind                   0.2384   0.1449   5.093e+17   0.0024   0.010    2.05%
+observed                0.2738   0.1665   6.671e+17   0.0025   0.009    1.54%
+channel_density         0.1465   0.0778   1.921e+18   0.0005   0.004    3.55%
+channel_vx              0.3889   0.2360   6.590e+03   0.0036   0.009    1.90%
+channel_vy              0.1547   0.0958   6.081e+03   0.0015   0.010    2.40%
+channel_var             0.1981   0.1803   1.899e+17   0.0042   0.021    0.12%
+[out] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/uncertainty_enkf_k4.json
+

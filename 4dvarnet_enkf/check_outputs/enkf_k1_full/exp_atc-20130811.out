@@ -1,0 +1,3 @@
+[export] 1 test days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 39821 frames, observed cells/frame mean 202.5
+[done] -> check_outputs/enkf_k1_full/obs_*.npz

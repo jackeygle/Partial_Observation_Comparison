@@ -1,0 +1,9 @@
+[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=400
+  atc-20130811: 400 frames in 423.2s, 0 SVD-skips -> est_atc-20130811.npz
+  atc-20130818: 400 frames in 416.8s, 0 SVD-skips -> est_atc-20130818.npz
+  atc-20130825: 400 frames in 417.3s, 0 SVD-skips -> est_atc-20130825.npz
+  atc-20130901: 400 frames in 416.8s, 0 SVD-skips -> est_atc-20130901.npz
+  atc-20130915: 400 frames in 418.5s, 0 SVD-skips -> est_atc-20130915.npz
+  atc-20130922: 400 frames in 412.0s, 0 SVD-skips -> est_atc-20130922.npz
+  atc-20130929: 400 frames in 411.2s, 0 SVD-skips -> est_atc-20130929.npz
+[done]

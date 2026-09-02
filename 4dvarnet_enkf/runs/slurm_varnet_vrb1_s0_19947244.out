@@ -1,0 +1,17 @@
+Submitted batch job 19947279
+[chain] submitted successor (afterany:19947244)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,103,542 (GENN prior 9,420 = 0.45%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var read-out] 52,000 params on the last hidden state   sigma^2 = softplus(out_var(h)) + 1e-06   beta=1.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_vrb1_s0/varnet_last.pt: continuing from epoch 146 (step 28762)
+[best] previous best blind MSE = 0.0304
+[schedule] epoch 146: n_iter -> 20, lr -> 0.0003
+[epoch 146] loss=-0.0165  盲区MSE=0.0304  density=0.0166 vx=0.0740 vy=0.0223 var=0.0087
+[epoch 147] loss=-0.0168  盲区MSE=0.0304  density=0.0166 vx=0.0741 vy=0.0223 var=0.0087
+[epoch 148] loss=-0.0176  盲区MSE=0.0304  density=0.0166 vx=0.0739 vy=0.0223 var=0.0087
+[epoch 149] loss=-0.0174  盲区MSE=0.0305  density=0.0166 vx=0.0743 vy=0.0223 var=0.0087
+[done] checkpoints + metrics in runs/varnet_vrb1_s0

@@ -1,0 +1,25 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 109, in <module>
+    main()
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 102, in main
+    Est, Spread, T, dt = run_day(npz, model, args.ensemble, args.radius, args.frames, dev)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/run_enkf_on_obs.py", line 71, in run_day
+    est = enkf.step(C, y_obs, model=model)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py", line 383, in step
+    X_a = self.update(X_f, C, y_obs, observed_cells=observed_cells)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Partial_observation/pedpred/ENKF.py", line 365, in update
+    K = (P_xy @ np.linalg.pinv(P_yy)) * Loc.T
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/linalg/_linalg.py", line 2256, in pinv
+    u, s, vt = svd(a, full_matrices=False, hermitian=hermitian)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/linalg/_linalg.py", line 1841, in svd
+    u, s, vh = gufunc(a, signature=signature)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/linalg/_linalg.py", line 154, in _raise_linalgerror_svd_nonconvergence
+    raise LinAlgError("SVD did not converge")
+numpy.linalg.LinAlgError: SVD did not converge

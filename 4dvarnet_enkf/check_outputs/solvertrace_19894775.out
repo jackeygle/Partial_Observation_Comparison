@@ -1,0 +1,9 @@
+[device] cuda  Tesla V100-SXM2-16GB
+[window] atc-20130811_corridor_1.0s.h5  window 60  (1, 4, 200, 36, 12)
+Traceback (most recent call last):
+  File "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/checks/diag_solver_trace.py", line 163, in <module>
+    assert _err < 1e-3, f"hand-run loop diverged from GradSolver.solve(): max |diff| {_err}"
+           ^^^^^^^^^^^
+AssertionError: hand-run loop diverged from GradSolver.solve(): max |diff| 0.7609834671020508
+srun: error: dgx2: task 0: Exited with exit code 1
+srun: Terminating StepId=19894775.0

@@ -1,0 +1,61 @@
+{
+  "hw": {
+    "cpu": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+    "cores": 16,
+    "node": "csl23",
+    "torch_threads": 16
+  },
+  "day": "atc-20130811",
+  "frames": 200,
+  "frames_with_obs": 50,
+  "m_mean": 798.8,
+  "ensemble": 100,
+  "radius": 7,
+  "repeats": 2,
+  "runs": {
+    "lab (untouched original)": {
+      "wall_mean": 200.5723415344255,
+      "wall_std": 0.01774365350138396,
+      "wall_all": [
+        200.55459788092412,
+        200.5900851879269
+      ],
+      "per_frame_ms": 1002.8617076721275,
+      "cores_used": 3.0527564556887956,
+      "speedup_vs_slowest": 1.0
+    },
+    "prev (round 1: localization)": {
+      "wall_mean": 9.566028623608872,
+      "wall_std": 0.00023384951055049896,
+      "wall_all": [
+        9.565794774098322,
+        9.566262473119423
+      ],
+      "per_frame_ms": 47.83014311804436,
+      "cores_used": 15.950396931846013,
+      "speedup_vs_slowest": 20.967148377479738
+    },
+    "opt  gain_mode=pinv": {
+      "wall_mean": 7.898421085090376,
+      "wall_std": 0.00020631507504731417,
+      "wall_all": [
+        7.898214770015329,
+        7.898627400165424
+      ],
+      "per_frame_ms": 39.49210542545188,
+      "cores_used": 15.94983206522114,
+      "speedup_vs_slowest": 25.393979299614728
+    },
+    "opt  gain_mode=ensemble": {
+      "wall_mean": 4.024175540078431,
+      "wall_std": 0.0016555460169911385,
+      "wall_all": [
+        4.0258310860954225,
+        4.02251999406144
+      ],
+      "per_frame_ms": 20.120877700392157,
+      "cores_used": 15.94855328384948,
+      "speedup_vs_slowest": 49.84184699122652
+    }
+  }
+}

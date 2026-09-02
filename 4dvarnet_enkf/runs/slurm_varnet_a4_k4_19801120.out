@@ -1,0 +1,30 @@
+Submitted batch job 19801677
+[chain] submitted successor (afterany:19801120)
+NVIDIA H200
+[obs] obs_every_k = 4  (每 4 帧观测)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,096,342 (GENN prior 54,220 = 2.59%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=0  data=0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_a4_k4/varnet_last.pt: continuing from epoch 85 (step 16745)
+[best] previous best blind MSE = 0.0345
+[schedule] epoch 85: n_iter -> 20, lr -> 0.0003
+[epoch  85] loss=0.0341  盲区MSE=0.0345  density=0.0246 vx=0.0696 vy=0.0313 var=0.0126
+           ↑ new best (0.0345) -> varnet_best.pt
+[epoch  86] loss=0.0354  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  87] loss=0.0393  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  88] loss=0.0353  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  89] loss=0.0357  盲区MSE=0.0346  density=0.0246 vx=0.0698 vy=0.0313 var=0.0126
+[epoch  90] loss=0.0334  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  91] loss=0.0325  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  92] loss=0.0299  盲区MSE=0.0345  density=0.0246 vx=0.0696 vy=0.0313 var=0.0126
+           ↑ new best (0.0345) -> varnet_best.pt
+[epoch  93] loss=0.0334  盲区MSE=0.0346  density=0.0246 vx=0.0699 vy=0.0313 var=0.0126
+[epoch  94] loss=0.0354  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  95] loss=0.0382  盲区MSE=0.0345  density=0.0246 vx=0.0695 vy=0.0313 var=0.0126
+           ↑ new best (0.0345) -> varnet_best.pt
+[epoch  96] loss=0.0357  盲区MSE=0.0345  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  97] loss=0.0322  盲区MSE=0.0346  density=0.0246 vx=0.0697 vy=0.0313 var=0.0126
+[epoch  98] loss=0.0345  盲区MSE=0.0345  density=0.0246 vx=0.0696 vy=0.0313 var=0.0126
+[epoch  99] loss=0.0393  盲区MSE=0.0345  density=0.0246 vx=0.0696 vy=0.0313 var=0.0126
+[done] checkpoints + metrics in runs/varnet_a4_k4

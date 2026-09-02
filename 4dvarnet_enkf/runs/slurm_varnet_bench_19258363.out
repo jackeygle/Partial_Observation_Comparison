@@ -1,0 +1,21 @@
+NVIDIA H200, 143771 MiB
+GPU: NVIDIA H200
+[data] building 3 days of windows for the benchmark...
+[data] 596 windows of (4, 200, 36, 12)
+
+[model] params=2,051,474  n_iter=15
+
+ batch  prec   s/step    win/s   GPUmem  min/epoch  h/100ep
+--------------------------------------------------------------
+     8  fp32    3.061      2.6    13.0G       40.2     67.0
+     8  bf16    2.461      3.3     7.1G       32.3     53.9
+    16  fp32    6.123      2.6    26.0G       40.2     67.0
+    16  bf16    2.689      5.9    14.2G       17.7     29.4
+    32  fp32   12.343      2.6    52.1G       40.5     67.5
+    32  bf16    3.046     10.5    28.3G       10.0     16.7
+    64  fp32   24.697      2.6   104.1G       40.8     67.9
+    64  bf16    7.521      8.5    56.6G       12.4     20.7
+   128  fp32   FAILED: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.32 GiB. GPU 0 has a 
+   128  bf16   15.018      8.5   113.0G       12.5     20.9
+
+[best] batch=32 bf16: 10.0 min/epoch, 16.7 h for 100 epochs, 28.3G GPU

@@ -1,0 +1,9 @@
+[enkf] apt-ibex on cpu; ensemble=100 radius=7 frames=400
+  atc-20130811: 400 frames in 425.7s (1064 ms/frame), 2 SVD-skips -> est_atc-20130811.npz
+  atc-20130818: 400 frames in 423.9s (1060 ms/frame), 0 SVD-skips -> est_atc-20130818.npz
+  atc-20130825: 400 frames in 410.9s (1027 ms/frame), 0 SVD-skips -> est_atc-20130825.npz
+  atc-20130901: 400 frames in 412.1s (1030 ms/frame), 0 SVD-skips -> est_atc-20130901.npz
+  atc-20130915: 400 frames in 411.9s (1030 ms/frame), 0 SVD-skips -> est_atc-20130915.npz
+  atc-20130922: 400 frames in 411.4s (1028 ms/frame), 0 SVD-skips -> est_atc-20130922.npz
+  atc-20130929: 400 frames in 411.0s (1028 ms/frame), 0 SVD-skips -> est_atc-20130929.npz
+[done]

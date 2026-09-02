@@ -1,0 +1,17 @@
+[device] cuda   ckpt runs/varnet_ml5_s0/varnet_best.pt   N=20
+[var-head] dropping the retired obs_var floor from this checkpoint ([0.003239, 0.099055, 0.007424, 4.2e-05])
+[data] atc-20130811_corridor_1.0s.h5  24 windows, 20 perturbations each
+[done] (24, 4, 200, 36, 12)
+[json] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/perturbed_obs_ensemble.json
+
+                              sigma     RMSE   sp/sk     90%
+  head                       0.1030   0.1855   0.555   56.9%
+  head_blind                 0.1534   0.1949   0.787   77.8%
+  head_observed              0.0458   0.1742   0.263   33.2%
+  perturbed_obs              0.0920   0.1855   0.496   73.3%
+  perturbed_obs_blind        0.0873   0.1949   0.448   73.0%
+  perturbed_obs_channel_density   0.0268   0.1135   0.236   48.1%
+  perturbed_obs_channel_var   0.0310   0.0732   0.424   88.6%
+  perturbed_obs_channel_vx   0.2315   0.3164   0.732   83.3%
+  perturbed_obs_channel_vy   0.0788   0.1390   0.567   73.1%
+  perturbed_obs_observed     0.0973   0.1742   0.559   73.6%

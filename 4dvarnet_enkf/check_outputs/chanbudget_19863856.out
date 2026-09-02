@@ -1,0 +1,12 @@
+[device] cuda  NVIDIA A100-SXM4-80GB
+[window] day=atc-20130811_corridor_1.0s.h5  window 60  shape (1, 4, 200, 36, 12)
+[solve] one window, 20 iterations, CPU: 0.3s
+[json] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/channel_budget.json
+
+  J(x0) = 0.4685   obs 0.0000  reg 0.4685
+     share: density 12.8%  vx 62.6%  vy 12.7%  var 11.9%
+
+  J(xhat) = 0.4173   obs 0.0786  reg 0.3387
+     share: density 18.0%  vx 56.3%  vy 15.0%  var 10.6%
+  psi_3(41,10,6) = +1.9307   partials density:+1.4189 vx:+0.6087 vy:+0.0642 var:+0.1062
+  dropped by the mask: density:+0.2210 vx:-0.0312 vy:-0.0005 var:+0.0011

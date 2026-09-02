@@ -1,0 +1,57 @@
+[device] cuda   windows 24
+[data] 24 windows of dT=200
+[old_h_only] done
+{
+  "old_h_only": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03486580029129982,
+      "sigma2_median_occupied": 0.028266804292798042,
+      "sigma2_ratio_occ_over_empty": 0.8107315301895142,
+      "grad_weight_share_empty": 0.9019883871078491,
+      "mse_empty": 0.004887430462986231,
+      "mse_occupied": 0.08374534547328949,
+      "grad_share_if_beta0": 0.34252360463142395,
+      "grad_share_if_beta1": 0.14764079451560974
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06634381413459778,
+      "sigma2_median_occupied": 0.0703049972653389,
+      "sigma2_ratio_occ_over_empty": 1.0597069263458252,
+      "grad_weight_share_empty": 0.911596953868866,
+      "mse_empty": 0.04635787010192871,
+      "mse_occupied": 0.9073187708854675,
+      "grad_share_if_beta0": 0.4504965841770172,
+      "grad_share_if_beta1": 0.5811233520507812
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.057285964488983154,
+      "sigma2_median_occupied": 0.05396090820431709,
+      "sigma2_ratio_occ_over_empty": 0.9419568777084351,
+      "grad_weight_share_empty": 0.9096101522445679,
+      "mse_empty": 0.006177642848342657,
+      "mse_occupied": 0.14391562342643738,
+      "grad_share_if_beta0": 0.07141807675361633,
+      "grad_share_if_beta1": 0.2161272168159485
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.032768234610557556,
+      "sigma2_median_occupied": 0.022222235798835754,
+      "sigma2_ratio_occ_over_empty": 0.6781639456748962,
+      "grad_weight_share_empty": 0.8973886966705322,
+      "mse_empty": 0.0015194171573966742,
+      "mse_occupied": 0.04226505011320114,
+      "grad_share_if_beta0": 0.13556170463562012,
+      "grad_share_if_beta1": 0.055108681321144104
+    }
+  }
+}
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/beta_gradient_share.json

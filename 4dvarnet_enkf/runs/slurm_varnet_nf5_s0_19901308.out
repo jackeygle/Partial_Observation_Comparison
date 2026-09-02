@@ -1,0 +1,118 @@
+Submitted batch job 19901388
+[chain] submitted successor (afterany:19901308)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,051,542 (GENN prior 9,420 = 0.46%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var-head] 548 params   sigma^2 = softplus(head) + 1e-12   beta=1.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 5, lr -> 0.001
+[epoch   0] loss=-0.0323  盲区MSE=0.0738  density=0.0234 vx=0.2236 vy=0.0386 var=0.0095
+           ↑ new best (0.0738) -> varnet_best.pt
+[epoch   1] loss=-0.0231  盲区MSE=0.0651  density=0.0234 vx=0.1898 vy=0.0380 var=0.0092
+           ↑ new best (0.0651) -> varnet_best.pt
+[epoch   2] loss=-0.0193  盲区MSE=0.0637  density=0.0237 vx=0.1838 vy=0.0380 var=0.0091
+           ↑ new best (0.0637) -> varnet_best.pt
+[epoch   3] loss=-0.0148  盲区MSE=0.0636  density=0.0250 vx=0.1818 vy=0.0382 var=0.0094
+           ↑ new best (0.0636) -> varnet_best.pt
+[epoch   4] loss=-0.0151  盲区MSE=0.0621  density=0.0245 vx=0.1765 vy=0.0378 var=0.0095
+           ↑ new best (0.0621) -> varnet_best.pt
+[epoch   5] loss=-0.0120  盲区MSE=0.0605  density=0.0246 vx=0.1702 vy=0.0381 var=0.0093
+           ↑ new best (0.0605) -> varnet_best.pt
+[epoch   6] loss=-0.0128  盲区MSE=0.0592  density=0.0244 vx=0.1650 vy=0.0382 var=0.0092
+           ↑ new best (0.0592) -> varnet_best.pt
+[epoch   7] loss=-0.0118  盲区MSE=0.0588  density=0.0245 vx=0.1632 vy=0.0382 var=0.0092
+           ↑ new best (0.0588) -> varnet_best.pt
+[epoch   8] loss=-0.0151  盲区MSE=0.0589  density=0.0245 vx=0.1638 vy=0.0381 var=0.0093
+[epoch   9] loss=-0.0125  盲区MSE=0.0583  density=0.0241 vx=0.1616 vy=0.0380 var=0.0092
+           ↑ new best (0.0583) -> varnet_best.pt
+[epoch  10] loss=-0.0127  盲区MSE=0.0606  density=0.0241 vx=0.1707 vy=0.0382 var=0.0093
+[epoch  11] loss=-0.0131  盲区MSE=0.0593  density=0.0242 vx=0.1665 vy=0.0371 var=0.0095
+[epoch  12] loss=-0.0125  盲区MSE=0.0543  density=0.0241 vx=0.1467 vy=0.0366 var=0.0097
+           ↑ new best (0.0543) -> varnet_best.pt
+[epoch  13] loss=-0.0142  盲区MSE=0.0510  density=0.0238 vx=0.1345 vy=0.0360 var=0.0096
+           ↑ new best (0.0510) -> varnet_best.pt
+[epoch  14] loss=-0.0137  盲区MSE=0.0494  density=0.0237 vx=0.1292 vy=0.0351 var=0.0097
+           ↑ new best (0.0494) -> varnet_best.pt
+[epoch  15] loss=-0.0146  盲区MSE=0.0478  density=0.0236 vx=0.1229 vy=0.0350 var=0.0098
+           ↑ new best (0.0478) -> varnet_best.pt
+[epoch  16] loss=-0.0139  盲区MSE=0.0463  density=0.0234 vx=0.1170 vy=0.0350 var=0.0098
+           ↑ new best (0.0463) -> varnet_best.pt
+[epoch  17] loss=-0.0135  盲区MSE=0.0456  density=0.0231 vx=0.1143 vy=0.0349 var=0.0099
+           ↑ new best (0.0456) -> varnet_best.pt
+[epoch  18] loss=-0.0137  盲区MSE=0.0446  density=0.0230 vx=0.1104 vy=0.0348 var=0.0100
+           ↑ new best (0.0446) -> varnet_best.pt
+[epoch  19] loss=-0.0144  盲区MSE=0.0436  density=0.0230 vx=0.1071 vy=0.0344 var=0.0099
+           ↑ new best (0.0436) -> varnet_best.pt
+[epoch  20] loss=-0.0149  盲区MSE=0.0426  density=0.0229 vx=0.1046 vy=0.0330 var=0.0098
+           ↑ new best (0.0426) -> varnet_best.pt
+[epoch  21] loss=-0.0158  盲区MSE=0.0421  density=0.0229 vx=0.1035 vy=0.0324 var=0.0098
+           ↑ new best (0.0421) -> varnet_best.pt
+[epoch  22] loss=-0.0144  盲区MSE=0.0412  density=0.0229 vx=0.1009 vy=0.0311 var=0.0098
+           ↑ new best (0.0412) -> varnet_best.pt
+[epoch  23] loss=-0.0149  盲区MSE=0.0400  density=0.0228 vx=0.0977 vy=0.0298 var=0.0098
+           ↑ new best (0.0400) -> varnet_best.pt
+[epoch  24] loss=-0.0152  盲区MSE=0.0389  density=0.0228 vx=0.0942 vy=0.0286 var=0.0098
+           ↑ new best (0.0389) -> varnet_best.pt
+[schedule] epoch 25: n_iter -> 10, lr -> 0.0007
+[epoch  25] loss=-0.0147  盲区MSE=0.0383  density=0.0228 vx=0.0924 vy=0.0281 var=0.0098
+           ↑ new best (0.0383) -> varnet_best.pt
+[epoch  26] loss=-0.0149  盲区MSE=0.0377  density=0.0228 vx=0.0911 vy=0.0271 var=0.0097
+           ↑ new best (0.0377) -> varnet_best.pt
+[epoch  27] loss=-0.0133  盲区MSE=0.0374  density=0.0228 vx=0.0905 vy=0.0266 var=0.0097
+           ↑ new best (0.0374) -> varnet_best.pt
+[epoch  28] loss=-0.0159  盲区MSE=0.0369  density=0.0227 vx=0.0890 vy=0.0261 var=0.0098
+           ↑ new best (0.0369) -> varnet_best.pt
+[epoch  29] loss=-0.0141  盲区MSE=0.0365  density=0.0227 vx=0.0877 vy=0.0259 var=0.0097
+           ↑ new best (0.0365) -> varnet_best.pt
+[epoch  30] loss=-0.0148  盲区MSE=0.0359  density=0.0227 vx=0.0855 vy=0.0256 var=0.0097
+           ↑ new best (0.0359) -> varnet_best.pt
+[epoch  31] loss=-0.0149  盲区MSE=0.0354  density=0.0227 vx=0.0840 vy=0.0252 var=0.0097
+           ↑ new best (0.0354) -> varnet_best.pt
+[epoch  32] loss=-0.0153  盲区MSE=0.0350  density=0.0227 vx=0.0828 vy=0.0248 var=0.0096
+           ↑ new best (0.0350) -> varnet_best.pt
+[epoch  33] loss=-0.0151  盲区MSE=0.0347  density=0.0226 vx=0.0819 vy=0.0247 var=0.0096
+           ↑ new best (0.0347) -> varnet_best.pt
+[epoch  34] loss=-0.0159  盲区MSE=0.0342  density=0.0226 vx=0.0803 vy=0.0244 var=0.0096
+           ↑ new best (0.0342) -> varnet_best.pt
+[epoch  35] loss=-0.0154  盲区MSE=0.0338  density=0.0226 vx=0.0790 vy=0.0241 var=0.0095
+           ↑ new best (0.0338) -> varnet_best.pt
+[epoch  36] loss=-0.0157  盲区MSE=0.0336  density=0.0226 vx=0.0783 vy=0.0239 var=0.0095
+           ↑ new best (0.0336) -> varnet_best.pt
+[epoch  37] loss=-0.0141  盲区MSE=0.0332  density=0.0225 vx=0.0771 vy=0.0237 var=0.0095
+           ↑ new best (0.0332) -> varnet_best.pt
+[epoch  38] loss=-0.0157  盲区MSE=0.0330  density=0.0225 vx=0.0765 vy=0.0235 var=0.0095
+           ↑ new best (0.0330) -> varnet_best.pt
+[epoch  39] loss=-0.0156  盲区MSE=0.0327  density=0.0225 vx=0.0757 vy=0.0234 var=0.0094
+           ↑ new best (0.0327) -> varnet_best.pt
+[epoch  40] loss=-0.0157  盲区MSE=0.0325  density=0.0224 vx=0.0751 vy=0.0232 var=0.0094
+           ↑ new best (0.0325) -> varnet_best.pt
+[epoch  41] loss=-0.0154  盲区MSE=0.0324  density=0.0224 vx=0.0746 vy=0.0232 var=0.0094
+           ↑ new best (0.0324) -> varnet_best.pt
+[epoch  42] loss=-0.0159  盲区MSE=0.0322  density=0.0224 vx=0.0740 vy=0.0232 var=0.0094
+           ↑ new best (0.0322) -> varnet_best.pt
+[epoch  43] loss=-0.0149  盲区MSE=0.0322  density=0.0224 vx=0.0737 vy=0.0231 var=0.0094
+           ↑ new best (0.0322) -> varnet_best.pt
+[epoch  44] loss=-0.0159  盲区MSE=0.0321  density=0.0224 vx=0.0733 vy=0.0231 var=0.0094
+           ↑ new best (0.0321) -> varnet_best.pt
+[epoch  45] loss=-0.0155  盲区MSE=0.0320  density=0.0224 vx=0.0729 vy=0.0231 var=0.0093
+           ↑ new best (0.0320) -> varnet_best.pt
+[epoch  46] loss=-0.0146  盲区MSE=0.0319  density=0.0224 vx=0.0727 vy=0.0231 var=0.0093
+           ↑ new best (0.0319) -> varnet_best.pt
+[epoch  47] loss=-0.0158  盲区MSE=0.0318  density=0.0224 vx=0.0725 vy=0.0231 var=0.0093
+           ↑ new best (0.0318) -> varnet_best.pt
+[epoch  48] loss=-0.0152  盲区MSE=0.0317  density=0.0224 vx=0.0720 vy=0.0231 var=0.0093
+           ↑ new best (0.0317) -> varnet_best.pt
+[epoch  49] loss=-0.0158  盲区MSE=0.0317  density=0.0224 vx=0.0718 vy=0.0231 var=0.0093
+           ↑ new best (0.0317) -> varnet_best.pt
+[schedule] epoch 50: n_iter -> 15, lr -> 0.0005
+[epoch  50] loss=-0.0149  盲区MSE=0.0315  density=0.0224 vx=0.0711 vy=0.0230 var=0.0093
+           ↑ new best (0.0315) -> varnet_best.pt
+[epoch  51] loss=-0.0154  盲区MSE=0.0313  density=0.0224 vx=0.0705 vy=0.0230 var=0.0093
+           ↑ new best (0.0313) -> varnet_best.pt
+[epoch  52] loss=-0.0154  盲区MSE=0.0312  density=0.0224 vx=0.0703 vy=0.0230 var=0.0093
+           ↑ new best (0.0312) -> varnet_best.pt
+[epoch  53] loss=-0.0156  盲区MSE=0.0312  density=0.0224 vx=0.0700 vy=0.0229 var=0.0093
+           ↑ new best (0.0312) -> varnet_best.pt
+[2026-08-24T01:58:10.005] error: *** JOB 19901308 ON gpu52 CANCELLED AT 2026-08-24T01:58:10 DUE TO TIME LIMIT ***
