@@ -99,7 +99,12 @@ FRAME_HI_PAD = max(FRESH_OFFSETS)
 LO = np.array([0.0, -5.0, -5.0, 0.0], np.float32)
 HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 
-CONVENTIONS = ("defined", "allcells")
+# 三套格子选择 × 裁剪/不裁剪。`full` 是「全场」——观测 + 盲区所有格子，即
+# eval_test_days.py 的 full_mse 和 eval_threeway_accuracy.py 的 rmse_all 那个量；
+# 放进来是为了在同一条代码路径上核对那两个脚本对 4DVarNet 报的 0.1702 与 0.2104。
+# `_noclip` 存在的理由：threeway 不裁剪，test_metrics 裁剪，这是它们唯一已知的口径差。
+BASE_CONVENTIONS = ("defined", "allcells", "full")
+CONVENTIONS = BASE_CONVENTIONS + tuple(f"{k}_noclip" for k in BASE_CONVENTIONS)
 
 
 def clip_np(x):
@@ -107,16 +112,21 @@ def clip_np(x):
 
 
 class Acc:
-    """逐通道、逐口径累计盲区平方误差与格数（池化用）。"""
+    """逐通道、逐口径累计平方误差与格数（池化用）。"""
 
     def __init__(self, C):
         self.se = {k: np.zeros(C) for k in CONVENTIONS}
         self.n = {k: np.zeros(C, dtype=np.int64) for k in CONVENTIONS}
 
-    def add(self, pred, true, sel):
-        """pred/true (T,C,H,W)；sel 是 {口径: (T,C,H,W) bool} 的掩码字典。"""
-        d2 = (pred - true) ** 2
+    def add(self, pred_clip, pred_raw, true, sel):
+        """pred/true (T,C,H,W)；sel 是 {口径: (T,C,H,W) bool} 的掩码字典。
+
+        `*_noclip` 的口径用未裁剪的 pred_raw 打分，其余用 pred_clip。
+        """
+        d2c = (pred_clip - true) ** 2
+        d2r = (pred_raw - true) ** 2
         for k, m in sel.items():
+            d2 = d2r if k.endswith("_noclip") else d2c
             for c in range(d2.shape[1]):
                 self.se[k][c] += float(d2[:, c][m[:, c]].sum())
                 self.n[k][c] += int(m[:, c].sum())
@@ -126,6 +136,11 @@ class Acc:
 
     def overall(self, k):
         return self.se[k].sum() / max(self.n[k].sum(), 1)
+
+    def merge(self, other):
+        for k in CONVENTIONS:
+            self.se[k] += other.se[k]
+            self.n[k] += other.n[k]
 
 
 def run_senseiver(model, Y, Om, dev, batch):
@@ -168,7 +183,11 @@ def build_masks(X, Omf, walk, C):
     blind = ~np.repeat(Omf[:, None], C, axis=1)                  # (T,C,H,W)
     cv = np.moveaxis(channel_valid(X), 0, 1)                     # (NCH,T,H,W) -> (T,C,H,W)
     w = walk[None, None]
-    return {"defined": blind & cv & w, "allcells": blind}
+    base = {"defined": blind & cv & w,
+            "allcells": blind,
+            "full": np.ones_like(blind)}                          # 全场 = 观测 + 盲区
+    base.update({f"{k}_noclip": v for k, v in base.items()})      # 同一批格子，不裁剪打分
+    return base
 
 
 def main():
@@ -176,6 +195,9 @@ def main():
     ap.add_argument("--senseiver", default="runs/senseiver_A/best.pt")
     ap.add_argument("--varnet", default="a4_k1,b0_k1",
                     help="逗号分隔的 4dvarnet run 名（runs/varnet_<名>/varnet_best.pt）")
+    ap.add_argument("--de-fmt", default="vsb0_s{}",
+                    help="不确定性头（NLL）深度集成的 run 名模板；留空则不评它")
+    ap.add_argument("--de-members", default="0,1,2,3,4")
     ap.add_argument("--enkf-dir", default=os.path.join(V4D, "check_outputs", "enkf_k1_full"))
     ap.add_argument("--dincae-json",
                     default=os.path.join(DINCAE, "check_outputs", "eval",
@@ -206,6 +228,18 @@ def main():
     for vn in vnames:
         sol, va, _ = load_solver(os.path.join(V4D, f"runs/varnet_{vn}/varnet_best.pt"), dev)
         vsolvers[vn] = (sol, va)
+
+    # 不确定性头（NLL 损失）的深度集成。点估计是各成员重建的均值（论文 Sec 2.4），
+    # 所以"集成"和"单成员均值±std"是两个不同的量，两个都报 —— 只报集成会把
+    # "平均带来的好处"和"损失函数的影响"混在一起。
+    de_members = [z.strip() for z in args.de_members.split(",") if z.strip()] \
+        if args.de_fmt else []
+    de_solvers, de_dT = [], None
+    for m in de_members:
+        sol, va, _ = load_solver(
+            os.path.join(V4D, f"runs/varnet_{args.de_fmt.format(m)}/varnet_best.pt"), dev)
+        de_solvers.append(sol)
+        de_dT = va["dT"]
     print(f"[model] Senseiver {sm.num_params:,} 参数 | "
           + " | ".join(f"4DVarNet {vn} dT={va['dT']} n_iter={sol.n_iter}"
                        for vn, (sol, va) in vsolvers.items())
@@ -215,8 +249,14 @@ def main():
     if args.days:
         days = days[:args.days]
 
-    names = ["Senseiver"] + [f"4DVarNet {vn}" for vn in vnames] + ["EnKF k1"]
+    de_names = [f"4DVarNet nll s{m}" for m in de_members]
+    names = ["Senseiver"] + [f"4DVarNet {vn}" for vn in vnames] \
+        + (["4DVarNet nll ens%d" % len(de_members)] if de_solvers else []) \
+        + de_names + ["EnKF k1"]
     accs = {k: Acc(C) for k in names}
+    # 按日的 overall，用来算"按日平均"那个口径。test_metrics_*.json / eval_test_days.py 报的是
+    # 它，eval_threeway_accuracy.py 报的是池化 —— 两者不是同一个量，这里同时给出。
+    day_overall = {k: {c: [] for c in CONVENTIONS} for k in names}
     per_day = []
 
     for d in days:
@@ -230,9 +270,10 @@ def main():
         lo, hi = FRAME_LO, n - FRAME_HI_PAD                  # DINCAE 能评的帧范围
         sel_all = build_masks(Xf, Omf, walk, C)
         cut = lambda m, a, b: {k: v[a:b] for k, v in m.items()}
+        dacc = {k: Acc(C) for k in names}                    # 这一天单独攒，才能算按日平均
 
-        p = clip_np(run_senseiver(sm, Y, Om, dev, args.batch))
-        accs["Senseiver"].add(p[lo:hi], Xf[lo:hi], cut(sel_all, lo, hi))
+        p = run_senseiver(sm, Y, Om, dev, args.batch)
+        dacc["Senseiver"].add(clip_np(p[lo:hi]), p[lo:hi], Xf[lo:hi], cut(sel_all, lo, hi))
         del p
 
         Omc = np.repeat(Omf[:, None], C, axis=1)
@@ -241,21 +282,47 @@ def main():
             sol, va = vsolvers[vn]
             pv, nkeep = run_varnet(sol, Yf, Omc, X0, va["dT"], dev, args.varnet_batch)
             b = min(hi, nkeep)                               # dT 对不齐时丢的尾巴
-            accs[f"4DVarNet {vn}"].add(clip_np(pv[lo:b]), Xf[lo:b], cut(sel_all, lo, b))
+            dacc[f"4DVarNet {vn}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
+                                       cut(sel_all, lo, b))
             del pv
+
+        if de_solvers:
+            ens = None
+            for m, sol in zip(de_members, de_solvers):
+                pv, nkeep = run_varnet(sol, Yf, Omc, X0, de_dT, dev, args.varnet_batch)
+                b = min(hi, nkeep)
+                dacc[f"4DVarNet nll s{m}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
+                                               cut(sel_all, lo, b))
+                ens = pv if ens is None else ens + pv      # 累加，别同时留 5 份整天数组
+                del pv
+            ens /= len(de_solvers)
+            b = min(hi, ens.shape[0])
+            dacc[f"4DVarNet nll ens{len(de_solvers)}"].add(
+                clip_np(ens[lo:b]), ens[lo:b], Xf[lo:b], cut(sel_all, lo, b))
+            del ens
 
         ep = os.path.join(args.enkf_dir, f"est_{stem}.npz")
         if os.path.exists(ep):
             est = np.load(ep)["Est"].astype(np.float32)
             b = min(hi, est.shape[0])
-            accs["EnKF k1"].add(clip_np(est[lo:b]), Xf[lo:b], cut(sel_all, lo, b))
+            dacc["EnKF k1"].add(clip_np(est[lo:b]), est[lo:b], Xf[lo:b], cut(sel_all, lo, b))
             del est
         else:
             print(f"  [warn] {stem} 没有 EnKF 导出", flush=True)
 
-        per_day.append({"day": stem, "frames_total": int(n),
-                        "frames_scored": int(hi - lo)})
-        print(f"  {stem}: {n} 帧, 评 [{lo},{hi})", flush=True)
+        rec = {"day": stem, "frames_total": int(n), "frames_scored": int(hi - lo)}
+        for k, a in dacc.items():
+            if a.n["full"].sum() == 0:
+                continue
+            accs[k].merge(a)
+            for c in CONVENTIONS:
+                day_overall[k][c].append(float(a.overall(c)))
+            rec[k] = {"full_mse": float(a.overall("full")),
+                      "defined_blind_mse": float(a.overall("defined"))}
+        per_day.append(rec)
+        print(f"  {stem}: {n} 帧, 评 [{lo},{hi})  "
+              + "  ".join(f"{k} full={rec[k]['full_mse']:.4f}" for k in dacc if k in rec),
+              flush=True)
 
     # --- DINCAE：读它已经算好的「有定义格子」逐通道 MSE ---------------------------
     dincae_pc = None
@@ -289,7 +356,13 @@ def main():
         res["results"][k] = {
             conv: {"per_channel": {chans[i]: float(v) for i, v in enumerate(a.mse(conv))},
                    "n_per_channel": {chans[i]: int(v) for i, v in enumerate(a.n[conv])},
-                   "overall": float(a.overall(conv))}
+                   "overall": float(a.overall(conv)),
+                   # 同一批数字的两种汇总方式，摆在一起就不会再被混用
+                   "overall_pooled": float(a.overall(conv)),
+                   "overall_mean_of_days": float(np.mean(day_overall[k][conv])),
+                   "rmse_pooled": float(np.sqrt(a.overall(conv))),
+                   "rmse_mean_of_days": float(np.mean(
+                       [np.sqrt(v) for v in day_overall[k][conv]]))}
             for conv in CONVENTIONS}
 
     # DINCAE 的合计用本脚本的格数重算，理由见文件头
@@ -306,6 +379,17 @@ def main():
                            "overall": float(se / max(nn.sum(), 1)),
                            "source": os.path.relpath(args.dincae_json, DINCAE)}
         res["results"]["DINCAE"] = entry
+
+    print("\n\n全场 RMSE（观测 + 盲区所有格子）—— 池化 vs 按日平均 vs 不裁剪\n")
+    print(f"{'方法':<20}{'池化':>10}{'按日平均':>12}{'池化,不裁':>12}{'按日平均,不裁':>16}")
+    print("-" * 70)
+    for k, q in res["results"].items():
+        if "full" not in q:
+            continue
+        print(f"{k:<20}{q['full']['rmse_pooled']:>10.4f}"
+              f"{q['full']['rmse_mean_of_days']:>12.4f}"
+              f"{q['full_noclip']['rmse_pooled']:>12.4f}"
+              f"{q['full_noclip']['rmse_mean_of_days']:>16.4f}")
 
     for conv, title in (("defined", "有定义格子 ∩ walkable ∩ 盲区（四方可比的口径）"),
                         ("allcells", "所有格子 ∩ 盲区（compare3 的旧口径，供对照）")):
