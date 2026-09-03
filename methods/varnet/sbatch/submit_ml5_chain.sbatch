@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 # ML5 — one member of a deep ensemble (Lakshminarayanan et al. 2017, arXiv:1612.01474).
 #
 # Usage:  sbatch --job-name=varnet_ml5_s0 sbatch/submit_ml5_chain.sbatch 0
@@ -62,8 +62,8 @@
 #                 finishes OR is killed at the time limit;
 #             (3) train with --resume.
 source /etc/profile 2>/dev/null
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 # GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
 # the time limit still has one queued. The cost is that a job which crashes in the first second
@@ -104,7 +104,7 @@ echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # (3) train. --init-seed varies, --data-seed pinned to 0 across all members.
 nvidia-smi --query-gpu=name --format=csv,noheader
-python3 -u train_varnet.py --resume \
+python3 -u -m methods.varnet.train --resume \
     --obs-every-k $K \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \

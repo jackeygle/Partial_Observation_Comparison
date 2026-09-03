@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 # VR — sigma^2 from the solver's SECOND OUTPUT LAYER instead of a separate module.
 #
 # Usage:  sbatch --job-name=varnet_vrb1_s0 sbatch/submit_vr_chain.sbatch 0 1.0
@@ -34,8 +34,8 @@
 # which is what we would rather present -- but the NLL is unbounded below as sigma^2 -> 0, so
 # --var-eps 1e-6 is doing real work there and this run may still misbehave. Watch epoch 1-10.
 source /etc/profile 2>/dev/null
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 # The sigma^2 read-out here takes [h, x_hat.detach()] -- var_sees_state, the default. The
 # narrow h-only version is submit_vr_chain.sbatch, and runs/varnet_vrb0_s0 is the baseline this
@@ -92,7 +92,7 @@ sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=aft
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 nvidia-smi --query-gpu=name --format=csv,noheader
-python3 -u train_varnet.py --resume \
+python3 -u -m methods.varnet.train --resume \
     --obs-every-k 1 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \

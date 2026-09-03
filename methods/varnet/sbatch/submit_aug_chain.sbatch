@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 # AUG — log sigma^2 is ITERATED as part of the solver state, not read off a hidden layer.
 #
 # Usage:  sbatch --job-name=varnet_aug0_s0 sbatch/submit_aug_chain.sbatch 0 0
@@ -31,8 +31,8 @@
 # used to sit here; it argued the OPPOSITE -- that sigma^2 should stay out of the
 # iterated state -- because this file was copied from that one. Removed 2026-09-03.)
 source /etc/profile 2>/dev/null
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 # AUGMENTED STATE: log sigma^2 is iterated as part of the state, not read off a hidden layer.
 #
@@ -111,7 +111,7 @@ sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=aft
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 nvidia-smi --query-gpu=name --format=csv,noheader
-python3 -u train_varnet.py --resume \
+python3 -u -m methods.varnet.train --resume \
     --obs-every-k 1 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \

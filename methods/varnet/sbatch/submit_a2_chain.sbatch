@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 # A2 — a LARGER prior than the baseline, solver unchanged.
 #
 # Usage:  sbatch --job-name=varnet_a2_k1 sbatch/submit_a2_chain.sbatch 1
@@ -25,8 +25,8 @@
 # better than b0's 0.1702 / 0.1891 for 3.4x the prior parameters, and 2.1x slower at
 # inference (7.86 vs 3.66 ms/frame). That trade is why b0, not this, is the model of record.
 source /etc/profile 2>/dev/null
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 K=${1:?usage: sbatch --job-name=varnet_a2_kN sbatch/submit_a2_chain.sbatch <obs_every_k>}
 OUTDIR=runs/varnet_a2_k${K}
@@ -52,7 +52,7 @@ echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # (3) train — no --lstm-hidden on purpose (solver stays at the config default, identical to
 nvidia-smi --query-gpu=name --format=csv,noheader
-python3 -u train_varnet.py --resume \
+python3 -u -m methods.varnet.train --resume \
     --obs-every-k $K \
     --hidden 64 --kt 5 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \

@@ -11,6 +11,6 @@
 # empty vs occupied cells, which is what discriminates the candidate causes.
 # Submit WITHOUT --export=NONE: that strips the shell so `module` itself is undefined, the load
 # silently no-ops and python3 is not on PATH.
-module load scicomp-python-env
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
-srun python3 checks/diag_sigma_headroom.py
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+srun python3 -m methods.varnet.checks.diag_sigma_headroom

@@ -11,8 +11,8 @@
 # uncertainty is only the empirical variance across its members, against the NLL-trained
 # ensemble that learns a sigma^2. Same architecture, same seeds, same schedule, same days --
 # the loss is the only difference, which is what makes it a single-variable comparison.
-module load scicomp-python-env
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
-srun python3 checks/eval_uncertainty.py --batch 2 \
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+srun python3 -m methods.varnet.checks.eval_uncertainty --batch 2 \
      --run-fmt "runs/varnet_mse5_s{}" --members 0 1 2 3 4 \
      --out check_outputs/eval/uncertainty_mse5.json

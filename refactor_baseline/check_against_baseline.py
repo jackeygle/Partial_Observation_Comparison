@@ -56,14 +56,17 @@ def main():
     # 结构差异先报，再比数值 —— 少了一个字段和数值变了是两种不同的错
     missing = sorted(set(base) - set(new))
     added = sorted(set(new) - set(base))
-    bad, checked, skipped = [], 0, 0
+    bad, strings, checked, skipped = [], [], 0, 0
 
     for k in sorted(set(base) & set(new)):
         a, b = base[k], new[k]
         if isinstance(a, bool) or isinstance(b, bool) or not isinstance(a, (int, float)) \
                 or not isinstance(b, (int, float)):
+            # 非数值字段单独一类：重构会合法地改变记录路径的字符串（source、
+            # enkf-dir、protocol 里的目录名），但**不允许**改变任何数值。
+            # 把两者混在一个判定里，就没法区分"路径搬了"和"算错了"。
             if a != b:
-                bad.append((k, a, b, None))
+                strings.append((k, a, b))
             else:
                 skipped += 1
             continue
@@ -89,6 +92,12 @@ def main():
     if missing or added:
         print()
 
+    if strings:
+        print(f"[字符串] {len(strings)} 处不同（路径类字段在重构里合法变化，不判失败）:")
+        for k, a, b in strings[:10]:
+            print(f"    {k}\n        基线 {a!r}\n        新   {b!r}")
+        print()
+
     if bad:
         print(f"[数值] {len(bad)} 处不一致:")
         for k, a, b, d in bad[:25]:
@@ -98,7 +107,11 @@ def main():
             print(f"    ... 另有 {len(bad) - 25} 处")
 
     ok = not bad and not missing
-    print(f"\n{'[通过] 重构没有改变任何数字。' if ok else '[失败] 重构改变了结果，先修再继续。'}")
+    if ok:
+        extra = f"（{len(strings)} 处路径字符串变化，见上）" if strings else ""
+        print(f"\n[通过] {checked} 个数值全部在容差内，重构没有改变结果。{extra}")
+    else:
+        print("\n[失败] 重构改变了结果，先修再继续。")
     return 0 if ok else 1
 
 

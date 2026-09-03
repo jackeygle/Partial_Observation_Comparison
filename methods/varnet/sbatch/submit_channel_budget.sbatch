@@ -10,6 +10,6 @@
 # work one psi output value out by hand against real data. The GPU is needed only for the second
 # decomposition, which runs the solver's 20 unrolled iterations.
 # Writes check_outputs/eval/channel_budget.json, which checks/plot_math_detail.py reads.
-module load scicomp-python-env
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
-srun python3 checks/diag_channel_budget.py
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+srun python3 -m methods.varnet.checks.diag_channel_budget

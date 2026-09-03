@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=48G
 #SBATCH --time=01:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/dincae_crowd/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/slurm_%x_%j.out
 
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/dincae_crowd
-python3 -u checks/evaluate.py "$@"
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
+python3 -u -m methods.dincae.checks.evaluate "$@"

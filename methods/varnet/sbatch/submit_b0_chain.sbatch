@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 #
 # Usage:  sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1
 #         sbatch --job-name=varnet_b0_k4 sbatch/submit_b0_chain.sbatch 4
@@ -36,8 +36,8 @@
 #                 finishes OR is killed at the time limit;
 #             (3) train with --resume.
 source /etc/profile 2>/dev/null
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 K=${1:?usage: sbatch --job-name=varnet_b0_kN sbatch/submit_b0_chain.sbatch <obs_every_k>}
 OUTDIR=runs/varnet_b0_k${K}
@@ -63,7 +63,7 @@ echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # (3) train — no --lstm-hidden on purpose (solver stays at the config default, identical to
 nvidia-smi --query-gpu=name --format=csv,noheader
-python3 -u train_varnet.py --resume \
+python3 -u -m methods.varnet.train --resume \
     --obs-every-k $K \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
     --loss supervised --iter-schedule "$SCHED" --clip-grad 1.0 \

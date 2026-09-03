@@ -9,6 +9,6 @@
 #SBATCH --exclude=gpu51
 # Fair four-way test of the learnt sigma^2: raw / globally rescaled / constant / 1-D lookup,
 # every fitted quantity taken from the valid split and applied unchanged to the 7 test days.
-module load scicomp-python-env
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
-srun python3 checks/diag_h_predicts_xhat.py
+source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+srun python3 -m methods.varnet.checks.diag_h_predicts_xhat

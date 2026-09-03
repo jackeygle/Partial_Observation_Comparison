@@ -17,12 +17,13 @@
 
 ## 怎么验收
 
-    python3 refactor_baseline/check_against_baseline.py <重构后新产出的 compare4/5 json>
+    # 4DVarNet 那几行有 ~4e-4 的固有抖动，见下面"复现下限"，所以容差按实测取
+    python3 refactor_baseline/check_against_baseline.py <新产出的 json> --tol 3e-4
 
-它逐个数值叶子比对,默认要求**完全相等**。EnKF 那条单独跑:
+EnKF 那条单独跑:
 
     # 重构后
-    python3 -m methods.varnet.checks.verify_enkf_opt --frames 12 --ensemble 100
+    python3 -m methods.enkf.checks.verify_enkf_opt --frames 12 --ensemble 100
     diff <(...) refactor_baseline/verify_enkf_opt.out
 
 ## 为什么要有这个目录
@@ -32,3 +33,28 @@
 只会静默算出别的数字"的那类东西。没有数值基线的话,重构完根本无法判断有没有改坏。
 
 重构完成、验收通过后,这个目录可以删,或者留着当回归测试。
+
+
+## 复现下限：4DVarNet 的数字只在前 3 位有效
+
+重构后 compare4 的 957 个数值里有 521 处与基线不同，全部集中在 4DVarNet 那几行，
+最大绝对差 2.39e-04（相对 4.2e-04）。Senseiver、EnKF、DINCAE 三方**逐位相同**。
+
+这不是重构造成的。同一台机器、同一份代码、连跑两次（作业 20051734）：
+
+| 方法 | 两次跑的最大相对差 |
+|---|---|
+| Senseiver | 0.00e+00 |
+| EnKF k1 | 0.00e+00 |
+| DINCAE | 0.00e+00 |
+| **4DVarNet b0_k1** | **4.18e-04** |
+
+和重构前后的 4.20e-04 是同一个量级 —— 也就是说 4DVarNet 的这个指标本身就没法逐位复现。
+
+原因：`GradSolver` 在**推理时**也要走 `torch.enable_grad()` 做 15~20 次反传（那是它的
+求解方式，不是训练），而 conv backward 的归约用 atomicAdd，累加顺序每次不同。
+Senseiver 在 `torch.no_grad()` 下只做前向，所以逐位可复现；EnKF 从 npz 读，纯 numpy。
+
+**对结果解读的影响**：4DVarNet 的任何数字，第 4 位小数是噪声。
+"a4 比 b0 好 15%" 这种结论远在下限之上（0.1109 vs 0.1284），安全；
+但不要报 "0.1782 vs 0.1781" 这种量级的差别，那在噪声里。
