@@ -19,3 +19,28 @@ NVIDIA H200
            ↑ new best (0.0600) -> varnet_best.pt
 [epoch   5] loss=-2.0314  盲区MSE=0.0573  density=0.0183 vx=0.1753 vy=0.0271 var=0.0086
            ↑ new best (0.0573) -> varnet_best.pt
+[epoch   6] loss=-2.0363  盲区MSE=0.0545  density=0.0183 vx=0.1643 vy=0.0269 var=0.0086
+           ↑ new best (0.0545) -> varnet_best.pt
+[epoch   7] loss=-2.0786  盲区MSE=0.0531  density=0.0182 vx=0.1590 vy=0.0267 var=0.0086
+           ↑ new best (0.0531) -> varnet_best.pt
+[epoch   8] loss=-2.0800  盲区MSE=0.0524  density=0.0183 vx=0.1558 vy=0.0267 var=0.0087
+           ↑ new best (0.0524) -> varnet_best.pt
+[epoch   9] loss=-2.0599  盲区MSE=0.0517  density=0.0183 vx=0.1530 vy=0.0267 var=0.0087
+           ↑ new best (0.0517) -> varnet_best.pt
+[epoch  10] loss=-2.1047  盲区MSE=0.0512  density=0.0183 vx=0.1511 vy=0.0266 var=0.0087
+           ↑ new best (0.0512) -> varnet_best.pt
+[epoch  11] loss=-2.1662  盲区MSE=0.0505  density=0.0183 vx=0.1483 vy=0.0267 var=0.0087
+           ↑ new best (0.0505) -> varnet_best.pt
+[epoch  12] loss=-2.1740  盲区MSE=0.0504  density=0.0185 vx=0.1477 vy=0.0267 var=0.0087
+           ↑ new best (0.0504) -> varnet_best.pt
+[epoch  13] loss=-2.1415  盲区MSE=0.0498  density=0.0184 vx=0.1456 vy=0.0266 var=0.0087
+           ↑ new best (0.0498) -> varnet_best.pt
+[epoch  14] loss=-2.1614  盲区MSE=0.0496  density=0.0185 vx=0.1447 vy=0.0267 var=0.0087
+           ↑ new best (0.0496) -> varnet_best.pt
+[epoch  15] loss=-2.2620  盲区MSE=0.0497  density=0.0186 vx=0.1445 vy=0.0268 var=0.0087
+[epoch  16] loss=-2.1926  盲区MSE=0.0494  density=0.0185 vx=0.1436 vy=0.0266 var=0.0087
+           ↑ new best (0.0494) -> varnet_best.pt
+[epoch  17] loss=-2.2402  盲区MSE=0.0494  density=0.0186 vx=0.1435 vy=0.0268 var=0.0087
+[epoch  18] loss=-2.1513  盲区MSE=0.0491  density=0.0185 vx=0.1426 vy=0.0267 var=0.0088
+           ↑ new best (0.0491) -> varnet_best.pt
+[2026-09-03T16:06:51.014] error: *** JOB 20052073 ON gpu52 CANCELLED AT 2026-09-03T16:06:51 DUE TO TIME LIMIT ***

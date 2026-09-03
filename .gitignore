@@ -36,3 +36,6 @@ core.*
 
 # chain 的进展戳，是瞬时状态
 **/.chain_last_epoch
+
+# compare 的中间产物（回归测试的临时输出）
+compare/results/_*.json

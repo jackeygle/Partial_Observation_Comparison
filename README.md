@@ -27,7 +27,8 @@ sbatch/_env.sh      唯一的环境入口
 
 ```bash
 source sbatch/_env.sh                    # module load + PYTHONPATH + PYTHONSAFEPATH
-python3 -m compare.compare4              # 五方对比
+python3 -m compare.compare5              # 五方对比，四套口径
+python3 -m compare.plot_compare5         # 主结果图
 python3 -m methods.varnet.train --help
 python3 -m methods.enkf.checks.verify_enkf_opt --frames 12
 ```
@@ -67,7 +68,7 @@ sbatch methods/dincae/sbatch/submit_eval.sbatch
 测量值。而盲区里 **88.4%** 的格子是空的。三个在完整场上训练的方法学会了"空格子输出 0"
 白拿这部分分；DINCAE 只在有定义的格子上训练过，就被这一项压垮。
 
-所以任何图表**只给一个数字而不说清算的是哪些格子，就是误导**。`compare/compare4.py`
+所以任何图表**只给一个数字而不说清算的是哪些格子，就是误导**。`compare/compare5.py`
 把两套口径并排算出来，规则的唯一定义在 `methods/dincae/state.py:channel_valid()`。
 
 另外 4DVarNet 的数字有 **~4e-4 的复现下限**（它推理时也要走 autograd 反传），

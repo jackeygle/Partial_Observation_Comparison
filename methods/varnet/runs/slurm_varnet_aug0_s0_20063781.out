@@ -1,0 +1,28 @@
+Submitted batch job 20064054
+[chain] submitted successor (afterany:20063781)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=3,945,942 (GENN prior 9,420 = 0.24%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_aug0_s0/varnet_last.pt: continuing from epoch 19 (step 3743)
+[best] previous best blind MSE = 0.0491
+[schedule] epoch 19: n_iter -> 5, lr -> 0.001
+[epoch  19] loss=-2.2046  盲区MSE=0.0491  density=0.0185 vx=0.1424 vy=0.0267 var=0.0087
+           ↑ new best (0.0491) -> varnet_best.pt
+[epoch  20] loss=-2.2249  盲区MSE=0.0491  density=0.0187 vx=0.1423 vy=0.0269 var=0.0088
+[epoch  21] loss=-2.2332  盲区MSE=0.0490  density=0.0186 vx=0.1421 vy=0.0268 var=0.0087
+           ↑ new best (0.0490) -> varnet_best.pt
+[epoch  22] loss=-2.2658  盲区MSE=0.0490  density=0.0186 vx=0.1417 vy=0.0268 var=0.0087
+           ↑ new best (0.0490) -> varnet_best.pt
+[epoch  23] loss=-2.2333  盲区MSE=0.0490  density=0.0187 vx=0.1419 vy=0.0268 var=0.0088
+[epoch  24] loss=-2.2231  盲区MSE=0.0491  density=0.0187 vx=0.1418 vy=0.0270 var=0.0088
+[schedule] epoch 25: n_iter -> 10, lr -> 0.0007
+[epoch  25] loss=-2.2218  盲区MSE=0.0492  density=0.0188 vx=0.1422 vy=0.0269 var=0.0088
+[epoch  26] loss=-2.2390  盲区MSE=0.0489  density=0.0187 vx=0.1414 vy=0.0268 var=0.0088
+           ↑ new best (0.0489) -> varnet_best.pt
+[epoch  27] loss=-2.2335  盲区MSE=0.0489  density=0.0188 vx=0.1411 vy=0.0269 var=0.0088
+           ↑ new best (0.0489) -> varnet_best.pt
+[epoch  28] loss=-2.2232  盲区MSE=0.0492  density=0.0188 vx=0.1420 vy=0.0271 var=0.0088

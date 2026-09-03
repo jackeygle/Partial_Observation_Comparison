@@ -1,51 +1,74 @@
 """
-compare4.py — 四方逐通道对比，「有定义格子」口径（Senseiver / 4DVarNet / EnKF / DINCAE）
-========================================================================================
+compare5.py — 五方逐通道对比，四套格子口径并列
+==============================================
 
-为什么要这个脚本。`compare3.py` 用的是 4dvarnet_enkf 的「所有格子」口径 —— 原始场、含非
-walkable、四通道无权重。DINCAE 在那个口径下的盲区 MSE 是 0.5644，但那不是它的真实水平：
-它从未在空格子的速度占位符 0 上训练过（`dincae_crowd/checks/evaluate.py` 的文件头写了这
-件事，并且已经预告"报它是为了可比，不是因为它更对"）。证据是 `vy`：DINCAE 自己的口径下
-0.1026，换成所有格子口径跳到 1.6489（16 倍），而 `vx` 几乎不动（0.546 → 0.571）。这种不
-对称是口径伪影，不是模型性质。
+五个方法（都在 7 个留出日的整天上、obs_every_k=1、seed=0、同一物理裁剪）:
 
-反过来，DINCAE 自己那个 0.1047 也不能和 compare3 的 0.028~0.046 并排放 —— 分母根本不是
-同一批格子。
+    Senseiver                    稀疏传感器 -> 场
+    4DVarNet MSE   单成员/集成    Eq.14 的 plain 平方损失
+    4DVarNet NLL   单成员/集成    高斯 NLL + σ̂ 读出头（"不确定性头"）
+    DINCAE                       卷积自编码器插补（16 个 checkpoint 输出平均）
+    EnKF k1                      局部化 EnKF，Partial_observation 的 vendor 副本
 
-所以这里把**另外三方也搬到「有定义格子」口径**上，让四方第一次落在同一张表里。
+MSE 臂与 NLL 臂的先验/求解器架构**逐权重相同**（hidden 32、kt 3、lstm_hidden 64、
+GENN 9,474），唯一差别是 NLL 那边多了 `grad_net.out_var` —— 692,000 参数的 σ̂ 读出头。
+所以损失函数的影响在单成员和集成两个层级上都是干净对比。
 
-口径（四方完全一致）
---------------------
-  * 有定义格子：density 处处有定义；vx/vy 要求 density>0；var 要求 var>0。
-    唯一的定义在 `methods/dincae/state.py:channel_valid()`，本脚本直接 import 它，
-    **不复制规则**（复制过来就会有第二个真相）。
+为什么要四套口径
+----------------
+**名次会随口径翻转。**同一份预测，在「所有格子」口径下 Senseiver 第一、DINCAE 差 12 倍
+垫底；换成「有定义格子」后 DINCAE 第一、Senseiver 第三。
+
+原因在速度通道：空格子里没有人，也就没有速度，数据管线在那里存的 `0` 是占位符而不是
+测量值，而盲区里 88.4% 的格子是空的。三个在完整场上训练的方法学会了"空格子输出 0"
+白拿这部分分；DINCAE 只在有定义的格子上训练过，就被这一项压垮 —— 它的 `vy` 在自己
+口径下是 0.1026，换成所有格子口径跳到 1.6489（16 倍），而 `vx` 几乎不动（0.546→0.571）。
+这种不对称是口径伪影，不是模型性质。
+
+所以四套并列，让差别在同一份输出里看得见，而不是要读者自己去比几个 json：
+
+    ① defined        盲区 ∩ 有定义 ∩ walkable      主结果，五方可比
+    ② defined_full   全场 ∩ 有定义 ∩ walkable      含观测格子
+    ③ allcells       盲区，所有格子                compare3 的旧口径
+    ④ full           全场，所有格子                eval_test_days 的 full_mse
+
+每套再乘「裁剪/不裁剪」和「池化/按日平均」，因为这两组也各自被混用过：
+`test_metrics_*.json` 报按日平均，`eval_threeway_accuracy.py` 报池化，两者不是同一个量。
+
+口径细节
+--------
+  * 有定义格子：density 处处有定义；vx/vy 要求 density>0；var 要求 var>0。唯一的定义在
+    `methods/dincae/state.py:channel_valid()`，本脚本直接 import 它，**不复制规则**。
   * ∩ walkable。已逐格核对 `methods/dincae/artifacts/state_stats.npz["valid_mask"]` 与
-    `nav.build_valid_mask_from_config()` 完全相同（290/432 格），所以两个项目喂给
-    `generate_observations` 的 `valid_mask` 是同一个，盲区集合本来就一致。
-  * ∩ 盲区（`~Omega`）。
-  * 同一物理裁剪（EnKF 的界，density[0,5] / vx,vy[-5,5] / var[0,2]）。
-  * 7 个留出日、整天、`obs_every_k=1`、`seed=0`、`obs_std` 同为 config 的值。
-  * 帧范围 `[1, T-1)`：DINCAE 的 `FRESH_OFFSETS=(-1,0,1)` 逼它丢掉首尾各一帧，另外三方
-    跟着丢，否则分母不同（这也是它 per_day 帧数比 Senseiver 少 2 的原因）。
-  * 池化：先按通道累加平方误差与格数，最后一次相除。不是"按日平均再平均" ——
-    `eval_threeway_accuracy.py` 的文件头解释过这两者不是同一个量。
-
-「所有格子」口径同时并排算出来，这样两套口径的差别在同一张表里看得见，而不是要读者
-自己去比两个 json。
+    `nav.build_valid_mask_from_config()` 完全相同（290/432 格），所以两边喂给
+    `generate_observations` 的 `valid_mask` 是同一个，盲区集合本来就一致（脚本里有断言）。
+  * 帧范围 `[1, T-1)`：DINCAE 的 `FRESH_OFFSETS=(-1,0,1)` 逼它丢掉首尾各一帧，其余方法
+    跟着丢，否则分母不同。
+  * 池化：先按通道累加平方误差与格数，最后一次相除。
 
 DINCAE 那一行
 -------------
-从 `dincae_crowd/check_outputs/eval/dincae_metrics_test.json` 的 `ours_blind_mse` 读，不重跑
-它的 16 个 checkpoint 输出平均。合并成"合计"时用的是**本脚本自己算出的逐通道格数**
-（掩码相同，格数就相同），而不是它的 `ours_blind_mse_all_channels` —— 后者是它自己帧范围
-下的分母，和这里对齐后的帧范围差 2 帧。
+从 `methods/dincae/check_outputs/eval/dincae_metrics_test.json` 读，不重跑它的 16 个
+checkpoint 输出平均。它自己的 evaluate.py 恰好就报四套口径，与这里一一对应
+（`ours_blind` / `ours_all` / `v4dvar_blind` / `v4dvar_all`）。合并成"合计"时用的是
+**本脚本自己算出的逐通道格数**，而不是它 json 里的 all_channels 值 —— 后者的分母是
+它自己的帧范围。
 
-本脚本只读 4dvarnet_enkf 和 dincae_crowd，不写入它们的任何目录。
+公平性提醒：DINCAE 这一行**本身就是 16 个 checkpoint 的输出平均**，天然带集成优势，
+该和"集成"那几行比，不该和单模型比。
 
-用法（GPU 节点）
-----------------
-    sbatch sbatch/submit_compare4.sbatch
-    sbatch sbatch/submit_compare4.sbatch --days 1        # 冒烟，只跑第一天
+复现下限
+--------
+4DVarNet 的数字有 ~4e-4 的相对抖动：`GradSolver` 在**推理时**也要走 autograd 反传，
+conv backward 的 atomicAdd 归约顺序每次不同。Senseiver（no_grad）、EnKF（numpy 读 npz）、
+DINCAE（读 json）都逐位可复现。见 `refactor_baseline/README.md`。
+**4DVarNet 的第 4 位小数是噪声，不要报那个量级的差别。**
+
+用法（GPU 节点，从仓库根）
+--------------------------
+    source sbatch/_env.sh
+    python3 -m compare.compare5
+    python3 -m compare.compare5 --days 1 --ensembles ""     # 冒烟，跳过集成
 """
 from __future__ import annotations
 
@@ -82,7 +105,7 @@ HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 # eval_test_days.py 的 full_mse 和 eval_threeway_accuracy.py 的 rmse_all 那个量；
 # 放进来是为了在同一条代码路径上核对那两个脚本对 4DVarNet 报的 0.1702 与 0.2104。
 # `_noclip` 存在的理由：threeway 不裁剪，test_metrics 裁剪，这是它们唯一已知的口径差。
-BASE_CONVENTIONS = ("defined", "allcells", "full")
+BASE_CONVENTIONS = ("defined", "defined_full", "allcells", "full")
 CONVENTIONS = BASE_CONVENTIONS + tuple(f"{k}_noclip" for k in BASE_CONVENTIONS)
 
 
@@ -162,9 +185,10 @@ def build_masks(X, Omf, walk, C):
     blind = ~np.repeat(Omf[:, None], C, axis=1)                  # (T,C,H,W)
     cv = np.moveaxis(channel_valid(X), 0, 1)                     # (NCH,T,H,W) -> (T,C,H,W)
     w = walk[None, None]
-    base = {"defined": blind & cv & w,
-            "allcells": blind,
-            "full": np.ones_like(blind)}                          # 全场 = 观测 + 盲区
+    base = {"defined": blind & cv & w,          # 盲区 ∩ 有定义 ∩ walkable
+            "defined_full": cv & w,                # 有定义 ∩ walkable，观测格子也算
+            "allcells": blind,                     # 盲区，所有格子
+            "full": np.ones_like(blind)}           # 全场 = 观测 + 盲区，所有格子
     base.update({f"{k}_noclip": v for k, v in base.items()})      # 同一批格子，不裁剪打分
     return base
 
@@ -176,9 +200,10 @@ def main():
                                          "senseiver_A", "best.pt"))
     ap.add_argument("--varnet", default="a4_k1,b0_k1",
                     help="逗号分隔的 4dvarnet run 名（runs/varnet_<名>/varnet_best.pt）")
-    ap.add_argument("--de-fmt", default="vsb0_s{}",
-                    help="不确定性头（NLL）深度集成的 run 名模板；留空则不评它")
-    ap.add_argument("--de-members", default="0,1,2,3,4")
+    ap.add_argument("--ensembles", default="MSE=mse5_s{},NLL=vsb0_s{}",
+                    help="逗号分隔的 `标签=run名模板`。每个集成会出 N 个单成员行加一个"
+                         "集成行。留空则不评任何集成。")
+    ap.add_argument("--ensemble-members", default="0,1,2,3,4")
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
                     default=os.path.join(paths.eval_out(paths.DINCAE),
@@ -190,7 +215,7 @@ def main():
     # check_outputs。重构前它写在 senseiver_crowd/check_outputs/eval/ 下，
     # 让人以为那是 Senseiver 的指标。
     ap.add_argument("--out", default=os.path.join(paths.COMPARE, "results",
-                                                  "compare4.json"))
+                                                  "compare5.json"))
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -215,18 +240,26 @@ def main():
         sol, va, _ = load_solver(os.path.join(paths.runs(paths.VARNET), f"varnet_{vn}", "varnet_best.pt"), dev)
         vsolvers[vn] = (sol, va)
 
-    # 不确定性头（NLL 损失）的深度集成。点估计是各成员重建的均值（论文 Sec 2.4），
-    # 所以"集成"和"单成员均值±std"是两个不同的量，两个都报 —— 只报集成会把
-    # "平均带来的好处"和"损失函数的影响"混在一起。
-    de_members = [z.strip() for z in args.de_members.split(",") if z.strip()] \
-        if args.de_fmt else []
-    de_solvers, de_dT = [], None
-    for m in de_members:
-        sol, va, _ = load_solver(
-            os.path.join(paths.runs(paths.VARNET), f"varnet_{args.de_fmt.format(m)}",
-                         "varnet_best.pt"), dev)
-        de_solvers.append(sol)
-        de_dT = va["dT"]
+    # 深度集成。点估计是各成员重建的均值（论文 Sec 2.4），所以"集成"和"单成员均值±std"
+    # 是两个不同的量，两个都报 —— 只报集成会把"平均带来的好处"和"损失函数的影响"混在一起。
+    #
+    # 两个集成并列的意义：mse5 与 vsb0 的先验/求解器架构**逐权重相同**（hidden 32、
+    # kt 3、lstm_hidden 64、GENN 9,474），唯一差别是 vsb0 多了 grad_net.out_var 这个
+    # 692,000 参数的 σ̂ 读出头。所以 MSE-vs-NLL 在单成员和集成两个层级上都是干净对比。
+    # （曾经以为要拿 b0_k1 和 vsb0 比会混进架构差异 —— 那是误记，b0_k1 本来就同架构。）
+    ens_members = [z.strip() for z in args.ensemble_members.split(",") if z.strip()]
+    ensembles = {}                                   # 标签 -> [solver, ...]
+    for spec in (z.strip() for z in args.ensembles.split(",") if z.strip()):
+        label, _, fmt = spec.partition("=")
+        assert fmt, f"--ensembles 的每一项要写成 标签=run名模板，收到 {spec!r}"
+        sols, edT = [], None
+        for m in ens_members:
+            sol, va, _ = load_solver(
+                os.path.join(paths.runs(paths.VARNET), f"varnet_{fmt.format(m)}",
+                             "varnet_best.pt"), dev)
+            sols.append(sol)
+            edT = va["dT"]
+        ensembles[label] = (sols, edT)
     print(f"[model] Senseiver {sm.num_params:,} 参数 | "
           + " | ".join(f"4DVarNet {vn} dT={va['dT']} n_iter={sol.n_iter}"
                        for vn, (sol, va) in vsolvers.items())
@@ -236,10 +269,11 @@ def main():
     if args.days:
         days = days[:args.days]
 
-    de_names = [f"4DVarNet nll s{m}" for m in de_members]
-    names = ["Senseiver"] + [f"4DVarNet {vn}" for vn in vnames] \
-        + (["4DVarNet nll ens%d" % len(de_members)] if de_solvers else []) \
-        + de_names + ["EnKF k1"]
+    names = ["Senseiver"] + [f"4DVarNet {vn}" for vn in vnames]
+    for label, (sols, _) in ensembles.items():
+        names.append(f"4DVarNet {label} ens{len(sols)}")
+        names += [f"4DVarNet {label} s{m}" for m in ens_members]
+    names.append("EnKF k1")
     accs = {k: Acc(C) for k in names}
     # 按日的 overall，用来算"按日平均"那个口径。test_metrics_*.json / eval_test_days.py 报的是
     # 它，eval_threeway_accuracy.py 报的是池化 —— 两者不是同一个量，这里同时给出。
@@ -273,18 +307,18 @@ def main():
                                        cut(sel_all, lo, b))
             del pv
 
-        if de_solvers:
+        for label, (sols, edT) in ensembles.items():
             ens = None
-            for m, sol in zip(de_members, de_solvers):
-                pv, nkeep = run_varnet(sol, Yf, Omc, X0, de_dT, dev, args.varnet_batch)
+            for m, sol in zip(ens_members, sols):
+                pv, nkeep = run_varnet(sol, Yf, Omc, X0, edT, dev, args.varnet_batch)
                 b = min(hi, nkeep)
-                dacc[f"4DVarNet nll s{m}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
-                                               cut(sel_all, lo, b))
+                dacc[f"4DVarNet {label} s{m}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
+                                                   cut(sel_all, lo, b))
                 ens = pv if ens is None else ens + pv      # 累加，别同时留 5 份整天数组
                 del pv
-            ens /= len(de_solvers)
+            ens /= len(sols)
             b = min(hi, ens.shape[0])
-            dacc[f"4DVarNet nll ens{len(de_solvers)}"].add(
+            dacc[f"4DVarNet {label} ens{len(sols)}"].add(
                 clip_np(ens[lo:b]), ens[lo:b], Xf[lo:b], cut(sel_all, lo, b))
             del ens
 
@@ -316,14 +350,20 @@ def main():
     if os.path.exists(args.dincae_json):
         with open(args.dincae_json) as f:
             dj = json.load(f)
-        dincae_pc = dj.get("ours_blind_mse")
-        dincae_all = dj.get("v4dvar_blind_mse")
+        # DINCAE 自己的 evaluate.py 恰好就报这四套，与本脚本的四个口径一一对应
+        dincae_by_conv = {
+            "defined":      dj.get("ours_blind_mse"),      # 有定义 ∩ walkable ∩ 盲区
+            "defined_full": dj.get("ours_all_mse"),        # 有定义 ∩ walkable ∩ 全场
+            "allcells":     dj.get("v4dvar_blind_mse"),    # 所有格子 ∩ 盲区
+            "full":         dj.get("v4dvar_all_mse"),      # 所有格子 ∩ 全场
+        }
+        dincae_pc = dincae_by_conv["defined"]
         if int(dj.get("n_days", 0)) != len(days):
             print(f"\n  [warn] DINCAE 那一行是 {dj.get('n_days')} 天池化的，本次只跑了 "
                   f"{len(days)} 天 —— 两者不可比，这张表只能用来看代码通不通。", flush=True)
     else:
         print(f"  [warn] 找不到 {args.dincae_json}，DINCAE 行留空", flush=True)
-        dincae_all = None
+        dincae_by_conv = {}
 
     # --- 输出 -------------------------------------------------------------------
     res = {"protocol": {
@@ -356,39 +396,47 @@ def main():
     if dincae_pc:
         ref = next(iter(accs.values()))
         entry = {}
-        for conv, pc in (("defined", dincae_pc), ("allcells", dincae_all)):
+        for conv, pc in dincae_by_conv.items():
             if not pc:
                 continue
             nn = ref.n[conv]
             se = sum(pc[c] * nn[i] for i, c in enumerate(chans))
+            ov = float(se / max(nn.sum(), 1))
+            # 字段与其他方法对齐，方便下游画图代码一视同仁。**没有** rmse_mean_of_days：
+            # DINCAE 那一行是从它自己的 json 读的池化值，我们手里没有它的逐日数据。
             entry[conv] = {"per_channel": {c: float(pc[c]) for c in chans},
                            "n_per_channel": {chans[i]: int(v) for i, v in enumerate(nn)},
-                           "overall": float(se / max(nn.sum(), 1)),
+                           "overall": ov, "overall_pooled": ov,
+                           "rmse_pooled": float(np.sqrt(ov)),
                            "source": os.path.relpath(args.dincae_json, paths.ROOT)}
         res["results"]["DINCAE"] = entry
 
     print("\n\n全场 RMSE（观测 + 盲区所有格子）—— 池化 vs 按日平均 vs 不裁剪\n")
-    print(f"{'方法':<20}{'池化':>10}{'按日平均':>12}{'池化,不裁':>12}{'按日平均,不裁':>16}")
-    print("-" * 70)
+    print(f"{'方法':<24}{'池化':>10}{'按日平均':>12}{'池化,不裁':>12}{'按日平均,不裁':>16}")
+    print("-" * 74)
     for k, q in res["results"].items():
         if "full" not in q:
             continue
-        print(f"{k:<20}{q['full']['rmse_pooled']:>10.4f}"
-              f"{q['full']['rmse_mean_of_days']:>12.4f}"
-              f"{q['full_noclip']['rmse_pooled']:>12.4f}"
-              f"{q['full_noclip']['rmse_mean_of_days']:>16.4f}")
+        cell = lambda c, f: (f"{q[c][f]:.4f}" if c in q and f in q[c] else "—")
+        print(f"{k:<24}{cell('full','rmse_pooled'):>10}"
+              f"{cell('full','rmse_mean_of_days'):>12}"
+              f"{cell('full_noclip','rmse_pooled'):>12}"
+              f"{cell('full_noclip','rmse_mean_of_days'):>16}")
 
-    for conv, title in (("defined", "有定义格子 ∩ walkable ∩ 盲区（四方可比的口径）"),
-                        ("allcells", "所有格子 ∩ 盲区（compare3 的旧口径，供对照）")):
+    for conv, title in (
+            ("defined", "① 有定义格子 ∩ walkable ∩ 盲区  —— 五方可比，主结果"),
+            ("defined_full", "② 有定义格子 ∩ walkable ∩ 全场（含观测格子）"),
+            ("allcells", "③ 所有格子 ∩ 盲区  —— compare3 的旧口径，供对照"),
+            ("full", "④ 所有格子 ∩ 全场  —— eval_test_days 的 full_mse 那个量")):
         print(f"\n{title}\n")
-        print(f"{'方法':<20}" + "".join(f"{c:>11}" for c in chans)
+        print(f"{'方法':<24}" + "".join(f"{c:>11}" for c in chans)
               + f"{'合计':>11}{'合计RMSE':>11}")
-        print("-" * (20 + 11 * (len(chans) + 2)))
+        print("-" * (24 + 11 * (len(chans) + 2)))
         for k, q in res["results"].items():
             if conv not in q:
                 continue
             pc, ov = q[conv]["per_channel"], q[conv]["overall"]
-            print(f"{k:<20}" + "".join(f"{pc[c]:>11.4f}" for c in chans)
+            print(f"{k:<24}" + "".join(f"{pc[c]:>11.4f}" for c in chans)
                   + f"{ov:>11.4f}{np.sqrt(ov):>11.4f}")
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)

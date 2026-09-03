@@ -17,8 +17,21 @@
 
 ## 怎么验收
 
+`compare4.py` 在 2026-09-04 改名为 `compare/compare5.py` 并加了两个口径（`defined_full`、
+`full`）和第二个集成臂（MSE）。回归测试**必须用与基线相同的参数**跑，否则行名和行数
+都变了，比对只会报一堆"少了字段"：
+
+    # 复现基线的行集合：两个 varnet 单模型 + 标签为 "nll" 的那个集成
+    python3 -m compare.compare5 --varnet a4_k1,b0_k1 --ensembles "nll=vsb0_s{}" \
+        --out compare/results/_regression.json
     # 4DVarNet 那几行有 ~4e-4 的固有抖动，见下面"复现下限"，所以容差按实测取
-    python3 refactor_baseline/check_against_baseline.py <新产出的 json> --tol 3e-4
+    python3 refactor_baseline/check_against_baseline.py \
+        compare/results/_regression.json --tol 3e-4
+
+新增的 `defined_full` / `full` 口径会被报成"多了字段"，那是正常的，不判失败。
+
+日常出主结果用默认参数（`--varnet a4_k1`、MSE 与 NLL 两个集成），产出
+`compare/results/compare5.json`，那份不是回归基线。
 
 EnKF 那条单独跑:
 
