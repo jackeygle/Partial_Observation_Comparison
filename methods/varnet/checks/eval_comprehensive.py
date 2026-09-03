@@ -36,10 +36,11 @@ import numpy as np, torch
 from crowdcore import config
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
+from crowdcore import paths
 from methods.varnet.checks.model_io import load_solver
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
+ENKFDIR = paths.enkf_export("enkf")
 CH = ["density", "vx", "vy", "var"]
 
 

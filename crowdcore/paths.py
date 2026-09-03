@@ -68,14 +68,16 @@ def eval_out(name: str) -> str:
 
 
 def enkf_export(which: str = "enkf_k1_full") -> str:
-    """EnKF 导出的估计场（est_*.npz / obs_*.npz），约 18 GB。
+    """EnKF 导出的估计场（est_*.npz / obs_*.npz），9 个目录约 17 GB。
 
-    这些文件**物理上留在 methods/varnet/check_outputs/ 下**，没有随 EnKF 代码搬到
-    methods/enkf/。理由：重新生成要几十个 GPU 小时，而 /scratch 上搬动它们虽然是
-    瞬间重命名，却会让所有引用它们的已有产出（compare4.json 等）对不上。
-    需要挪的话改这一个函数。
+    2026-09-03 从 methods/varnet/check_outputs/ 搬到了 methods/enkf/check_outputs/ ——
+    它们是 EnKF 的产出，挂在 4DVarNet 目录下只是历史遗留（那时两个方法共处一个目录）。
+    /scratch 是单一文件系统，所以搬 17 GB 是瞬间重命名，不是拷贝。
+
+    搬迁刻意排在数值验收**之后**：先证明重构没改变任何数字，再动数据，
+    否则两个变量混在一起，出问题就分不清是 import 改错了还是路径挪错了。
     """
-    return os.path.join(METHODS, VARNET, "check_outputs", which)
+    return os.path.join(METHODS, ENKF, "check_outputs", which)
 
 
 def enkf_vendor(which: str = "enkf_lab") -> str:

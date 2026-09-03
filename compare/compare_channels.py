@@ -26,7 +26,7 @@ from methods.varnet.checks.model_io import load_solver
 # 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
 # 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
 ROOT = paths.method(paths.VARNET)
-ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
+ENKFDIR = paths.enkf_export("enkf")
 CH = config.get("grid", "channels")
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CKPT = os.environ.get("VARNET_CKPT", "runs/varnet_b0_k1/varnet_best.pt")

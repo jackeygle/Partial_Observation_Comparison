@@ -31,7 +31,7 @@ from methods.varnet.checks.model_io import load_solver
 # 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
 # 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
 ROOT = paths.method(paths.VARNET)
-ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
+ENKFDIR = paths.enkf_export("enkf")
 ARROW_MIN = 0.1                                           # draw a heading arrow only where there is real crowd
 
 

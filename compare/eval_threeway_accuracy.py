@@ -47,7 +47,7 @@ from crowdcore import navigation as nav                                         
 from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval", "threeway_accuracy.json")
-ENKF_SRC = os.path.join(ROOT, "check_outputs", "enkf_k1_full")
+ENKF_SRC = paths.enkf_export("enkf_k1_full")
 CHAN = list(config.get("grid", "channels"))
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MSE_RUN = os.environ.get("AUDIT_MSE", "runs/varnet_b0_k1")

@@ -22,9 +22,15 @@
 # script's no-read-out branch, not in the design.
 #
 # RUN IT WITHOUT THE CHAIN FIRST:
-#     sbatch --job-name=varnet_aug0_s0 --time=00:30:00 sbatch/submit_aug_chain.sbatch 0 0 99
-#   Generation 99 is above MAX_GEN, so no successor is queued and the failure is visible in
-#   one log instead of two hundred and fifty missing ones.
+#     sbatch --export=ALL,NOCHAIN=1 --job-name=varnet_aug0_s0 --time=00:35:00 \
+#            sbatch/submit_aug_chain.sbatch 0 0
+#   NOCHAIN=1 skips only the successor submission; training still runs, so the failure lands
+#   in one log instead of two hundred and fifty missing ones.
+#
+#   Do NOT try to get the same effect by passing a generation above MAX_GEN (`... 0 0 99`):
+#   the generation cap sits BEFORE the training call, so it refuses to run at all. That was
+#   written here as the recommended usage on 2026-09-03 and was simply wrong -- job 20051936
+#   died in one second printing "generation 99 exceeds 12".
 #
 # The design rationale, the R^2 audit it came from, and the ceiling it can reach are all
 # in the AUGMENTED STATE block below. (A block of submit_vr_chain.sbatch's rationale
@@ -106,9 +112,14 @@ mkdir -p "$OUTDIR" && echo "$EPOCH_NOW" > "$STAMP"
 # placed there falls back to CPU. TRANSIENT -- remove this once the node is healthy. The real
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
-sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_aug_chain.sbatch $S $BETA $((GEN+1))
-echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
+if [ "${NOCHAIN:-0}" = "1" ]; then
+    echo "[chain] NOCHAIN=1 — 只跑这一段，不排后继"
+else
+    sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME \
+           --dependency=afterany:$SLURM_JOB_ID \
+           sbatch/submit_aug_chain.sbatch $S $BETA $((GEN+1))
+    echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
+fi
 
 nvidia-smi --query-gpu=name --format=csv,noheader
 python3 -u -m methods.varnet.train --resume \
