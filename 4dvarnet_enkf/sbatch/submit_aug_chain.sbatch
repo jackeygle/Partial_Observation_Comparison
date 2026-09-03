@@ -37,11 +37,31 @@ source /etc/profile 2>/dev/null
 module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
 
-# --var-h-only PINS the old design. This script produced runs/varnet_vrb{0,1}_s0, whose
-# out_var is (C*T, hidden_ch, 1, 1) -- sigma^2 off the LSTM hidden state alone. var_sees_state
-# later became the default, so without this flag a --resume here builds a wider out_var than the
-# checkpoint holds and dies on load_state_dict. These runs are the baseline the wider read-out
-# is measured against, so they must keep reproducing the narrow one.
+# AUGMENTED STATE: log sigma^2 is iterated as part of the state, not read off a hidden layer.
+#
+# The problem this addresses. In the paper's feed-forward net the mean IS the final layer's
+# output, so a sigma^2 read out of the same layer shares everything that determines the mean.
+# Here the final layer emits an ITERATION INCREMENT and the prediction is x0 minus 20 of them,
+# so a read-out on the last hidden state is conditioned on a lossy summary of the solve rather
+# than on the reconstruction. Feeding it x_hat helped a little and nowhere near enough, and a
+# 24-bin lookup on |x_hat| still beat it -- so the limitation was never model capacity.
+#
+# What changes. The prior term of J becomes a Gaussian log-likelihood of the prior residual,
+#     mean[ (x - Phi(x))^2 e^{-s} + s ]     with s = log sigma^2,
+# whose stationary point in s is sigma^2 = (x - Phi(x))^2. That gives sigma^2 a gradient FROM
+# THE COST, so the learned optimiser can descend [x, s] jointly, 20 steps, the same way it does
+# the field. autograd supplies both gradients from one call.
+#
+# The ceiling, stated up front. sigma^2 now chases the prior residual, and the same-channel
+# prior residual predicts the TRUE error with R^2 0.38 (vx), 0.35 (vy), 0.11 (density)
+# (check_outputs/eval/sigma_drivers.json). So this route cannot exceed roughly that, density
+# will likely barely move, and the current read-out's rank agreement is about 0.03 -- a tenfold
+# gain would still be a partial answer, not a solved problem.
+#
+# ONE SEED FIRST. This is a real architecture change (C*dT -> 2*C*dT on the optimiser's channel
+# axis, 2.7M -> ~4M parameters) and it may simply not train. Train five only if the rank
+# agreement actually moves.
+
 # GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
 # the time limit still has one queued. The cost is that a job which crashes in the first second
 # also queues one, and that successor crashes too: on 2026-08-31 a one-line bug in a banner
@@ -55,9 +75,9 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_vrbN_sM sbatch/submit_vr_chain.sbatch <seed> <beta>}
+S=${1:?usage: sbatch --job-name=varnet_aug0_sM sbatch/submit_aug_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
-TAG=$(python3 -c "print('vrb%d' % round(float('$BETA')))")
+TAG=aug0   # BETA ignored; the loss is Eq.1 as written
 OUTDIR=runs/varnet_${TAG}_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
@@ -76,7 +96,7 @@ fi
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
 sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_vr_chain.sbatch $S $BETA $((GEN+1))
+       sbatch/submit_aug_chain.sbatch $S $BETA $((GEN+1))
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 nvidia-smi --query-gpu=name --format=csv,noheader
@@ -84,6 +104,6 @@ python3 -u train_varnet.py --resume \
     --obs-every-k 1 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
-    --loss nll --nll-beta $BETA --var-eps 1e-6 --var-h-only \
+    --loss nll --nll-beta 0.0 --var-eps 1e-6 --augmented-var \
     --iter-schedule "$SCHED" --clip-grad 1.0 \
     --outdir $OUTDIR

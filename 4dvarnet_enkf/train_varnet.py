@@ -192,6 +192,13 @@ def main():
                     help="--loss nll 的方差头宽度")
     ap.add_argument("--var-layers", type=int, default=2,
                     help="--loss nll 的方差头层数(逐点 1x1x1)")
+    ap.add_argument("--augmented-var", action="store_true",
+                    help="iterate log sigma^2 as part of the state instead of reading it off "
+                         "the last hidden layer. The prior term of J becomes a Gaussian "
+                         "log-likelihood of the prior residual, which is what gives sigma^2 a "
+                         "gradient from the cost; the LSTM then descends [x, log sigma^2] "
+                         "together. Doubles the optimiser's channel axis (C*dT -> 2*C*dT). "
+                         "Requires --loss nll")
     ap.add_argument("--var-h-only", action="store_true",
                     help="build the sigma^2 read-out on the LSTM hidden state ALONE, without "
                          "the detached x_hat. This is what runs/varnet_vrb{0,1}_s0 did, and it "
@@ -269,7 +276,8 @@ def main():
                         hidden_ch=args.lstm_hidden,
                         dropout=args.dropout,
                         predict_var=args.loss == "nll", var_eps=args.var_eps,
-                        var_sees_state=not args.var_h_only).to(dev)
+                        var_sees_state=not args.var_h_only,
+                        augmented_var=args.augmented_var).to(dev)
     params = list(solver.parameters())
     opt = torch.optim.Adam(params, lr=args.lr)
     n_param = sum(p.numel() for p in solver.parameters())
@@ -279,10 +287,17 @@ def main():
           f"loss={args.loss}  n_iter={args.n_iter}  amp={args.amp}", flush=True)
     print(f"[seed] init={init_seed}  data={data_seed}", flush=True)
     if args.loss == "nll":
-        _nv = sum(p.numel() for p in solver.grad_net.out_var.parameters())
-        print(f"[var read-out] {_nv:,} params on the last hidden state   "
-              f"sigma^2 = softplus(out_var(h)) + {args.var_eps:g}   beta={args.nll_beta}",
-              flush=True)
+        # augmented_var has NO read-out: log sigma^2 is a state channel the solver iterates,
+        # so out_var is deliberately None there and this banner must not assume it exists.
+        if solver.augmented_var:
+            print(f"[var] AUGMENTED STATE: log sigma^2 iterated with x over {args.n_iter} "
+                  f"steps; prior term of J is a Gaussian log-likelihood of the prior residual"
+                  f"   eps={args.var_eps:g}", flush=True)
+        else:
+            _nv = sum(p.numel() for p in solver.grad_net.out_var.parameters())
+            print(f"[var read-out] {_nv:,} params on the last hidden state   "
+                  f"sigma^2 = softplus(out_var(h)) + {args.var_eps:g}   beta={args.nll_beta}",
+                  flush=True)
     if sched:
         print("[schedule] " + "  ".join(f"ep{e}→{n}it@lr{l:g}" for e, n, l in sched), flush=True)
 

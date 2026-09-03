@@ -36,6 +36,7 @@ Verification (shapes, end-to-end differentiability, a can-it-learn smoke test) i
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -85,9 +86,38 @@ class VarCost(nn.Module):
         n_per_channel = v.numel() / v.shape[1]
         return (per_channel_sq * w ** 2).sum() / n_per_channel
 
-    def forward(self, dx, dy):
-        return (self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
-                + self.alpha_reg ** 2 * self._weighted_l2(dx, self.w_reg))
+    def forward(self, dx, dy, s_logvar=None):
+        """s_logvar = log sigma^2, an AUGMENTED STATE channel set, or None for the plain cost.
+
+        When given, the prior term becomes a Gaussian log-likelihood of the prior residual
+        instead of a plain squared norm:
+
+            plain       ||x - Phi(x)||^2_{W_reg}
+            augmented   mean[ (x - Phi(x))^2 e^{-s} + s ]  (per channel, W_reg-weighted)
+
+        Setting d/ds to zero gives sigma^2 = (x - Phi(x))^2, so descending J now drives the
+        variance toward the squared prior residual -- which is the point: sigma^2 acquires a
+        gradient from the variational cost itself and can be iterated alongside x, rather than
+        being a read-out that only hears from the outer training loss through 20 steps of
+        backprop.
+
+        Why the prior residual and not the observation residual: the observation term is
+        identically zero on unobserved cells, so a variance placed there would have no gradient
+        exactly where it is needed. The prior term is active everywhere. Measured, the
+        same-channel prior residual predicts the TRUE error with R^2 0.38 (vx), 0.35 (vy), 0.11
+        (density) versus 0.013/0.001/0.028 for distance-to-observation
+        (check_outputs/eval/sigma_drivers.json, TRUE_ERROR block) -- so it is a real signal, and
+        those figures are also the CEILING of what this route can reach.
+        """
+        obs = self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
+        if s_logvar is None:
+            return obs + self.alpha_reg ** 2 * self._weighted_l2(dx, self.w_reg)
+        # per-channel, weighted, normalised the same way _weighted_l2 does
+        nll = dx ** 2 * torch.exp(-s_logvar) + s_logvar          # (B, C, T, H, W)
+        per_channel = nll.sum(dim=(0, 2, 3, 4))
+        n_per_channel = nll.numel() / nll.shape[1]
+        prior = (per_channel * self.w_reg ** 2).sum() / n_per_channel
+        return obs + self.alpha_reg ** 2 * prior
 
 
 # --------------------------------------------------------------------------- #
@@ -200,13 +230,18 @@ class GradSolver(nn.Module):
     """
 
     def __init__(self, phi, n_channels=4, dT=7, n_iter=15, hidden_ch=64, dropout=0.0,
-                 predict_var=False, var_eps=1e-6, var_sees_state=True):
+                 predict_var=False, var_eps=1e-6, var_sees_state=True,
+                 augmented_var=False):
         super().__init__()
         self.phi = phi
         self.obs_op = ObsOperator()
         self.var_cost = VarCost(n_channels)
-        self.grad_net = GradUpdateLSTM(n_channels * dT, hidden_ch, dropout,
-                                       predict_var=predict_var,
+        # augmented_var doubles the state the optimiser sees: [x, log sigma^2], so the LSTM's
+        # channel axis goes from C*dT to 2*C*dT and there is no separate variance read-out.
+        self.augmented_var = bool(augmented_var)
+        n_in = n_channels * dT * (2 if self.augmented_var else 1)
+        self.grad_net = GradUpdateLSTM(n_in, hidden_ch, dropout,
+                                       predict_var=predict_var and not self.augmented_var,
                                        var_sees_state=var_sees_state)
         self.n_iter = n_iter
         self.C, self.T = n_channels, dT
@@ -218,14 +253,23 @@ class GradSolver(nn.Module):
         # WAS ours, was three orders of magnitude larger, and shaped what the head learnt.
         self.var_eps = float(var_eps)
 
-    def _cost_and_grad(self, x, y, mask):
-        """Variational cost J and its gradient w.r.t. x (automatic differentiation —
-        no hand-derived gradient of Φ)."""
+    def _cost_and_grad(self, x, y, mask, s_logvar=None):
+        """Variational cost J and its gradient (automatic differentiation — no hand-derived
+        gradient of Phi).
+
+        With s_logvar the state is AUGMENTED to [x, log sigma^2] and the gradient is taken with
+        respect to both, so the solver descends the variance alongside the field. Both come out
+        of one autograd call, which is the whole reason this is cheap to do: nothing about the
+        variance's gradient had to be derived by hand either.
+        """
         dy = self.obs_op(x, y, mask)
         dx = x - self.phi(x)
-        J = self.var_cost(dx, dy)
-        grad = torch.autograd.grad(J, x, create_graph=self.training)[0]
-        return J, grad
+        if s_logvar is None:
+            J = self.var_cost(dx, dy)
+            return J, torch.autograd.grad(J, x, create_graph=self.training)[0], None
+        J = self.var_cost(dx, dy, s_logvar)
+        gx, gs = torch.autograd.grad(J, (x, s_logvar), create_graph=self.training)
+        return J, gx, gs
 
     def solve(self, x0, y, mask, return_var=False):
         """Iterate n_iter times from x0 and return the reconstruction.
@@ -238,10 +282,35 @@ class GradSolver(nn.Module):
         x = x0.requires_grad_(True)          # x0 is a leaf tensor; enabling grad once suffices
         state = None
         normg = None                         # gradient RMS: computed ONCE (first step) and reused,
+
+        if self.augmented_var:
+            # ---- augmented state z = [x, s], s = log sigma^2 -----------------------
+            # Both halves are iterated by the SAME learned optimiser on the SAME cost. That is
+            # the difference from a read-out: sigma^2 is refined n_iter times against a gradient
+            # of J, rather than produced once from a hidden state and supervised only through
+            # the outer loss across 20 steps of backprop.
+            # s starts at log(softplus(-3)) so the initial sigma matches the read-out design's
+            # 0.049 (sigma ~ 0.22, about the model's own RMSE).
+            s_lv = torch.full_like(x0, float(np.log(np.log1p(np.exp(-3.0))))).requires_grad_(True)
+            for _ in range(self.n_iter):
+                J, gx, gs = self._cost_and_grad(x, y, mask, s_lv)
+                g = torch.cat([gx, gs], dim=1)                   # (B, 2C, T, H, W)
+                if normg is None:
+                    normg = torch.sqrt((g ** 2).mean() + 1e-12)
+                upd_2d, state, h_last = self.grad_net(
+                    (g / normg).reshape(B, 2 * C * T, H, W), state)
+                upd = upd_2d.reshape(B, 2 * C, T, H, W) / self.n_iter
+                x = x - upd[:, :C]
+                s_lv = s_lv - upd[:, C:]
+            if not return_var:
+                return x
+            # clamp only so exp() stays finite; -13.8 is sigma^2 = 1e-6, the paper's own floor
+            return x, torch.exp(s_lv.clamp(-13.8, 6.0)) + self.var_eps
+
         for _ in range(self.n_iter):         #   matching 4dvarnet-core (normgrad_ carried across steps)
             # Subsequent x is non-leaf (x - upd), already in the graph and requires
             # grad automatically — no need to toggle again
-            J, grad = self._cost_and_grad(x, y, mask)
+            J, grad, _ = self._cost_and_grad(x, y, mask)
             if normg is None:                # reference: normgrad_ = sqrt(mean(grad**2)) at step 0
                 normg = torch.sqrt((grad ** 2).mean() + 1e-12)
             grad_2d = (grad / normg).reshape(B, C * T, H, W)

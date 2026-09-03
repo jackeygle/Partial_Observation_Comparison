@@ -44,6 +44,20 @@ def _VAR_SEES_STATE(sd, a):
     return int(w.shape[1]) > int(a["lstm_hidden"])
 
 
+def _AUGMENTED(sd, a):
+    """Was this trained with log sigma^2 as part of the iterated state?
+
+    Read off the LSTM's input width, not off a stored flag: the augmented solver feeds
+    [x, log sigma^2] to the optimiser, so gates.weight has 2*C*dT + hidden input channels
+    against C*dT + hidden for every earlier run. Building the wrong one is a shape error on
+    load_state_dict, which would cost us those checkpoints.
+    """
+    w = sd.get("grad_net.lstm.gates.weight")
+    if w is None:
+        return False
+    return int(w.shape[1]) > 4 * int(a["dT"]) + int(a["lstm_hidden"])
+
+
 def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
     """Rebuild the trained solver. Returns (solver, args, ckpt).
 
@@ -68,7 +82,8 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
                         dropout=a.get("dropout", 0.0),
                         predict_var=_HAS_VAR(sd),
                         var_eps=a.get("var_eps", 1e-6),
-                        var_sees_state=_VAR_SEES_STATE(sd, a)).to(device)
+                        var_sees_state=_VAR_SEES_STATE(sd, a),
+                        augmented_var=_AUGMENTED(sd, a)).to(device)
     solver.load_state_dict(sd, strict=strict)
     solver.eval()
     return solver, a, ck

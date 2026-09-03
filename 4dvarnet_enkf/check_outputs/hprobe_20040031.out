@@ -1,0 +1,6 @@
+[cfg] runs/varnet_vsb0_s0/varnet_best.pt  dT=200  hidden=64  -> read-out maps 64 to 800
+[data] 6,912 spatial cells x 64 features -> 800 targets
+[x_hat] R^2 from h_last:  density 0.031   vx 0.001   vy 0.021   var 0.006   _overall 0.009
+[x0   ] R^2 from h_last:  density 0.007   vx -0.018   vy -0.013   var -0.004   _overall -0.014
+
+[written] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/h_predicts_xhat.json

@@ -1,0 +1,37 @@
+Submitted batch job 20043275
+[chain] submitted successor (afterany:20041618)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,051,542 (GENN prior 9,420 = 0.46%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=2  data=0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_mse5_s2/varnet_last.pt: continuing from epoch 105 (step 20685)
+[best] previous best blind MSE = 0.0272
+[schedule] epoch 105: n_iter -> 20, lr -> 0.0003
+[epoch 105] loss=0.0280  盲区MSE=0.0274  density=0.0162 vx=0.0629 vy=0.0219 var=0.0087
+[epoch 106] loss=0.0280  盲区MSE=0.0273  density=0.0162 vx=0.0622 vy=0.0219 var=0.0087
+[epoch 107] loss=0.0297  盲区MSE=0.0273  density=0.0162 vx=0.0625 vy=0.0219 var=0.0087
+[epoch 108] loss=0.0258  盲区MSE=0.0272  density=0.0162 vx=0.0621 vy=0.0219 var=0.0087
+           ↑ new best (0.0272) -> varnet_best.pt
+[epoch 109] loss=0.0276  盲区MSE=0.0275  density=0.0162 vx=0.0631 vy=0.0220 var=0.0087
+[epoch 110] loss=0.0282  盲区MSE=0.0272  density=0.0162 vx=0.0621 vy=0.0219 var=0.0087
+           ↑ new best (0.0272) -> varnet_best.pt
+[epoch 111] loss=0.0286  盲区MSE=0.0273  density=0.0162 vx=0.0625 vy=0.0220 var=0.0087
+[epoch 112] loss=0.0259  盲区MSE=0.0273  density=0.0162 vx=0.0623 vy=0.0219 var=0.0087
+[epoch 113] loss=0.0269  盲区MSE=0.0283  density=0.0163 vx=0.0663 vy=0.0220 var=0.0087
+[epoch 114] loss=0.0291  盲区MSE=0.0274  density=0.0162 vx=0.0629 vy=0.0219 var=0.0087
+[epoch 115] loss=0.0269  盲区MSE=0.0274  density=0.0162 vx=0.0629 vy=0.0219 var=0.0087
+[epoch 116] loss=0.0285  盲区MSE=0.0274  density=0.0162 vx=0.0627 vy=0.0219 var=0.0087
+[epoch 117] loss=0.0289  盲区MSE=0.0273  density=0.0162 vx=0.0622 vy=0.0219 var=0.0087
+[epoch 118] loss=0.0272  盲区MSE=0.0274  density=0.0163 vx=0.0628 vy=0.0219 var=0.0087
+[epoch 119] loss=0.0271  盲区MSE=0.0274  density=0.0162 vx=0.0626 vy=0.0219 var=0.0087
+[epoch 120] loss=0.0268  盲区MSE=0.0273  density=0.0162 vx=0.0623 vy=0.0219 var=0.0087
+[epoch 121] loss=0.0289  盲区MSE=0.0274  density=0.0162 vx=0.0629 vy=0.0219 var=0.0087
+[epoch 122] loss=0.0295  盲区MSE=0.0274  density=0.0162 vx=0.0626 vy=0.0219 var=0.0087
+[epoch 123] loss=0.0263  盲区MSE=0.0274  density=0.0162 vx=0.0628 vy=0.0219 var=0.0087
+[epoch 124] loss=0.0304  盲区MSE=0.0274  density=0.0162 vx=0.0626 vy=0.0219 var=0.0087
+[epoch 125] loss=0.0278  盲区MSE=0.0273  density=0.0162 vx=0.0622 vy=0.0219 var=0.0087
+[epoch 126] loss=0.0262  盲区MSE=0.0272  density=0.0162 vx=0.0620 vy=0.0219 var=0.0087
+           ↑ new best (0.0272) -> varnet_best.pt
+[2026-09-03T02:32:26.004] error: *** JOB 20041618 ON gpu60 CANCELLED AT 2026-09-03T02:32:26 DUE TO TIME LIMIT ***

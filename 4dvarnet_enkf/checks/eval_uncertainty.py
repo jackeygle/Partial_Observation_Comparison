@@ -116,9 +116,17 @@ def main():
     for s in args.members:
         p = os.path.join(ROOT, args.run_fmt.format(s), "varnet_best.pt")
         sol, A, ck = load_solver(p, dev)
-        if sol.grad_net.out_var is None:
-            raise SystemExit(f"{p} has no variance read-out — was it trained with --loss nll?")
         solvers.append(sol)
+    # An MSE-trained ensemble has no learnt sigma^2 at all, and that is a configuration the
+    # paper itself evaluates: Table 2's "Ensemble-M (MSE)" takes the EMPIRICAL VARIANCE across
+    # the members as the uncertainty. Its Sec. 3.2 and App. A.2 report that this is markedly
+    # worse calibrated than learning the variance ("the empirical variance ... consistently
+    # underestimates the true uncertainty"). Allowing it here is what makes that comparison
+    # reproducible on our data instead of quoted from theirs.
+    has_var = all(s_.grad_net.out_var is not None or s_.augmented_var for s_ in solvers)
+    if not has_var:
+        print("[mode] no learnt sigma^2 in these runs -> uncertainty is the member spread "
+              "alone (their Table 2 'Ensemble-M (MSE)')", flush=True)
     dT, k = A["dT"], A.get("obs_every_k") or config.get("observation", "obs_every_k")
     print(f"[members] {len(solvers)} x {args.run_fmt}  dT={dT}  obs_every_k={k}  dev={dev}",
           flush=True)
@@ -146,13 +154,17 @@ def main():
             mus, vars_ = [], []
             for sol in solvers:
                 with torch.enable_grad():
-                    xr, vr = sol(x0b.clone(), yb, mb, return_var=True)
+                    if has_var:
+                        xr, vr = sol(x0b.clone(), yb, mb, return_var=True)
+                    else:
+                        xr = sol(x0b.clone(), yb, mb)
+                        vr = torch.zeros_like(xr)      # no aleatoric term to average
                 mus.append(xr.detach())
                 vars_.append(vr.detach())
             mu = torch.stack(mus); var = torch.stack(vars_)
             # Sec. 2.4 moment matching, split into its two halves
             mu_s = mu.mean(0)
-            ale = var.mean(0)                     # mean of the members' own sigma^2
+            ale = var.mean(0)                     # mean of the members' own sigma^2 (0 if MSE)
             epi = mu.var(0, unbiased=False)        # disagreement between members
             acc["mu"].append(mu_s.cpu()); acc["sig_tot"].append((ale + epi).sqrt().cpu())
             acc["sig_ale"].append(ale.sqrt().cpu()); acc["sig_epi"].append(epi.sqrt().cpu())

@@ -65,6 +65,19 @@ source /etc/profile 2>/dev/null
 module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
 
+# GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
+# the time limit still has one queued. The cost is that a job which crashes in the first second
+# also queues one, and that successor crashes too: on 2026-08-31 a one-line bug in a banner
+# print spun this chain through ~250 generations in minutes. The cap turns a code bug into a
+# handful of wasted jobs instead of a scheduler flood. 150 epochs at 3h/segment needs ~6.
+GEN=${3:-1}
+MAX_GEN=12
+if [ "$GEN" -gt "$MAX_GEN" ]; then
+    echo "[chain] generation $GEN exceeds $MAX_GEN — refusing to continue. Something is"
+    echo "        failing immediately rather than running out of time; check the last log."
+    exit 1
+fi
+
 S=${1:?usage: sbatch --job-name=varnet_ml5_sN sbatch/submit_ml5_chain.sbatch <init_seed>}
 # k=1 only for now: the EnKF reliability diagram we compare against was computed at k=1, and
 # doing both k would double an already 79-GPU-hour experiment. k=4 is a follow-up.

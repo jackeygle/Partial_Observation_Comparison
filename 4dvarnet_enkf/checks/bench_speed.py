@@ -122,11 +122,33 @@ def measure(fn):
     return w, (r1.ru_utime - r0.ru_utime) + (r1.ru_stime - r0.ru_stime)
 
 
-def summarise(walls, cpus, n_frames):
+def summarise(walls, cpus, n_frames, per_frame_is_latency):
+    """Per-frame mean and std, plus what "per frame" actually means for this method.
+
+    THROUGHPUT vs LATENCY. The EnKF assimilates one frame at a time, so wall/n_frames is both
+    its amortised cost and the delay between an observation arriving and that frame's estimate
+    being available -- for it the two numbers coincide. 4DVarNet reconstructs a whole dT-frame
+    window in one solve, so wall/n_frames is throughput only: on a device you cannot produce
+    frame t's estimate from frame t's observation, you wait for the window. Reporting a single
+    "ms/frame" for both would compare the EnKF's latency against our throughput.
+
+    latency_s is therefore the delay to a given frame's estimate: one frame's cost for a
+    sequential filter, one whole window's solve for a windowed method. dT is baked into the
+    read-out's weight shape (C*dT channels), so shortening the window for online use is a
+    retrain, not a setting.
+
+    The std is taken on the PER-FRAME figure rather than on the batch total, which is what the
+    number is quoted as.
+    """
     walls, cpus = np.array(walls), np.array(cpus)
+    pf = walls / n_frames
     return {"wall_mean": float(walls.mean()), "wall_std": float(walls.std()),
             "wall_all": walls.tolist(), "n_frames": int(n_frames),
-            "per_frame_s": float(walls.mean() / n_frames),
+            "per_frame_s": float(pf.mean()),
+            "per_frame_std_s": float(pf.std()),
+            "per_frame_is_latency": bool(per_frame_is_latency),
+            "latency_s": float(pf.mean() if per_frame_is_latency else walls.mean()),
+            "latency_std_s": float(pf.std() if per_frame_is_latency else walls.std()),
             # CPU-seconds / wall-seconds: 1.0 = one core busy the whole time. Shows whether a
             # method actually uses the cores it was given (the EnKF was measured at 1.36 of 4).
             "cores_used": float((cpus / walls).mean())}
@@ -337,14 +359,22 @@ def main():
             print(f"  {name:16s} {w:8.2f} s   {w / nf * 1000:8.2f} ms/frame", flush=True)
 
     for name, (_, nf, desc) in prepared.items():
-        res["runs"][name] = summarise(walls[name], cpus[name], nf) | {"desc": desc}
+        res["runs"][name] = summarise(walls[name], cpus[name], nf,
+                                      per_frame_is_latency=name.startswith("enkf")
+                                      ) | {"desc": desc}
 
-    print("\n" + "=" * 78)
-    print(f"{'method':16s} {'s/window':>16s} {'ms/frame':>11s} {'cores':>7s}  vs fastest")
+    print("\n" + "=" * 92)
+    print(f"{'method':16s} {'throughput ms/frame':>22s} {'latency to one frame':>22s} "
+          f"{'cores':>6s}  vs fastest")
     fastest = min(r["per_frame_s"] for r in res["runs"].values())
     for n, r in res["runs"].items():
-        print(f"{n:16s} {r['wall_mean']:>10.2f}±{r['wall_std']:<5.2f} {r['per_frame_s'] * 1000:>11.2f} "
-              f"{r['cores_used']:>6.1f}  {r['per_frame_s'] / fastest:>8.1f}x")
+        lat = (f"{r['latency_s'] * 1000:.2f} ms" if r["per_frame_is_latency"]
+               else f"{r['latency_s']:.2f} s (whole window)")
+        print(f"{n:16s} {r['per_frame_s'] * 1000:>13.2f}±{r['per_frame_std_s'] * 1000:<7.3f} "
+              f"{lat:>22s} {r['cores_used']:>6.1f}  {r['per_frame_s'] / fastest:>8.1f}x")
+    print("\nthroughput = amortised cost per frame over the batch. latency = delay until a given\n"
+          "frame's estimate exists: one frame for the sequential filter, one whole window solve\n"
+          "for the windowed method, which is not an online/causal estimator.")
     # Spread relative to the effect: if the largest std is small next to the gaps between
     # methods, contention from co-tenant jobs did not change the ranking.
     worst = max(r["wall_std"] / r["wall_mean"] for r in res["runs"].values())

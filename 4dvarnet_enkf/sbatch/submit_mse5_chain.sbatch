@@ -37,11 +37,19 @@ source /etc/profile 2>/dev/null
 module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
 
-# --var-h-only PINS the old design. This script produced runs/varnet_vrb{0,1}_s0, whose
-# out_var is (C*T, hidden_ch, 1, 1) -- sigma^2 off the LSTM hidden state alone. var_sees_state
-# later became the default, so without this flag a --resume here builds a wider out_var than the
-# checkpoint holds and dies on load_state_dict. These runs are the baseline the wider read-out
-# is measured against, so they must keep reproducing the narrow one.
+# The MSE arm of the three-way comparison, and Lakshminarayanan et al.'s own Table 2 baseline:
+# M networks trained on the plain squared loss, whose uncertainty is the EMPIRICAL VARIANCE
+# across their predictions rather than a learnt sigma^2. --loss supervised sets predict_var
+# False, so these have no variance read-out at all -- that is the point of the comparison.
+#
+# Architecture, schedule, data and seeds match runs/varnet_vsb0_s* exactly; the ONLY difference
+# is the loss. Without that the ensemble spread would mix a seed effect with an architecture
+# effect, which is why the existing MSE models (a2/a4/b0, hidden 64/96/32, kt 5/5/3) cannot be
+# used as an ensemble even though there are three of them.
+#
+# The paper's Table 2 finding is that learning the variance beats this by a wide margin. Whether
+# that holds here is the question these runs answer.
+
 # GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
 # the time limit still has one queued. The cost is that a job which crashes in the first second
 # also queues one, and that successor crashes too: on 2026-08-31 a one-line bug in a banner
@@ -55,9 +63,9 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_vrbN_sM sbatch/submit_vr_chain.sbatch <seed> <beta>}
+S=${1:?usage: sbatch --job-name=varnet_mse5_sM sbatch/submit_mse5_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
-TAG=$(python3 -c "print('vrb%d' % round(float('$BETA')))")
+TAG=mse5   # BETA is ignored here; kept so the chain's argument list is unchanged
 OUTDIR=runs/varnet_${TAG}_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
@@ -76,7 +84,7 @@ fi
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
 sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_vr_chain.sbatch $S $BETA $((GEN+1))
+       sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1))
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 nvidia-smi --query-gpu=name --format=csv,noheader
@@ -84,6 +92,6 @@ python3 -u train_varnet.py --resume \
     --obs-every-k 1 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
-    --loss nll --nll-beta $BETA --var-eps 1e-6 --var-h-only \
+    --loss supervised \
     --iter-schedule "$SCHED" --clip-grad 1.0 \
     --outdir $OUTDIR

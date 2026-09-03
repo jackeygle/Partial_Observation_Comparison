@@ -54,6 +54,19 @@ cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
 # the prior through h_last (measured: 5.7e3 / 7.2e1 / 2.1e1). That is the same in vrb0, whose
 # out_var also read h_last, so the vrb0-vs-vsb0 contrast still isolates x_hat-access + capacity
 # -- but "the mean is untouched" is false and must not be written anywhere.
+# GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
+# the time limit still has one queued. The cost is that a job which crashes in the first second
+# also queues one, and that successor crashes too: on 2026-08-31 a one-line bug in a banner
+# print spun this chain through ~250 generations in minutes. The cap turns a code bug into a
+# handful of wasted jobs instead of a scheduler flood. 150 epochs at 3h/segment needs ~6.
+GEN=${3:-1}
+MAX_GEN=12
+if [ "$GEN" -gt "$MAX_GEN" ]; then
+    echo "[chain] generation $GEN exceeds $MAX_GEN — refusing to continue. Something is"
+    echo "        failing immediately rather than running out of time; check the last log."
+    exit 1
+fi
+
 S=${1:?usage: sbatch --job-name=varnet_vsbN_sM sbatch/submit_vs_chain.sbatch <seed> <beta>}
 BETA=${2:?missing beta}
 TAG=$(python3 -c "print('vsb%d' % round(float('$BETA')))")
@@ -75,7 +88,7 @@ fi
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
 sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_vs_chain.sbatch $S $BETA
+       sbatch/submit_vs_chain.sbatch $S $BETA $((GEN+1))
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 nvidia-smi --query-gpu=name --format=csv,noheader

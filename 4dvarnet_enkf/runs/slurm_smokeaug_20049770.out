@@ -1,0 +1,4 @@
+augmented=False params=  236,022  gates_in=  96  sigma^2 mean=0.04859  min=4.86e-02  max=0.049  x finite=True
+              grad on var_cost.alpha_reg = 1.159e-02
+augmented=True  params=  308,694  gates_in= 128  sigma^2 mean=0.04475  min=3.42e-02  max=0.053  x finite=True
+              grad on var_cost.alpha_reg = 6.152e-04

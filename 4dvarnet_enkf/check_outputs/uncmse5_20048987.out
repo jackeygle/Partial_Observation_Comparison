@@ -1,0 +1,25 @@
+[mode] no learnt sigma^2 in these runs -> uncertainty is the member spread alone (their Table 2 'Ensemble-M (MSE)')
+[members] 5 x runs/varnet_mse5_s{}  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1756   0.0684    8.154  0.0648   0.37   72.7%
+all_aleatoric_only              0.1756      nan      nan  0.0000   0.00    0.0%
+all_epistemic_only              0.1756   0.0684    8.154  0.0648   0.37   72.7%
+all_constant_sigma_baseline     0.1756   0.0814   -0.321  0.1756   1.00   92.8%
+blind                           0.1885   0.0641   14.331  0.0602   0.32   75.6%
+observed                        0.1597   0.0732    1.153  0.0699   0.44   69.4%
+channel_density                 0.1152   0.0496    1.894  0.0526   0.46   73.8%
+channel_vx                      0.2955   0.1486    3.553  0.1356   0.46   68.3%
+channel_vy                      0.1274   0.0608    2.317  0.0593   0.47   70.4%
+channel_var                     0.0806   0.0145   24.852  0.0116   0.14   78.4%
+
+[out] /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/check_outputs/eval/uncertainty_mse5.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%
