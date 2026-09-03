@@ -11,3 +11,11 @@ NVIDIA H200
            ↑ new best (0.0766) -> varnet_best.pt
 [epoch   1] loss=-1.7023  盲区MSE=0.0737  density=0.0215 vx=0.2301 vy=0.0348 var=0.0084
            ↑ new best (0.0737) -> varnet_best.pt
+[epoch   2] loss=-1.8707  盲区MSE=0.0687  density=0.0192 vx=0.2186 vy=0.0290 var=0.0083
+           ↑ new best (0.0687) -> varnet_best.pt
+[epoch   3] loss=-1.9371  盲区MSE=0.0627  density=0.0186 vx=0.1958 vy=0.0282 var=0.0084
+           ↑ new best (0.0627) -> varnet_best.pt
+[epoch   4] loss=-2.0092  盲区MSE=0.0600  density=0.0185 vx=0.1854 vy=0.0277 var=0.0085
+           ↑ new best (0.0600) -> varnet_best.pt
+[epoch   5] loss=-2.0314  盲区MSE=0.0573  density=0.0183 vx=0.1753 vy=0.0271 var=0.0086
+           ↑ new best (0.0573) -> varnet_best.pt
