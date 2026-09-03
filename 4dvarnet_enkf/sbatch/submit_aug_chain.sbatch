@@ -5,34 +5,31 @@
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf/runs/slurm_%x_%j.out
-# VR — sigma^2 from the solver's SECOND OUTPUT LAYER instead of a separate module.
+# AUG — log sigma^2 is ITERATED as part of the solver state, not read off a hidden layer.
 #
-# Usage:  sbatch --job-name=varnet_vrb1_s0 sbatch/submit_vr_chain.sbatch 0 1.0
-#         sbatch --job-name=varnet_vrb0_s0 sbatch/submit_vr_chain.sbatch 0 0.0
-#         (args: init seed, nll beta)
+# Usage:  sbatch --job-name=varnet_aug0_s0 sbatch/submit_aug_chain.sbatch 0 0
+#         (args: init seed, nll beta [ignored], generation [internal])
 #
-# Why. Lakshminarayanan Sec. 2.2.1 says "a network that outputs two values in the final layer,
-# corresponding to the predicted mean and variance". Our previous design bolted a separate
-# pointwise module onto x_hat instead, and the audit showed what that cost: that head keyed off
-# distance-to-observation, a feature which predicts the true error with R^2 of roughly 0.01-0.03,
-# while ignoring |x_hat|, which predicts it with 0.21-0.45. See checks/diag_sigma_drivers.py.
+# STATUS 2026-09-03: this configuration DOES NOT TRAIN. 251 jobs were submitted between
+# 2026-09-02T20:08 and 2026-09-03T12:47; 250 of them FAILED after 2-5 minutes each and left
+# NO log files behind, so there is nothing to diagnose from. The generation cap below did not
+# stop it. Before submitting this chain again, run ONE job with no chaining and make sure its
+# log actually appears -- see "RUN IT WITHOUT THE CHAIN FIRST" below.
 #
-# The read-out sees h, the LSTM hidden state after the last of the 20 descent steps: it carries
-# every gradient of J taken along the way, a 3x3 spatial context per step, and all-to-all
-# mixing across the 200 frames. A pointwise head on x_hat sees one cell.
+# The mechanism itself is sound: scratch/smoke_aug.py passes (job 20049770), gates_in goes
+# 96 -> 128, sigma^2 stays finite, and the gradient does reach var_cost.alpha_reg (6.15e-04).
+# So the failure is at full scale (dT=200, n_iter up to 20, batch 32, AMP) or in the training
+# script's no-read-out branch, not in the design.
 #
-# sigma^2 is deliberately NOT put into the iterated state. It has no term in J -- the
-# observation term has no sigma^2 component and Phi maps state channels to state channels -- so
-# an augmented state would leave it unconstrained by the cost. Constraining it properly needs a
-# prior on the covariance itself; Beauchamp et al. (AIES 2025) use an SPDE prior for that, which
-# is a different piece of work.
+# RUN IT WITHOUT THE CHAIN FIRST:
+#     sbatch --job-name=varnet_aug0_s0 --time=00:30:00 sbatch/submit_aug_chain.sbatch 0 0 99
+#   Generation 99 is above MAX_GEN, so no successor is queued and the failure is visible in
+#   one log instead of two hundred and fifty missing ones.
 #
-# Controlled against runs/varnet_nf5_s0: identical config, identical seeds, identical 150
-# epochs. The ONLY difference is where sigma^2 is read from. Any change is attributable.
-#
-# beta: 1.0 reproduces nf5's loss exactly, so it isolates the read-out. 0.0 is Eq.1 verbatim,
-# which is what we would rather present -- but the NLL is unbounded below as sigma^2 -> 0, so
-# --var-eps 1e-6 is doing real work there and this run may still misbehave. Watch epoch 1-10.
+# The design rationale, the R^2 audit it came from, and the ceiling it can reach are all
+# in the AUGMENTED STATE block below. (A block of submit_vr_chain.sbatch's rationale
+# used to sit here; it argued the OPPOSITE -- that sigma^2 should stay out of the
+# iterated state -- because this file was copied from that one. Removed 2026-09-03.)
 source /etc/profile 2>/dev/null
 module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
@@ -82,11 +79,25 @@ OUTDIR=runs/varnet_${TAG}_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
-DONE=$(python3 -c "import torch,os; p='$OUTDIR/varnet_last.pt'; print(1 if (os.path.exists(p) and int(torch.load(p,map_location='cpu').get('epoch',-1))+1>=$EPOCHS) else 0)" 2>/dev/null)
-if [ "$DONE" = "1" ]; then
+EPOCH_NOW=$(python3 -c "import torch,os; p='$OUTDIR/varnet_last.pt'; print(int(torch.load(p,map_location='cpu').get('epoch',-1)) if os.path.exists(p) else -1)" 2>/dev/null || echo -1)
+if [ "$EPOCH_NOW" = "" ]; then EPOCH_NOW=-1; fi
+if [ "$EPOCH_NOW" -ge "$((EPOCHS-1))" ]; then
     echo "[chain] target $EPOCHS epochs reached — stopping chain."
     exit 0
 fi
+
+# PROGRESS GATE. The generation counter above is not enough: on 2026-09-02/03 this chain ran
+# 251 generations anyway. A crash-loop cannot advance the epoch counter, so gate the successor
+# on actual progress instead of trusting an argument that has to survive every resubmission.
+# The stamp holds the epoch the PREVIOUS generation saw; if this generation sees the same one,
+# the previous segment produced nothing and chaining again would just repeat it.
+STAMP=$OUTDIR/.chain_last_epoch
+if [ -f "$STAMP" ] && [ "$EPOCH_NOW" -le "$(cat "$STAMP")" ]; then
+    echo "[chain] previous generation made NO progress (epoch still $EPOCH_NOW) — refusing to"
+    echo "        chain. Fix the crash first; run one job with generation 99 to see its log."
+    exit 1
+fi
+mkdir -p "$OUTDIR" && echo "$EPOCH_NOW" > "$STAMP"
 
 # --export=NONE is REQUIRED: without it each generation re-runs `module load` on an inherited
 # environment, PATH grows by one copy per generation, and after ~6 generations every command

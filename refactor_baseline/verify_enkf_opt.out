@@ -1,0 +1,35 @@
+[data] obs_atc-20130811.npz  12 frames, 3 with observations, m in [856, 1060]  ensemble=100
+
+[unit] rewritten helpers vs reference implementations
+  _localization_matrix  n=40  bit-identical: True
+  _localization_matrix  n=60  bit-identical: True
+  _localization_matrix  n=0   bit-identical: True
+  _obs_indices                     identical: True
+  _obs_indices (non-selection C)   identical: True
+  _backproject_obs_bias  m=120      identical: True
+  _backproject_obs_bias  m=127      identical: True
+  GeneratePartialObs (9 configs)   identical: True
+
+[strict] enkf_opt (gain_mode=pinv) vs enkf_lab — must be bit-identical
+  opt vs lab                         est     bit-identical: True
+  opt vs lab                         spread  bit-identical: True
+  opt vs lab                         ens     bit-identical: True
+  opt vs lab                         bias    bit-identical: True
+  opt(obs_idx given) vs lab          est     bit-identical: True
+  opt(obs_idx given) vs lab          spread  bit-identical: True
+  opt(obs_idx given) vs lab          ens     bit-identical: True
+  opt(obs_idx given) vs lab          bias    bit-identical: True
+
+[fast] enkf_opt gain_mode=ensemble vs enkf_lab — same gain, different rounding
+  opt(ensemble) vs lab               est     max|d|=1.776e-15  rel=2.887e-15  identical=False
+  opt(ensemble) vs lab               spread  max|d|=2.776e-16  rel=9.712e-16  identical=False
+  opt(ensemble) vs lab               ens     max|d|=4.996e-15  rel=6.235e-15  identical=False
+  opt(ensemble) vs lab               bias    max|d|=8.327e-17  rel=8.136e-16  identical=False
+
+[speed] same frames, same node, one process
+  lab         10.16s    847.1 ms/frame   x 1.00 vs lab
+  opt          1.00s     83.6 ms/frame   x10.13 vs lab
+  opt_idx      0.98s     81.3 ms/frame   x10.42 vs lab
+  opt_fast     0.39s     32.8 ms/frame   x25.86 vs lab
+
+[verdict] PASS — strict path bit-identical: True, unit checks: True
