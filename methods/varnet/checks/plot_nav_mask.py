@@ -19,7 +19,6 @@ from __future__ import annotations
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import matplotlib
 matplotlib.use("Agg")
@@ -28,9 +27,9 @@ from matplotlib.collections import PolyCollection
 from matplotlib.patches import Patch
 import numpy as np
 
-import navigation as nav
-from navigation import load_atc_map, world_to_map_pixel
-from data_pipeline.h5_to_grid import SUBSETS, rotation_matrix
+from crowdcore import navigation as nav
+from crowdcore.navigation import load_atc_map, world_to_map_pixel
+from crowdcore.data.h5_to_grid import SUBSETS, rotation_matrix
 
 
 def main():

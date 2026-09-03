@@ -36,6 +36,7 @@ import sys
 import time
 
 import numpy as np
+from crowdcore import paths
 import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -216,9 +217,9 @@ def main():
     ap.add_argument("--day", default="atc-20130811")
     args = ap.parse_args()
 
-    npz = os.path.join(ROOT, "check_outputs", "enkf", f"obs_{args.day}.npz")
+    npz = os.path.join(paths.enkf_export("enkf"), f"obs_{args.day}.npz")
     if not os.path.exists(npz):
-        npz = sorted(glob.glob(os.path.join(ROOT, "check_outputs", "enkf", "obs_*.npz")))[0]
+        npz = sorted(glob.glob(os.path.join(paths.enkf_export("enkf"), "obs_*.npz")))[0]
     pre, obs_std = frames(npz, args.frames)
     n_obs = sum(c is not None for c, _, _ in pre)
     m = [c.shape[0] for c, _, _ in pre if c is not None]

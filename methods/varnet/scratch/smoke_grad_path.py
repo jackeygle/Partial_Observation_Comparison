@@ -1,8 +1,7 @@
+# 从仓库根跑: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_grad_path
 import sys, os, torch
-R="/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
-sys.path.insert(0,R); sys.path.insert(0,os.path.join(R,"checks"))
-from variational_solver import GradSolver
-from prior_model import GENN
+from methods.varnet.variational_solver import GradSolver
+from methods.varnet.prior_model import GENN
 d = torch.device("cuda"); C,T,H,W = 4,8,36,12
 torch.manual_seed(0)
 S = GradSolver(GENN(n_channels=C).to(d), n_channels=C, dT=T, n_iter=4, hidden_ch=64,

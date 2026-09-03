@@ -22,9 +22,9 @@ Run:
 from __future__ import annotations
 
 import os
+from crowdcore import paths
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import matplotlib
 matplotlib.use("Agg")
@@ -33,10 +33,13 @@ import matplotlib.pyplot as plt
 from slides.build_slides import (render_pptx, render_pdf, render_notes,
                                   PAGE_W, OUTPUTS)
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT_PPTX = os.path.join(ROOT, "slides", "meeting_deck.pptx")
-OUT_PDF = os.path.join(ROOT, "slides", "meeting_deck.pdf")
-OUT_NOTES = os.path.join(ROOT, "slides", "meeting_notes.md")
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
+OUT_PPTX = os.path.join(paths.SLIDES, "meeting_deck.pptx")
+OUT_PDF = os.path.join(paths.SLIDES, "meeting_deck.pdf")
+OUT_NOTES = os.path.join(paths.SLIDES, "meeting_notes.md")
 
 # The training run whose numbers/curve the deck reports. This is the ONLY place the
 # run is named; all training hyper-parameters are read back from that run's checkpoint
@@ -112,7 +115,7 @@ def render_architecture_detail(outpath):
     Hyper-parameters (kernels, widths, iters) are read from config + the checkpoint, not typed here."""
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
     import torch
-    import config as cfg
+    from crowdcore import config as cfg
     P = cfg.CFG["prior"]
     ck = torch.load(os.path.join(ROOT, RUN, "varnet_last.pt"), map_location="cpu")
     a = ck["args"]
@@ -223,7 +226,7 @@ def render_training_table(outpath, run=RUN):
     """
     import json
     import torch
-    import config as cfg
+    from crowdcore import config as cfg
     ck = torch.load(os.path.join(ROOT, run, "varnet_last.pt"), map_location="cpu")
     a = ck["args"]                                        # the exact training args
     n_param = sum(v.numel() for v in ck["solver"].values() if hasattr(v, "numel"))
@@ -307,7 +310,7 @@ def _headline():
 
 
 def define_slides():
-    import config as cfg
+    from crowdcore import config as cfg
     arch = render_architecture(F("prior_model", "architecture.png"))
     arch_detail = render_architecture_detail(F("prior_model", "architecture_detail.png"))
     table = render_training_table(F("training", "train_table.png"))

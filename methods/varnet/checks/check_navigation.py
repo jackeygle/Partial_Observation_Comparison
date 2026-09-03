@@ -25,11 +25,10 @@ import sys
 from collections import deque
 from math import sqrt
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # make parent-level modules importable
 
 import numpy as np
 
-from navigation import _NEIGHBORS, astar, is_valid, random_valid_cell
+from crowdcore.navigation import _NEIGHBORS, astar, is_valid, random_valid_cell
 
 
 # --------------------------------------------------------------------------- #
@@ -165,8 +164,8 @@ def test_random(n_masks=20, pairs_per_mask=20, seed=0):
 # 3) Real ATC mask — invariants + figure for visual inspection
 # --------------------------------------------------------------------------- #
 def test_real_data(file, outdir, seed=0, n_pairs=50, n_plot=4):
-    from observation_model import load_state, resolve_file
-    import navigation
+    from crowdcore.observation_model import load_state, resolve_file
+    from crowdcore import navigation
     X, _ = load_state(resolve_file(file))
     mask = navigation.build_valid_mask_from_config(X)     # the mask the pipeline actually uses (hybrid)
     print(f"[load] walkable {int(mask.sum())}/{mask.size} cells (source per config.yaml)")

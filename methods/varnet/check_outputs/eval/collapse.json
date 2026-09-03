@@ -3,32 +3,32 @@
   "n_cells": 4147200,
   "windows": 12,
   "sigma2": {
-    "min": 1.0012768143496942e-06,
+    "min": 1.0009351854023407e-06,
     "q": {
-      "0.001": 3.5527386899047997e-06,
-      "0.01": 4.450769483810291e-05,
-      "0.1": 0.001321583054959774,
-      "0.5": 0.044482000172138214,
-      "0.9": 0.9004918932914734,
-      "0.99": 3.7138757705688477
+      "0.001": 3.7111033179826336e-06,
+      "0.01": 4.57482565252576e-05,
+      "0.1": 0.0013275292003527284,
+      "0.5": 0.044905565679073334,
+      "0.9": 0.8982985019683838,
+      "0.99": 3.6932358741760254
     },
     "frac_below_1.01x_floor": 4.533179012345679e-06,
-    "frac_below_2x_floor": 0.000437403549382716,
-    "frac_below_10x_floor": 0.002880979938271605,
-    "frac_below_100x_floor": 0.018359085648148147
+    "frac_below_2x_floor": 0.00041319444444444444,
+    "frac_below_10x_floor": 0.0027859278549382718,
+    "frac_below_100x_floor": 0.01807643711419753
   },
   "decomposition": {
-    "epistemic_share_of_variance": 0.025497952476143837,
-    "aleatoric_share_of_variance": 0.9745009541511536,
-    "epistemic_spread_skill": 0.565039873123169,
-    "aleatoric_spread_skill": 3.493152618408203,
-    "total_spread_skill": 3.5385587215423584
+    "epistemic_share_of_variance": 0.025485193356871605,
+    "aleatoric_share_of_variance": 0.9745148420333862,
+    "epistemic_spread_skill": 0.5644433498382568,
+    "aleatoric_spread_skill": 3.490363597869873,
+    "total_spread_skill": 3.53570818901062
   },
   "members": {
-    "pairwise_rms_diff_mean": 0.13977181762456894,
-    "pairwise_rms_diff_min": 0.0966673195362091,
-    "pairwise_rms_diff_max": 0.1887074112892151,
-    "reconstruction_rms": 0.17407837510108948,
-    "err_rms": 0.16039931774139404
+    "pairwise_rms_diff_mean": 0.13955017328262329,
+    "pairwise_rms_diff_min": 0.09652350097894669,
+    "pairwise_rms_diff_max": 0.188509002327919,
+    "reconstruction_rms": 0.174056276679039,
+    "err_rms": 0.16031552851200104
   }
 }

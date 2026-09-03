@@ -26,12 +26,10 @@ import numpy as np
 import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
-import config                                                        # noqa: E402
-import observation_model as om                                       # noqa: E402
-import navigation as nav                                             # noqa: E402
-from model_io import load_solver                                     # noqa: E402
+from crowdcore import config                                                        # noqa: E402
+from crowdcore import observation_model as om                                       # noqa: E402
+from crowdcore import navigation as nav                                             # noqa: E402
+from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval", "channel_budget.json")
 CHAN = list(config.get("grid", "channels"))
@@ -47,7 +45,7 @@ C = len(CHAN)
 
 # ── one real window: truth, observation, mask, initial guess ────────────────────────────
 day = sorted(config.split_files("test"))[0] if hasattr(config, "split_files") else None
-import observation_model as _om                                      # noqa: E402
+from crowdcore import observation_model as _om                                      # noqa: E402
 _files = _om.split_files("test")
 X_day, _ = _om.load_state(_files[0])
 valid = nav.build_valid_mask_from_config(X_day)

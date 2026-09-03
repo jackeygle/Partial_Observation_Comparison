@@ -27,11 +27,10 @@ from __future__ import annotations
 
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # make parent-level modules importable
 
 import torch
 
-from prior_model import GENN, prior_residual
+from methods.varnet.prior_model import GENN, prior_residual
 
 
 def _rand_state(B=2, C=4, T=7, H=36, W=12, seed=0):

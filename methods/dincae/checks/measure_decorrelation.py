@@ -1,12 +1,10 @@
 import os, sys
 # checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
 # 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
 # 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import numpy as np, h5py, glob, navigation as nav
+import numpy as np, h5py, glob
+from crowdcore import navigation as nav
 fps=sorted(glob.glob('/scratch/work/zhangx29/data/grid_cache/atc-*_corridor_1.0s.h5'))
 Xf=h5py.File(fps[0],'r')['grid']; valid=nav.build_valid_mask_from_config(Xf[:])
 X=Xf[20000:32000]                        # 12000 s, 白天繁忙段

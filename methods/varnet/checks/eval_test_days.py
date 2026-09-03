@@ -24,17 +24,16 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import time
 
 import numpy as np
 import torch
 
-import config
-import navigation as nav
-import observation_model as om
-from model_io import load_solver
+from crowdcore import config
+from crowdcore import navigation as nav
+from crowdcore import observation_model as om
+from methods.varnet.checks.model_io import load_solver
 
 
 def windows(arr, dT):

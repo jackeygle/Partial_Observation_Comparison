@@ -27,12 +27,11 @@ from __future__ import annotations
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import dataset as ds
-import sensors
-from positional import PositionalEncoder
+from methods.senseiver import dataset as ds
+from methods.senseiver import sensors
+from methods.senseiver.positional import PositionalEncoder
 
 FAIL = []
 

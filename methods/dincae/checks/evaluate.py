@@ -48,16 +48,14 @@ import torch
 
 # checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
 # 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import observation_model as om                                    # noqa: E402
+from crowdcore import observation_model as om                                    # noqa: E402
 
-from state import (CHANNELS, StateStats, NCH, channel_valid,  # noqa: E402
+from methods.dincae.state import (CHANNELS, StateStats, NCH, channel_valid,  # noqa: E402
                          fwd_channel, inv_channel)
-from dataset import obs_config                                     # noqa: E402
-from encoding import (FRESH_OFFSETS, N_IN, N_STATIC, observed_pair,  # noqa: E402
+from methods.dincae.dataset import obs_config                                     # noqa: E402
+from methods.dincae.encoding import (FRESH_OFFSETS, N_IN, N_STATIC, observed_pair,  # noqa: E402
                       static_channels)
-from model import DINCAE                                            # noqa: E402
+from methods.dincae.model import DINCAE                                            # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 与 4dvarnet_enkf/checks/eval_test_days.py:clip_bounds 完全一致（EnKF 的物理界）

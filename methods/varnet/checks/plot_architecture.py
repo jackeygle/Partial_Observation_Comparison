@@ -21,10 +21,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
 import torch                                                        # noqa: E402
-from model_io import load_solver                                    # noqa: E402
+from methods.varnet.checks.model_io import load_solver                                    # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval")
 CK = os.path.join(ROOT, "runs", "varnet_a2_k1", "varnet_best.pt")

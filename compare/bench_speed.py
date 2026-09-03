@@ -76,6 +76,7 @@ import argparse
 import importlib
 import json
 import os
+from crowdcore import paths
 import resource
 import sys
 import time
@@ -83,18 +84,19 @@ import time
 import numpy as np
 import torch
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
 
 # after sys.path — this lives in the project root, not in checks/
-import observation_model as om
+from crowdcore import observation_model as om
 H, W, F = 36, 12, 4
 TOTAL, STATE_DIM = H * W, F * H * W
 PROC_STD = (0.02829307, 0.31263075, 0.12325809, 0.41680932)
 INIT_STD = (0.2290, 1.2660, 0.3429, 0.0259)
 SRC = {"orig": "/scratch/work/zhangx29/Partial_observation",
-       "opt": os.path.join(ROOT, "enkf_opt")}
+       "opt": paths.enkf_vendor("enkf_opt")}
 
 
 def hw_info():
@@ -206,7 +208,7 @@ def bench_enkf(src, obs_npz, n_frames, warmup_frames=10):
 
 # ---------------------------------------------------------------- 4DVarNet
 def bench_varnet(ckpt, obs_npz, n_frames, device="cpu"):
-    from model_io import load_solver
+    from methods.varnet.checks.model_io import load_solver
     dev = torch.device(device)
     solver, a, _ = load_solver(ckpt, dev)
     dT = a["dT"]
@@ -238,7 +240,7 @@ def bench_varnet_ensemble(ckpts, obs_npz, n_frames, device="cpu"):
     M models resident at once change the allocator's and the cache's behaviour, and the
     moment-matching itself costs something. A benchmark that multiplies is not a benchmark.
     """
-    from model_io import load_solver
+    from methods.varnet.checks.model_io import load_solver
     dev = torch.device(device)
     solvers, a = [], None
     for c in ckpts:

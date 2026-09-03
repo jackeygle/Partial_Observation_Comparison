@@ -38,10 +38,8 @@ import torch
 import torch.nn as nn
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
-from model_io import load_solver  # noqa: E402
-from prior_model import GENN, ZeroCentreConv3d  # noqa: E402
+from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.varnet.prior_model import GENN, ZeroCentreConv3d  # noqa: E402
 
 OK, FAIL, WARN = "  [ok]  ", "  [FAIL]", "  [note]"
 

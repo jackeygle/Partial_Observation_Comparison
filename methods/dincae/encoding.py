@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from state import (CHANNELS, NCH, StateStats, channel_valid,  # noqa: F401
+from methods.dincae.state import (CHANNELS, NCH, StateStats, channel_valid,  # noqa: F401
                          fwd_channel)
 
 FRESH_OFFSETS = (-1, 0, 1)          # ntime_win = 3（论文默认，必须奇数）

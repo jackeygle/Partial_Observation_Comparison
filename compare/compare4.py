@@ -17,9 +17,9 @@ walkable、四通道无权重。DINCAE 在那个口径下的盲区 MSE 是 0.564
 口径（四方完全一致）
 --------------------
   * 有定义格子：density 处处有定义；vx/vy 要求 density>0；var 要求 var>0。
-    唯一的定义在 `dincae_crowd/state.py:channel_valid()`，本脚本按路径 import 它，
+    唯一的定义在 `methods/dincae/state.py:channel_valid()`，本脚本直接 import 它，
     **不复制规则**（复制过来就会有第二个真相）。
-  * ∩ walkable。已逐格核对 `dincae_crowd/artifacts/state_stats.npz["valid_mask"]` 与
+  * ∩ walkable。已逐格核对 `methods/dincae/artifacts/state_stats.npz["valid_mask"]` 与
     `nav.build_valid_mask_from_config()` 完全相同（290/432 格），所以两个项目喂给
     `generate_observations` 的 `valid_mask` 是同一个，盲区集合本来就一致。
   * ∩ 盲区（`~Omega`）。
@@ -50,45 +50,24 @@ DINCAE 那一行
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import os
+from crowdcore import paths
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import torch
 
-import dataset as ds
-import sensors
-from network import Senseiver
+from methods.senseiver import dataset as ds
+from methods.senseiver import sensors
+from methods.senseiver.network import Senseiver
 
-V4D = "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
-DINCAE = "/scratch/work/zhangx29/Thesis_Project/dincae_crowd"
-for p in (V4D, os.path.join(V4D, "checks")):
-    if p not in sys.path:
-        sys.path.append(p)
-from model_io import load_solver                                    # noqa: E402
-import navigation as nav                                            # noqa: E402
-
-
-def _load_isolated(name, path):
-    """按路径加载一个模块，给它一个不会和本项目撞名的名字。
-
-    dincae_crowd 和 senseiver_crowd 都有 dataset.py / losses.py / model.py，把 dincae 的根
-    塞进 sys.path 会把本项目的模块顶掉。dincae 的 state.py 只依赖 numpy/h5py 和
-    4dvarnet_enkf 的 navigation/observation_model（都已在 sys.path 上），所以可以单独加载。
-    """
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
-
-
-_dstate = _load_isolated("dincae_state", os.path.join(DINCAE, "state.py"))
-channel_valid = _dstate.channel_valid
-StateStats = _dstate.StateStats
+from methods.varnet.checks.model_io import load_solver
+from crowdcore import navigation as nav
+# 「有定义格子」规则的唯一定义。2026-09-03 重构前这里是一段 importlib.spec_from_file_location
+# 的 hack —— 因为 dincae 和 senseiver 都有 dataset.py/losses.py/model.py，把 dincae 的根塞进
+# sys.path 会把本项目的模块顶掉。包化之后直接 import 就行。
+from methods.dincae.state import StateStats, channel_valid
 
 # DINCAE 的 FRESH_OFFSETS = (-1, 0, 1)，见 dincae_crowd/encoding.py:30。写死在这里并断言，
 # 免得为了一个常量去 import 那边会撞名的 encoding.py。
@@ -158,7 +137,7 @@ def run_senseiver(model, Y, Om, dev, batch):
 
 def run_varnet(solver, Y, Omc, X0, dT, dev, batch):
     """返回 (重建 (nw*dT, C, H, W), 覆盖的帧数)。与 compare3.run_varnet 同一路径。"""
-    import observation_model as om
+    from crowdcore import observation_model as om
     win = lambda a: om.to_windows(a, dT)
     Yw, Mw, X0w = win(Y), win(Omc.astype(np.float32)), win(X0)
     outs = []
@@ -192,20 +171,26 @@ def build_masks(X, Omf, walk, C):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--senseiver", default="runs/senseiver_A/best.pt")
+    ap.add_argument("--senseiver",
+                    default=os.path.join(paths.runs(paths.SENSEIVER),
+                                         "senseiver_A", "best.pt"))
     ap.add_argument("--varnet", default="a4_k1,b0_k1",
                     help="逗号分隔的 4dvarnet run 名（runs/varnet_<名>/varnet_best.pt）")
     ap.add_argument("--de-fmt", default="vsb0_s{}",
                     help="不确定性头（NLL）深度集成的 run 名模板；留空则不评它")
     ap.add_argument("--de-members", default="0,1,2,3,4")
-    ap.add_argument("--enkf-dir", default=os.path.join(V4D, "check_outputs", "enkf_k1_full"))
+    ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
-                    default=os.path.join(DINCAE, "check_outputs", "eval",
+                    default=os.path.join(paths.eval_out(paths.DINCAE),
                                          "dincae_metrics_test.json"))
     ap.add_argument("--days", type=int, default=0)
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--varnet-batch", type=int, default=16)
-    ap.add_argument("--out", default="check_outputs/eval/compare4.json")
+    # 输出落在 compare/ 自己的目录：这个量是跨方法的，不属于任何一个方法的
+    # check_outputs。重构前它写在 senseiver_crowd/check_outputs/eval/ 下，
+    # 让人以为那是 Senseiver 的指标。
+    ap.add_argument("--out", default=os.path.join(paths.COMPARE, "results",
+                                                  "compare4.json"))
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -213,7 +198,8 @@ def main():
     chans = ds.channels()
 
     # walkable：两个项目的掩码已核对相同，这里断言一次，别让它悄悄漂掉
-    walk = StateStats(os.path.join(DINCAE, "artifacts", "state_stats.npz")).valid
+    walk = StateStats(os.path.join(paths.method(paths.DINCAE),
+                                   "artifacts", "state_stats.npz")).valid
     walk_4d = nav.build_valid_mask_from_config()
     assert walk.shape == walk_4d.shape and (walk == walk_4d).all(), \
         "dincae 的 walkable 与 4dvarnet 的不再一致，四方口径的前提被破坏了"
@@ -226,7 +212,7 @@ def main():
     vnames = [z.strip() for z in args.varnet.split(",") if z.strip()]
     vsolvers = {}
     for vn in vnames:
-        sol, va, _ = load_solver(os.path.join(V4D, f"runs/varnet_{vn}/varnet_best.pt"), dev)
+        sol, va, _ = load_solver(os.path.join(paths.runs(paths.VARNET), f"varnet_{vn}", "varnet_best.pt"), dev)
         vsolvers[vn] = (sol, va)
 
     # 不确定性头（NLL 损失）的深度集成。点估计是各成员重建的均值（论文 Sec 2.4），
@@ -237,7 +223,8 @@ def main():
     de_solvers, de_dT = [], None
     for m in de_members:
         sol, va, _ = load_solver(
-            os.path.join(V4D, f"runs/varnet_{args.de_fmt.format(m)}/varnet_best.pt"), dev)
+            os.path.join(paths.runs(paths.VARNET), f"varnet_{args.de_fmt.format(m)}",
+                         "varnet_best.pt"), dev)
         de_solvers.append(sol)
         de_dT = va["dT"]
     print(f"[model] Senseiver {sm.num_params:,} 参数 | "
@@ -377,7 +364,7 @@ def main():
             entry[conv] = {"per_channel": {c: float(pc[c]) for c in chans},
                            "n_per_channel": {chans[i]: int(v) for i, v in enumerate(nn)},
                            "overall": float(se / max(nn.sum(), 1)),
-                           "source": os.path.relpath(args.dincae_json, DINCAE)}
+                           "source": os.path.relpath(args.dincae_json, paths.ROOT)}
         res["results"]["DINCAE"] = entry
 
     print("\n\n全场 RMSE（观测 + 盲区所有格子）—— 池化 vs 按日平均 vs 不裁剪\n")

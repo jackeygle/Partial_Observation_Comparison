@@ -25,13 +25,14 @@ import sys
 import time
 
 import numpy as np
+from crowdcore import paths
 import torch
 
 H, W, F = 36, 12, 4
 TOTAL = H * W
 STATE_DIM = F * TOTAL
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
+ENKFDIR = paths.enkf_export("enkf")
 # EnKF process/init noise: the calibrated values from the original ENKF.py main().
 PROC_STD = (0.02829307, 0.31263075, 0.12325809, 0.41680932)
 INIT_STD = (0.2290, 1.2660, 0.3429, 0.0259)

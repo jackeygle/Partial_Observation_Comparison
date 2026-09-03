@@ -25,12 +25,9 @@ import sys
 import numpy as np
 
 # append 而不是 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的顶掉。
-_V4D = "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
-if _V4D not in sys.path:
-    sys.path.append(_V4D)
-import config as cfg4d                                          # noqa: E402
-import navigation as nav                                        # noqa: E402
-import observation_model as om                                  # noqa: E402
+from crowdcore import config as cfg4d                                          # noqa: E402
+from crowdcore import navigation as nav                                        # noqa: E402
+from crowdcore import observation_model as om                                  # noqa: E402
 
 
 def obs_config():

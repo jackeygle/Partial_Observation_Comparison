@@ -34,10 +34,10 @@ from __future__ import annotations
 import glob
 import json
 import os
+from crowdcore import paths
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx
+from slides.build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx
 
 import numpy as np
 
@@ -217,7 +217,7 @@ slides = [
 ]
 
 if __name__ == "__main__":
-    out = os.path.join(ROOT, "slides")
+    out = paths.SLIDES
     render_pptx(slides, os.path.join(out, "speed_deck.pptx"))
     render_pdf(slides, os.path.join(out, "speed_deck.pdf"))
     render_notes(slides, os.path.join(out, "speed_deck_notes.md"))

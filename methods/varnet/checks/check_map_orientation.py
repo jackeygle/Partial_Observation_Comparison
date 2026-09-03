@@ -24,14 +24,13 @@ import argparse
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 
-import navigation as nav
-from navigation import load_atc_map, map_obstacle_fraction, world_to_map_pixel
-from data_pipeline.h5_to_grid import SUBSETS, rotation_matrix
-from observation_model import load_state, resolve_file
+from crowdcore import navigation as nav
+from crowdcore.navigation import load_atc_map, map_obstacle_fraction, world_to_map_pixel
+from crowdcore.data.h5_to_grid import SUBSETS, rotation_matrix
+from crowdcore.observation_model import load_state, resolve_file
 
 
 def main():

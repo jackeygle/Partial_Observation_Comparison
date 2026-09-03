@@ -21,11 +21,11 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
+from crowdcore import paths
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
+ENKFDIR = paths.enkf_export("enkf")
 
 
 def main():
@@ -58,7 +58,7 @@ def main():
                "blind_mse_mean": float(bl.mean()), "blind_mse_std": float(bl.std()),
                "full_mse_mean": float(fu.mean()), "full_mse_std": float(fu.std()),
                "per_day": per_day}
-    outp = os.path.join(ROOT, "check_outputs", "eval", "enkf_metrics.json")
+    outp = os.path.join(paths.eval_out(paths.VARNET), "enkf_metrics.json")
     os.makedirs(os.path.dirname(outp), exist_ok=True)
     with open(outp, "w") as f:
         json.dump(summary, f, indent=2)

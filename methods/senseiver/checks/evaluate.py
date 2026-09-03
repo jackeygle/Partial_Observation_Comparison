@@ -30,13 +30,12 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import torch
 
-import dataset as ds
-import sensors
-from network import Senseiver
+from methods.senseiver import dataset as ds
+from methods.senseiver import sensors
+from methods.senseiver.network import Senseiver
 
 
 def clip_bounds(x):

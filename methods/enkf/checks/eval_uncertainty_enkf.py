@@ -34,8 +34,7 @@ import numpy as np
 from scipy.stats import norm
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-import config  # noqa: E402
+from crowdcore import config  # noqa: E402
 
 SQRT_PI = np.sqrt(np.pi)
 ZS = list(range(10, 100, 10))

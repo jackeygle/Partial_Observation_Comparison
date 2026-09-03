@@ -23,6 +23,7 @@ baseline's own configuration, so a diagram cannot drift from the model it descri
 """
 from __future__ import annotations
 import os
+from crowdcore import paths
 import sys
 
 import json as _json_
@@ -33,17 +34,18 @@ import matplotlib.pyplot as plt
 import torch
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
 EV = os.path.join(ROOT, "check_outputs", "eval")
 INK, MUTED = "#20334d", "#5b6a7d"
 C_EK, C_VN, C_OBS, C_UN = "#b5651d", "#0e6b8a", "#4a7a4a", "#7a4a7a"
 
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
-from model_io import load_solver  # noqa: E402
+from methods.varnet.checks.model_io import load_solver  # noqa: E402
 
 # ─────────────────────────── sizes, read from the artefacts ───────────────────────────
-sys.path.insert(0, os.path.join(ROOT, "enkf_lab"))
+sys.path.insert(0, paths.enkf_vendor("enkf_lab"))
 from pedpred.utils import load_model  # noqa: E402
 N_SURR = sum(p.numel() for p in
              load_model(os.path.join(ROOT, "enkf_lab", "apt-ibex_train_model_28D.pth"),
@@ -64,12 +66,11 @@ NENS, RAD, INFL = 100, 7, 1.02
 SDIM = C * H * W
 
 # the variance head, instantiated exactly as train_varnet.py builds it
-sys.path.insert(0, ROOT)
 # the variance read-out's size, from the solver itself: a second 1x1 conv on the hidden state
 N_VAR = (_S.grad_net.lstm.hidden_ch + 1) * (C * DT)
 # channel names, and the sigma the head actually produces across the field (from
 # checks/diag_varhead_trace.py). There is no longer a per-channel floor: sigma^2 = softplus(head)
-import config  # noqa: E402
+from crowdcore import config  # noqa: E402
 CHAN = config.CFG["grid"]["channels"]
 _VHT = os.path.join(EV, "varhead_trace.json")
 SIG_RANGE = (_json_.load(open(_VHT))["sigma_range"]

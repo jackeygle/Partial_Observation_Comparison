@@ -26,7 +26,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
 EV = os.path.join(ROOT, "check_outputs", "eval")
 OUT = os.path.join(ROOT, "check_outputs", "eval")
 

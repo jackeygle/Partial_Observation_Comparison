@@ -47,12 +47,10 @@ import torch
 import torch.nn.functional as F
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
-import config                                                        # noqa: E402
-import observation_model as om                                       # noqa: E402
-import navigation as nav                                             # noqa: E402
-from model_io import load_solver                                     # noqa: E402
+from crowdcore import config                                                        # noqa: E402
+from crowdcore import observation_model as om                                       # noqa: E402
+from crowdcore import navigation as nav                                             # noqa: E402
+from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval", "solver_trace.json")
 CHAN = list(config.get("grid", "channels"))

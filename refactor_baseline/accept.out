@@ -1,0 +1,71 @@
+######## 验收 1/2: enkf_opt 与 enkf_lab 逐位相同 ########
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/verify_enkf_opt.py", line 261, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/verify_enkf_opt.py", line 221, in main
+    npz = sorted(glob.glob(os.path.join(ROOT, "check_outputs", "enkf", "obs_*.npz")))[0]
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+######## 验收 2/2: compare4 复现基线数字 ########
+[model] Senseiver 65,892 参数 | 4DVarNet a4_k1 dT=200 n_iter=15 | 4DVarNet b0_k1 dT=200 n_iter=20 | walkable 290/432 | device=cuda
+  atc-20130811: 39821 帧, 评 [1,39820)  Senseiver full=0.0138  4DVarNet a4_k1 full=0.0238  4DVarNet b0_k1 full=0.0272  4DVarNet nll ens5 full=0.0311  4DVarNet nll s0 full=0.0324  4DVarNet nll s1 full=0.0337  4DVarNet nll s2 full=0.0321  4DVarNet nll s3 full=0.0321  4DVarNet nll s4 full=0.0330  EnKF k1 full=0.0473
+  atc-20130818: 38885 帧, 评 [1,38884)  Senseiver full=0.0196  4DVarNet a4_k1 full=0.0299  4DVarNet b0_k1 full=0.0344  4DVarNet nll ens5 full=0.0388  4DVarNet nll s0 full=0.0406  4DVarNet nll s1 full=0.0416  4DVarNet nll s2 full=0.0401  4DVarNet nll s3 full=0.0399  4DVarNet nll s4 full=0.0412  EnKF k1 full=0.0609
+  atc-20130825: 42890 帧, 评 [1,42889)  Senseiver full=0.0169  4DVarNet a4_k1 full=0.0274  4DVarNet b0_k1 full=0.0316  4DVarNet nll ens5 full=0.0357  4DVarNet nll s0 full=0.0373  4DVarNet nll s1 full=0.0386  4DVarNet nll s2 full=0.0369  4DVarNet nll s3 full=0.0368  4DVarNet nll s4 full=0.0379  EnKF k1 full=0.0563
+  atc-20130901: 39758 帧, 评 [1,39757)  Senseiver full=0.0187  4DVarNet a4_k1 full=0.0292  4DVarNet b0_k1 full=0.0336  4DVarNet nll ens5 full=0.0380  4DVarNet nll s0 full=0.0397  4DVarNet nll s1 full=0.0410  4DVarNet nll s2 full=0.0392  4DVarNet nll s3 full=0.0391  4DVarNet nll s4 full=0.0403  EnKF k1 full=0.0601
+  atc-20130915: 39383 帧, 评 [1,39382)  Senseiver full=0.0162  4DVarNet a4_k1 full=0.0266  4DVarNet b0_k1 full=0.0310  4DVarNet nll ens5 full=0.0351  4DVarNet nll s0 full=0.0367  4DVarNet nll s1 full=0.0378  4DVarNet nll s2 full=0.0363  4DVarNet nll s3 full=0.0362  4DVarNet nll s4 full=0.0373  EnKF k1 full=0.0552
+  atc-20130922: 38842 帧, 评 [1,38841)  Senseiver full=0.0154  4DVarNet a4_k1 full=0.0261  4DVarNet b0_k1 full=0.0301  4DVarNet nll ens5 full=0.0347  4DVarNet nll s0 full=0.0362  4DVarNet nll s1 full=0.0372  4DVarNet nll s2 full=0.0359  4DVarNet nll s3 full=0.0358  4DVarNet nll s4 full=0.0368  EnKF k1 full=0.0550
+  atc-20130929: 37964 帧, 评 [1,37963)  Senseiver full=0.0192  4DVarNet a4_k1 full=0.0300  4DVarNet b0_k1 full=0.0347  4DVarNet nll ens5 full=0.0398  4DVarNet nll s0 full=0.0415  4DVarNet nll s1 full=0.0427  4DVarNet nll s2 full=0.0410  4DVarNet nll s3 full=0.0409  4DVarNet nll s4 full=0.0421  EnKF k1 full=0.0647
+
+
+全场 RMSE（观测 + 盲区所有格子）—— 池化 vs 按日平均 vs 不裁剪
+
+方法                          池化        按日平均       池化,不裁         按日平均,不裁
+----------------------------------------------------------------------
+Senseiver               0.1308      0.1306      0.1305          0.1304
+4DVarNet a4_k1          0.1660      0.1659      0.1670          0.1670
+4DVarNet b0_k1          0.1782      0.1781      0.1796          0.1796
+4DVarNet nll ens5       0.1901      0.1900      0.1907          0.1906
+4DVarNet nll s0         0.1942      0.1942      0.1950          0.1950
+4DVarNet nll s1         0.1972      0.1972      0.1982          0.1981
+4DVarNet nll s2         0.1932      0.1932      0.1939          0.1938
+4DVarNet nll s3         0.1930      0.1929      0.1936          0.1936
+4DVarNet nll s4         0.1958      0.1957      0.1964          0.1963
+EnKF k1                 0.2388      0.2387      0.2388          0.2387
+
+有定义格子 ∩ walkable ∩ 盲区（四方可比的口径）
+
+方法                      density         vx         vy        var         合计     合计RMSE
+--------------------------------------------------------------------------------------
+Senseiver                0.0242     0.6334     0.1108     0.0543     0.1180     0.3435
+4DVarNet a4_k1           0.0309     0.5075     0.1276     0.0770     0.1109     0.3331
+4DVarNet b0_k1           0.0328     0.6260     0.1345     0.0780     0.1284     0.3584
+4DVarNet nll ens5        0.0335     0.7772     0.1315     0.0783     0.1481     0.3848
+4DVarNet nll s0          0.0343     0.7948     0.1324     0.0784     0.1510     0.3886
+4DVarNet nll s1          0.0341     0.7957     0.1357     0.0784     0.1514     0.3891
+4DVarNet nll s2          0.0339     0.7836     0.1325     0.0782     0.1493     0.3864
+4DVarNet nll s3          0.0341     0.7844     0.1339     0.0781     0.1497     0.3869
+4DVarNet nll s4          0.0344     0.7968     0.1350     0.0784     0.1516     0.3894
+EnKF k1                  0.0246     0.7435     0.1207     0.0661     0.1352     0.3677
+DINCAE                   0.0230     0.5457     0.1026     0.0539     0.1047     0.3236
+
+所有格子 ∩ 盲区（compare3 的旧口径，供对照）
+
+方法                      density         vx         vy        var         合计     合计RMSE
+--------------------------------------------------------------------------------------
+Senseiver                0.0139     0.0788     0.0144     0.0064     0.0284     0.1685
+4DVarNet a4_k1           0.0177     0.0753     0.0207     0.0111     0.0312     0.1767
+4DVarNet b0_k1           0.0189     0.0932     0.0229     0.0113     0.0366     0.1912
+4DVarNet nll ens5        0.0190     0.1212     0.0200     0.0113     0.0429     0.2071
+4DVarNet nll s0          0.0194     0.1273     0.0203     0.0114     0.0446     0.2112
+4DVarNet nll s1          0.0193     0.1293     0.0234     0.0113     0.0458     0.2141
+4DVarNet nll s2          0.0193     0.1252     0.0205     0.0114     0.0441     0.2100
+4DVarNet nll s3          0.0194     0.1240     0.0209     0.0115     0.0439     0.2096
+4DVarNet nll s4          0.0196     0.1288     0.0215     0.0113     0.0453     0.2128
+EnKF k1                  0.0143     0.1103     0.0209     0.0394     0.0462     0.2150
+DINCAE                   0.0134     0.5713     1.6489     0.0239     0.5644     0.7513
+
+[out] /scratch/work/zhangx29/Thesis_Project/compare/results/compare4.json

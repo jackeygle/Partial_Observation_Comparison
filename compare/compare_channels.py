@@ -12,15 +12,20 @@ Run on a GPU node:  python3 checks/compare_channels.py
 """
 from __future__ import annotations
 import glob, json, os, sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np, torch
-import config, navigation as nav, observation_model as om
-from model_io import load_solver
+from crowdcore import config
+from crowdcore import navigation as nav
+from crowdcore import observation_model as om
+from crowdcore import paths
+from methods.varnet.checks.model_io import load_solver
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
 ENKFDIR = os.path.join(ROOT, "check_outputs", "enkf")
 CH = config.get("grid", "channels")
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")

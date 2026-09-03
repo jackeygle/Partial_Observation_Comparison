@@ -57,14 +57,14 @@ import os
 import h5py
 import numpy as np
 
-import navigation                                        # walkable region / is_valid / A* path planning
+from crowdcore import navigation                                        # walkable region / is_valid / A* path planning
 
 # --------------------------------------------------------------------------- #
 # Fixed conventions — ALL centralised in config.yaml (supervisor's requirement);
 # this module only reads them. The PROVENANCE of every value is documented in
 # config.yaml comments (why the sensing radius is 7, how the noise std was calibrated).
 # --------------------------------------------------------------------------- #
-import config
+from crowdcore import config
 
 DATA_ROOT = config.get("data", "root")
 GRID_CACHE = os.path.join(DATA_ROOT, config.get("data", "grid_cache"))  # pre-gridded data directory

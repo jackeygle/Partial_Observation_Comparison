@@ -47,7 +47,7 @@ def load_atc_map(map_dir=None):
     """
     import yaml
     from PIL import Image
-    import config as _cfg
+    from crowdcore import config as _cfg
     map_dir = map_dir or _cfg.get("navigation", "map_dir")
     with open(os.path.join(map_dir, "localization_grid.yaml")) as f:
         meta = yaml.safe_load(f)
@@ -70,7 +70,7 @@ def _per_cell_pixel_fraction(pixel_mask, subset="corridor", grid_res=1.0, map_di
     and average the boolean `pixel_mask` there. Shared by map_obstacle_fraction and
     build_valid_mask_from_map (raw vs inflated obstacle mask).
     """
-    from data_pipeline.h5_to_grid import SUBSETS, rotation_matrix   # grid geometry definitions
+    from crowdcore.data.h5_to_grid import SUBSETS, rotation_matrix   # grid geometry definitions
     img, map_res, map_origin = load_atc_map(map_dir)
     s = SUBSETS[subset]
     origin, theta, (H, W) = np.asarray(s["origin"]), s["theta"], s["shape"]
@@ -114,7 +114,7 @@ def _obstacle_pixels(map_dir=None, solid=True):
     handled by the data-wall criterion, see build_valid_mask_from_config.)
     """
     import yaml
-    import config as _cfg
+    from crowdcore import config as _cfg
     map_dir = map_dir or _cfg.get("navigation", "map_dir")
     with open(os.path.join(map_dir, "localization_grid.yaml")) as f:
         meta = yaml.safe_load(f)
@@ -159,7 +159,7 @@ def build_valid_mask_from_map(subset="corridor", robot_radius_m=None, grid_res=1
     (`robot_radius_m` is accepted for signature compatibility but not used.)
     The corridor extent is fixed by the 36x12 subset box; the map decides free/obstacle.
     """
-    import config as _cfg
+    from crowdcore import config as _cfg
     obst = _obstacle_pixels(map_dir)
     occ_frac = _per_cell_pixel_fraction(obst, subset, grid_res, map_dir)
     walkable = occ_frac < 0.5                                       # >=50% obstacle pixels -> cell is wall
@@ -188,7 +188,7 @@ def cell_visibility(radius, subset="corridor", grid_res=1.0, map_dir=None):
     key = (round(float(radius), 3), subset)
     if key in _VIS_CACHE:
         return _VIS_CACHE[key]
-    from data_pipeline.h5_to_grid import SUBSETS
+    from crowdcore.data.h5_to_grid import SUBSETS
     H, W = SUBSETS[subset]["shape"]
     wall = _map_wall(subset, grid_res, map_dir)          # SAME wall definition as the walkable mask
     N = H * W
@@ -257,8 +257,8 @@ def _visited_union(split="train", tau=None):
 
     Cached as a .npy next to the grid_cache files, keyed by split and tau.
     """
-    import observation_model as om                        # lazy: avoid circular import
-    import config as _cfg
+    from crowdcore import observation_model as om                        # lazy: avoid circular import
+    from crowdcore import config as _cfg
     if tau is None:
         tau = float(_cfg.get("navigation", "visited_tau", default=0.25))
     cache = os.path.join(om.GRID_CACHE, f"visited_union_{split}_tau{tau:g}_corridor.npy")
@@ -292,7 +292,7 @@ def _map_wall(subset="corridor", grid_res=1.0, map_dir=None):
       "per_cell" — the supervisor's baseline: a cell is a wall iff its raw
         obstacle fraction >= occupancy_thresh (default 0.5).
     """
-    import config as _cfg
+    from crowdcore import config as _cfg
     rule = str(_cfg.get("navigation", "obstacle_rule", default="footprint")).lower()
     obst = _obstacle_pixels(map_dir)
     if rule == "footprint":
@@ -329,7 +329,7 @@ def build_valid_mask_from_config(X=None):
     criterion comes from the fixed training-set union, so the mask is identical
     for every day (train/valid/test).
     """
-    import config as _cfg
+    from crowdcore import config as _cfg
     walkable = ~_map_wall("corridor", 1.0)                 # 2. map wall (connected footprint)
     walkable &= _visited_union("train")                    # 1. data wall (training-set union)
     if _cfg.get("navigation", "keep_largest_component", default=True):

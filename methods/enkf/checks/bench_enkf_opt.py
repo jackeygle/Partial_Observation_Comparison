@@ -34,6 +34,7 @@ import sys
 import time
 
 import numpy as np
+from crowdcore import paths
 import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -150,7 +151,7 @@ def main():
     ap.add_argument("--out", default="check_outputs/eval/bench_enkf_opt.json")
     args = ap.parse_args()
 
-    z = np.load(os.path.join(ROOT, "check_outputs", "enkf", f"obs_{args.day}.npz"))
+    z = np.load(os.path.join(paths.enkf_export("enkf"), f"obs_{args.day}.npz"))
     Y, Om, obs_std = z["Y"], z["Omega"], z["obs_std"]
     T = min(args.frames, Y.shape[0])
     pre = []

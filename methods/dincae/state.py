@@ -50,9 +50,8 @@ import h5py
 import numpy as np
 
 # append 而非 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的同名模块顶掉
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import navigation as nav                                         # noqa: E402
-import observation_model as om                                    # noqa: E402
+from crowdcore import navigation as nav                                         # noqa: E402
+from crowdcore import observation_model as om                                    # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHANNELS = ("density", "vx", "vy", "var")

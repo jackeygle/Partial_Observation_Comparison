@@ -17,13 +17,11 @@ results discussion, not this one.
 from __future__ import annotations
 
 import os
+from crowdcore import paths
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT_ = os.path.dirname(HERE)
-sys.path.insert(0, HERE)
-sys.path.insert(0, ROOT_)
-from build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
+from slides.build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
 
 F = lambda *p: os.path.join(OUTPUTS, *p)
 
@@ -133,7 +131,7 @@ slides = [
 ]
 
 if __name__ == "__main__":
-    out = os.path.join(ROOT, "slides")
+    out = paths.SLIDES
     render_pptx(slides, os.path.join(out, "de_apply_deck.pptx"))
     render_pdf(slides, os.path.join(out, "de_apply_deck.pdf"))
     render_notes(slides, os.path.join(out, "de_apply_deck_notes.md"))

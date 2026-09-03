@@ -29,14 +29,12 @@ import numpy as np
 
 # checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
 # 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import observation_model as om                                    # noqa: E402
+from crowdcore import observation_model as om                                    # noqa: E402
 
-from state import (CHANNEL_TRANSFORM, CHANNELS, StateStats,  # noqa: E402
+from methods.dincae.state import (CHANNEL_TRANSFORM, CHANNELS, StateStats,  # noqa: E402
                          NCH, channel_valid, fwd_channel)
-from dataset import encode_day, obs_config                         # noqa: E402
-from encoding import (FRESH_OFFSETS, N_IN, N_STATIC, N_TGT,        # noqa: E402
+from methods.dincae.dataset import encode_day, obs_config                         # noqa: E402
+from methods.dincae.encoding import (FRESH_OFFSETS, N_IN, N_STATIC, N_TGT,        # noqa: E402
                       encode_target, observed_pair)
 
 

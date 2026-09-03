@@ -31,14 +31,13 @@ import shutil
 import sys
 import tempfile
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # make parent-level modules importable
 
 import h5py
 import numpy as np
 
-from data_pipeline import csv_to_h5
-from data_pipeline.csv_to_h5 import _iter_csv_chunks, convert
-from data_pipeline.h5_to_grid import (
+from crowdcore.data import csv_to_h5
+from crowdcore.data.csv_to_h5 import _iter_csv_chunks, convert
+from crowdcore.data.h5_to_grid import (
     SUBSETS, build_grid_for_day, build_period_index, points2grid, rotation_matrix,
 )
 

@@ -22,12 +22,11 @@ from __future__ import annotations
 
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # make parent-level modules importable
 
 import torch
 
-from prior_model import GENN
-from variational_solver import GradSolver, ObsOperator
+from methods.varnet.prior_model import GENN
+from methods.varnet.variational_solver import GradSolver, ObsOperator
 
 
 def main():

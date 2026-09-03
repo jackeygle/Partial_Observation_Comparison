@@ -27,11 +27,11 @@ order of magnitude cheaper. Every number is read from check_outputs/eval at buil
 from __future__ import annotations
 import json
 import os
+from crowdcore import paths
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
-from build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
+from slides.build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
 
 EV = os.path.join(OUTPUTS, "eval")
 J = lambda n: json.load(open(os.path.join(EV, n)))
@@ -120,7 +120,7 @@ slides = [
 ]
 
 if __name__ == "__main__":
-    out = os.path.join(ROOT, "slides")
+    out = paths.SLIDES
     render_pdf(slides, os.path.join(out, "meeting3_deck.pdf"))
     render_pptx(slides, os.path.join(out, "meeting3_deck.pptx"))
     render_notes(slides, os.path.join(out, "meeting3_deck_notes.md"))

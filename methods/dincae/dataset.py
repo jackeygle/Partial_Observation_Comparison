@@ -27,12 +27,11 @@ import numpy as np
 import torch
 
 # append 而非 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的同名模块顶掉
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import config as cfg4d                                            # noqa: E402
-import observation_model as om                                     # noqa: E402
+from crowdcore import config as cfg4d                                            # noqa: E402
+from crowdcore import observation_model as om                                     # noqa: E402
 
-from state import StateStats, NCH                           # noqa: E402
-from encoding import (FRESH_OFFSETS, N_IN, N_STATIC, encode_target,  # noqa: E402
+from methods.dincae.state import StateStats, NCH                           # noqa: E402
+from methods.dincae.encoding import (FRESH_OFFSETS, N_IN, N_STATIC, encode_target,  # noqa: E402
                       observed_pair, static_channels)
 
 CACHE_VER = 4   # 1=age/aggregation; 2=论文版; 3=+残差归一化; 4=+var 走 log1p

@@ -14,13 +14,14 @@ Run on a GPU node:
 """
 from __future__ import annotations
 import argparse, os, sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np, torch
-import config, navigation as nav, observation_model as om
-from model_io import load_solver
+from crowdcore import config
+from crowdcore import navigation as nav
+from crowdcore import observation_model as om
+from methods.varnet.checks.model_io import load_solver
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARROW_MIN = 0.1

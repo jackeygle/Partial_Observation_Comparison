@@ -1,7 +1,6 @@
+# 从仓库根跑: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_postdel
 import sys, os, torch
-R="/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
-sys.path.insert(0,R); sys.path.insert(0,os.path.join(R,"checks"))
-from model_io import load_solver
+from methods.varnet.checks.model_io import load_solver
 d = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 for ck in ["runs/varnet_vsb0_s0/varnet_best.pt","runs/varnet_vrb0_s0/varnet_best.pt",
            "runs/varnet_ml5_s0/varnet_best.pt"]:

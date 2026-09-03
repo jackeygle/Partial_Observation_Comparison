@@ -48,11 +48,9 @@ import numpy as np
 
 # checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
 # 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import config                                                    # noqa: E402
-import navigation as nav                                         # noqa: E402
-import observation_model as om                                    # noqa: E402
+from crowdcore import config                                                    # noqa: E402
+from crowdcore import navigation as nav                                         # noqa: E402
+from crowdcore import observation_model as om                                    # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

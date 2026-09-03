@@ -33,21 +33,17 @@ import argparse
 import glob
 import json
 import os
+from crowdcore import paths
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import torch
 
-import dataset as ds
-import sensors
-from network import Senseiver
+from methods.senseiver import dataset as ds
+from methods.senseiver import sensors
+from methods.senseiver.network import Senseiver
 
-V4D = "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
-for p in (V4D, os.path.join(V4D, "checks")):
-    if p not in sys.path:
-        sys.path.append(p)
-from model_io import load_solver                                    # noqa: E402
+from methods.varnet.checks.model_io import load_solver                                    # noqa: E402
 
 LO = np.array([0.0, -5.0, -5.0, 0.0], np.float32)
 HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
@@ -89,7 +85,7 @@ def run_senseiver(model, Y, Om, dev, batch, C, H, W):
 
 
 def run_varnet(solver, X, Y, Omc, X0, dT, dev, batch):
-    import observation_model as om
+    from crowdcore import observation_model as om
     win = lambda a: om.to_windows(a, dT)
     Xw, Yw = win(X), win(Y)
     Mw, X0w = win(Omc.astype(np.float32)), win(X0)
@@ -109,7 +105,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--senseiver", default="runs/senseiver_A/best.pt")
     ap.add_argument("--varnet", default="a4_k1")
-    ap.add_argument("--enkf-dir", default=os.path.join(V4D, "check_outputs", "enkf_k1_full"))
+    ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--days", type=int, default=0)
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--varnet-batch", type=int, default=16)
@@ -121,7 +117,7 @@ def main():
 
     sck = torch.load(args.senseiver, map_location=dev, weights_only=False)
     sm = Senseiver(**sck["hparams"]).to(dev); sm.load_state_dict(sck["model"]); sm.eval()
-    solver, va, _ = load_solver(os.path.join(V4D, f"runs/varnet_{args.varnet}/varnet_best.pt"), dev)
+    solver, va, _ = load_solver(os.path.join(paths.runs(paths.VARNET), f"varnet_{args.varnet}", "varnet_best.pt"), dev)
     print(f"[model] Senseiver {sm.num_params:,} 参数 | 4DVarNet {args.varnet} "
           f"dT={va['dT']} n_iter={solver.n_iter} | device={dev}", flush=True)
 

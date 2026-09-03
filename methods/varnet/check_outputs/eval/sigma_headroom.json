@@ -6,58 +6,58 @@
   "per_channel": {
     "density": {
       "n_scored": 566780,
-      "err2_occ_over_empty": 19.25146484375,
+      "err2_occ_over_empty": 19.40468978881836,
       "learnt": {
-        "spread_skill": 41.742958068847656,
-        "occ_over_empty": 1.0993804931640625,
-        "nll": 9.316437721252441
+        "spread_skill": 41.36302947998047,
+        "occ_over_empty": 1.170710563659668,
+        "nll": 6.9114089012146
       },
       "lookup": {
-        "spread_skill": 0.8832105994224548,
-        "occ_over_empty": 2.7691993713378906,
-        "nll": -2.3056023120880127
+        "spread_skill": 0.8881157040596008,
+        "occ_over_empty": 2.7577905654907227,
+        "nll": -2.3003485202789307
       }
     },
     "vx": {
       "n_scored": 566780,
-      "err2_occ_over_empty": 23.599794387817383,
+      "err2_occ_over_empty": 23.8094539642334,
       "learnt": {
-        "spread_skill": 3.9683265686035156,
-        "occ_over_empty": 1.2121503353118896,
-        "nll": 38.135231018066406
+        "spread_skill": 3.9360461235046387,
+        "occ_over_empty": 1.3151477575302124,
+        "nll": 40.47547149658203
       },
       "lookup": {
-        "spread_skill": 1.0704247951507568,
-        "occ_over_empty": 1.9014688730239868,
-        "nll": -0.8970313668251038
+        "spread_skill": 1.0742132663726807,
+        "occ_over_empty": 1.9079948663711548,
+        "nll": -0.8992777466773987
       }
     },
     "vy": {
       "n_scored": 566780,
-      "err2_occ_over_empty": 27.22891616821289,
+      "err2_occ_over_empty": 27.511638641357422,
       "learnt": {
-        "spread_skill": 19.360048294067383,
-        "occ_over_empty": 1.106797218322754,
-        "nll": 0.722707211971283
+        "spread_skill": 19.521846771240234,
+        "occ_over_empty": 1.1585426330566406,
+        "nll": 0.7069786190986633
       },
       "lookup": {
-        "spread_skill": 0.9035604000091553,
-        "occ_over_empty": 2.137279987335205,
-        "nll": -1.8944950103759766
+        "spread_skill": 0.9029783606529236,
+        "occ_over_empty": 2.1165239810943604,
+        "nll": -1.8983726501464844
       }
     },
     "var": {
       "n_scored": 566780,
-      "err2_occ_over_empty": 29.61601448059082,
+      "err2_occ_over_empty": 29.408050537109375,
       "learnt": {
-        "spread_skill": 131.4884490966797,
-        "occ_over_empty": 0.9583238363265991,
-        "nll": -0.01060701347887516
+        "spread_skill": 133.3862762451172,
+        "occ_over_empty": 0.9689585566520691,
+        "nll": 5.294984340667725
       },
       "lookup": {
-        "spread_skill": 0.5305553674697876,
-        "occ_over_empty": 1.8902981281280518,
-        "nll": -2.522576332092285
+        "spread_skill": 0.542508065700531,
+        "occ_over_empty": 1.9653345346450806,
+        "nll": -2.593378782272339
       }
     }
   }

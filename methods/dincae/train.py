@@ -32,14 +32,13 @@ import numpy as np
 import torch
 
 # append 而非 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的同名模块顶掉
-sys.path.append("/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
-import observation_model as om                                    # noqa: E402
+from crowdcore import observation_model as om                                    # noqa: E402
 
-from state import CHANNELS, StateStats, NCH                # noqa: E402
-from dataset import ChunkedDays, obs_config                        # noqa: E402
-from encoding import N_IN                                          # noqa: E402
-from losses import residual_mse, dincae_loss                        # noqa: E402
-from model import DINCAE                                           # noqa: E402
+from methods.dincae.state import CHANNELS, StateStats, NCH                # noqa: E402
+from methods.dincae.dataset import ChunkedDays, obs_config                        # noqa: E402
+from methods.dincae.encoding import N_IN                                          # noqa: E402
+from methods.dincae.losses import residual_mse, dincae_loss                        # noqa: E402
+from methods.dincae.model import DINCAE                                           # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 

@@ -17,13 +17,17 @@ Kalman update is host numpy) — a GPU-vs-CPU ratio would measure hardware, not 
 from __future__ import annotations
 import json
 import os
+from crowdcore import paths
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
 D = json.load(open(os.path.join(ROOT, "check_outputs/eval/bench_speed_cpu.json")))
 R, HW = D["runs"], D["hw"]
 OUT = os.path.join(ROOT, "check_outputs", "eval")

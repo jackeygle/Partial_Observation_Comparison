@@ -18,14 +18,11 @@ from __future__ import annotations
 
 import json
 import os
+from crowdcore import paths
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT_ = os.path.dirname(HERE)
-sys.path.insert(0, HERE)
-sys.path.insert(0, ROOT_)
-sys.path.insert(0, os.path.join(ROOT_, "checks"))
-from build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
+from slides.build_slides import OUTPUTS, ROOT, render_notes, render_pdf, render_pptx  # noqa: E402
 
 import numpy as np  # noqa: E402
 
@@ -223,7 +220,7 @@ slides = [
 ]
 
 if __name__ == "__main__":
-    out = os.path.join(ROOT, "slides")
+    out = paths.SLIDES
     render_pptx(slides, os.path.join(out, "uncertainty_deck.pptx"))
     render_pdf(slides, os.path.join(out, "uncertainty_deck.pdf"))
     render_notes(slides, os.path.join(out, "uncertainty_deck_notes.md"))

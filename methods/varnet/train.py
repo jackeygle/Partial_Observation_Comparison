@@ -29,12 +29,12 @@ from contextlib import nullcontext
 import numpy as np
 import torch
 
-import config
-import observation_model as d
-import navigation as nav
-from prior_model import GENN
-from variational_solver import GradSolver
-from losses import compute_loss
+from crowdcore import config
+from crowdcore import observation_model as d
+from crowdcore import navigation as nav
+from methods.varnet.prior_model import GENN
+from methods.varnet.variational_solver import GradSolver
+from methods.varnet.losses import compute_loss
 
 _T = config.CFG["training"]                              # training defaults (config.yaml)
 

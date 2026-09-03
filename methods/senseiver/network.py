@@ -23,8 +23,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from model import Decoder, Encoder
-from positional import PositionalEncoder, encoding_channels
+from methods.senseiver.model import Decoder, Encoder
+from methods.senseiver.positional import PositionalEncoder, encoding_channels
 
 
 class Senseiver(nn.Module):

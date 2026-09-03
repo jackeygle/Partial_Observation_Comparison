@@ -31,18 +31,20 @@ runs/varnet_mse5_s* are training for exactly that.
 from __future__ import annotations
 import json
 import os
+from crowdcore import paths
 import sys
 
 import numpy as np
 import torch
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
-import config                                                        # noqa: E402
-import observation_model as om                                       # noqa: E402
-import navigation as nav                                             # noqa: E402
-from model_io import load_solver                                     # noqa: E402
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
+from crowdcore import config                                                        # noqa: E402
+from crowdcore import observation_model as om                                       # noqa: E402
+from crowdcore import navigation as nav                                             # noqa: E402
+from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval", "threeway_accuracy.json")
 ENKF_SRC = os.path.join(ROOT, "check_outputs", "enkf_k1_full")

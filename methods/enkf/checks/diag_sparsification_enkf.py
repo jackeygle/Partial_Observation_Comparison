@@ -30,12 +30,12 @@ import sys
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-import config                                                        # noqa: E402
+from crowdcore import config                                                        # noqa: E402
+from crowdcore import paths
 
-SRC = os.path.join(ROOT, "check_outputs", "enkf_k1_full")
+SRC = paths.enkf_export("enkf_k1_full")
 DAY = os.environ.get("AUDIT_DAY", "atc-20130811")
-OUT = os.path.join(ROOT, "check_outputs", "eval", "sparsification_enkf.json")
+OUT = os.path.join(paths.eval_out(paths.VARNET), "sparsification_enkf.json")
 CHAN = list(config.get("grid", "channels"))
 FRACS = np.linspace(0.0, 0.9, 19)
 

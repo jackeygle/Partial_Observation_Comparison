@@ -51,13 +51,11 @@ import numpy as np
 import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "checks"))
 
 # Reuse the benchmark's own constants and hardware probe rather than restating them: if the
 # ensemble size, noise or localization radius ever changes there, this must follow, and the
 # shares are only meaningful applied to that script's totals.
-from bench_speed import (F, H, INIT_STD, PROC_STD, SRC, STATE_DIM, TOTAL, W,  # noqa: E402
+from compare.bench_speed import (F, H, INIT_STD, PROC_STD, SRC, STATE_DIM, TOTAL, W,  # noqa: E402
                          build_C, hw_info)
 
 

@@ -19,10 +19,10 @@ All coordinates are in inches on a 16:9 (13.333 x 7.5) page.
 from __future__ import annotations
 
 import os
+from crowdcore import paths
 import sys
 import textwrap
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import matplotlib
 matplotlib.use("Agg")
@@ -33,7 +33,10 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.util import Inches, Pt
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
+# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
+# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+ROOT = paths.method(paths.VARNET)
 OUTPUTS = os.path.join(ROOT, "check_outputs")             # output root of all check/plot scripts
 
 PAGE_W, PAGE_H = 13.333, 7.5                              # 16:9, inches

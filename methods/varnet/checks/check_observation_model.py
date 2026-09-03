@@ -20,12 +20,11 @@ import argparse
 import json
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # make parent-level modules importable
 
 import numpy as np
 
-import navigation
-from observation_model import (
+from crowdcore import navigation
+from crowdcore.observation_model import (
     CHANNEL_NAMES, NUM_AGENTS, SENSING_RANGE,
     fill_missing_state, generate_observations, load_state, resolve_file,
 )

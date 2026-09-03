@@ -25,12 +25,11 @@ import argparse
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import config
-import navigation as nav
-import observation_model as om
+from crowdcore import config
+from crowdcore import navigation as nav
+from crowdcore import observation_model as om
 
 
 def main():

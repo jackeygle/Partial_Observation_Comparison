@@ -1,0 +1,292 @@
+[cfg] dT=200 k=1 days=7  mse=runs/varnet_b0_k1  de=runs/varnet_vsb0_s{} x5
+  atc-20130811  199 windows
+  atc-20130818  194 windows
+  atc-20130825  214 windows
+  atc-20130901  198 windows
+  atc-20130915  196 windows
+  atc-20130922  194 windows
+  atc-20130929  189 windows
+
+                         all     blind  observed    density        vx        vy       var
+enkf                  0.2389    0.2151    0.2634     0.1429    0.3812    0.1540    0.1974
+varnet_mse            0.2104    0.2198    0.1992     0.1367    0.3578    0.1538    0.0819
+nll, each of 5        0.2147    0.2319    0.1933
+   +- std            ±0.0149   ±0.0150   ±0.0151
+   best member        0.2021    0.2194    0.1804
+nll, ens of 5         0.1953    0.2129    0.1732     0.1124    0.3437    0.1235    0.0812
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/threeway_accuracy.json
+[figure] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/speed_bars.png
+[figure] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/speed_scaling.png
+
+--- for the slide ---
+  EnKF original        2630.72 ms/frame        0.4x real time         0.4 frames/s
+  EnKF vectorised       131.42 ms/frame        7.6x real time         7.6 frames/s
+  4DVarNet CPU            2.51 ms/frame      398.5x real time       398.5 frames/s
+  4DVarNet GPU            0.17 ms/frame     5724.7x real time      5724.7 frames/s
+
+  vectorisation speed-up      20.0x  (bit-identical output)
+  4DVarNet vs EnKF, same CPU  52.4x
+  k has no effect on 4DVarNet: CPU 2.51 vs 2.51 ms, GPU 0.17 vs 0.17 ms
+  EnKF original used only 3.7 of 16 cores (serial Python); vectorised uses 15.6
+walkable cells: 290/432 (67.1%)
+per-frame coverage of walkable cells: 55.4%
+revisit gap (s): median 1  mean 2  p75 1  p90 1  p95 4  p99 24  max 1393
+walkable cells never observed in 4000 s: 0/290
+  window     3 s -> P(cell seen >=1 time) = 0.630
+  window     9 s -> P(cell seen >=1 time) = 0.765
+  window    27 s -> P(cell seen >=1 time) = 0.927
+  window    61 s -> P(cell seen >=1 time) = 0.986
+  window   121 s -> P(cell seen >=1 time) = 0.996
+  window   301 s -> P(cell seen >=1 time) = 0.998
+  window   601 s -> P(cell seen >=1 time) = 0.999
+  window  1201 s -> P(cell seen >=1 time) = 1.000
+busy segment: mean density 0.0885, occupancy 31.4%
+lag(s):           0      1      2      4      8     16     32     64    128    256    512
+AC density:    1.00   0.54   0.28   0.19   0.12   0.09   0.05   0.03   0.01   0.01   0.01
+AC vx:         1.00   0.48   0.20   0.08   0.03   0.02   0.01   0.01   0.01   0.00   0.01
+/scratch/work/zhangx29/Thesis_Project/methods/dincae/checks/measure_decorrelation.py:26: RuntimeWarning: Mean of empty slice
+  m=np.nanmean(a,0); a=a-m; s=np.nanstd(a,0)+1e-12; out=[]
+/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/scratch/work/zhangx29/Thesis_Project/methods/dincae/checks/measure_decorrelation.py:29: RuntimeWarning: Mean of empty slice
+  p=a[:-L]*a[L:]; out.append(float(np.nanmean(np.nanmean(p,0)/(s*s))))
+AC vx|occ:     1.00   0.68   0.37   0.17   0.09   0.06   0.03   0.05   0.02  -0.00   0.01
+  persistence lag    1s: density MSE 0.03040 (clim 0.03672)  vx MSE 0.1808 (clim 0.2289)
+  persistence lag    4s: density MSE 0.06082 (clim 0.03672)  vx MSE 0.4031 (clim 0.2289)
+  persistence lag   16s: density MSE 0.06730 (clim 0.03672)  vx MSE 0.4430 (clim 0.2289)
+  persistence lag   61s: density MSE 0.07134 (clim 0.03672)  vx MSE 0.4557 (clim 0.2289)
+  persistence lag  256s: density MSE 0.07303 (clim 0.03672)  vx MSE 0.4554 (clim 0.2289)
+unobserved (t,cell) share: 44.5%
+age of last obs at UNOBSERVED cells (s): median 9  p25 4  p75 20  p90 35  p95 47
+   share of unobserved cells whose last obs is <=  2s old : 17.1%
+   share of unobserved cells whose last obs is <=  4s old : 29.5%
+   share of unobserved cells whose last obs is <=  8s old : 47.5%
+   share of unobserved cells whose last obs is <= 16s old : 69.1%
+   share of unobserved cells whose last obs is <= 32s old : 88.4%
+   share of unobserved cells whose last obs is <= 64s old : 97.2%
+[runs] 2: ['beta0', 'beta1']
+[device] cuda   windows 24
+[data] 24 windows of dT=200
+[beta0] done
+[beta1] done
+{
+  "beta0": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.03481980413198471,
+      "sigma2_median_occupied": 0.027369216084480286,
+      "sigma2_ratio_occ_over_empty": 0.7860243916511536,
+      "grad_weight_share_empty": 0.9175381064414978,
+      "mse_empty": 0.00488700345158577,
+      "mse_occupied": 0.0840010941028595,
+      "grad_share_if_beta0": 0.33721983432769775,
+      "grad_share_if_beta1": 0.1476987898349762
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.06552042067050934,
+      "sigma2_median_occupied": 0.06842372566461563,
+      "sigma2_ratio_occ_over_empty": 1.0443114042282104,
+      "grad_weight_share_empty": 0.929150402545929,
+      "mse_empty": 0.04639348387718201,
+      "mse_occupied": 0.9087673425674438,
+      "grad_share_if_beta0": 0.448890745639801,
+      "grad_share_if_beta1": 0.5815877318382263
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.05699492245912552,
+      "sigma2_median_occupied": 0.051097571849823,
+      "sigma2_ratio_occ_over_empty": 0.8965284824371338,
+      "grad_weight_share_empty": 0.929302453994751,
+      "mse_empty": 0.006166602950543165,
+      "mse_occupied": 0.14363516867160797,
+      "grad_share_if_beta0": 0.06935783475637436,
+      "grad_share_if_beta1": 0.2158646583557129
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.033029016107320786,
+      "sigma2_median_occupied": 0.021021168678998947,
+      "sigma2_ratio_occ_over_empty": 0.6364455223083496,
+      "grad_weight_share_empty": 0.8972073793411255,
+      "mse_empty": 0.001512250048108399,
+      "mse_occupied": 0.04226604476571083,
+      "grad_share_if_beta0": 0.14453156292438507,
+      "grad_share_if_beta1": 0.054848812520504
+    }
+  },
+  "beta1": {
+    "density": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.014457682147622108,
+      "sigma2_median_occupied": 0.018470875918865204,
+      "sigma2_ratio_occ_over_empty": 1.277582049369812,
+      "grad_weight_share_empty": 0.9538354277610779,
+      "mse_empty": 0.009683462791144848,
+      "mse_occupied": 0.07962989062070847,
+      "grad_share_if_beta0": 0.06380562484264374,
+      "grad_share_if_beta1": 0.21944564580917358
+    },
+    "vx": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.07401042431592941,
+      "sigma2_median_occupied": 0.07953396439552307,
+      "sigma2_ratio_occ_over_empty": 1.074631929397583,
+      "grad_weight_share_empty": 0.9461827874183655,
+      "mse_empty": 0.028411880135536194,
+      "mse_occupied": 0.6782829761505127,
+      "grad_share_if_beta0": 0.015079325065016747,
+      "grad_share_if_beta1": 0.422842413187027
+    },
+    "vy": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.025982802733778954,
+      "sigma2_median_occupied": 0.03231482952833176,
+      "sigma2_ratio_occ_over_empty": 1.2437007427215576,
+      "grad_weight_share_empty": 0.9493271708488464,
+      "mse_empty": 0.009569285437464714,
+      "mse_occupied": 0.14014370739459991,
+      "grad_share_if_beta0": 0.02011866495013237,
+      "grad_share_if_beta1": 0.23986783623695374
+    },
+    "var": {
+      "n_blind": 1116719,
+      "frac_empty": 0.9366572969565307,
+      "sigma2_median_empty": 0.005252855364233255,
+      "sigma2_median_occupied": 0.009657200425863266,
+      "sigma2_ratio_occ_over_empty": 1.8384668827056885,
+      "grad_weight_share_empty": 0.9565947651863098,
+      "mse_empty": 0.0034331639762967825,
+      "mse_occupied": 0.04708214849233627,
+      "grad_share_if_beta0": 0.9009963870048523,
+      "grad_share_if_beta1": 0.1178441196680069
+    }
+  },
+  "beta0_vs_beta1_mse_pct": {
+    "density": {
+      "empty_pct": -49.532480714907635,
+      "occupied_pct": 5.489400334570171
+    },
+    "vx": {
+      "empty_pct": 63.28903140470208,
+      "occupied_pct": 33.98056187772964
+    },
+    "vy": {
+      "empty_pct": -35.558375901294625,
+      "occupied_pct": 2.491343594312956
+    },
+    "var": {
+      "empty_pct": -55.95170931102443,
+      "occupied_pct": -10.229150284867261
+    }
+  }
+}
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/beta_gradient_share.json
+[device] cuda  Tesla V100-SXM2-16GB
+[window] day=atc-20130811_corridor_1.0s.h5  window 60  shape (1, 4, 200, 36, 12)
+[solve] one window, 20 iterations, CPU: 0.1s
+[J] by hand 0.414021  vs VarCost 0.414021  (diff 4.38e-09)
+[chain] psi 32 feats, 13 killed by ReLU; phi0 16 killed; fine [0.3534, -0.4699, -0.2335, 0.0528]  coarse [0.6113, 0.0674, 0.1786, -0.2215]
+[json] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/channel_budget.json
+
+  J(x0) = 0.4685   obs 0.0000  reg 0.4685
+     share: density 12.8%  vx 62.6%  vy 12.7%  var 11.9%
+
+  J(xhat) = 0.4140   obs 0.0782  reg 0.3359
+     share: density 18.1%  vx 56.0%  vy 15.1%  var 10.7%
+  psi_3(41,10,6) = +1.9307   partials density:+1.4189 vx:+0.6087 vy:+0.0642 var:+0.1062
+  dropped by the mask: density:+0.2210 vx:-0.0312 vy:-0.0005 var:+0.0011
+[members] 5  dT=200  var_eps=1e-06
+
+=== (a) per-cell: is sigma^2 sitting on the floor? ===
+  quantile 0.001  sigma^2 = 3.711e-06   (4x the floor)
+  quantile 0.01   sigma^2 = 4.575e-05   (46x the floor)
+  quantile 0.1    sigma^2 = 1.328e-03   (1,328x the floor)
+  quantile 0.5    sigma^2 = 4.491e-02   (44,906x the floor)
+  quantile 0.9    sigma^2 = 8.983e-01   (898,299x the floor)
+  quantile 0.99   sigma^2 = 3.693e+00   (3,693,236x the floor)
+  fraction below  1.01x floor: 0.0005%
+  fraction below     2x floor: 0.0413%
+  fraction below    10x floor: 0.2786%
+  fraction below   100x floor: 1.8076%
+
+=== (b) across members: has the ensemble collapsed? ===
+  epistemic_share_of_variance        0.0255
+  aleatoric_share_of_variance        0.9745
+  epistemic_spread_skill             0.5644
+  aleatoric_spread_skill             3.4904
+  total_spread_skill                 3.5357
+  pairwise RMS difference between members: mean 0.13955 (min 0.09652, max 0.18851)
+  for scale: the ensemble's own error RMS is 0.16032  -> members differ from each other by 87.0% of the error they make
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/collapse.json
+[cfg] runs/varnet_vsb0_s0/varnet_best.pt  dT=200  hidden=64  -> read-out maps 64 to 800
+[data] 6,912 spatial cells x 64 features -> 800 targets
+[x_hat] R^2 from h_last:  density 0.034   vx 0.001   vy 0.020   var 0.007   _overall 0.009
+[x0   ] R^2 from h_last:  density 0.007   vx -0.017   vy -0.014   var -0.005   _overall -0.014
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/h_predicts_xhat.json
+[device] cuda   ckpt runs/varnet_ml5_s0/varnet_best.pt   N=20
+[data] atc-20130811_corridor_1.0s.h5  24 windows, 20 perturbations each
+[done] (24, 4, 200, 36, 12)
+[json] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/perturbed_obs_ensemble.json
+
+                              sigma     RMSE   sp/sk     90%
+  perturbed_obs              0.0920   0.1854   0.496   73.3%
+  perturbed_obs_blind        0.0874   0.1948   0.448   73.0%
+  perturbed_obs_channel_density   0.0268   0.1135   0.236   48.1%
+  perturbed_obs_channel_var   0.0310   0.0732   0.424   88.8%
+  perturbed_obs_channel_vx   0.2315   0.3162   0.732   83.3%
+  perturbed_obs_channel_vy   0.0788   0.1389   0.567   73.2%
+  perturbed_obs_observed     0.0973   0.1741   0.559   73.7%
+[device] cuda   windows 24   bins 32
+[data] atc-20130811_corridor_1.0s.h5  24 windows
+[device] cuda  ck runs/varnet_vrb0_s0/varnet_best.pt  dT 200  windows/day 12
+[fit ] atc-20121028_corridor_1.0s.h5
+[score] atc-20130811_corridor_1.0s.h5
+[density ] err2 occ/empty   19.4x | learnt occ/empty  1.17 nll   6.9114 | lookup occ/empty   2.76 nll  -2.3003
+[vx      ] err2 occ/empty   23.8x | learnt occ/empty  1.32 nll  40.4755 | lookup occ/empty   1.91 nll  -0.8993
+[vy      ] err2 occ/empty   27.5x | learnt occ/empty  1.16 nll   0.7070 | lookup occ/empty   2.12 nll  -1.8984
+[var     ] err2 occ/empty   29.4x | learnt occ/empty  0.97 nll   5.2950 | lookup occ/empty   1.97 nll  -2.5934
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/sigma_headroom.json
+[device] cuda
+[data] atc-20130811_corridor_1.0s.h5  40 of 199 windows
+[device] cuda  Tesla V100-SXM2-16GB
+[data] atc-20130811_corridor_1.0s.h5  16 windows strided across the day  (16, 4, 200, 36, 12)
+[check] x rebuilt from the captured updates vs solver output: 0.00e+00
+[check] recomputed J matches the hooked J at all 20 steps
+[check] step 10, hidden 51 (of 64; 45 have a railed gate): f*c+i*g and o*tanh(c) both reproduce the module; W_out.h = +0.08095 == u +0.08095
+[gconv] gate f, hidden 51, 7,776 terms: grad +6.6992 + hidden +0.7972 + bias +0.0061 = +7.5025  ->  sigmoid 0.999449
+        frame t=41 alone -0.2439  vs the other 199 frames +6.9432
+[json] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/solver_trace.json
+
+  J: 0.4522 -> 0.2066   (54.3% down)
+  blind MSE: 0.06855 -> 0.02913
+  forget gate mean: first 0.494  last 0.360  range [0.360, 0.494]
+  fraction of gate values railed (<0.05 or >0.95): i 32.0%  f 38.7%  o 30.8%  |g|>0.95 36.2%
+  update norm: first 131.1029  last 48.1761
+  J is lowest at step 16 (0.2034), blind MSE lowest at step 19 (0.02911)
+  grad RMS frozen at step 0 and reused for all 20 steps: 0.000001
+[members] 5  dT=200  windows=12
+[members] 5 x runs/varnet_vsb0_s{}  dT=200  k=1  dev=cuda
+  atc-20130616_corridor_1.0s.h5  175 windows
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+/var/spool/slurmd/job20050550/slurm_script: line 10: 855483 Killed                  python3 -u -m refactor_baseline.import_all
+[2026-09-03T14:01:04.300] error: Detected 1 oom_kill event in StepId=20050550.batch. Some of the step tasks have been OOM Killed.

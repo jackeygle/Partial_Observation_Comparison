@@ -26,7 +26,6 @@ import argparse, json, os, sys
 import numpy as np, torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
 LAB = os.path.join(ROOT, "enkf_lab")
 sys.path.insert(0, LAB)
 from pedpred.utils import load_model            # noqa: E402

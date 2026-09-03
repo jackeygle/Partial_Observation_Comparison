@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import torch
 
-import config
-from prior_model import GENN
-from variational_solver import GradSolver
+from crowdcore import config
+from methods.varnet.prior_model import GENN
+from methods.varnet.variational_solver import GradSolver
 
 
 def _HAS_VAR(sd):
