@@ -37,20 +37,25 @@ from crowdcore import observation_model as om                                   
 from crowdcore import navigation as nav                                             # noqa: E402
 from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
 
-OUT = os.path.join(ROOT, "check_outputs", "eval", "sparsification.json")
+# AUDIT_OUT keeps a second model's run from overwriting the first's result file
+OUT = os.path.join(ROOT, "check_outputs", "eval",
+                   os.environ.get("AUDIT_OUT", "sparsification.json"))
 CHAN = list(config.get("grid", "channels"))
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 FMT = os.environ.get("AUDIT_FMT", "runs/varnet_vsb0_s{}")
+# AUDIT_MEMBERS lets a single-model run be measured too: the augmented-state solver is trained
+# as one network, so hard-coding five here would have made it unmeasurable.
+MEMBERS = [int(z) for z in os.environ.get("AUDIT_MEMBERS", "0,1,2,3,4").split(",")]
 NW = int(os.environ.get("AUDIT_WINDOWS", 12))
 FRACS = np.linspace(0.0, 0.9, 19)          # fraction of most-uncertain cells removed
 
 solvers, A = [], None
-for s in range(5):
+for s in MEMBERS:
     sol, A, _ = load_solver(os.path.join(ROOT, FMT.format(s), "varnet_best.pt"), DEV)
     solvers.append(sol)
 DT = A["dT"]
 K = A.get("obs_every_k") or config.get("observation", "obs_every_k")
-print(f"[members] 5  dT={DT}  windows={NW}", flush=True)
+print(f"[members] {len(solvers)} from {FMT}  dT={DT}  windows={NW}", flush=True)
 
 X = np.asarray(om.load_state(om.split_files("test")[0])[0])
 X = X[:(len(X) // DT) * DT]

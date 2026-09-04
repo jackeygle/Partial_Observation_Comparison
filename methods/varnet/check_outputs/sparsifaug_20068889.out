@@ -1,0 +1,41 @@
+[members] 1 from runs/varnet_aug0_s{}  dT=200  windows=12
+/scratch/work/zhangx29/Thesis_Project/methods/varnet/checks/diag_sparsification.py:108: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  a = np.trapz(np.array(out["sigma"]) - np.array(out["oracle"]), FRACS)
+/scratch/work/zhangx29/Thesis_Project/methods/varnet/checks/diag_sparsification.py:109: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  b = np.trapz(np.array(out["random"]) - np.array(out["oracle"]), FRACS)
+
+=== blind  (2,267,120 cells) ===
+  AUSE = 0.219   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.755
+  dropped      sigma    oracle    random
+       0%    0.1680    0.1680    0.1681
+      20%    0.0703    0.0261    0.1683
+      45%    0.0368    0.0000    0.1679
+      70%    0.0227    0.0000    0.1681
+      90%    0.0100    0.0000    0.1665
+
+=== blind_empty  (2,166,844 cells) ===
+  AUSE = 0.150   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.754
+  dropped      sigma    oracle    random
+       0%    0.1197    0.1197    0.1199
+      20%    0.0469    0.0254    0.1196
+      45%    0.0230    0.0000    0.1199
+      70%    0.0071    0.0000    0.1196
+      90%    0.0006    0.0000    0.1182
+
+=== blind_occupied  (100,276 cells) ===
+  AUSE = 0.411   (0 = matches oracle, 1 = no better than random)
+  Spearman(sigma, |err|) = 0.656
+  dropped      sigma    oracle    random
+       0%    0.5743    0.5743    0.5743
+      20%    0.4427    0.2424    0.5734
+      45%    0.2889    0.0882    0.5733
+      70%    0.2009    0.0052    0.5771
+      90%    0.1549    0.0000    0.5733
+[density ] AUSE 0.343   Spearman 0.435
+[vx      ] AUSE 0.434   Spearman 0.449
+[vy      ] AUSE 0.410   Spearman 0.416
+[var     ] AUSE 0.320   Spearman 0.440
+
+[written] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/sparsification_aug0.json

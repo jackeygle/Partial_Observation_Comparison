@@ -200,10 +200,14 @@ def main():
                                          "senseiver_A", "best.pt"))
     ap.add_argument("--varnet", default="a4_k1,b0_k1",
                     help="逗号分隔的 4dvarnet run 名（runs/varnet_<名>/varnet_best.pt）")
-    ap.add_argument("--ensembles", default="MSE=mse5_s{},NLL=vsb0_s{}",
-                    help="逗号分隔的 `标签=run名模板`。每个集成会出 N 个单成员行加一个"
-                         "集成行。留空则不评任何集成。")
-    ap.add_argument("--ensemble-members", default="0,1,2,3,4")
+    ap.add_argument("--arms", default="MSE=mse5_s{},NLL=vsb0_s{}",
+                    help="逗号分隔的 `标签=run名模板`。每个臂会出 N 个单种子行，"
+                         "外加一行跨种子的 mean±std。留空则不评任何臂。")
+    ap.add_argument("--arm-seeds", default="0,1,2,3,4")
+    ap.add_argument("--with-ensemble", action="store_true",
+                    help="额外算一行 N 个成员重建取平均的集成。**默认关** —— 论文里"
+                         "没有集成这个说法，主表报单模型。留着这个开关是因为集成的"
+                         "增益本身是个可报的量（实测 MSE 臂 4.2%%、NLL 臂 1.7%%）。")
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
                     default=os.path.join(paths.eval_out(paths.DINCAE),
@@ -247,9 +251,9 @@ def main():
     # kt 3、lstm_hidden 64、GENN 9,474），唯一差别是 vsb0 多了 grad_net.out_var 这个
     # 692,000 参数的 σ̂ 读出头。所以 MSE-vs-NLL 在单成员和集成两个层级上都是干净对比。
     # （曾经以为要拿 b0_k1 和 vsb0 比会混进架构差异 —— 那是误记，b0_k1 本来就同架构。）
-    ens_members = [z.strip() for z in args.ensemble_members.split(",") if z.strip()]
+    ens_members = [z.strip() for z in args.arm_seeds.split(",") if z.strip()]
     ensembles = {}                                   # 标签 -> [solver, ...]
-    for spec in (z.strip() for z in args.ensembles.split(",") if z.strip()):
+    for spec in (z.strip() for z in args.arms.split(",") if z.strip()):
         label, _, fmt = spec.partition("=")
         assert fmt, f"--ensembles 的每一项要写成 标签=run名模板，收到 {spec!r}"
         sols, edT = [], None
@@ -271,7 +275,8 @@ def main():
 
     names = ["Senseiver"] + [f"4DVarNet {vn}" for vn in vnames]
     for label, (sols, _) in ensembles.items():
-        names.append(f"4DVarNet {label} ens{len(sols)}")
+        if args.with_ensemble:
+            names.append(f"4DVarNet {label} ens{len(sols)}")
         names += [f"4DVarNet {label} s{m}" for m in ens_members]
     names.append("EnKF k1")
     accs = {k: Acc(C) for k in names}
@@ -314,12 +319,14 @@ def main():
                 b = min(hi, nkeep)
                 dacc[f"4DVarNet {label} s{m}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
                                                    cut(sel_all, lo, b))
-                ens = pv if ens is None else ens + pv      # 累加，别同时留 5 份整天数组
+                if args.with_ensemble:
+                    ens = pv if ens is None else ens + pv   # 累加，别同时留 5 份整天数组
                 del pv
-            ens /= len(sols)
-            b = min(hi, ens.shape[0])
-            dacc[f"4DVarNet {label} ens{len(sols)}"].add(
-                clip_np(ens[lo:b]), ens[lo:b], Xf[lo:b], cut(sel_all, lo, b))
+            if args.with_ensemble:
+                ens /= len(sols)
+                b = min(hi, ens.shape[0])
+                dacc[f"4DVarNet {label} ens{len(sols)}"].add(
+                    clip_np(ens[lo:b]), ens[lo:b], Xf[lo:b], cut(sel_all, lo, b))
             del ens
 
         ep = os.path.join(args.enkf_dir, f"est_{stem}.npz")
@@ -392,6 +399,35 @@ def main():
                        [np.sqrt(v) for v in day_overall[k][conv]]))}
             for conv in CONVENTIONS}
 
+    # --- 跨种子汇总：单模型该报的数字 -------------------------------------------
+    #
+    # 主表报单模型（论文里没有集成这个说法）。但"单模型"不是一个数 —— 有 5 个种子，
+    # 所以诚实的写法是 mean ± std，和 Lakshminarayanan 报 fold 间均值与散布是一个道理。
+    # 挑最好的那个种子报会系统性偏乐观；挑 s0 报则是任意的。
+    #
+    # 这个 spread 还有第二个用处：判断两臂的差距是不是超出种子噪声。实测 MSE 臂
+    # 0.1239±0.0033、NLL 臂 0.1506±0.0009，差 0.0267 = MSE 种子标准差的 8.2 倍，
+    # 所以"MSE 比 NLL 好"在单模型层面就成立，不靠集成。
+    res["seed_summary"] = {}
+    for label in ensembles:
+        keys = [f"4DVarNet {label} s{m}" for m in ens_members if f"4DVarNet {label} s{m}" in accs]
+        if not keys:
+            continue
+        entry = {}
+        for conv in CONVENTIONS:
+            ov = [float(accs[k].overall(conv)) for k in keys]
+            pc = {c: [float(accs[k].mse(conv)[i]) for k in keys]
+                  for i, c in enumerate(chans)}
+            entry[conv] = {
+                "n_seeds": len(keys),
+                "overall_mean": float(np.mean(ov)), "overall_std": float(np.std(ov)),
+                "overall_min": float(np.min(ov)), "overall_max": float(np.max(ov)),
+                "rmse_mean": float(np.mean([np.sqrt(v) for v in ov])),
+                "per_channel_mean": {c: float(np.mean(v)) for c, v in pc.items()},
+                "per_channel_std": {c: float(np.std(v)) for c, v in pc.items()},
+            }
+        res["seed_summary"][label] = entry
+
     # DINCAE 的合计用本脚本的格数重算，理由见文件头
     if dincae_pc:
         ref = next(iter(accs.values()))
@@ -438,6 +474,14 @@ def main():
             pc, ov = q[conv]["per_channel"], q[conv]["overall"]
             print(f"{k:<24}" + "".join(f"{pc[c]:>11.4f}" for c in chans)
                   + f"{ov:>11.4f}{np.sqrt(ov):>11.4f}")
+        for label, e in res.get("seed_summary", {}).items():
+            if conv not in e:
+                continue
+            q = e[conv]
+            print(f"{'4DVarNet ' + label + ' 单模型':<24}"
+                  + "".join(f"{q['per_channel_mean'][c]:>11.4f}" for c in chans)
+                  + f"{q['overall_mean']:>11.4f}{np.sqrt(q['overall_mean']):>11.4f}"
+                  + f"   ± {q['overall_std']:.4f} ({q['n_seeds']} 种子)")
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w") as f:

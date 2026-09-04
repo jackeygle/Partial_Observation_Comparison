@@ -21,9 +21,10 @@
 `full`）和第二个集成臂（MSE）。回归测试**必须用与基线相同的参数**跑，否则行名和行数
 都变了，比对只会报一堆"少了字段"：
 
-    # 复现基线的行集合：两个 varnet 单模型 + 标签为 "nll" 的那个集成
-    python3 -m compare.compare5 --varnet a4_k1,b0_k1 --ensembles "nll=vsb0_s{}" \
-        --out compare/results/_regression.json
+    # 复现基线的行集合：两个 varnet 单模型 + 标签为 "nll" 的那个臂，并显式打开集成
+    # （2026-09-04 起集成默认关 —— 论文里没有集成这个说法，主表报单模型）
+    python3 -m compare.compare5 --varnet a4_k1,b0_k1 --arms "nll=vsb0_s{}" \
+        --with-ensemble --out compare/results/_regression.json
     # 4DVarNet 那几行有 ~4e-4 的固有抖动，见下面"复现下限"，所以容差按实测取
     python3 refactor_baseline/check_against_baseline.py \
         compare/results/_regression.json --tol 3e-4

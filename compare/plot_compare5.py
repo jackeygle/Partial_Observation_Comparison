@@ -3,6 +3,10 @@ plot_compare5.py — 主结果图：五方 × 四通道 × 两套口径
 
 读 `compare/results/compare5.json`，画一张图讲完全部主结果，外加"名次会翻转"这件事。
 
+**全部是单模型，不做集成** —— 论文里没有集成这个说法。两个 4DVarNet 臂各有 5 个训练
+种子，柱高取跨种子均值、误差棒是 ±1 标准差："单模型"不是一个数，挑最好的种子报会
+系统性偏乐观，挑 s0 报则是任意的。另外三方各只有一个模型，没有误差棒。
+
 版面：**两行 × 五列的小多组**
 
     行 = 口径      上：有定义格子 ∩ walkable ∩ 盲区（五方可比）
@@ -38,14 +42,19 @@ import numpy as np
 from compare import plotstyle as ps
 from crowdcore import paths
 
-#: 主表只画这五个方法。a4_k1、各单成员属于消融，另有图。
-#: 值是 compare5.json 里的行名；None 表示按前缀找（成员数可能不是 5）。
+#: 主表画这五个方法，**都是单模型** —— 论文里没有集成这个说法。
+#: 两个 4DVarNet 臂各有 5 个种子，取跨种子 mean 并画 ±std 误差棒：单模型不是一个数，
+#: 挑最好的种子报会系统性偏乐观，挑 s0 报则是任意的。
+#:
+#: 三元组 = (compare5.json 里的取数方式, 图例标签, 取色用的键)
+#:   ("row",  行名前缀)      从 results[...] 直接取
+#:   ("seed", 臂标签)        从 seed_summary[...] 取 mean±std
 ROWS = [
-    ("DINCAE",                 "DINCAE"),
-    ("4DVarNet MSE ens",       "4DVarNet (MSE loss)"),
-    ("4DVarNet NLL ens",       "4DVarNet + uncertainty head"),
-    ("Senseiver",              "Senseiver"),
-    ("EnKF k1",                "EnKF"),
+    ("row",  "DINCAE",     "DINCAE",                      "DINCAE"),
+    ("seed", "MSE",        "4DVarNet (MSE loss)",         "4DVarNet MSE"),
+    ("seed", "NLL",        "4DVarNet + uncertainty head", "4DVarNet NLL"),
+    ("row",  "Senseiver",  "Senseiver",                   "Senseiver"),
+    ("row",  "EnKF k1",    "EnKF",                        "EnKF k1"),
 ]
 
 PANELS = [
@@ -73,13 +82,20 @@ def main():
     results, chans = doc["results"], doc["channels"]
     cols = chans + ["total"]
 
-    rows = []
-    for prefix, label in ROWS:
-        key, entry = pick(results, prefix)
-        if entry is None:
-            print(f"  [warn] {args.json} 里没有 {prefix}*，跳过这一行")
-            continue
-        rows.append((label, ps.method_color(key), entry))
+    seeds = doc.get("seed_summary", {})
+    rows = []                      # (label, color, kind, payload)
+    for kind, ref, label, ckey in ROWS:
+        if kind == "seed":
+            if ref not in seeds:
+                print(f"  [warn] {args.json} 的 seed_summary 里没有 {ref}，跳过这一行")
+                continue
+            rows.append((label, ps.method_color(ckey), "seed", seeds[ref]))
+        else:
+            key, entry = pick(results, ref)
+            if entry is None:
+                print(f"  [warn] {args.json} 里没有 {ref}*，跳过这一行")
+                continue
+            rows.append((label, ps.method_color(key), "row", entry))
 
     ps.use()
     # wspace 给得大：每个面板有自己的 y 轴，刻度标签需要横向空间，否则会压到
@@ -92,17 +108,24 @@ def main():
     for r, (conv, conv_title) in enumerate(PANELS):
         for c, ch in enumerate(cols):
             ax = axes[r, c]
-            vals, colors, labels = [], [], []
-            for label, color, entry in rows:
-                q = entry.get(conv)
+            vals, errs, colors = [], [], []
+            for label, color, kind, payload in rows:
+                q = payload.get(conv)
                 if q is None:
                     continue
-                vals.append(q["overall"] if ch == "total" else q["per_channel"][ch])
+                if kind == "seed":
+                    vals.append(q["overall_mean"] if ch == "total"
+                                else q["per_channel_mean"][ch])
+                    errs.append(q["overall_std"] if ch == "total"
+                                else q["per_channel_std"][ch])
+                else:
+                    vals.append(q["overall"] if ch == "total" else q["per_channel"][ch])
+                    errs.append(0.0)                  # 单模型方法没有种子散布
                 colors.append(color)
-                labels.append(label)
 
-            bars = ax.bar(range(len(vals)), vals, color=colors, width=0.66, zorder=3)
-            hi = max(vals) if vals else 1.0
+            bars = ax.bar(range(len(vals)), vals, yerr=errs, color=colors, width=0.66,
+                          zorder=3, error_kw=dict(ecolor=ps.INK, lw=0.9, capsize=2.5))
+            hi = max(v + e for v, e in zip(vals, errs)) if vals else 1.0
             # 数值竖排：5 根柱子 × 4 位小数，横排一定会撞在一起（第一版就撞成
             # ".0242.0246" 这样）。竖排后每个标签只占一根柱子的宽度。
             for b, v in zip(bars, vals):
@@ -120,7 +143,7 @@ def main():
 
     # 图例放最下方一行，五个方法各一个色块 —— 面板里不再重复标签
     handles = [__import__("matplotlib").patches.Patch(facecolor=col, label=lab)
-               for lab, col, _ in rows]
+               for lab, col, _, _ in rows]
     fig.legend(handles=handles, loc="lower center", ncol=len(rows), frameon=False,
                bbox_to_anchor=(0.5, -0.035), fontsize=ps.FS_TICK)
 
@@ -128,6 +151,8 @@ def main():
     fig.suptitle(
         f"Per-channel reconstruction error, five methods  —  {n_days} held-out days, "
         "full day, obs_every_k=1, identical clipping\n"
+        "Single models throughout (no ensembling). Error bars on the two 4DVarNet arms are "
+        "\u00b11 s.d. over 5 training seeds.\n"
         "Each panel has its own y axis: the four channels differ by an order of magnitude, "
         "so a shared axis would flatten density/vy/var under vx. Panels are not comparable "
         "to each other.",
