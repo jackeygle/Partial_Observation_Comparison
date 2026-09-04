@@ -4,3 +4,21 @@
   atc-20130825_corridor_1.0s.h5  214 windows
   atc-20130901_corridor_1.0s.h5  198 windows
   atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.2122   0.0760   -0.249  0.1181   0.56   85.2%
+all_aleatoric_only              0.2122   0.0760   -0.249  0.1181   0.56   85.2%
+all_epistemic_only              0.2122   0.100922515607552.000  0.0000   0.00    0.0%
+all_constant_sigma_baseline     0.2122   0.0982   -0.131  0.2122   1.00   92.5%
+blind                           0.2351   0.0754    0.386  0.1051   0.45   85.2%
+observed                        0.1828   0.0767   -0.968  0.1328   0.73   85.2%
+channel_density                 0.1162   0.0436   -1.013  0.0710   0.61   84.9%
+channel_vx                      0.3766   0.1870    0.440  0.2778   0.74   81.1%
+channel_vy                      0.1350   0.0596   -0.733  0.0988   0.73   86.0%
+channel_var                     0.0811   0.0137    0.311  0.0246   0.30   88.8%
+
+[out] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/uncertainty_aug0.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%

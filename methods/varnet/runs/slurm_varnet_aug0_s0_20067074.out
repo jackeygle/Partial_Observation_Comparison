@@ -11,3 +11,23 @@ NVIDIA H200
 [best] previous best blind MSE = 0.0489
 [schedule] epoch 130: n_iter -> 20, lr -> 0.0003
 [epoch 130] loss=-2.3360  盲区MSE=0.0502  density=0.0189 vx=0.1454 vy=0.0278 var=0.0087
+[epoch 131] loss=-2.3121  盲区MSE=0.0502  density=0.0189 vx=0.1455 vy=0.0278 var=0.0087
+[epoch 132] loss=-2.3339  盲区MSE=0.0502  density=0.0189 vx=0.1455 vy=0.0277 var=0.0087
+[epoch 133] loss=-2.3505  盲区MSE=0.0500  density=0.0188 vx=0.1449 vy=0.0277 var=0.0087
+[epoch 134] loss=-2.3532  盲区MSE=0.0501  density=0.0189 vx=0.1452 vy=0.0277 var=0.0087
+[epoch 135] loss=-2.3122  盲区MSE=0.0502  density=0.0189 vx=0.1453 vy=0.0278 var=0.0087
+[epoch 136] loss=-2.3093  盲区MSE=0.0501  density=0.0189 vx=0.1451 vy=0.0277 var=0.0087
+[epoch 137] loss=-2.2944  盲区MSE=0.0501  density=0.0189 vx=0.1451 vy=0.0277 var=0.0087
+[epoch 138] loss=-2.2536  盲区MSE=0.0501  density=0.0189 vx=0.1449 vy=0.0278 var=0.0087
+[epoch 139] loss=-2.2624  盲区MSE=0.0502  density=0.0189 vx=0.1453 vy=0.0278 var=0.0087
+[epoch 140] loss=-2.3045  盲区MSE=0.0503  density=0.0189 vx=0.1456 vy=0.0278 var=0.0087
+[epoch 141] loss=-2.3517  盲区MSE=0.0502  density=0.0189 vx=0.1453 vy=0.0278 var=0.0087
+[epoch 142] loss=-2.0830  盲区MSE=0.0519  density=0.0198 vx=0.1509 vy=0.0280 var=0.0088
+[epoch 143] loss=-2.2677  盲区MSE=0.0509  density=0.0190 vx=0.1480 vy=0.0279 var=0.0087
+[epoch 144] loss=-2.2628  盲区MSE=0.0505  density=0.0189 vx=0.1465 vy=0.0279 var=0.0087
+[epoch 145] loss=-2.3737  盲区MSE=0.0504  density=0.0189 vx=0.1459 vy=0.0278 var=0.0087
+[epoch 146] loss=-2.3420  盲区MSE=0.0504  density=0.0189 vx=0.1460 vy=0.0278 var=0.0087
+[epoch 147] loss=-2.3173  盲区MSE=0.0503  density=0.0189 vx=0.1457 vy=0.0278 var=0.0087
+[epoch 148] loss=-2.2004  盲区MSE=0.0508  density=0.0192 vx=0.1473 vy=0.0281 var=0.0087
+[epoch 149] loss=-2.3194  盲区MSE=0.0504  density=0.0189 vx=0.1462 vy=0.0279 var=0.0087
+[done] checkpoints + metrics in runs/varnet_aug0_s0
