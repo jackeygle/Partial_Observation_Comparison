@@ -1,8 +1,8 @@
 # ============================================================
-# 生成数据 —— 不入库（原始 31G 里 30G 都是这些）
+# Generated data -- not tracked (30 of the raw 31G is this)
 # ============================================================
 
-# 模型权重与张量缓存
+# Model weights and tensor caches
 *.pt
 *.pth
 *.npz
@@ -10,12 +10,13 @@
 *.h5
 *.nc
 
-# DINCAE 网格缓存（13G）
-# 用 **/ 而不是写死路径：2026-09-03 的目录重构让写死的路径全部失效，1000 张
-# seq_ppt 帧因此被暂存进来一次。规则跟着目录名走，不跟着位置走。
+# DINCAE grid cache (13G)
+# **/ instead of a hardcoded path: the 2026-09-03 directory refactor broke
+# every hardcoded path, and 1000 seq_ppt frames got staged in once as a
+# result. The rule follows the directory name, not a location.
 **/cache/
 
-# 逐帧序列图导出（1000 张 PNG，44MB，重跑即得，论文里也用不上）
+# Per-frame sequence exports (1000 PNGs, 44MB, cheap to regenerate, unused in the paper)
 **/check_outputs/eval/seq_ppt_*/
 
 # ============================================================
@@ -29,13 +30,13 @@ __pycache__/
 venv/
 
 # ============================================================
-# 杂项
+# Misc
 # ============================================================
 .DS_Store
 core.*
 
-# chain 的进展戳，是瞬时状态
+# chain's progress stamp -- transient state
 **/.chain_last_epoch
 
-# compare 的中间产物（回归测试的临时输出）
+# compare's intermediate artifacts (regression-test scratch output)
 compare/results/_*.json

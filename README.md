@@ -3,6 +3,9 @@
 Comparing five methods for reconstructing crowd density/velocity fields from
 **partial observations** on the ATC pedestrian trajectory dataset.
 
+For step-by-step commands (training, reproducing the headline comparison,
+per-method diagnostics), see [HOW_TO_USE.md](HOW_TO_USE.md).
+
 ## Structure
 
 ```
