@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=64G
 #SBATCH --time=01:30:00
-#SBATCH --output=check_outputs/uncrefresh_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/uncrefresh_%j.out
 # Re-run the uncertainty evaluation now that the variance head's sigma^2 floor is gone.
 # No retraining: the same 5 checkpoints, only the head's parameterisation changed
 # (sigma^2 = softplus(head) instead of obs_var + softplus(head)). Regenerates the json the

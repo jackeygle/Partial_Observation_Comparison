@@ -48,8 +48,8 @@ def main():
 
     # 2) The observation operator only penalises observed cells
     dy = ObsOperator()(x_rec, y, mask).detach()
-    assert float(dy[mask < 0.5].abs().max()) == 0.0, "观测项不应在未观测格上非零"
-    print("[2] obs operator OK: (x-y)⊙Ω 仅在观测格非零")
+    assert float(dy[mask < 0.5].abs().max()) == 0.0, "the observation term must not be nonzero on unobserved cells"
+    print("[2] obs operator OK: (x-y) x Omega is nonzero only on observed cells")
 
     # 3) End-to-end differentiability: one backward pass sends gradients to both Φ and solver params
     loss = ((x_rec - x_true) ** 2).mean()                  # supervised reconstruction loss (Eq.14)
@@ -57,10 +57,10 @@ def main():
     n_grad = sum(int(p.grad is not None and p.grad.abs().sum() > 0)
                  for p in solver.parameters())
     n_total = sum(1 for _ in solver.parameters())
-    print(f"[3] differentiable: {n_grad}/{n_total} 个参数张量收到梯度 (Φ + solver 都可训练)")
+    print(f"[3] differentiable: {n_grad}/{n_total} parameter tensors received a gradient (both Phi and the solver are trainable)")
     assert n_grad > 0
 
-    print("\n轻量检查通过 ✓  (链路通、观测项正确、端到端可微; 训练用 GPU: sbatch submit_varnet.sbatch)")
+    print("\nlight check passed ✓  (pipeline works, observation term correct, end-to-end differentiable; train on GPU: sbatch submit_varnet.sbatch)")
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@
 #SBATCH --mem=64G
 #SBATCH --time=0-04:00:00
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/slurm_%x_%j.out
-# 用法: sbatch sbatch/submit_eval.sbatch [evaluate.py 的参数]
+# Usage: sbatch sbatch/submit_eval.sbatch [evaluate.py args]
 set -euo pipefail
 cd /scratch/work/zhangx29/Thesis_Project/methods/senseiver
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh

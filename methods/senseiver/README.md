@@ -1,357 +1,444 @@
-# senseiver_crowd — Senseiver 在 ATC 人群场上的复现
+# senseiver_crowd — reproducing Senseiver on the ATC crowd field
 
-**第三条方法路线**。前两条（4DVarNet 复现 + Localized EnKF 对比）在
-[`../4dvarnet_enkf/`](../4dvarnet_enkf/)。本目录只复用它的**数据管线与观测配置**
-（`config.yaml` / `observation_model.py` / `navigation.py`），不依赖它的任何结论，
-也不修改它的任何一行。
+**The third method route.** The first two (4DVarNet reproduction + Localized EnKF
+comparison) live in [`../4dvarnet_enkf/`](../4dvarnet_enkf/). This directory only
+reuses its **data pipeline and observation configuration** (`config.yaml` /
+`observation_model.py` / `navigation.py`), does not depend on any of its
+conclusions, and does not modify any of its lines.
 
-论文：Santos et al., *The Senseiver: attention-based global field reconstruction from
-sparse observations*（NeurIPS ML4PS 2022 workshop；正式版 Nature MI 2023）。
-参考实现：[`../../reference/Senseiver/`](../../reference/Senseiver/)（官方 PyTorch 代码）。
+Paper: Santos et al., *The Senseiver: attention-based global field reconstruction
+from sparse observations* (NeurIPS ML4PS 2022 workshop; published version Nature MI
+2023). Reference implementation:
+[`../../reference/Senseiver/`](../../reference/Senseiver/) (the official PyTorch
+code).
 
-**目标是复现论文的方法**，不是先做改进。凡是偏离参考实现的地方都在下面逐条列出并说明理由。
+**The goal is to reproduce the paper's method**, not to improve on it first. Every
+place that deviates from the reference implementation is listed below with its
+reason.
 
 ---
 
-## 端到端
+## End to end
 
 ```bash
 module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/senseiver_crowd
 
-# 1. 自检（GPU 节点，约 1 分钟）
+# 1. Self-check (GPU node, ~1 minute)
 srun -p gpu-debug --gres=gpu:1 -t 00:14:00 --mem=16G bash -c \
   'module load scicomp-pytorch-env/2026.1; python3 -u checks/check_model.py; python3 -u checks/check_sensors.py'
 
-# 2. 训练（自链接到 100 epoch）
+# 2. Training (self-chains to 100 epochs)
 sbatch sbatch/submit_train.sbatch
 #   -> runs/senseiver_A/{last.pt, best.pt, metrics.jsonl}
 
-# 3. 在 7 个留出日上评估（口径与 4DVarNet / EnKF 完全一致）
+# 3. Evaluate on the 7 held-out days (convention exactly matches 4DVarNet / EnKF)
 sbatch sbatch/submit_eval.sbatch --ckpt runs/senseiver_A/best.pt --tag _test
 #   -> check_outputs/eval/senseiver_metrics_test.json
 ```
 
-**torch 只在 GPU 节点跑**（`sbatch`，或 `srun -p gpu-debug --gres=gpu:1`），不要在登录节点。
+**torch only runs on GPU nodes** (`sbatch`, or `srun -p gpu-debug --gres=gpu:1`),
+never on the login node.
 
 ---
 
-## 目录结构
+## Directory layout
 
-| path | 角色 |
+| path | role |
 |---|---|
-| `positional.py` | 论文 `a = PE(χ)`：sin-cos 位置编码 |
-| `model.py` | 论文 `z = E(a_s,s)` 与 `ŝ_q = D(z,a_q)`：Encoder / Decoder |
-| `sensors.py` | **本项目新增**：观测 → 变长传感器 token 集（padding + pad_mask） |
-| `network.py` | 整机（纯 PyTorch，不用 Lightning） |
-| `losses.py` | 训练损失（照抄参考实现的无权重 MSE）+ 诊断拆分 |
-| `dataset.py` | 一天 → 样本；观测配置逐字读 `4dvarnet_enkf/config.yaml` |
-| `train.py` | 训练循环（Adam / AMP / `--resume`） |
-| `checks/check_model.py` | 置换不变性、padding 不变性、可微、维度断言 |
-| `checks/check_sensors.py` | token 构造的不变量 |
-| `checks/trace_pipeline.py` | 打印数据管线每一步的形状；README 的 Pipeline 一节就是它的输出 |
-| `checks/evaluate.py` | 留出日评估，指标逐字复刻 `eval_test_days.py` |
-| `checks/compare3.py` | 三方逐通道对比（Senseiver / 4DVarNet / EnKF），全天同口径 |
-| `checks/plot_compare3.py` | 上者的图（小多组，每通道一个面板） |
-| `sbatch/` | SLURM 提交脚本（训练自链接续训） |
-| `runs/` `check_outputs/` | 产物 |
+| `positional.py` | the paper's `a = PE(chi)`: sin-cos positional encoding |
+| `model.py` | the paper's `z = E(a_s,s)` and `s_hat_q = D(z,a_q)`: Encoder / Decoder |
+| `sensors.py` | **new in this project**: observation -> variable-length sensor token set (padding + pad_mask) |
+| `network.py` | the whole model (plain PyTorch, no Lightning) |
+| `losses.py` | training loss (the reference implementation's unweighted MSE, copied as-is) + a diagnostic breakdown |
+| `dataset.py` | one day -> samples; observation config read verbatim from `4dvarnet_enkf/config.yaml` |
+| `train.py` | training loop (Adam / AMP / `--resume`) |
+| `checks/check_model.py` | permutation invariance, padding invariance, differentiability, dimension assertions |
+| `checks/check_sensors.py` | invariants of the token construction |
+| `checks/trace_pipeline.py` | prints the shape at every step of the data pipeline; this README's Pipeline section is its output |
+| `checks/evaluate.py` | held-out-day evaluation, metrics copied verbatim from `eval_test_days.py` |
+| `checks/compare3.py` | three-way per-channel comparison (Senseiver / 4DVarNet / EnKF), same convention, full day |
+| `checks/plot_compare3.py` | the figure for the above (small multiples, one panel per channel) |
+| `sbatch/` | SLURM submission scripts (training self-chains to resume) |
+| `runs/` `check_outputs/` | artifacts |
 
 ---
 
-## 方法：Senseiver 的三个组件在代码里的落点
+## Method: where Senseiver's three components land in the code
 
-论文 §2：
+Paper sec.2:
 
 ```
-a    = PE(χ)                    positional.PositionalEncoder
-z    = E(PE(χ_s), s(χ_s,t))     model.Encoder      传感器集 -> 定长 latent
-ŝ_q  = D(z, PE(χ_q))            model.Decoder      latent + 查询坐标 -> 场值
+a    = PE(chi)                     positional.PositionalEncoder
+z    = E(PE(chi_s), s(chi_s,t))    model.Encoder      sensor set -> fixed-length latent
+s_q  = D(z, PE(chi_q))             model.Decoder      latent + query coords -> field value
 ```
 
-Appendix A 的结构细节，参考实现的具体做法：编码块 = cross-attention（可学习 latent 当 Q，
-传感器当 K/V）+ self-attention 块，`num_layers` 个块**共享权重**（`layer_1` 独立 +
-`layer_n` 复用 `num_layers-1` 次）。解码 = 查询位置编码与一个可学习向量拼接当 Q，
-z 当 K/V，单层 cross-attention 后接线性输出头（`latent_size=1`）。
+Structural detail from Appendix A, as implemented by the reference code: the
+encoder block = cross-attention (learnable latents as Q, sensors as K/V) + a
+self-attention block, with `num_layers` blocks **sharing weights** (`layer_1` is
+independent, `layer_n` is reused `num_layers-1` times). Decoding = the query's
+positional encoding concatenated with a learnable vector as Q, z as K/V, a single
+cross-attention layer followed by a linear output head (`latent_size=1`).
 
-### 为什么选这个方法（论述要点）
+### Why this method (the argument to make)
 
-**不是因为可扩展性。** 论文的卖点是解码代价与域大小解耦，能吃下 128×128×512 的域；
-ATC 只有 36×12 = 432 格，这个卖点在这里完全用不上，稠密 CNN 反而更省。
+**Not because of scalability.** The paper's selling point is that decoding cost is
+decoupled from the domain size, handling a 128x128x512 domain. ATC only has
+36x12 = 432 cells, so that selling point is entirely wasted here -- a dense CNN
+would be cheaper.
 
-**是因为传感器集是变长、移动、无序的。** 三个机器人每秒看到的格子集合和数量都在变
-（实测 k=1 下 **每帧 185–265 格**）。cross-attention 对这样的集合天然置换不变、长度无关，
-而 Voronoi-CNN / 稠密卷积那一类方法处理"传感器位置每帧都变"是别扭的。
-`checks/check_model.py` 把置换不变性和 padding 不变性证明成了可复跑的断言
-（实测 max|Δ| 分别为 2.7e-7 和 0.0），这是本方法能站住的前提。
+**Because the sensor set is variable-length, moving, and unordered.** The set and
+count of cells the three robots see each second keeps changing (measured: **185-265
+cells per frame** at k=1). Cross-attention is naturally permutation-invariant and
+length-agnostic for such a set, whereas methods like Voronoi-CNN / dense
+convolution are awkward when "sensor positions change every frame."
+`checks/check_model.py` turns permutation invariance and padding invariance into
+rerunnable assertions (measured max|delta| of 2.7e-7 and 0.0 respectively) -- this is
+the premise the method's case rests on.
 
 ---
 
-## Pipeline：一帧数据从原始网格走到损失
+## Pipeline: one frame of data from the raw grid to the loss
 
-下面每个形状都是 `checks/trace_pipeline.py` 真跑出来的，不是推的。
+Every shape below was actually produced by `checks/trace_pipeline.py`, not
+inferred.
 
 ```
-① grid_cache 一天                      (T, 4, 36, 12)   float32
-   4dvarnet_enkf 的 Stage-2 产物，1 秒 1 帧
-        │
-        │  observation_model.generate_observations   ← 4dvarnet_enkf，配置读 config.yaml
-        ▼
-② Y      (T, 4, 36, 12)   带噪部分观测，未观测处 = 0
-   Omega  (T, 36, 12) bool 该秒哪些格被机器人看到（逐帧变化；追踪的这 64 帧里 105–265，
-                                                  整天平均 202.8）
-        │
-        │  dataset.load_day   展平 H×W → HW，并按 --stride 抽帧
-        ▼
-③ X  (N, 4, 432)   目标（真值）
-   Y  (N, 4, 432)   观测
+1  grid_cache, one day                    (T, 4, 36, 12)   float32
+   4dvarnet_enkf's Stage-2 output, 1 frame per second
+        |
+        |  observation_model.generate_observations  <- 4dvarnet_enkf, config read from config.yaml
+        v
+2  Y      (T, 4, 36, 12)   noisy partial observation, 0 where unobserved
+   Omega  (T, 36, 12) bool  which cells the robots saw this second (varies per
+                            frame; 105-265 over the 64 traced frames, 202.8 average
+                            over the full day)
+        |
+        |  dataset.load_day   flatten H x W -> HW, subsample frames by --stride
+        v
+3  X  (N, 4, 432)   target (ground truth)
+   Y  (N, 4, 432)   observation
    Om (N, 432) bool
-        │
-        │  sensors.build_batch   ← 本项目新增的那一步
-        ▼
-④ tokens   (B, Nmax, 68)   Nmax = 批内最大传感器数；68 = 4 通道值 + 64 位置编码
-   pad_mask (B, Nmax) bool  True = padding 位
-        │
-        │  model.Encoder   cross-attn(latent 当 Q, 传感器当 K/V) + self-attn，权重共享 3 层
-        ▼
-⑤ z  (B, 64, 32)   ← 定长！与传感器数量无关，这是 Senseiver 的全部要点
-        │
-        │  model.Decoder   查询坐标当 Q，z 当 K/V
-        │  coords (B, 432, 64)  ← 整张网格的位置编码，每帧都查全部 432 格
-        ▼
-⑥ out (B, 432, 4)  →  reshape  →  (B, 4, 36, 12)
-        │
-        │  losses.senseiver_loss = 原始场上的四通道无权重 MSE（照抄参考实现）
-        ▼
-⑦ 与 X 比。盲区 = ~Omega 广播到 4 通道（实测约占 42%）
+        |
+        |  sensors.build_batch   <- the step added by this project
+        v
+4  tokens   (B, Nmax, 68)   Nmax = the largest sensor count in the batch;
+                            68 = 4 channel values + 64-dim positional encoding
+   pad_mask (B, Nmax) bool  True = a padding slot
+        |
+        |  model.Encoder   cross-attn (latents as Q, sensors as K/V) + self-attn,
+        |                  weights shared across 3 layers
+        v
+5  z  (B, 64, 32)   <- fixed length! independent of the sensor count -- this is
+                       the whole point of Senseiver
+        |
+        |  model.Decoder   query coordinates as Q, z as K/V
+        |  coords (B, 432, 64)  <- positional encoding for the entire grid,
+        |                          every frame queries all 432 cells
+        v
+6  out (B, 432, 4)  ->  reshape  ->  (B, 4, 36, 12)
+        |
+        |  losses.senseiver_loss = unweighted 4-channel MSE on the raw field
+        |                          (copied from the reference implementation)
+        v
+7  compared against X. Blind = ~Omega broadcast to 4 channels (measured ~42%)
 ```
 
-### 四个关键点
+### Four key points
 
-**为什么 ④→⑤ 是这个方法的全部价值。** 每帧传感器数从 224 变到 265，但 z 永远是
-`(64, 32)`。变长、无序的观测集合被压成定长表示——`checks/check_model.py` 把这一点
-证明成了断言（打乱顺序 max\|Δ\| = 2.7e-7，padding 到不同长度 max\|Δ\| = 0.0）。
+**Why 4 -> 5 is this method's entire value.** The sensor count per frame ranges
+from 224 to 265, but z is always `(64, 32)`. A variable-length, unordered
+observation set is compressed into a fixed-length representation --
+`checks/check_model.py` turns this into an assertion (shuffled order max|delta| =
+2.7e-7, padded to different lengths max|delta| = 0.0).
 
-**⑥ 查询的是全部 432 格，不是 290 个 walkable 格。** 理由见"偏离"第 1 条：机器人
-能看见它开不进去的格子（实测 32.1%），而且评估口径给非 walkable 格打分。
+**6 queries all 432 cells, not just the 290 walkable ones.** Reason: see deviation
+#1 -- robots can see cells they cannot drive into (measured 32.1%), and the
+evaluation convention scores non-walkable cells too.
 
-**标准化只在 ④ 发生。** tokens 的前 4 维是 `(Y - mean) / std`，但 ⑥ 的输出和 ⑦ 的
-损失都在**原始场**上。输入侧标准化是特征调理；对目标做逐通道缩放则等价于给损失加权重，
-那会改变被优化的量。
+**Normalisation only happens at 4.** The first 4 dimensions of the tokens are
+`(Y - mean) / std`, but both 6's output and 7's loss operate on the **raw field**.
+Normalising the input side is feature conditioning; per-channel scaling of the
+target would be equivalent to adding a weight to the loss, which would change the
+quantity being optimised.
 
-**四个通道是一起训的，损失被 vx 主导。** 四通道无权重相加（论文 Eq.，我们照抄），
-而 vx 的 std 是 0.54、var 只有 0.12，所以单一 MSE 里 vx 占大头。这不是 bug，是这个
-指标的性质——`4dvarnet_enkf/checks/compare_channels.py` 的文件头抱怨的是同一件事。
-**报告时单一数字和逐通道拆分必须都给**（`evaluate.py` 两个都写进 JSON 了）。
+**The four channels are trained together, and the loss is dominated by vx.** The
+four channels are summed unweighted (the paper's Eq., copied as-is), and vx's std
+is 0.54 while var's is only 0.12, so vx dominates a single MSE. This is not a bug,
+it is a property of this metric -- the header of
+`4dvarnet_enkf/checks/compare_channels.py` complains about the same thing. **Both
+the single number and the per-channel breakdown must be reported** (`evaluate.py`
+writes both into the JSON).
 
-### 容易看错的两个 "1"
+### Two easily-misread "1"s
 
-| 名字 | 是什么 | **不是**什么 |
+| Name | What it is | What it is **not** |
 |---|---|---|
-| `latent_size = 1` | 解码器里可学习标记向量的个数，拼在每个查询点的位置编码后面当 Q。参考实现 `s_parser.py` 硬编码为 1，注释 "collapse from n_sensors to 1 observation" | 不是输出通道数。改成 2 只会让每个查询点变成两行 Query |
-| `dec_num_cross_attention_heads = 1` | 解码器 cross-attention 的注意力头数 | 同样与通道数无关 |
+| `latent_size = 1` | the number of learnable token vectors in the decoder, concatenated after each query point's positional encoding to form Q. The reference implementation's `s_parser.py` hardcodes it to 1, with the comment "collapse from n_sensors to 1 observation" | not the number of output channels. Setting it to 2 would just turn each query point into two rows of Query |
+| `dec_num_cross_attention_heads = 1` | the number of attention heads in the decoder's cross-attention | likewise unrelated to the channel count |
 
-**输出通道数由 `im_ch` 决定，取自 `config.yaml` 的 `state_shape: [4,36,12]`，恒为 4。**
-可以从 checkpoint 直接核对：`decoder.postproc.weight` 的形状是 `(4, 32)`，
-`encoder.preproc.weight` 是 `(32, 68)`，`in_mean` 有 4 个元素。
-
----
-
-## 偏离参考实现之处（逐条，附理由）
-
-**必改（照抄会出错）**
-
-1. **取消 `pix_avail`（"值为 0 即无效"），查询全部 432 格。**
-   参考实现用 `data[0]!=0` 挑参与训练的像素（`dataloaders.py:152`），并在测试时
-   `output_im[data==0]=0`（`network_light.py:126`）。这个 hack 的用途是跳过
-   **没有值可重建**的区域（海温的大陆、孔隙的固体）。ATC 网格上不存在这样的格子：
-   密度 0 是合法值，非 walkable 区同样有真值，而且**评估口径会给它们打分**。
-   `check_sensors.py` 实测 **32.1% 的观测格落在非 walkable 区**（机器人能看见开不进去的
-   柱子，见 4dvarnet_enkf README），进一步说明不能按 walkable 裁剪查询集。
-2. **`Decoder` 增加维度断言。** 解码器的 cross-attention 把 `dec_num_latent_channels`
-   当 KV 维，而喂进去的 `z` 的通道数由**编码器**决定；两者不等会静默错位。参考实现
-   没有这个检查，它 README 的例子恰好都设成相同值，掩盖了这个坑。
-
-**必加（参考实现没这个场景）**
-
-3. **变长传感器集：padding + `pad_mask`。** 这条通路在参考实现里其实**已经存在**
-   （`Encoder.forward(x, pad_mask)` → `CrossAttention` → `key_padding_mask`），只是它的
-   dataloader 从不传值，因为它的传感器集定长。我们没有改结构，只是第一次把它用上。
-4. **空传感器集的保护。** `obs_every_k > 1` 时有的帧一个观测都没有，cross-attention 的
-   K/V 为空会让 softmax 产生 NaN。放一个全零哑 token 并标为有效；模型对这种帧只能输出
-   常数场——这是信息上的事实，不是实现缺陷。
-5. **逐通道输入标准化。** 参考实现的 5 个数据集**全是单通道**（`datasets.py` 里
-   `sea`/`pipe`/`cylinder`/`plume`/`pore` 最后一维都是 1），所以它只做了一个全局标量
-   除法，对多通道没有给出做法。我们有 4 个尺度差一个量级以上的通道。做法：
-   **只标准化编码器输入，目标与损失一律留在原始场**。理由：对比口径是原始场上的
-   四通道无权重 MSE，任何对目标的逐通道缩放都等价于偷偷给损失加权重。
-
-**工程性**
-
-6. **删掉 `fairscale` 的 `checkpoint_wrapper`。** `activation_checkpoint` 在参考实现里
-   从未被 `s_parser.py` 暴露，恒为 False，是死代码。
-7. **不用 PyTorch-Lightning。** 参考实现的 `train.py` 的 `Trainer()` **没传
-   `accelerator`/`devices`**，`s_parser.py` 算出来的 `gpu_device` 只在 `--test` 分支用得上，
-   所以命令行指定卡号在训练时是无效的。我们要在 SLURM 上自链接续训，自己写循环更省事。
-8. **`space_bands` 32 → 16。** 频率是 `linspace(1, dim/2, bands)`，W=12 时最高频只有 6，
-   32 个 band 纯冗余。
-9. **`lr` 默认 1e-3**（参考的 argparse 默认是 1e-4）。它 README 里帧数上万的那个例子
-   （pipe）用的就是 1e-3，我们是百万帧量级，同一档。
-10. **不做像素抽样。** 参考实现每步只随机查 `batch_pixels` 个像素，因为它的域大到无法
-    整张查。432 格整张查一次的代价可以忽略，去掉一个与论文无关的随机性来源。
-11. **`--stride` 抽帧。** 相邻秒高度冗余。这不算改动——参考实现同样是从全部帧里随机抽
-    `training_frames` 帧来训练。
-
-**明确没有搬过来的**
-
-12. **参考实现的传感器数量增广。** `dataloaders.py:168-171` 只对 `pipe` 数据集做了
-    "每批从 6144 个传感器里随机取 `40+300|N(0,1)|` 个"——论文 Fig.2b 那条"推理时任意
-    传感器数都能用"的曲线就是靠它训出来的，而它的 README 完全没提。我们不需要：
-    移动机器人**天然**每帧数量都不同，这个增广是内建的。
+**The number of output channels is decided by `im_ch`**, taken from
+`config.yaml`'s `state_shape: [4,36,12]`, and is always 4. Can be checked directly
+from the checkpoint: `decoder.postproc.weight` has shape `(4, 32)`,
+`encoder.preproc.weight` has shape `(32, 68)`, `in_mean` has 4 elements.
 
 ---
 
-## 与另两种方法的公平契约
+## Deviations from the reference implementation (each with its reason)
 
-三种方法面对的观测**完全一致**，差异只来自方法本身：
+**Required (copying as-is would be wrong)**
 
-| 锚点 | 做法 |
+1. **Removed `pix_avail` ("a value of 0 means invalid"), query all 432 cells.**
+   The reference implementation picks which pixels train with `data[0]!=0`
+   (`dataloaders.py:152`) and at test time does `output_im[data==0]=0`
+   (`network_light.py:126`). That hack exists to skip regions with **nothing to
+   reconstruct** (land in sea-temperature data, solid material in porous media).
+   No such cells exist on the ATC grid: density 0 is a valid value, non-walkable
+   regions still have a ground truth, and **the evaluation convention scores
+   them**. `check_sensors.py` measures **32.1% of observed cells falling on
+   non-walkable ground** (robots can see pillars they cannot drive into, see the
+   4dvarnet_enkf README) -- further reason the query set cannot be clipped to
+   walkable cells.
+2. **Added dimension assertions to `Decoder`.** The decoder's cross-attention
+   treats `dec_num_latent_channels` as the KV dimension, while the channel count
+   of the incoming `z` is decided by the **encoder**; a mismatch between the two
+   silently misaligns. The reference implementation has no such check -- its
+   README's examples happen to always set them equal, hiding this trap.
+
+**Added (the reference implementation has no such scenario)**
+
+3. **Variable-length sensor sets: padding + `pad_mask`.** This path actually
+   **already exists** in the reference implementation
+   (`Encoder.forward(x, pad_mask)` -> `CrossAttention` -> `key_padding_mask`), it
+   is just that its dataloader never passes a value, because its sensor set is
+   fixed-length. We did not change the architecture, only used this path for the
+   first time.
+4. **A guard for empty sensor sets.** When `obs_every_k > 1`, some frames have no
+   observation at all, and empty K/V in cross-attention makes softmax produce NaN.
+   A single all-zero dummy token is inserted and marked valid; the model can only
+   output a constant field for such a frame -- that is an informational fact, not
+   an implementation flaw.
+5. **Per-channel input normalisation.** The reference implementation's 5 datasets
+   are **all single-channel** (`datasets.py`'s `sea`/`pipe`/`cylinder`/`plume`/`pore`
+   all have a last dimension of 1), so it only does one global scalar division and
+   gives no recipe for multiple channels. We have 4 channels whose scales differ by
+   more than an order of magnitude. Approach: **normalise only the encoder input,
+   leave the target and the loss on the raw field throughout**. Reason: the
+   comparison convention is unweighted 4-channel MSE on the raw field, and any
+   per-channel scaling of the target would be secretly adding a weight to the loss.
+
+**Engineering**
+
+6. **Removed `fairscale`'s `checkpoint_wrapper`.** `activation_checkpoint` is never
+   exposed by `s_parser.py` in the reference implementation, is always False, and
+   is dead code.
+7. **No PyTorch-Lightning.** The reference implementation's `train.py` calls
+   `Trainer()` **without passing `accelerator`/`devices`**; the `gpu_device`
+   computed by `s_parser.py` is only used in the `--test` branch, so specifying a
+   GPU index on the command line has no effect during training. We need to
+   self-chain and resume on SLURM, so writing our own loop is simpler.
+8. **`space_bands` 32 -> 16.** The frequencies are `linspace(1, dim/2, bands)`;
+   with W=12 the highest frequency is only 6, so 32 bands is pure redundancy.
+9. **`lr` defaults to 1e-3** (the reference argparse default is 1e-4). Its README's
+   example with tens of thousands of frames (pipe) also uses 1e-3, and we are in
+   the millions-of-frames range, the same regime.
+10. **No pixel subsampling.** The reference implementation randomly queries only
+    `batch_pixels` pixels per step, because its domain is too large to query in
+    full. Querying all 432 cells at once is negligible cost, removing one source of
+    randomness unrelated to the paper.
+11. **`--stride` frame subsampling.** Adjacent seconds are highly redundant. This
+    is not really a change -- the reference implementation likewise trains on
+    `training_frames` frames randomly drawn from all frames.
+
+**Explicitly not carried over**
+
+12. **The reference implementation's sensor-count augmentation.**
+    `dataloaders.py:168-171` only does this for the `pipe` dataset -- "randomly
+    take `40+300|N(0,1)|` sensors out of 6144 per batch" -- and it is what trains
+    the curve in the paper's Fig.2b, "any sensor count works at inference time";
+    its README never mentions it. We do not need it: moving robots **naturally**
+    give a different count every frame, so this augmentation is already built in.
+
+---
+
+## The fairness contract with the other two methods
+
+All three methods face **exactly the same** observations; differences only come
+from the method itself:
+
+| Anchor | Approach |
 |---|---|
-| 观测参数 | 逐字读 `4dvarnet_enkf/config.yaml` 的 `observation` 段；本目录不设任何默认值 |
-| 观测生成 | 直接调用 `om.generate_observations` + `nav.build_valid_mask_from_config` |
-| 数据切分 | `om.split_files()`；32 训练日 / 7 验证日 / 7 测试日，训练日严格早于测试日 |
-| 指标 | 盲区 MSE（`mask<0.5`）+ 全场 MSE，原始场、四通道无权重、含非 walkable 格 |
-| 物理裁剪 | 与 EnKF 相同：density[0,5]、vx/vy[-5,5]、var[0,2]（默认开） |
-| 初值 | 均不从真值初始化 |
-| 计时 | 只计模型前向，不计数据准备（三种方法共享的常数） |
+| Observation parameters | read verbatim from `4dvarnet_enkf/config.yaml`'s `observation` section; this directory sets no defaults of its own |
+| Observation generation | calls `om.generate_observations` + `nav.build_valid_mask_from_config` directly |
+| Data split | `om.split_files()`; 32 training days / 7 validation days / 7 test days, training days strictly earlier than test days |
+| Metrics | blind MSE (`mask<0.5`) + full-field MSE, on the raw field, four channels unweighted, including non-walkable cells |
+| Physical clipping | same as the EnKF: density[0,5], vx/vy[-5,5], var[0,2] (on by default) |
+| Initial value | none initialised from the ground truth |
+| Timing | only the model's forward pass is timed, not data preparation (a constant shared by all three methods) |
 
-对标线（全天口径，盲区 MSE）：**4DVarNet 0.0338**，**EnKF 0.0392**。
+Benchmark (full-day convention, blind MSE): **4DVarNet 0.0338**, **EnKF 0.0392**.
 
-### 一句必须写进结论的话
+### One sentence that must go in the conclusions
 
-本版 Senseiver **只看第 t 帧的观测重建第 t 帧**（论文原样，无任何时间编码——论文
-§3 Discussion 明说 sin-cos 时间编码试过且失败了）。而 4DVarNet 看的是 dT=200 帧的
-时窗。这**不是公平比较，是有意的消融**：它量化的正是"时间维度值多少"。不加这句话，
-表格会被误读。
+This version of Senseiver **reconstructs frame t from only frame t's observation**
+(as in the paper, with no temporal encoding at all -- the paper's sec.3 Discussion
+explicitly says a sin-cos time encoding was tried and failed). 4DVarNet, by
+contrast, sees a dT=200-frame time window. This is **not a fair comparison, it is a
+deliberate ablation**: it quantifies exactly "how much is the time dimension
+worth." Without this sentence, the table would be misread.
 
 ---
 
-## 结果（7 个留出日，全天，obs_every_k=1，三方同一裁剪）
+## Results (7 held-out days, full day, obs_every_k=1, same clipping across all three)
 
-由 `checks/evaluate.py`（单方）和 `checks/compare3.py`（三方逐通道）产生。
-4DVarNet 的数字是**我们用它自己的 `eval_test_days.py` 重跑的**（`--outdir` 指向本目录，
-不写入 4dvarnet_enkf），与它存档值吻合到小数点后 4 位，确认存档口径同样是 clip ON。
+Produced by `checks/evaluate.py` (single method) and `checks/compare3.py`
+(three-way, per channel). 4DVarNet's numbers are **rerun by us using its own
+`eval_test_days.py`** (`--outdir` pointed at this directory, nothing written into
+4dvarnet_enkf), matching its archived values to 4 decimal places, confirming the
+archived convention also had clipping ON.
 
-### 总表
+### Summary table
 
-| 方法 | 盲区 MSE | 全场 MSE | 参数量 | ms/帧 |
+| Method | Blind MSE | Full-field MSE | Parameters | ms/frame |
 |---|---|---|---|---|
-| **Senseiver** | **0.0284 ± 0.0034** | **0.0171** | **65,892** | **0.047** |
-| 4DVarNet `a4_k1` | 0.0308 ± 0.0036 | 0.0272 | 2,096,432 | 0.184 |
-| 4DVarNet `b0_k1` | 0.0338 ± 0.0040 | 0.0290 | 2,051,596 | 0.086 |
-| EnKF `k1` | 0.0462 | — | — | — |
+| **Senseiver** | **0.0284 +/- 0.0034** | **0.0171** | **65,892** | **0.047** |
+| 4DVarNet `a4_k1` | 0.0308 +/- 0.0036 | 0.0272 | 2,096,432 | 0.184 |
+| 4DVarNet `b0_k1` | 0.0338 +/- 0.0040 | 0.0290 | 2,051,596 | 0.086 |
+| EnKF `k1` | 0.0462 | -- | -- | -- |
 
-Senseiver 逐日 7/7 胜 4DVarNet-a4，差值 mean +0.00237、std 0.00030（远小于差值本身）。
+Senseiver beats 4DVarNet-a4 on 7/7 days, difference mean +0.00237, std 0.00030 (far
+smaller than the difference itself).
 
-> **口径警告**：`4dvarnet_enkf/check_outputs/eval/enkf_metrics.json` 里的 **0.0392
-> 不能用**——它来自 `check_outputs/enkf/`，是 **obs_every_k=4 且每天只有 400 帧**。
-> 而每天前 400 帧是空场（密度只有全天的 1/6.9），双重偏易。全天 k=1 的 EnKF 估计在
-> `check_outputs/enkf_k1_full/`，重新打分是 **0.0462**。
+> **Convention warning**: the **0.0392** in
+> `4dvarnet_enkf/check_outputs/eval/enkf_metrics.json` **must not be used** -- it
+> comes from `check_outputs/enkf/`, which is **obs_every_k=4 with only 400 frames
+> per day**. And the first 400 frames of each day are an empty field (density is
+> only 1/6.9 of the full day's), a doubly favourable subset. The full-day k=1 EnKF
+> estimate is in `check_outputs/enkf_k1_full/`, re-scored at **0.0462**.
 
-### 逐通道盲区 MSE —— 排名**不是**一致的
+### Per-channel blind MSE -- the ranking is **not** consistent
 
-| 方法 | density | vx | vy | var | 合计 |
+| Method | density | vx | vy | var | total |
 |---|---|---|---|---|---|
 | Senseiver | **0.0139** | 0.0788 | **0.0144** | **0.0064** | **0.0284** |
 | 4DVarNet `a4_k1` | 0.0177 | **0.0753** | 0.0207 | 0.0111 | 0.0312 |
 | EnKF `k1` | 0.0143 | 0.1103 | 0.0209 | 0.0394 | 0.0462 |
 
-![三方逐通道对比](check_outputs/eval/compare3.png)
+![Three-way per-channel comparison](check_outputs/eval/compare3.png)
 
-图用**小多组**而不是分组柱状图：四个通道量级差一个数量级，同一根 y 轴会把
-density/vy/var 压成看不见的细条，读者只剩下 vx 的差异可看——而那恰好是唯一
-4DVarNet 领先的通道，图会给出与数据相反的印象。各面板 y 轴独立，面板之间不可比。
+The figure uses **small multiples** rather than a grouped bar chart: the four
+channels differ by an order of magnitude, and a shared y-axis would flatten
+density/vy/var into invisible slivers, leaving the reader only able to see the
+difference in vx -- which happens to be the one channel where 4DVarNet leads,
+giving an impression opposite to the data. Each panel has its own y-axis; panels
+are not comparable to each other.
 
-**必须和总表一起报的三件事：**
+**Three things that must be reported alongside the summary table:**
 
-1. **vx 上 4DVarNet 赢**（0.0753 vs 0.0788，好 4.4%），而 vx 占盲区总误差的 **69%**。
-   Senseiver 的总分领先**全部来自另外三个通道**（density −21%、vy −30%、var −42%）。
-   即：在走廊主方向的人流速度上，变分同化的动力学先验仍然更强。
-2. **EnKF 在 density 上几乎追平**（0.0143 vs 0.0139），尽管总分落后 46%——它是被 var
-   拖垮的（0.0394，是 Senseiver 的 6 倍）。总分最差的方法在最有物理意义的通道上是竞争性的。
-3. 只报合计会给出"Senseiver 全面胜出"的错误印象。**逐通道必须一起给。**
+1. **4DVarNet wins on vx** (0.0753 vs 0.0788, 4.4% better), and vx accounts for
+   **69%** of total blind error. Senseiver's overall lead comes **entirely from
+   the other three channels** (density -21%, vy -30%, var -42%). In other words:
+   for velocity along the corridor's main direction, variational assimilation's
+   dynamical prior is still stronger.
+2. **The EnKF nearly ties on density** (0.0143 vs 0.0139), despite trailing 46%
+   overall -- it is dragged down by var (0.0394, 6x Senseiver's). The
+   worst-overall method is competitive on the most physically meaningful channel.
+3. Reporting only the total gives the false impression that "Senseiver wins across
+   the board." **The per-channel breakdown must always be given alongside it.**
 
-### 误差的区域分解
+### Spatial decomposition of the error
 
-盲区占 53.1%（逐日几乎不变）。把全场 MSE 拆成盲区 / 观测区：
+Blind cells make up 53.1% (nearly constant day to day). Splitting full-field MSE
+into blind / observed:
 
-| 方法 | 盲区 | **观测区** | 全场 |
+| Method | Blind | **Observed** | Full field |
 |---|---|---|---|
 | Senseiver | 0.0284 | **0.0043** | 0.0171 |
 | 4DVarNet `a4_k1` | 0.0308 | **0.0231** | 0.0272 |
-| 相对优势 | **+7.7%** | **+81.4%** | +37% |
+| Relative advantage | **+7.7%** | **+81.4%** | +37% |
 
-**全场那个 37% 主要来自观测区，不是来自对未观测区域猜得更准。** 解码器可以让每个查询点
-直接 attend 到该位置的传感器 token，所以观测格上基本是在复现观测值（误差 0.0043，
-量级接近观测噪声本身）；4DVarNet 的解在 20 步学习式梯度下降里被先验项拉着走，
-观测区会被平滑掉一部分。
+**That 37% on the full field comes mostly from the observed cells, not from
+guessing the unobserved region more accurately.** The decoder lets every query
+point attend directly to that location's sensor token, so on observed cells it is
+essentially reproducing the observation (error 0.0043, close in magnitude to the
+observation noise itself); 4DVarNet's solution is pulled by the prior term
+through 20 steps of learned gradient descent, which smooths away some of the
+observed cells' accuracy.
 
-两个数都不是作弊——两种方法拿到同一份观测，还原观测处本来就是任务的一部分。但
-**用全场 MSE 当头条会显著夸大结论**；4dvarnet_enkf 的 README 把盲区 MSE 标为
-*the real task* 是有道理的。
+Neither number is cheating -- both methods get the same observations, and
+recovering the observed locations is genuinely part of the task. But **leading
+with full-field MSE would significantly inflate the conclusion**; the
+4dvarnet_enkf README's choice to label blind MSE as *the real task* is justified.
 
-### 消融：观测到底贡献了多少
+### Ablation: how much do observations actually contribute
 
-抹掉传感器**读数**、只保留它们的**位置**与 pad_mask（`checks/evaluate.py --ablate-values`）：
+Erase the sensor **readings**, keep only their **positions** and the pad_mask
+(`checks/evaluate.py --ablate-values`):
 
-| | 盲区 MSE | 全场 MSE |
+| | Blind MSE | Full-field MSE |
 |---|---|---|
-| 正常 | 0.0284 | 0.0171 |
-| 只给位置 | 0.0343 (**+21%**) | 0.0515 (+201%) |
+| normal | 0.0284 | 0.0171 |
+| positions only | 0.0343 (**+21%**) | 0.0515 (+201%) |
 
-模型确实在用观测，但**盲区重建里有相当大一部分来自学到的走廊气候态，而不是当下的观测**。
-而且 21% 是**上界**——抹掉读数喂的是模型没见过的常数（分布外输入），一个专门训练的
-纯气候态模型只会更好。
+The model is genuinely using the observations, but **a substantial share of the
+blind-cell reconstruction comes from a learned corridor climatology, not from the
+current observations**. And 21% is an **upper bound** -- erasing the readings feeds
+the model constants it has never seen (an out-of-distribution input), and a model
+trained specifically as a pure climatology would only do better.
 
-所以正确的表述是：**在这个覆盖率(47%)和这个稀疏度下，一个直接的、摊销式的回归器比
-迭代变分同化更有效**，而不是"注意力机制把稀疏观测用得特别好"。
+So the correct statement is: **at this coverage (47%) and this sparsity, a direct,
+amortised regressor is more effective than iterative variational assimilation**,
+not "attention mechanisms make especially good use of sparse observations."
 
-### 一个有利于本方法的设定差异
+### One setup difference that favours this method
 
-Senseiver 只用第 t 帧的观测重建第 t 帧；4DVarNet 重建第 t 帧时可以用整个 dT=200 窗口的
-观测。**4DVarNet 拿到的信息严格更多**，这个设定对 Senseiver 不利，而它在总分上仍然领先。
-这让总分结论更强，但不改变上面第 1 条（vx 上它是输的）。
+Senseiver reconstructs frame t using only frame t's observation; 4DVarNet, when
+reconstructing frame t, can use observations from the entire dT=200 window.
+**4DVarNet strictly receives more information**, a setup unfavourable to
+Senseiver, and it still leads overall. This makes the overall-score conclusion
+stronger, but does not change point 1 above (it loses on vx).
 
 ---
 
-## 实测的数据事实
+## Measured facts about the data
 
-| 量 | 值 |
+| Quantity | Value |
 |---|---|
-| 网格 | 36×12 = 432 格，4 通道；walkable 290 格 |
-| 观测覆盖（k=1） | 每帧 185–265 格，约 44–47% |
-| 观测格落在非 walkable | 32.1% |
-| 通道量级（walkable 内，std） | density 0.17 / vx 0.46 / vy 0.16 / var 0.11 |
-| 帧数 | 约 40k 帧/天 × 32 训练日 ≈ 128 万帧 |
-| 模型参数量 | 65,892（默认超参） |
-| 数据准备 | 10.3 s/天（整天观测模拟），144 MB/天（stride=4） |
+| Grid | 36x12 = 432 cells, 4 channels; 290 walkable cells |
+| Observation coverage (k=1) | 185-265 cells per frame, ~44-47% |
+| Observed cells falling on non-walkable ground | 32.1% |
+| Channel scale (within walkable, std) | density 0.17 / vx 0.46 / vy 0.16 / var 0.11 |
+| Frame count | ~40k frames/day x 32 training days ~= 1.28M frames |
+| Model parameter count | 65,892 (default hyperparameters) |
+| Data preparation | 10.3 s/day (simulating a full day's observations), 144 MB/day (stride=4) |
 
-覆盖率 44% 意味着**这不是 Senseiver 论文的稀疏区**（NOAA 是 10~300 传感器 / 64800 格，
-< 1%）。报告里不要引用它的稀疏性卖点。
+44% coverage means **this is not the Senseiver paper's sparse regime** (NOAA is
+10-300 sensors / 64800 cells, < 1%). Do not cite its sparsity selling point in the
+report.
 
 ---
 
 ## Gotchas
 
-- **`sys.path` 用 `append` 不是 `insert(0)`**：`4dvarnet_enkf` 里也有 `losses.py`，
-  插到最前会把本目录的同名模块顶掉。
-- **`/tmp` 是节点本地的**：计算节点写进 `/tmp` 的东西登录节点看不见。产物一律写
-  `runs/` 和 `check_outputs/`。
-- **前 400 帧是空场**：`--frames 400` 的评估数字会明显偏乐观，只适合冒烟，不要当结论。
-- **EnKF 的 0.0392 不能引用**：`4dvarnet_enkf/check_outputs/eval/enkf_metrics.json`
-  来自 `check_outputs/enkf/`，是 obs_every_k=**4** 且每天只有 **400** 帧的双重偏易子集。
-  全天 k=1 的估计在 `check_outputs/enkf_k1_full/`，重新打分是 **0.0462**。
-  同理 `test_metrics_matched_clip.json` 的 0.0258 也是 400 帧口径。
-- **单日结论不能外推**：逐通道排名在单日和七天上会不同（我们踩过：单日看 EnKF 的
-  density 最好，七天下来是 Senseiver 略优）。任何逐通道声明都要用满 7 天。
-- `observation_model.generate_observations` 的 docstring 说 "only observe walkable cells"，
-  与该项目 README 和实际数据不符（实测 32.1% 越界）。以数据为准。
+- **`sys.path` uses `append`, not `insert(0)`**: `4dvarnet_enkf` also has a
+  `losses.py`; inserting at the front would shadow this directory's same-named
+  module.
+- **`/tmp` is node-local**: what a compute node writes to `/tmp` is invisible to
+  the login node. Artifacts always go to `runs/` and `check_outputs/`.
+- **The first 400 frames are an empty field**: evaluation numbers from
+  `--frames 400` are noticeably over-optimistic, fine for a smoke test, not to be
+  treated as a conclusion.
+- **The EnKF's 0.0392 must not be cited**:
+  `4dvarnet_enkf/check_outputs/eval/enkf_metrics.json` comes from
+  `check_outputs/enkf/`, a doubly-favourable subset with obs_every_k=**4** and only
+  **400** frames per day. The full-day k=1 estimate is in
+  `check_outputs/enkf_k1_full/`, re-scored at **0.0462**. Likewise
+  `test_metrics_matched_clip.json`'s 0.0258 is also under the 400-frame convention.
+- **Single-day conclusions do not extrapolate**: per-channel rankings differ
+  between a single day and seven days (we hit this: on one day the EnKF looks best
+  on density, over seven days Senseiver is slightly ahead). Any per-channel claim
+  must use the full 7 days.
+- `observation_model.generate_observations`'s docstring says "only observe
+  walkable cells," which does not match this project's README or the actual data
+  (measured 32.1% falling outside). Trust the data.

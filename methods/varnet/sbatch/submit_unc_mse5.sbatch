@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=96G
 #SBATCH --time=02:00:00
-#SBATCH --output=check_outputs/uncmse5_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/uncmse5_%j.out
 #SBATCH --exclude=gpu51
 # Lakshminarayanan et al.'s Table 2 contrast, on our data: an MSE-trained ensemble whose
 # uncertainty is only the empirical variance across its members, against the NLL-trained

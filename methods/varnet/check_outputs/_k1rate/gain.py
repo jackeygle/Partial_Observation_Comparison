@@ -1,4 +1,4 @@
-"""直接测:同化一帧观测,到底把状态改变了多少?"""
+"""Direct measurement: assimilating one frame of observations, how much does it actually change the state?"""
 import sys, numpy as np, torch
 PO="/scratch/work/zhangx29/Partial_observation"; sys.path.insert(0,PO)
 from pedpred.ENKF import LocalizedEnsembleKalmanFilter
@@ -21,7 +21,7 @@ def C_of(cells):
         for k in range(F): C[i*F+k,k*TOTAL+r*W+c]=1.0
     return C
 
-# 先跑 500 帧让滤波器进入稳态
+# run 500 frames first to let the filter reach steady state
 for t in range(500):
     cells=list(zip(*np.where(Om[t])))
     if cells:
@@ -33,25 +33,25 @@ t=500
 while not Om[t].any(): t+=1
 cells=list(zip(*np.where(Om[t]))); C=C_of(cells); y=C@Y[t].reshape(-1)
 Xsave=f.X.copy()
-# (a) 只预报
+# (a) forecast only
 Xf=f.forecast(model); est_fore=f._clip_bounds(Xf).mean(0)
-# (b) 预报 + 同化
+# (b) forecast + assimilate
 f.X=Xsave; est_anal=f.step(C,y,model=model).reshape(-1)
 
 d=np.abs(est_anal-est_fore)
 mm=np.zeros((F,H,W),bool)
 for (r,c) in cells: mm[:,r,c]=True
 mm=mm.reshape(-1)
-print(f"  该帧观测格子数: {len(cells)}")
-print(f"  集合 spread    : {f.get_std().mean():.5f}")
+print(f"  observed cells this frame: {len(cells)}")
+print(f"  ensemble spread          : {f.get_std().mean():.5f}")
 print()
-print(f"  同化把状态改变了多少(|分析后 − 纯预报|):")
-print(f"    被观测的格子 : {d[mm].mean():.6f}")
-print(f"    未观测的格子 : {d[~mm].mean():.6f}")
+print(f"  how much assimilation changed the state (|post-analysis - forecast only|):")
+print(f"    observed cells   : {d[mm].mean():.6f}")
+print(f"    unobserved cells : {d[~mm].mean():.6f}")
 print()
-print(f"  作为参照,该帧状态本身的量级:")
-print(f"    |纯预报值|   : {np.abs(est_fore[mm]).mean():.6f}")
-print(f"    预报离真值   : {np.abs(est_fore[mm]-Xt[t].reshape(-1)[mm]).mean():.6f}")
-print(f"    观测离真值   : {np.abs(Y[t].reshape(-1)[mm]-Xt[t].reshape(-1)[mm]).mean():.6f}")
+print(f"  for reference, the scale of this frame's state itself:")
+print(f"    |forecast-only value|     : {np.abs(est_fore[mm]).mean():.6f}")
+print(f"    forecast vs. truth        : {np.abs(est_fore[mm]-Xt[t].reshape(-1)[mm]).mean():.6f}")
+print(f"    observation vs. truth     : {np.abs(Y[t].reshape(-1)[mm]-Xt[t].reshape(-1)[mm]).mean():.6f}")
 print()
-print(f"  → 同化的修正量 / 预报的误差 = {d[mm].mean()/np.abs(est_fore[mm]-Xt[t].reshape(-1)[mm]).mean()*100:.2f}%")
+print(f"  -> assimilation's correction / forecast's error = {d[mm].mean()/np.abs(est_fore[mm]-Xt[t].reshape(-1)[mm]).mean()*100:.2f}%")

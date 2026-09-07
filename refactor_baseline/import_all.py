@@ -1,25 +1,31 @@
 """
-import_all.py — Phase 3 的第一道验收：所有 import 目标都解析得到吗
+import_all.py — Phase 3's first acceptance check: does every import target resolve?
 
-重构改了 186 处 import、95 处 sys.path、以及所有写死的旧路径。这类改动**改错了不会在
-语法检查里报错**，只会在真正 import 时炸，或者更糟 —— 静默 import 到另一个同名模块。
+The refactor changed 186 imports, 95 sys.path lines, and every hardcoded old
+path. This kind of change **raises no syntax-check error when done wrong** --
+it only blows up at actual import time, or worse, silently imports a different
+same-named module.
 
-两层检查，因为这两件事必须分开：
+Two tiers, because these two things must be kept separate:
 
-  Tier A（静态，不执行任何代码）
-      用 ast 解析每个 .py，把它的每一条 import 目标喂给 importlib.util.find_spec。
-      覆盖全部文件，包括那些顶层就跑 main 的画图/评测脚本。
+  Tier A (static, executes no code)
+      Parses every .py with ast, feeds every one of its import targets to
+      importlib.util.find_spec. Covers every file, including plotting/eval
+      scripts that run main() at the top level.
 
-  Tier B（真 import）
-      只对**无副作用的库模块**做真正的 import：crowdcore 的四个，以及各方法的
-      model/losses/dataset/... 这些。顺带确认三份同名 losses.py 各自独立 ——
-      那是整场重构的主要目的。
+  Tier B (real import)
+      Only genuinely imports **side-effect-free library modules**: crowdcore's
+      four, and each method's model/losses/dataset/... Incidentally confirms
+      the three same-named losses.py files stay independent -- that is the
+      main point of the whole refactor.
 
-第一版直接 importlib.import_module 了所有 99 个模块，结果把各评测脚本的顶层代码全跑了
-一遍（很多脚本没有 if __name__ 保护），14 分钟后 32G 内存被撑爆。"能不能 import"和
-"跑一遍"是两件事，这里只验前者。
+The first version did importlib.import_module on all 99 modules directly,
+which ran every evaluation/plotting script's top-level code (many scripts have
+no `if __name__` guard), blowing past 32G of memory after 14 minutes.
+"Can it be imported" and "run it once" are two different things; only the
+former is checked here.
 
-用法（登录节点即可，但要先 source sbatch/_env.sh 拿到 torch）:
+Usage (the login node is fine, but source sbatch/_env.sh first to get torch):
     python3 -m refactor_baseline.import_all
 """
 from __future__ import annotations
@@ -35,12 +41,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKIP_DIRS = {"__pycache__", ".git", "enkf_lab", "enkf_opt",
              "runs", "check_outputs", "cache", "artifacts"}
 
-#: Tier B：这些模块顶层只有定义，import 它们不会跑任何计算
+#: Tier B: these modules only have definitions at the top level; importing them runs no computation
 SAFE_LEAVES = {"config", "navigation", "observation_model", "paths",
                "model", "losses", "dataset", "network", "positional", "sensors",
                "state", "encoding", "prior_model", "variational_solver"}
 
-#: 这些顶层名字来自 vendor 副本，靠 sys.path 在运行时注入，静态解析必然找不到
+#: These top-level names come from vendor copies, injected onto sys.path at runtime; static resolution can never find them
 VENDOR_ROOTS = {"pedpred"}
 
 
@@ -53,11 +59,11 @@ def py_files():
 
 
 def import_targets(path: str):
-    """(模块名, 行号) —— 该文件 import 的每一个顶层模块。相对 import 跳过。"""
+    """(module name, line number) -- every top-level module this file imports. Relative imports are skipped."""
     try:
         tree = ast.parse(open(path).read(), filename=path)
     except SyntaxError as e:
-        yield (f"<语法错误: {e}>", getattr(e, "lineno", 0))
+        yield (f"<syntax error: {e}>", getattr(e, "lineno", 0))
         return
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -69,7 +75,7 @@ def import_targets(path: str):
 
 
 def tier_a():
-    print("[Tier A] 静态解析每一条 import 目标（不执行代码）\n")
+    print("[Tier A] statically resolving every import target (executes no code)\n")
     bad = 0
     for p in py_files():
         rel = os.path.relpath(p, ROOT)
@@ -83,7 +89,7 @@ def tier_a():
                 continue
             try:
                 if importlib.util.find_spec(mod) is None:
-                    fails.append((lineno, f"找不到 {mod}"))
+                    fails.append((lineno, f"cannot find {mod}"))
             except (ImportError, ModuleNotFoundError, ValueError) as e:
                 fails.append((lineno, f"{mod}: {type(e).__name__} {e}"))
         if fails:
@@ -91,12 +97,12 @@ def tier_a():
             print(f"  {rel}")
             for lineno, msg in fails:
                 print(f"      :{lineno}  {msg}")
-    print(f"\n  {'全部 import 目标都解析得到' if not bad else f'{bad} 处解析不到'}")
+    print(f"\n  {'every import target resolves' if not bad else f'{bad} could not be resolved'}")
     return bad
 
 
 def tier_b():
-    print("\n[Tier B] 真正 import 无副作用的库模块\n")
+    print("\n[Tier B] actually importing the side-effect-free library modules\n")
     mods = []
     for p in py_files():
         rel = os.path.relpath(p, ROOT)
@@ -113,23 +119,23 @@ def tier_b():
         except BaseException:
             bad += 1
             print(f"  {m}\n      {traceback.format_exc(limit=2).strip().splitlines()[-1]}")
-    print(f"  {len(mods) - bad}/{len(mods)} 个库模块 import 成功")
+    print(f"  {len(mods) - bad}/{len(mods)} library modules imported successfully")
 
-    print("\n[同名模块隔离] 重构的主要目的")
+    print("\n[same-name module isolation] the main point of the refactor")
     import methods.dincae.losses as ld
     import methods.senseiver.losses as ls
     import methods.varnet.losses as lv
     for tag, m in (("varnet", lv), ("dincae", ld), ("senseiver", ls)):
         print(f"  {tag:<10} {os.path.relpath(m.__file__, ROOT)}")
-    assert len({lv.__file__, ld.__file__, ls.__file__}) == 3, "三份 losses 指向同一个文件！"
-    print("  三份同名 losses 各自独立")
+    assert len({lv.__file__, ld.__file__, ls.__file__}) == 3, "the three losses files point to the same file!"
+    print("  the three same-named losses files are each independent")
     return bad
 
 
 def main():
     a = tier_a()
     b = tier_b()
-    print(f"\n{'[通过]' if not (a or b) else '[失败]'} Tier A {a} 处问题，Tier B {b} 个模块失败")
+    print(f"\n{'[PASS]' if not (a or b) else '[FAIL]'} Tier A {a} problems, Tier B {b} modules failed")
     return 1 if (a or b) else 0
 
 

@@ -1,0 +1,25 @@
+[hw] Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores · node=csl4 · OMP=unset torch=4
+[gpu] none
+[cfg] 1000 frames, 5 timed repeats (+1 warm-up each), 4DVarNet = runs/varnet_a2_k*
+
+[setup] preparing + warming up ...
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/compare/bench_speed.py", line 494, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/compare/bench_speed.py", line 442, in main
+    run_once, warm, nf = fn()
+                         ^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/compare/bench_speed.py", line 397, in <lambda>
+    lambda: bench_enkf("opt", k1, args.frames)),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/compare/bench_speed.py", line 180, in bench_enkf
+    z = np.load(obs_npz)
+        ^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/enkf_k1_full/obs_atc-20130811.npz'
+srun: error: csl4: task 0: Exited with exit code 1
+srun: Terminating StepId=20094862.0

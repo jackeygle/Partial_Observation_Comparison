@@ -1,0 +1,16 @@
+Submitted batch job 20085660
+[chain] submitted successor (afterany:20084606)
+NVIDIA H200
+[obs] obs_every_k = 1  (每帧观测,对齐 EnKF 项目)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=3,945,942 (GENN prior 9,420 = 0.24%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=1  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_aug0_s1/varnet_last.pt: continuing from epoch 147 (step 28959)
+[best] previous best blind MSE = 0.0486
+[schedule] epoch 147: n_iter -> 20, lr -> 0.0003
+[epoch 147] loss=-2.3703  盲区MSE=0.0500  density=0.0188 vx=0.1461 vy=0.0264 var=0.0088
+[epoch 148] loss=-2.3143  盲区MSE=0.0499  density=0.0188 vx=0.1456 vy=0.0264 var=0.0088
+[epoch 149] loss=-2.3254  盲区MSE=0.0501  density=0.0188 vx=0.1463 vy=0.0264 var=0.0088
+[done] checkpoints + metrics in runs/varnet_aug0_s1

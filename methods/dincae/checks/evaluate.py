@@ -1,36 +1,49 @@
 """
-evaluate.py — 在留出日上评估 DINCAE，并做论文的三项检验
+evaluate.py — evaluate DINCAE on held-out days, and run the paper's three checks
 ========================================================
 
-三件事，都来自论文：
+Three things, all from the paper:
 
-1. **多 epoch 输出平均**（1.0 Fig.3 / 参考实现 `save_epochs = 200:10:epochs` 是默认行为）
-   把后段每 10 个 epoch 存下的 checkpoint 的**输出**平均（不是权重平均），比任何单个 epoch
-   都好。σ̂² 同样平均。1.0 也提醒：忽略不同 epoch 之间误差的相关性会**高估** σ̂。
+1. **Multi-epoch output averaging** (1.0 Fig.3 / the reference implementation's
+   `save_epochs = 200:10:epochs` is this default behaviour). Average the
+   **outputs** (not the weights) of checkpoints saved every 10 epochs late in
+   training -- better than any single epoch. sigma-hat^2 is averaged the same
+   way. 1.0 also warns: ignoring the correlation between errors across epochs
+   will **overestimate** sigma-hat.
 
-2. **σ̂ 校准**（2.0 §5.2 Fig.9b/10b）
-   按预测 SD 把格子分 10 档（在预测 SD 的 10%~90% 分位之间均匀切），每档算实际 RMS，
-   画"实际 SD vs 预测 SD"。理想情况落在对角线上。
-   2.0 还对 σ̂ 施加了一个**全局调整因子**，让平均 RMS 对上平均预测 SD —— 也就是说原始 σ̂
-   的绝对尺度是有偏的，可信的是它的结构与排序。这里把调整前后都报出来。
+2. **sigma-hat calibration** (2.0 sec.5.2 Fig.9b/10b)
+   Bin cells into 10 bins by predicted SD (cut evenly between the 10%-90%
+   percentiles of predicted SD), compute the actual RMS in each bin, plot
+   "actual SD vs predicted SD". Ideally this falls on the diagonal.
+   2.0 also applies a **global adjustment factor** to sigma-hat, matching the
+   average RMS to the average predicted SD -- i.e. the raw sigma-hat's absolute
+   scale is biased, and what's trustworthy is its structure and ordering. Both
+   before and after adjustment are reported here.
 
-3. **变率保持**（1.0 Fig.8 / 2.0 Table 3）
-   重建场的标准差 vs 真值的标准差。RMSE 类指标偏爱平滑场（double penalty，1.0 引
-   Gilleland 2009 / Ebert 2013），所以必须另外报变率，否则"更平滑"会被误读成"更好"。
+3. **Variance retention** (1.0 Fig.8 / 2.0 Table 3)
+   The reconstructed field's standard deviation vs. the ground truth's. RMSE-type
+   metrics favour a smooth field (double penalty, 1.0 cites Gilleland 2009 /
+   Ebert 2013), so variance must be reported separately, or "smoother" gets
+   misread as "better".
 
-**两套 MSE 口径都报**，因为它们会给出不同结论（这是 4dvarnet_enkf 项目里已经踩过的坑）：
+**Both MSE conventions are reported**, because they lead to different conclusions
+(a pitfall already hit once in the 4dvarnet_enkf project):
 
-  * `ours`  : 只在**该通道有定义**的格子上算（速度要求 density>0，var 要求 vel_var>0），
-              且限制在 walkable 内。这是我们训练时的口径。
-  * `v4dvar`: 完全照 `4dvarnet_enkf/checks/eval_test_days.py` 的口径 —— 原始场、所有格子
-              （含非 walkable）、四通道无权重、盲区 = `mask < 0.5`，并施加与 EnKF 相同的
-              物理裁剪 (density[0,5], vx/vy[-5,5], var[0,2])。
-              注意这个口径会在**我们从未训练过的格子**（非 walkable、空格子的速度占位符 0）
-              上打分，所以对我们不利；报它是为了可比，不是因为它更对。
+  * `ours`  : computed only on cells where **that channel is defined** (velocity
+              requires density>0, var requires vel_var>0), restricted to
+              walkable. This is our training convention.
+  * `v4dvar`: exactly follows `4dvarnet_enkf/checks/eval_test_days.py`'s
+              convention -- the raw field, all cells (including non-walkable),
+              four channels unweighted, blind = `mask < 0.5`, with the same
+              physical clipping as the EnKF (density[0,5], vx/vy[-5,5], var[0,2]).
+              Note this convention scores cells **we were never trained on**
+              (non-walkable, empty-cell velocity placeholders of 0), so it is
+              unfavourable to us; it is reported for comparability, not because
+              it is more correct.
 
-用法（**GPU 节点**）:
-    sbatch sbatch/submit_eval.sbatch                 # 默认 test split
-    # 或
+Usage (**GPU node**):
+    sbatch sbatch/submit_eval.sbatch                 # defaults to the test split
+    # or
     srun -p gpu-debug --gres=gpu:1 -t 00:14:00 bash -c \
       'module load scicomp-pytorch-env/2026.1; python3 -u evaluate.py --split valid --days 1 --frames 4000'
 """
@@ -46,8 +59,10 @@ import h5py
 import numpy as np
 import torch
 
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
+# Scripts in checks/ import source modules from the project root; the root must
+# be inserted at the front (so this directory's losses.py takes priority),
+# 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
+# at the front would shadow this directory's).
 from crowdcore import observation_model as om                                    # noqa: E402
 
 from methods.dincae.state import (CHANNELS, StateStats, NCH, channel_valid,  # noqa: E402
@@ -58,14 +73,14 @@ from methods.dincae.encoding import (FRESH_OFFSETS, N_IN, N_STATIC, observed_pai
 from methods.dincae.model import DINCAE                                            # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# 与 4dvarnet_enkf/checks/eval_test_days.py:clip_bounds 完全一致（EnKF 的物理界）
+# Exactly matches 4dvarnet_enkf/checks/eval_test_days.py:clip_bounds (the EnKF's physical bounds)
 CLIP = ((0.0, 5.0), (-5.0, 5.0), (-5.0, 5.0), (0.0, 2.0))
 
 
 def load_models(run_dir, ckpt_glob, dev):
-    """载入要做输出平均的 checkpoint 列表。"""
+    """Loads the list of checkpoints whose outputs will be averaged."""
     paths = sorted(glob.glob(ckpt_glob or os.path.join(run_dir, "ckpt_*.pt")))
-    if not paths:                                    # 没有中间 checkpoint 就用 last.pt
+    if not paths:                                    # fall back to last.pt if there are no intermediate checkpoints
         paths = [os.path.join(run_dir, "last.pt")]
     models, epochs = [], []
     for p in paths:
@@ -79,7 +94,8 @@ def load_models(run_dir, ckpt_glob, dev):
 
 
 def build_inputs(scaled, invvar, t_unix, idx, H, W):
-    """按 dataset.encode_day 的同一布局拼输入（这里是评估路径，逐块处理以省内存）。"""
+    """Assembles the input using the same layout as dataset.encode_day (this is
+    the evaluation path, processed in chunks to save memory)."""
     out = np.empty((len(idx), N_IN, H, W), dtype=np.float32)
     out[:, :N_STATIC] = static_channels(t_unix[idx], H, W)
     o = N_STATIC
@@ -94,19 +110,23 @@ def build_inputs(scaled, invvar, t_unix, idx, H, W):
 
 @torch.no_grad()
 def predict_day(models, stats, fp, dev, frames=0, batch=256):
-    """一天的重建（多 checkpoint 输出平均）。
+    """Reconstruction for one day (averaged over multiple checkpoints' outputs).
 
-    返回 (Xt, rec, mu_n, sd_n, M)：
-      Xt   (n,NCH,H,W) 真值，**原始物理单位**
-      rec  (n,NCH,H,W) 重建，**原始物理单位**（已反归一化、加回逐格均值、并做逆变换；
-           log1p 通道取**中位数** expm1(μ)，不做对数正态均值修正 —— 理由见
-           `state.inv_channel`）
-      mu_n (n,NCH,H,W) 归一化残差空间的均值预测
-      sd_n (n,NCH,H,W) 归一化残差空间的预测标准差
-      M    (n,NCH,H,W) bool 观测掩膜
+    Returns (Xt, rec, mu_n, sd_n, M):
+      Xt   (n,NCH,H,W) ground truth, **raw physical units**
+      rec  (n,NCH,H,W) reconstruction, **raw physical units** (denormalised,
+           the per-cell mean added back, and inverse-transformed; log1p channels
+           take the **median**, expm1(mu), without the log-normal mean
+           correction -- see `state.inv_channel` for why)
+      mu_n (n,NCH,H,W) predicted mean in normalised residual space
+      sd_n (n,NCH,H,W) predicted standard deviation in normalised residual space
+      M    (n,NCH,H,W) bool observation mask
 
-    σ̂ 校准在**归一化空间**做：高斯假设活在那里，而校准看的是 actual/pred 的比值，
-    本身无量纲，所以在哪个空间做都一样，在模型自己的空间做最干净（log1p 通道尤其）。
+    sigma-hat calibration is done in **normalised space**: the Gaussian
+    assumption lives there, and calibration looks at the actual/predicted ratio,
+    which is itself dimensionless, so doing it in either space gives the same
+    result -- doing it in the model's own space is cleanest (especially for
+    log1p channels).
     """
     oc = obs_config()
     with h5py.File(fp, "r") as f:
@@ -134,19 +154,20 @@ def predict_day(models, stats, fp, dev, frames=0, batch=256):
         xb = torch.from_numpy(build_inputs(scaled, invvar, t_unix, idx, H, W)).to(dev)
         m_sum = torch.zeros(len(idx), NCH, H, W, device=dev)
         s2_sum = torch.zeros_like(m_sum)
-        for m in models:                             # 输出平均（1.0 Fig.3）
-            mo, s2 = m(xb)[-1]                       # 取最后一级（精化后的输出）
+        for m in models:                             # output averaging (1.0 Fig.3)
+            mo, s2 = m(xb)[-1]                       # take the last level (post-refinement output)
             m_sum += mo; s2_sum += s2
         k = len(models)
         mu_n[b:b + len(idx)] = (m_sum / k).cpu().numpy()
         s2_n[b:b + len(idx)] = (s2_sum / k).cpu().numpy()
 
-    # 归一化残差 -> 变换空间的绝对值 -> 原始物理值
-    x_sp = mu_n * std + mean                                 # 变换空间（log1p 通道仍是 log）
+    # Normalised residual -> absolute value in transformed space -> raw physical value
+    x_sp = mu_n * std + mean                                 # transformed space (log1p channels are still log)
     rec = np.empty_like(x_sp)
     for c in range(NCH):
-        # 用**中位数** expm1(μ)，不做对数正态均值修正 —— 后者在 σ̂ 未校准时会炸
-        # （实测 var 的物理 MSE 达 10²²）。理由见 `state.inv_channel`。
+        # Uses the **median**, expm1(mu), without the log-normal mean correction
+        # -- the latter blows up when sigma-hat is uncalibrated (measured: var's
+        # physical-space MSE reaching 10^22). See `state.inv_channel` for why.
         rec[:, c] = inv_channel(x_sp[:, c], c)
     return X[idx_all], rec, mu_n, np.sqrt(np.maximum(s2_n, 0.0)), M[idx_all]
 
@@ -159,23 +180,27 @@ def clip_bounds(x):
 
 
 def accumulate(acc, Xt, rec, mu_n, sd_n, M, stats):
-    """把一天的统计量累加进 acc（逐通道；两套 MSE 口径 + 校准 + 变率）。
+    """Accumulates one day's statistics into acc (per channel; both MSE conventions + calibration + variance).
 
-    MSE 与变率在**物理空间**；校准在**归一化空间**（高斯假设所在，见 predict_day）。
+    MSE and variance are in **physical space**; calibration is in **normalised
+    space** (where the Gaussian assumption lives, see predict_day).
     """
     cv = channel_valid(Xt)                                    # (NCH,n,H,W)
     walk = stats.valid[None]
-    blind = ~M                                                # 未被观测
+    blind = ~M                                                # unobserved
     rec_clip = clip_bounds(rec)
 
     for c in range(NCH):
         d2 = (rec[:, c] - Xt[:, c]) ** 2
         d2c = (rec_clip[:, c] - Xt[:, c]) ** 2
-        # --- ours: 该通道有定义 ∩ walkable。**也施加物理裁剪** ---
-        # 物理界（density≥0、var∈[0,2]…）是先验已知的，两套口径都可以用。必须裁的原因：
-        # 信息形式下 `m = x₁·σ̂²` 而 σ̂² 上限是 1/µ = 1000（Eq.6 钳位），未收敛的模型能输出
-        # μ≈1000，log1p 通道再一反变换就是天文数字，几个格子就能统治整条 MSE。
-        # 同时保留 `*_noclip` 让这种病态可见，而不是被裁剪悄悄藏起来。
+        # --- ours: that channel is defined ∩ walkable. **Physical clipping also applied** ---
+        # The physical bounds (density>=0, var in [0,2], ...) are known priors and
+        # apply to both conventions. Why clipping is necessary: in information
+        # form `m = x1*sigma-hat^2` and sigma-hat^2 is capped at 1/mu = 1000
+        # (Eq.6 clamping), so an unconverged model can output mu~1000, and after
+        # inverting a log1p channel that becomes an astronomical number, letting
+        # a handful of cells dominate the whole MSE. `*_noclip` is kept alongside
+        # so this pathology stays visible instead of being quietly hidden by clipping.
         ours = cv[c] & walk
         for tag, sel in (("ours_blind", ours & blind[:, c]), ("ours_all", ours)):
             a = acc[tag][c]
@@ -184,18 +209,18 @@ def accumulate(acc, Xt, rec, mu_n, sd_n, M, stats):
                          ("ours_all_noclip", ours)):
             a = acc[tag][c]
             a["se"] += float(d2[sel].sum()); a["n"] += int(sel.sum())
-        # --- v4dvar: 所有格子、裁剪后 ---
+        # --- v4dvar: all cells, clipped ---
         for tag, sel in (("v4dvar_blind", blind[:, c]),
                          ("v4dvar_all", np.ones_like(blind[:, c]))):
             a = acc[tag][c]
             a["se"] += float(d2c[sel].sum()); a["n"] += int(sel.sum())
-        # --- 变率保持（1.0 Fig.8）：在 ours 口径的格子上比标准差 ---
+        # --- variance retention (1.0 Fig.8): compare standard deviations on the ours-convention cells ---
         a = acc["var_retention"][c]
         a["st"] += float(Xt[:, c][ours].sum()); a["st2"] += float((Xt[:, c][ours] ** 2).sum())
-        a["sr"] += float(rec_clip[:, c][ours].sum())          # 裁剪后，同上
+        a["sr"] += float(rec_clip[:, c][ours].sum())          # clipped, same as above
         a["sr2"] += float((rec_clip[:, c][ours] ** 2).sum())
         a["n"] += int(ours.sum())
-        # --- 校准：盲区 ∩ 有定义，在归一化空间收集 (预测 SD, 平方误差) ---
+        # --- calibration: blind ∩ defined, collect (predicted SD, squared error) in normalised space ---
         sel = ours & blind[:, c]
         tgt_n = (fwd_channel(Xt[:, c].astype(np.float64), c)
                  - stats.mean[c][None]) / stats.std[c]
@@ -204,7 +229,7 @@ def accumulate(acc, Xt, rec, mu_n, sd_n, M, stats):
 
 
 def calibration_table(sd, se, nbin=10):
-    """2.0 §5.2 的做法：按预测 SD 在 p10~p90 之间均匀分 nbin 档，每档算实际 RMS。"""
+    """2.0 sec.5.2's approach: bin evenly by predicted SD between p10 and p90 into nbin bins, compute the actual RMS in each."""
     if len(sd) == 0:
         return []
     lo, hi = np.percentile(sd, [10, 90])
@@ -225,27 +250,27 @@ def main():
     ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_full"))
     ap.add_argument("--ckpt-glob", default="")
     ap.add_argument("--split", default="test", choices=["test", "valid"])
-    ap.add_argument("--days", type=int, default=0, help="只用前 N 天(调试)")
-    ap.add_argument("--frames", type=int, default=0, help="每天只用前 N 帧(调试)")
+    ap.add_argument("--days", type=int, default=0, help="use only the first N days (debug)")
+    ap.add_argument("--frames", type=int, default=0, help="use only the first N frames per day (debug)")
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--calib-sample", type=int, default=4_000_000,
-                    help="校准直方图最多保留多少个点(随机下采样)")
+                    help="max number of points kept for the calibration histogram (random subsample)")
     ap.add_argument("--out", default=os.path.join(ROOT, "check_outputs", "eval"))
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if dev.type == "cpu":
-        print("!! 没有 GPU —— torch 不要在登录节点跑（见 README）", flush=True)
+        print("!! no GPU -- do not run torch on the login node (see README)", flush=True)
 
     stats = StateStats()
     models, epochs, paths = load_models(args.run_dir, args.ckpt_glob, dev)
-    print(f"输出平均使用 {len(models)} 个 checkpoint: epochs {epochs}")
+    print(f"output averaging over {len(models)} checkpoints: epochs {epochs}")
 
     files = om.split_files(args.split)
     if args.days:
         files = files[: args.days]
-    print(f"{args.split} split: {len(files)} 天")
+    print(f"{args.split} split: {len(files)} days")
 
     mk = lambda: [{"se": 0.0, "n": 0} for _ in range(NCH)]
     TAGS = ("ours_blind", "ours_all", "ours_blind_noclip", "ours_all_noclip",
@@ -258,7 +283,7 @@ def main():
 
     for fp in files:
         Xt, rec, mu_n, sd_n, M = predict_day(models, stats, fp, dev, args.frames, args.batch)
-        # 当日的 ours_blind MSE（逐天记录，便于看稳定性）
+        # this day's ours_blind MSE (recorded per day, to see stability)
         cv = channel_valid(Xt); walk = stats.valid[None]
         day_mse = {}
         for c in range(NCH):
@@ -282,7 +307,7 @@ def main():
         result[tag + "_mse"] = {CHANNELS[c]: (acc[tag][c]["se"] / acc[tag][c]["n"]
                                              if acc[tag][c]["n"] else None)
                                 for c in range(NCH)}
-        # 四通道无权重合并（4dvarnet_enkf 报的就是这个合并数）
+        # unweighted merge of the four channels (this is the merged number 4dvarnet_enkf reports)
         se = sum(acc[tag][c]["se"] for c in range(NCH))
         n = sum(acc[tag][c]["n"] for c in range(NCH))
         result[tag + "_mse_all_channels"] = se / n if n else None
@@ -305,7 +330,7 @@ def main():
             j = rng.choice(len(sd), args.calib_sample, replace=False)
             sd, se = sd[j], se[j]
         rows = calibration_table(sd, se)
-        # 全局调整因子（2.0 §5.2）：让平均预测 SD 对上实际 RMS
+        # global adjustment factor (2.0 sec.5.2): matches average predicted SD to actual RMS
         adj = (float(np.sqrt(se.mean()) / sd.mean()) if len(sd) and sd.mean() > 0 else None)
         result["calibration"][CHANNELS[c]] = {
             "bins": rows, "global_adjust_factor": adj,
@@ -317,27 +342,27 @@ def main():
     with open(path, "w") as f:
         json.dump(result, f, indent=2)
 
-    print("\n=== MSE（两套口径）===")
-    print(f"{'口径':16s} " + "  ".join(f"{c:>9s}" for c in CHANNELS) + "   四通道合并")
+    print("\n=== MSE (both conventions) ===")
+    print(f"{'convention':16s} " + "  ".join(f"{c:>9s}" for c in CHANNELS) + "   4-channel merged")
     for tag in TAGS:
         vals = "  ".join(f"{result[tag + '_mse'][c]:9.5f}"
                          if result[tag + "_mse"][c] is not None else "        -"
                          for c in CHANNELS)
         print(f"{tag:16s} {vals}   {result[tag + '_mse_all_channels']:.5f}")
 
-    print("\n=== 变率保持（重建 SD / 真值 SD，1 最好；<1 = 被抹平）===")
+    print("\n=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===")
     for c in CHANNELS:
         v = result["var_retention"][c]
         print(f"  {c:8s} truth {v['truth_sd']:.4f}  rec {v['rec_sd']:.4f}  "
               f"ratio {v['ratio']:.3f}" if v["ratio"] else f"  {c}: -")
 
-    print("\n=== σ̂ 校准（盲区、归一化空间；理想是 actual ≈ pred）===")
+    print("\n=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===")
     for c in CHANNELS:
         v = result["calibration"][c]
         if not v["bins"]:
-            print(f"  {c}: 样本不足"); continue
-        print(f"  {c:8s} 平均预测SD {v['mean_pred_sd']:.4f}  实际RMS {v['actual_rms']:.4f}  "
-              f"全局调整因子 {v['global_adjust_factor']:.3f}  (n={v['n']:,})")
+            print(f"  {c}: not enough samples"); continue
+        print(f"  {c:8s} mean predicted SD {v['mean_pred_sd']:.4f}  actual RMS {v['actual_rms']:.4f}  "
+              f"global adjustment factor {v['global_adjust_factor']:.3f}  (n={v['n']:,})")
         for r in v["bins"]:
             print(f"      pred {r['pred_sd']:.4f} -> actual {r['actual_sd']:.4f}  "
                   f"(n={r['n']:,})")

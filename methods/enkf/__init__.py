@@ -1,12 +1,14 @@
-"""EnKF 基线 —— 不是我们写的，是 vendor 进来的。
+"""EnKF baseline — not written by us, vendored in.
 
-  enkf_lab/   /scratch/work/zhangx29/Partial_observation 的逐字节只读副本。
-              **不要编辑**，文件是刻意 chmod 444 的。
-  enkf_opt/   允许修改的副本；任何改动都必须通过 checks/verify_enkf_opt.py 的
-              逐位比对（np.array_equal，不是 isclose）。
+  enkf_lab/   a byte-identical, read-only copy of /scratch/work/zhangx29/Partial_observation.
+              **Do not edit** — the files are deliberately chmod 444.
+  enkf_opt/   a copy that may be modified; any change must pass the bit-identical
+              comparison in checks/verify_enkf_opt.py (np.array_equal, not isclose).
 
-注意 enkf_lab/pedpred/ 与 enkf_opt/pedpred/ **刻意不是**本包的子包:它们里面有
-`pedpred -> .` 自链接，靠把那一层放进 sys.path 让包内的 `from pedpred.X import Y`
-解析 —— 这是原项目的布局，动它就等于改 vendor 副本。所以这两个目录没有从
-methods.enkf 继续往下的 __init__.py，按路径加载即可。
+Note that enkf_lab/pedpred/ and enkf_opt/pedpred/ are **deliberately not**
+subpackages of this package: they contain a `pedpred -> .` self-symlink, relying on
+that directory being placed on sys.path so that `from pedpred.X import Y` inside the
+package resolves — this is the original project's layout, and changing it would mean
+modifying the vendor copy. So neither directory has an __init__.py continuing down
+from methods.enkf; they are loaded by path instead.
 """

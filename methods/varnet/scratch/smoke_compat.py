@@ -1,4 +1,4 @@
-# 从仓库根跑: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_compat
+# Run from the repo root: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_compat
 import sys, os, torch
 from methods.varnet.checks.model_io import load_solver
 d = torch.device("cuda" if torch.cuda.is_available() else "cpu")

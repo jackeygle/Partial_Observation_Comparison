@@ -1,21 +1,29 @@
 """
-dataset.py — ATC 的一天 -> Senseiver 的训练样本
+dataset.py — one day of ATC -> Senseiver's training samples
 ================================================
 
-**观测场景完全沿用 `4dvarnet_enkf/config.yaml`**（3 个机器人 / 感知半径 7 /
-视线遮挡 / 同一套 obs_std / 同一个 obs_every_k / 同一个 walkable 规则），并且直接调用
-它的 `observation_model.generate_observations` 和 `navigation.build_valid_mask_from_config`。
-三种方法面对的观测完全一致，差异只来自方法本身——这是三方对比能成立的前提。
+**The observation scenario follows `4dvarnet_enkf/config.yaml` exactly** (3
+robots / sensing radius 7 / line-of-sight occlusion / the same obs_std / the
+same obs_every_k / the same walkable rule), calling its
+`observation_model.generate_observations` and
+`navigation.build_valid_mask_from_config` directly. All three methods face
+exactly the same observations, and any difference comes only from the method
+itself -- this is the premise the three-way comparison rests on.
 
-本目录不在任何地方给观测参数设默认值；要改就去改 `4dvarnet_enkf/config.yaml`。
+This directory sets no defaults anywhere for the observation parameters; to
+change them, edit `4dvarnet_enkf/config.yaml`.
 
-样本的粒度
-----------
-参考实现的一个训练样本 = (一帧的传感器读数, 该帧的若干查询点)。我们照搬：
-**一帧一个样本**，查询点是整张 432 格网格（见 `sensors.query_all` 的说明）。
+Sample granularity
+----------------
+In the reference implementation, one training sample = (one frame's sensor
+readings, that frame's query points). We follow the same convention: **one
+sample per frame**, with query points being the entire 432-cell grid (see
+`sensors.query_all`'s note).
 
-相邻帧（1 秒间隔）高度冗余，用 `--stride` 抽帧，默认 4。这不是对论文的改动——
-参考实现同样是从全部帧里随机抽 `training_frames` 帧来训练。
+Adjacent frames (1-second spacing) are highly redundant, subsampled by
+`--stride`, default 4. This is not a deviation from the paper -- the reference
+implementation likewise trains on `training_frames` frames randomly drawn from
+all frames.
 """
 from __future__ import annotations
 
@@ -24,14 +32,15 @@ import sys
 
 import numpy as np
 
-# append 而不是 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的顶掉。
+# append rather than insert(0): 4dvarnet_enkf also has a losses.py, inserting at
+# the front would shadow this directory's.
 from crowdcore import config as cfg4d                                          # noqa: E402
 from crowdcore import navigation as nav                                        # noqa: E402
 from crowdcore import observation_model as om                                  # noqa: E402
 
 
 def obs_config():
-    """观测参数——逐字取自 4dvarnet_enkf/config.yaml。"""
+    """Observation parameters -- taken verbatim from 4dvarnet_enkf/config.yaml."""
     return dict(
         sensing_range=cfg4d.get("observation", "sensing_range"),
         num_agents=cfg4d.get("observation", "num_agents"),
@@ -42,7 +51,7 @@ def obs_config():
 
 
 def state_shape():
-    """(C, H, W) —— 取自 config.yaml 的 grid.state_shape。"""
+    """(C, H, W) -- taken from config.yaml's grid.state_shape."""
     return tuple(cfg4d.get("grid", "state_shape"))
 
 
@@ -52,9 +61,10 @@ def channels():
 
 # --------------------------------------------------------------------------- #
 def load_day(path, stride=4, seed=0, frames=0, obs_every_k=None, add_noise=None):
-    """一天 -> (X, Y, Omega)，都已抽帧并展平成 (N, C, HW) / (N, HW)。
+    """One day -> (X, Y, Omega), all subsampled and flattened to (N, C, HW) / (N, HW).
 
-    frames>0 时只取该天的前 frames 帧（评估时用来对齐别的方法跑过的帧数）。
+    When frames>0, only takes that day's first `frames` frames (used during
+    evaluation to align with another method's frame count).
     """
     oc = obs_config()
     X, _ = om.load_state(path)
@@ -77,10 +87,13 @@ def load_day(path, stride=4, seed=0, frames=0, obs_every_k=None, add_noise=None)
 
 
 class DayBank:
-    """把若干天拼成一个可随机取批的样本池（参考实现也是全量驻留内存后随机抽帧）。
+    """Concatenates several days into one pool that batches can be randomly
+    drawn from (the reference implementation also holds everything resident in
+    memory and subsamples frames randomly).
 
-    内存：每天抽帧后约 2 x N x C x HW x 4B。stride=4 时一天约 138 MB，
-    32 天约 4.4 GB —— sbatch 里申请 64G 足够。
+    Memory: about 2 x N x C x HW x 4B per day after subsampling. At stride=4,
+    one day is about 138 MB, 32 days about 4.4 GB -- 64G requested in the sbatch
+    scripts is plenty.
     """
 
     def __init__(self, files, stride=4, seed=0, max_days=0, frames=0,
@@ -92,15 +105,16 @@ class DayBank:
             Xs.append(x); Ys.append(y); Os.append(o)
             if verbose:
                 print(f"  [{i+1}/{len(files)}] {os.path.basename(f).split('_')[0]}: "
-                      f"{x.shape[0]} 帧, 观测格/帧 {o.sum(1).mean():.1f}", flush=True)
+                      f"{x.shape[0]} frames, observed cells/frame {o.sum(1).mean():.1f}", flush=True)
         self.X = np.concatenate(Xs, 0)
         self.Y = np.concatenate(Ys, 0)
         self.Omega = np.concatenate(Os, 0)
         self.n = self.X.shape[0]
 
     def input_stats(self):
-        """编码器输入的逐通道标准化统计量：在**被观测到的格子**上统计，
-        因为进编码器的只有这些格子的读数。"""
+        """Per-channel standardisation statistics for the encoder's input:
+        computed over **observed cells** only, since those are the only
+        readings that reach the encoder."""
         m = self.Omega                                        # (N, HW)
         vals = [self.Y[:, c][m] for c in range(self.Y.shape[1])]
         mean = np.array([v.mean() for v in vals], np.float32)

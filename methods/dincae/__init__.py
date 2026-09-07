@@ -1,9 +1,11 @@
-"""DINCAE:卷积自编码器插补，逐通道输出均值与 sigma^2（信息形式）。
+"""DINCAE: convolutional autoencoder inpainting, outputting a per-channel mean and
+sigma^2 (information form).
 
-  state / encoding    通道定义、变换、逐格统计、输入编码
-  dataset / model     数据与网络
-  losses / train      损失与训练入口
+  state / encoding    channel definitions, transforms, per-cell statistics, input encoding
+  dataset / model     data and network
+  losses / train      loss and training entry point
 
-注意它只在**该通道有定义**的格子上训练（空格子没有速度），这决定了它必须用哪套
-评测口径 —— 见顶层 compare/compare4.py 的文件头。
+Note it only trains on cells where **that channel is defined** (empty cells have no
+velocity) — this decides which scoring convention it must use, see the header of
+the top-level compare/compare4.py.
 """

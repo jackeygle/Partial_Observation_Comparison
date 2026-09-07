@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=96G
 #SBATCH --time=02:00:00
-#SBATCH --output=check_outputs/uncvsb0_%j.out
+#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/uncvsb0_%j.out
 # The 5-member deep ensemble, combined by Lakshminarayanan et al. Sec. 2.4 moment matching:
 #   mu*     = mean_m mu_m
 #   sigma*^2= mean_m sigma_m^2 + Var_m(mu_m)     (population variance, unbiased=False)

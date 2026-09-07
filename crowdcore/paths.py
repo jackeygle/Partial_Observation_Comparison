@@ -1,15 +1,18 @@
 """
-paths.py — 仓库内路径的唯一真相
+paths.py — single source of truth for paths inside the repo
 
-重构前，`/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf` 这个字符串在 22 个地方被写死，
-另有若干处写死 `dincae_crowd`。2026-09-03 的目录重构让它们全部失效 —— 而这类失效不会
-报错，只会让脚本读不到文件或者读到别人的文件。所以路径集中在这里，按**本文件的位置**
-反推仓库根，跟着仓库走。
+Before the refactor, the string `/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf`
+was hardcoded in 22 places, with several more hardcoding `dincae_crowd`. The
+2026-09-03 directory refactor broke all of them silently -- that kind of failure
+never raises an error, it just makes a script read no file, or someone else's file.
+So paths are centralised here, deriving the repo root from **this file's own
+location** and following the repo wherever it moves.
 
-数据本身（ATC 的 h5、grid_cache、真实地图）不在这里 —— 它们在仓库之外，路径在
-`config.yaml` 的 `data.root` / `navigation.map_dir` 里，那是给用户改的配置，不是代码常量。
+The data itself (ATC's h5 files, grid_cache, the real map) is not here -- it lives
+outside the repo, with its path in `config.yaml`'s `data.root` / `navigation.map_dir`,
+which is user-editable configuration, not a code constant.
 
-用法:
+Usage:
     from crowdcore import paths
     paths.method("varnet")                  -> <root>/methods/varnet
     paths.runs("varnet")                    -> <root>/methods/varnet/runs
@@ -21,7 +24,7 @@ from __future__ import annotations
 
 import os
 
-#: 仓库根。本文件在 <root>/crowdcore/paths.py，所以上两级就是根。
+#: Repo root. This file lives at <root>/crowdcore/paths.py, so two levels up is the root.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CROWDCORE = os.path.join(ROOT, "crowdcore")
@@ -30,11 +33,13 @@ COMPARE = os.path.join(ROOT, "compare")
 SLIDES = os.path.join(ROOT, "slides")
 BASELINE = os.path.join(ROOT, "refactor_baseline")
 
-#: 五个方法的目录名。写在这里而不是各处字符串，改名时只有一处要动。
+#: Directory names of the five methods. Kept here rather than as scattered string
+#: literals, so a rename only touches one place.
 VARNET, ENKF, DINCAE, SENSEIVER = "varnet", "enkf", "dincae", "senseiver"
 
-#: 参考实现（Kazemi Eskeri et al., IROS 2025 workshop）。**在本仓库之外**，
-#: 我们只读它，从不写它 —— methods/enkf/enkf_lab/ 是它的只读 vendor 副本。
+#: The reference implementation (Kazemi Eskeri et al., IROS 2025 workshop).
+#: **Outside this repo** -- we only read it, never write to it; methods/enkf/enkf_lab/
+#: is a read-only vendor copy of it.
 REFERENCE_IMPL = "/scratch/work/zhangx29/Partial_observation"
 
 
@@ -44,48 +49,54 @@ def method(name: str) -> str:
 
 
 def runs(name: str) -> str:
-    """训练产出:checkpoint、metrics.jsonl、slurm 日志。"""
+    """Training output: checkpoints, metrics.jsonl, slurm logs."""
     return os.path.join(METHODS, name, "runs")
 
 
 def run_dir(name: str, tag: str) -> str:
-    """单个训练 run,例如 run_dir("varnet", "b0_k1") -> methods/varnet/runs/varnet_b0_k1。
+    """A single training run, e.g. run_dir("varnet", "b0_k1") -> methods/varnet/runs/varnet_b0_k1.
 
-    注意 varnet 的目录名带 `varnet_` 前缀（历史原因），这里不替调用方拼前缀，
-    调用方传完整的目录名。
+    Note varnet's directory names carry a `varnet_` prefix (for historical reasons);
+    this function does not add that prefix for the caller, callers pass the full
+    directory name.
     """
     return os.path.join(METHODS, name, "runs", tag)
 
 
 def check_outputs(name: str) -> str:
-    """验证脚本的产出:指标 json、图、slurm 日志。"""
+    """Output of the diagnostic scripts: metric jsons, figures, slurm logs."""
     return os.path.join(METHODS, name, "check_outputs")
 
 
 def eval_out(name: str) -> str:
-    """check_outputs/eval —— 各方法放最终指标与图的地方。"""
+    """check_outputs/eval -- where each method puts its final metrics and figures."""
     return os.path.join(METHODS, name, "check_outputs", "eval")
 
 
 def enkf_export(which: str = "enkf_k1_full") -> str:
-    """EnKF 导出的估计场（est_*.npz / obs_*.npz），9 个目录约 17 GB。
+    """The EnKF's exported estimated fields (est_*.npz / obs_*.npz), 9 directories, ~17 GB.
 
-    2026-09-03 从 methods/varnet/check_outputs/ 搬到了 methods/enkf/check_outputs/ ——
-    它们是 EnKF 的产出，挂在 4DVarNet 目录下只是历史遗留（那时两个方法共处一个目录）。
-    /scratch 是单一文件系统，所以搬 17 GB 是瞬间重命名，不是拷贝。
+    Moved on 2026-09-03 from methods/varnet/check_outputs/ to
+    methods/enkf/check_outputs/ -- they are the EnKF's output, and sitting under the
+    4DVarNet directory was only a historical artifact (from when the two methods
+    shared one directory). /scratch is a single filesystem, so moving 17 GB was an
+    instant rename, not a copy.
 
-    搬迁刻意排在数值验收**之后**：先证明重构没改变任何数字，再动数据，
-    否则两个变量混在一起，出问题就分不清是 import 改错了还是路径挪错了。
+    The move was deliberately scheduled **after** the numerical acceptance check:
+    prove the refactor did not change any number first, then move the data --
+    otherwise the two variables get tangled, and a problem afterwards cannot be
+    traced to a broken import versus a moved path.
     """
     return os.path.join(METHODS, ENKF, "check_outputs", which)
 
 
 def enkf_vendor(which: str = "enkf_lab") -> str:
-    """methods/enkf/enkf_lab 或 enkf_opt。
+    """methods/enkf/enkf_lab or enkf_opt.
 
-    这两个目录**刻意不是 Python 包的一部分**：它们内部有 `pedpred -> .` 自链接，
-    靠把 `<dir>` 放进 sys.path 让包内的 `from pedpred.X import Y` 解析。
-    见 methods/enkf/__init__.py。
+    These two directories are **deliberately not part of the Python package**: they
+    contain a `pedpred -> .` self-symlink, relying on `<dir>` being placed on
+    sys.path so that `from pedpred.X import Y` inside the package resolves.
+    See methods/enkf/__init__.py.
     """
     assert which in ("enkf_lab", "enkf_opt"), which
     return os.path.join(METHODS, ENKF, which)

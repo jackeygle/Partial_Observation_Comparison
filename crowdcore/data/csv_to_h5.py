@@ -179,16 +179,16 @@ def validate_transform(csv_path, ref_h5_path, n=200, atol=1e-5):
         ref_pos, ref_vel = f["position"][:n], f["velocity"][:n]
     ep = float(np.max(np.abs(pos - ref_pos)))
     ev = float(np.max(np.abs(vel - ref_vel)))
-    print(f"[validate] 前 {n} 行: position max|Δ|={ep:.3e}  velocity max|Δ|={ev:.3e}")
-    print(f"[validate] {'通过 ✓' if ep <= atol and ev <= atol else '偏差 ✗'} (atol={atol})")
+    print(f"[validate] first {n} rows: position max|Δ|={ep:.3e}  velocity max|Δ|={ev:.3e}")
+    print(f"[validate] {'PASS ✓' if ep <= atol and ev <= atol else 'MISMATCH ✗'} (atol={atol})")
     return ep <= atol and ev <= atol
 
 
 def main():
     ap = argparse.ArgumentParser(description="raw ATC CSV -> trajectory H5 (clean port)")
     ap.add_argument("--csv", required=True)
-    ap.add_argument("--out", default=None, help="输出轨迹 H5（不给则只验证）")
-    ap.add_argument("--validate", default=None, help="给现有轨迹 H5 路径则对拍验证转换")
+    ap.add_argument("--out", default=None, help="output trajectory H5 (if omitted, only validation runs)")
+    ap.add_argument("--validate", default=None, help="path to an existing trajectory H5 to cross-check the conversion against")
     ap.add_argument("--n", type=int, default=200)
     args = ap.parse_args()
     if args.validate:
@@ -196,7 +196,7 @@ def main():
     elif args.out:
         convert(args.csv, args.out)
     else:
-        ap.error("需要 --out 或 --validate")
+        ap.error("either --out or --validate is required")
 
 
 if __name__ == "__main__":

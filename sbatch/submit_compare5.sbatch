@@ -6,18 +6,19 @@
 #SBATCH --mem=128G
 #SBATCH --time=0-02:00:00
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/compare/results/slurm_%x_%j.out
-# 五方逐通道对比，四套格子口径并列。
+# Per-channel comparison across five methods, four cell-scope conventions side by side.
 #
-# 这个作业脚本放在顶层 sbatch/ 而不是某个方法的 sbatch/ 下：它评的是全部五个方法，
-# 归到任何一方名下都会误导（compare4 曾经住在 senseiver_crowd/ 里，它的输出也就
-# 落在 senseiver 的 check_outputs 里，看着像是 Senseiver 的指标）。
+# This job script lives in the top-level sbatch/, not under any one method's sbatch/:
+# it scores all five methods, and filing it under any single one would be misleading
+# (compare4 used to live in senseiver_crowd/, so its output landed in Senseiver's
+# check_outputs and looked like a Senseiver metric).
 #
-# 内存 128G：EnKF 的 est_*.npz 单日约 500MB，加上 12 个 solver 各自整天的
-# (T,C,H,W) 中间量。
+# 128G memory: the EnKF's est_*.npz is about 500MB per day, plus 12 solvers' worth of
+# whole-day (T,C,H,W) intermediates.
 #
-# 用法:
-#   sbatch sbatch/submit_compare5.sbatch                        # 全量
-#   sbatch sbatch/submit_compare5.sbatch --days 1 --ensembles "" # 冒烟
+# Usage:
+#   sbatch sbatch/submit_compare5.sbatch                          # full run
+#   sbatch sbatch/submit_compare5.sbatch --days 1 --ensembles ""  # smoke test
 set -euo pipefail
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 cd "$THESIS_ROOT"

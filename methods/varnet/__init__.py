@@ -1,8 +1,8 @@
-"""4DVarNet:用一个学到的优化器最小化变分代价 J。
+"""4DVarNet: minimise the variational cost J with a learned optimiser.
 
-  prior_model         GENN 先验 Phi
-  variational_solver  GradSolver —— 展开的梯度下降 + ConvLSTM
-  losses              Eq.14 的 plain MSE 与高斯 NLL
-  train               训练入口
-  checks/             本方法自己的诊断（跨方法的在顶层 compare/）
+  prior_model         the GENN prior Phi
+  variational_solver  GradSolver — unrolled gradient descent + ConvLSTM
+  losses              Eq.14's plain MSE and the Gaussian NLL
+  train               training entry point
+  checks/             this method's own diagnostics (cross-method ones live in top-level compare/)
 """

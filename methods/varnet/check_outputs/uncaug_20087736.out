@@ -1,0 +1,25 @@
+[members] 5 x runs/varnet_aug0_s{}  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.2118   0.0814   -0.911  0.1906   0.90   96.4%
+all_aleatoric_only              0.2118   0.0794   -0.970  0.1595   0.75   93.5%
+all_epistemic_only              0.2118   0.0796    1.408  0.0920   0.43   81.2%
+all_constant_sigma_baseline     0.2118   0.0982   -0.133  0.2118   1.00   92.4%
+blind                           0.2327   0.0784   -1.042  0.1679   0.72   96.2%
+observed                        0.1853   0.0848   -0.763  0.2163   1.17   96.7%
+blind_constant_sigma_baseline   0.2327   0.1036   -0.039  0.2327   1.00   93.5%
+channel_density                 0.1174   0.0508   -1.118  0.1331   1.13   96.7%
+channel_vx                      0.3759   0.1892    0.258  0.4026   1.07   93.4%
+channel_vy                      0.1331   0.0634   -0.803  0.1576   1.18   96.4%
+channel_var                     0.0817   0.0223   -1.982  0.0691   0.85   99.2%
+
+[out] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/uncertainty_aug0.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%

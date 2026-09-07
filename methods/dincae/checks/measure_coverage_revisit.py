@@ -1,8 +1,8 @@
 import os, sys
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
+# Scripts in checks/ import source modules from the project root; the root must
+# be inserted at the front (so this directory's losses.py takes priority),
+# 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
+# at the front would shadow this directory's).
 import numpy as np, h5py, glob
 from crowdcore import observation_model as d
 from crowdcore import navigation as nav

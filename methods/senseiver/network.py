@@ -1,21 +1,26 @@
 """
-network.py — Senseiver 整机
+network.py — the whole Senseiver model
 ============================
 
-对应参考实现的 `network_light.py`，但改成**纯 PyTorch 的 nn.Module**，不用
-PyTorch-Lightning。理由有二：
-  * 参考实现的 Lightning 封装带着一个 bug —— `train.py` 的 `Trainer()` 根本没传
-    `accelerator`/`devices`，`s_parser.py` 辛苦算出来的 `gpu_device` 只在 `--test`
-    分支用得上，所以命令行指定卡号在训练时是无效的；
-  * 我们要在 SLURM 上自链接续训，自己写循环比迁就 Lightning 的 ckpt 约定更省事。
+Corresponds to the reference implementation's `network_light.py`, but rewritten
+as a **plain PyTorch nn.Module**, without PyTorch-Lightning. Two reasons:
+  * The reference implementation's Lightning wrapper carries a bug -- `train.py`'s
+    `Trainer()` never passes `accelerator`/`devices` at all, so the `gpu_device`
+    that `s_parser.py` painstakingly computes is only used in the `--test`
+    branch, meaning a GPU index given on the command line has no effect during
+    training;
+  * We need to self-chain and resume on SLURM, and writing our own loop is
+    simpler than working around Lightning's checkpoint conventions.
 
-前向与参考实现完全一致：
+The forward pass exactly matches the reference implementation:
 
-    z = encoder(sensor_tokens, pad_mask)          # 论文 z = E(a_s, s)
-    ŝ = decoder(z, query_pos_encodings)           # 论文 ŝ_q = D(z, a_q)
+    z = encoder(sensor_tokens, pad_mask)          # the paper's z = E(a_s, s)
+    s_hat = decoder(z, query_pos_encodings)       # the paper's s_hat_q = D(z, a_q)
 
-位置编码和输入标准化统计量都注册成 buffer，跟着 checkpoint 走，这样评估脚本
-不需要重新推导任何东西就能复现训练时的输入约定。
+The positional encoding and the input-standardisation statistics are both
+registered as buffers, so they travel with the checkpoint -- the evaluation
+script never has to re-derive anything to reproduce the training-time input
+convention.
 """
 from __future__ import annotations
 
@@ -71,7 +76,7 @@ class Senseiver(nn.Module):
             num_output_channels=im_ch,
             num_cross_attention_heads=dec_num_cross_attention_heads,
             dropout=dropout,
-            enc_latent_channels=enc_num_latent_channels)     # 改动 2 的断言在这里生效
+            enc_latent_channels=enc_num_latent_channels)     # change 2's assertion takes effect here
 
         pe = PositionalEncoder((*self.grid, im_ch), space_bands).float()
         self.register_buffer("pos_enc", pe, persistent=True)
@@ -90,7 +95,7 @@ class Senseiver(nn.Module):
         return self.decoder(z, coords)
 
     def reconstruct(self, tokens, pad_mask):
-        """查询整张网格，返回 (B, C, H, W)。"""
+        """Queries the entire grid, returns (B, C, H, W)."""
         b = tokens.shape[0]
         coords = self.pos_enc[None].expand(b, -1, -1)
         out = self.forward(tokens, pad_mask, coords)          # (B, HW, C)

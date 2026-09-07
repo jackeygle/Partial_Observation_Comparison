@@ -201,7 +201,7 @@ def validate_against_cache(traj_h5_path, cache_h5_path, subset="corridor",
     with h5py.File(cache_h5_path, "r") as f:
         ref = f["grid"][:n]
     names = ("density", "vx", "vy", "var")
-    print(f"[validate] 前 {n} 帧, 我方 vs grid_cache 逐通道最大绝对误差:")
+    print(f"[validate] first {n} frames, our impl vs grid_cache, per-channel max absolute error:")
     ok = True
     for c in range(4):
         err = float(np.max(np.abs(grid[:, c] - ref[:, c])))
@@ -209,19 +209,19 @@ def validate_against_cache(traj_h5_path, cache_h5_path, subset="corridor",
         if err > atol:
             ok = False
         print(f"    {names[c]:8s} max|Δ| = {err:.3e}   [{flag}]")
-    print(f"[validate] {'全部通过 ✓' if ok else '存在偏差 ✗'} (atol={atol})")
+    print(f"[validate] {'ALL PASS ✓' if ok else 'MISMATCH FOUND ✗'} (atol={atol})")
     return ok
 
 
 def main():
     ap = argparse.ArgumentParser(description="Trajectory H5 -> 4-channel grid_cache (clean reimpl)")
-    ap.add_argument("--traj-h5", required=True, help="输入轨迹 H5 (position/velocity/index_1.0s)")
-    ap.add_argument("--out", default=None, help="输出 grid_cache H5 路径（不给则只验证）")
+    ap.add_argument("--traj-h5", required=True, help="input trajectory H5 (position/velocity/index_1.0s)")
+    ap.add_argument("--out", default=None, help="output grid_cache H5 path (if omitted, only validation runs)")
     ap.add_argument("--subset", default="corridor", choices=list(SUBSETS))
     ap.add_argument("--period", type=float, default=1.0)
     ap.add_argument("--resolution", type=float, default=1.0)
-    ap.add_argument("--validate", default=None, help="给定现有 grid_cache 路径则对拍验证")
-    ap.add_argument("--n", type=int, default=30, help="验证用前 n 帧")
+    ap.add_argument("--validate", default=None, help="path to an existing grid_cache to cross-check against")
+    ap.add_argument("--n", type=int, default=30, help="use the first n frames for validation")
     args = ap.parse_args()
 
     if args.validate:

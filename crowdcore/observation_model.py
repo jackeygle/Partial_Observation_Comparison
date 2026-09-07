@@ -217,8 +217,22 @@ class MultiAgentSensor:
         drive into it, but it CAN see the crowd around it. Intersecting with the
         walkable mask would wrongly blind those obstacle-adjacent, populated cells
         (~1/4 of crowd mass sits next to mall pillars). Sight is limited only by
-        range and line-of-sight; walls block the sight line (line_of_sight=True) and
-        hold ~0 density anyway, so they are never meaningfully "observed".
+        range and line-of-sight; walls block the sight line (line_of_sight=True).
+
+        Measured on atc-20130811 (2026-09-05), because "walls hold ~0 density" used to
+        be asserted here without a number and it is only half true:
+
+          * non-walkable cells hold 5.57% of the day's total crowd mass, NOT ~0 --
+            the map's 50%-occupancy rule rounds pillar/stall edges into obstacles
+            while the tracker still puts people there (peak density 1.83 on such a
+            cell, against 2.80 on the walkable side);
+          * but of the non-walkable cells the robots actually SEE, 98.74% are empty,
+            and they carry 0.95% of the observed crowd mass.
+
+        So the sight rule costs ~1% of the observed signal, which is why intersecting
+        with walkable is not worth a retrain: it would delete that 1% of true signal
+        while those cells stay in the ground truth under the allcells/full conventions,
+        turning them into permanent blind spots.
         """
         observed = np.zeros((self.H, self.W), dtype=bool)
         r2 = self.sensing_range ** 2                      # compare squared distances, avoiding the sqrt

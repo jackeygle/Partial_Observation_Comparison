@@ -135,27 +135,28 @@ def main():
     ap = argparse.ArgumentParser(description="Train GENN-prior variational reconstruction "
                                              "(defaults from config.yaml)")
     ap.add_argument("--split", default=_T["split"], choices=["train", "valid", "test"])
-    ap.add_argument("--days", type=int, default=_T["days"], help="最多用多少天")
-    ap.add_argument("--dT", type=int, default=_T["dT"], help="时间窗长度(秒)")
+    ap.add_argument("--days", type=int, default=_T["days"], help="max number of days to use")
+    ap.add_argument("--dT", type=int, default=_T["dT"], help="time window length (seconds)")
     ap.add_argument("--sensing-range", type=int, default=d.SENSING_RANGE)
     ap.add_argument("--num-agents", type=int, default=d.NUM_AGENTS)
     ap.add_argument("--n-iter", type=int, default=config.get("solver", "n_iter"),
-                    help="solver 迭代次数(论文 5~20)")
+                    help="number of solver iterations (paper uses 5-20)")
     ap.add_argument("--hidden", type=int, default=config.get("prior", "hidden"),
                     # %% not % — argparse runs every help string through `help % params`,
                     # so a literal percent sign makes --help raise ValueError.
-                    help="GENN 隐藏通道(先验的主要容量旋钮; GENN 只占全模型 0.46%% 参数)")
+                    help="GENN hidden channels (the prior's main capacity knob; GENN is only 0.46%% of the full model's parameters)")
     ap.add_argument("--n-phi-layers", type=int, default=config.get("prior", "n_phi_layers"),
-                    help="GENN 里 phi 的 pointwise(1x1x1) 层数")
+                    help="number of pointwise (1x1x1) layers in GENN's phi")
     ap.add_argument("--kt", type=int, default=config.get("prior", "kt"),
-                    help="GENN psi 的时间核(必须奇数; 越大 Phi 能看到越远的帧)")
+                    help="GENN psi's temporal kernel (must be odd; larger lets Phi see further frames)")
     ap.add_argument("--kh", type=int, default=config.get("prior", "kh"),
-                    help="GENN psi 的空间核-高(奇数)。加大核是给 GENN 加容量的低显存路径: "
-                         "激活只由 --hidden 决定,核只影响权重和算力")
+                    help="GENN psi's spatial kernel height (odd). Enlarging the kernel is a "
+                         "low-memory way to add capacity to GENN: activations are decided "
+                         "only by --hidden, the kernel only affects weights and compute")
     ap.add_argument("--kw", type=int, default=config.get("prior", "kw"),
-                    help="GENN psi 的空间核-宽(奇数)")
+                    help="GENN psi's spatial kernel width (odd)")
     ap.add_argument("--lstm-hidden", type=int, default=config.get("solver", "lstm_hidden"),
-                    help="solver LSTM 隐藏通道")
+                    help="the solver LSTM's hidden channels")
     ap.add_argument("--loss", default=_T["loss"],
                     choices=["supervised", "unsupervised", "nll"],
                     help="supervised=Eq.14 (4DVarNet), unsupervised=Eq.13, "
@@ -171,12 +172,12 @@ def main():
     ap.add_argument("--batch", type=int, default=_T["batch"])
     ap.add_argument("--epochs", type=int, default=_T["epochs"])
     ap.add_argument("--max-windows", type=int, default=_T["max_windows"],
-                    help=">0 时随机下采样到这么多训练窗口(提速)")
-    ap.add_argument("--n-eval", type=int, default=_T["n_eval"], help="每轮评估用的固定窗口数")
-    ap.add_argument("--steps", type=int, default=0, help=">0 时只跑这么多步(调试用)")
+                    help="when >0, randomly subsample down to this many training windows (for speed)")
+    ap.add_argument("--n-eval", type=int, default=_T["n_eval"], help="fixed number of windows used for evaluation each epoch")
+    ap.add_argument("--steps", type=int, default=0, help="when >0, run only this many steps (for debugging)")
     ap.add_argument("--lr", type=float, default=_T["lr"])
     ap.add_argument("--seed", type=int, default=_T["seed"],
-                    help="旧的单一 seed;同时设定初始权重和观测实现。保留以复现既有 run")
+                    help="the old single seed; sets both the weight initialisation and the observation realisation. Kept to reproduce existing runs")
     # Deep-ensembles (arXiv:1612.01474 Sec. 2.4) varies ONLY the initialisation and the data
     # ordering — every member sees the same training set ("We used the entire training
     # dataset to train each network"; bagging is reported to hurt). Our single --seed drove
@@ -185,13 +186,13 @@ def main():
     # noise, and observation noise is already in the data itself. Split them:
     # --init-seed is what an ensemble member varies, --data-seed stays fixed across members.
     ap.add_argument("--init-seed", type=int, default=None,
-                    help="只影响权重初始化(集成成员之间改这个);默认沿用 --seed")
+                    help="affects only weight initialisation (varied between ensemble members); defaults to --seed")
     ap.add_argument("--data-seed", type=int, default=None,
-                    help="只影响机器人路线与观测噪声(集成成员之间保持相同);默认沿用 --seed")
+                    help="affects only the robot routes and observation noise (kept the same across ensemble members); defaults to --seed")
     ap.add_argument("--var-hidden", type=int, default=32,
-                    help="--loss nll 的方差头宽度")
+                    help="width of the variance head for --loss nll")
     ap.add_argument("--var-layers", type=int, default=2,
-                    help="--loss nll 的方差头层数(逐点 1x1x1)")
+                    help="number of layers in the variance head for --loss nll (pointwise 1x1x1)")
     ap.add_argument("--augmented-var", action="store_true",
                     help="iterate log sigma^2 as part of the state instead of reading it off "
                          "the last hidden layer. The prior term of J becomes a Gaussian "
@@ -210,28 +211,34 @@ def main():
                          "for numerical stability, not as a physical floor")
     ap.add_argument("--nll-beta", type=float, default=0.0,
                     # %% not % — argparse runs every help string through `help % params`.
-                    help="每点 NLL 上的 detach(sigma^2)^beta 权重。这不在 Lakshminarayanan "
-                         "et al. 里,所以默认 0,此时权重恒为 1,损失就是论文 Eq.1 原样。"
-                         "非零只用于排查:beta=0 曾在旧设计(独立 head + 0.25xMAD 下限)下崩过,"
-                         "RMSE +52%%,那两样现在都没了")
+                    help="a detach(sigma^2)^beta weight on the per-point NLL. This is not in "
+                         "Lakshminarayanan et al., so it defaults to 0, where the weight is "
+                         "always 1 and the loss is exactly the paper's Eq.1. Nonzero is only "
+                         "for troubleshooting: beta=0 once collapsed under an old design "
+                         "(a separate head + a 0.25xMAD floor), RMSE +52%%, and neither of "
+                         "those two exists anymore")
     ap.add_argument("--outdir", default=_T["outdir"])
     ap.add_argument("--no-noise", action="store_true",
-                    help="观测不加噪声(对照实验; 默认由 config observation.add_noise 决定)")
+                    help="do not add noise to observations (a control experiment; the default is decided by config observation.add_noise)")
     ap.add_argument("--resume", action="store_true",
-                    help="从 outdir/varnet_last.pt 断点续训(载入 solver+optimizer+epoch)")
+                    help="resume from a checkpoint at outdir/varnet_last.pt (loads solver+optimizer+epoch)")
     ap.add_argument("--amp", action="store_true",
-                    help="bf16 混合精度(H200 提速,精度几乎无损)")
+                    help="bf16 mixed precision (speeds things up on the H200, near-lossless precision)")
     ap.add_argument("--obs-every-k", type=int, default=None,
-                    help="覆盖 config 的 observation.obs_every_k(每几帧观测一次)。"
-                         "k=1 对齐 EnKF 项目(每帧观测); k=4 对齐论文 Lorenz-96。"
-                         "留空 = 用 config 的值。设了此项才能让两个 k 的实验同时训练")
+                    help="overrides config's observation.obs_every_k (observe once every "
+                         "how many frames). k=1 matches the EnKF project (every frame "
+                         "observed); k=4 matches the paper's Lorenz-96. Empty = use config's "
+                         "value. Only setting this lets two k experiments train side by side")
     ap.add_argument("--iter-schedule", default="",
-                    help="论文 §3.4 的迭代递增课程 'epoch:n_iter[:lr],...',例如 "
-                         "'0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'。空 = 全程固定 --n-iter。"
-                         "官方实现同时切 lr(步数变多→梯度路径变长→lr 要降)")
+                    help="the paper's sec.3.4 iteration-increment curriculum, "
+                         "'epoch:n_iter[:lr],...', e.g. "
+                         "'0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'. Empty = --n-iter fixed "
+                         "throughout. The official implementation steps lr at the same time "
+                         "(more steps -> a longer gradient path -> lr needs to come down)"),
     ap.add_argument("--clip-grad", type=float, default=0.0,
-                    help=">0 时按该范数裁剪梯度。大先验(--hidden 128)在 15 epoch 里出现过 "
-                         "loss spike(盲区MSE 0.0516 -> 0.0992),裁剪是标准的稳定手段")
+                    help="when >0, clips the gradient to this norm. The larger prior "
+                         "(--hidden 128) once had a loss spike within 15 epochs (blind MSE "
+                         "0.0516 -> 0.0992); clipping is the standard stabiliser")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -254,7 +261,7 @@ def main():
     # ---- data ----
     k_eff = args.obs_every_k or config.get("observation", "obs_every_k")
     print(f"[obs] obs_every_k = {k_eff}"
-          + ("  (每帧观测,对齐 EnKF 项目)" if k_eff == 1 else f"  (每 {k_eff} 帧观测)"), flush=True)
+          + ("  (observed every frame, matching the EnKF project)" if k_eff == 1 else f"  (observed every {k_eff} frames)"), flush=True)
     files = d.split_files(args.split)
     X, Y, M, X0 = build_windows(files, args.dT, args.sensing_range, args.num_agents,
                                 data_seed, args.days,
@@ -391,7 +398,7 @@ def main():
         train_loss = float(loss.detach())
         rec = {"epoch": epoch, "step": step, "train_loss": train_loss,
                "rec_unobs_mse": rec_unobs, "r_score": r_score, "per_channel": per_ch}
-        print(f"[epoch {epoch:3d}] loss={train_loss:.4f}  盲区MSE={rec_unobs:.4f}  "
+        print(f"[epoch {epoch:3d}] loss={train_loss:.4f}  blind_MSE={rec_unobs:.4f}  "
               + " ".join(f"{k}={v:.4f}" for k, v in per_ch.items()), flush=True)
         with open(metrics_path, "a") as f:                  # append this epoch's metrics (one JSON per line)
             f.write(json.dumps(rec) + "\n")

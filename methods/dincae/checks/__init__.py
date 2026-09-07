@@ -1,1 +1,1 @@
-"""本方法自己的诊断脚本。跨方法的在顶层 compare/。"""
+"""This method's own diagnostic scripts. Cross-method ones live in top-level compare/."""

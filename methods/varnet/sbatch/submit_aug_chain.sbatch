@@ -113,7 +113,7 @@ mkdir -p "$OUTDIR" && echo "$EPOCH_NOW" > "$STAMP"
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
 if [ "${NOCHAIN:-0}" = "1" ]; then
-    echo "[chain] NOCHAIN=1 — 只跑这一段，不排后继"
+    echo "[chain] NOCHAIN=1 -- running only this segment, no successor queued"
 else
     sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME \
            --dependency=afterany:$SLURM_JOB_ID \

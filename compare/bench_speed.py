@@ -81,15 +81,19 @@ import resource
 import sys
 import time
 
+import h5py
 import numpy as np
 import torch
 
-# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
-# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
-# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+# This script used to live under 4dvarnet_enkf/, and ROOT always pointed there
+# (runs/, check_outputs/ hang off it). After the 2026-09-03 refactor it moved to
+# the top level, where dirname(dirname(__file__)) would become the repo root, and
+# every os.path.join(ROOT, ...) would silently point somewhere wrong -- hence the
+# explicit binding.
 ROOT = paths.method(paths.VARNET)
 
 # after sys.path — this lives in the project root, not in checks/
+from crowdcore import config  # noqa: E402
 from crowdcore import observation_model as om
 H, W, F = 36, 12, 4
 TOTAL, STATE_DIM = H * W, F * H * W
@@ -124,7 +128,7 @@ def measure(fn):
     return w, (r1.ru_utime - r0.ru_utime) + (r1.ru_stime - r0.ru_stime)
 
 
-def summarise(walls, cpus, n_frames, per_frame_is_latency):
+def summarise(walls, cpus, n_frames, window_frames):
     """Per-frame mean and std, plus what "per frame" actually means for this method.
 
     THROUGHPUT vs LATENCY. The EnKF assimilates one frame at a time, so wall/n_frames is both
@@ -134,10 +138,19 @@ def summarise(walls, cpus, n_frames, per_frame_is_latency):
     frame t's estimate from frame t's observation, you wait for the window. Reporting a single
     "ms/frame" for both would compare the EnKF's latency against our throughput.
 
-    latency_s is therefore the delay to a given frame's estimate: one frame's cost for a
-    sequential filter, one whole window's solve for a windowed method. dT is baked into the
-    read-out's weight shape (C*dT channels), so shortening the window for online use is a
-    retrain, not a setting.
+    latency_s is therefore the delay to a given frame's estimate: the cost of the smallest
+    unit the method can produce independently -- one frame for a sequential filter, one whole
+    dT-frame window for a windowed solver:
+
+        latency = wall / n_frames * window_frames
+
+    `window_frames` is 1 for per-frame methods, so the formula covers both. It used to be
+    `walls.mean()` for windowed methods, which is the WHOLE BATCH: at 1000 frames and dT=200
+    that is five windows, and 4DVarNet's latency was reported as 2.74 s when one window solves
+    in 0.55 s. The docstring already said "one whole window's solve"; the code did not.
+
+    dT is baked into the read-out's weight shape (C*dT channels), so shortening the window for
+    online use is a retrain, not a setting.
 
     The std is taken on the PER-FRAME figure rather than on the batch total, which is what the
     number is quoted as.
@@ -148,9 +161,10 @@ def summarise(walls, cpus, n_frames, per_frame_is_latency):
             "wall_all": walls.tolist(), "n_frames": int(n_frames),
             "per_frame_s": float(pf.mean()),
             "per_frame_std_s": float(pf.std()),
-            "per_frame_is_latency": bool(per_frame_is_latency),
-            "latency_s": float(pf.mean() if per_frame_is_latency else walls.mean()),
-            "latency_std_s": float(pf.std() if per_frame_is_latency else walls.std()),
+            "window_frames": int(window_frames),
+            "per_frame_is_latency": bool(window_frames == 1),
+            "latency_s": float(pf.mean() * window_frames),
+            "latency_std_s": float(pf.std() * window_frames),
             # CPU-seconds / wall-seconds: 1.0 = one core busy the whole time. Shows whether a
             # method actually uses the cores it was given (the EnKF was measured at 1.36 of 4).
             "cores_used": float((cpus / walls).mean())}
@@ -203,7 +217,7 @@ def bench_enkf(src, obs_npz, n_frames, warmup_frames=10):
                 except np.linalg.LinAlgError:
                     pass
             f.X = f._clip_bounds(f.forecast(model))
-    return once, (lambda: once(warmup_frames)), n_frames
+    return once, (lambda: once(warmup_frames)), n_frames, 1   # per-frame assimilation
 
 
 # ---------------------------------------------------------------- 4DVarNet
@@ -229,7 +243,90 @@ def bench_varnet(ckpt, obs_npz, n_frames, device="cpu"):
         if dev.type == "cuda":
             torch.cuda.synchronize()                  # CUDA is async: without this we would
                                                       # time the launch, not the computation
-    return once, once, n
+    return once, once, n, dT              # windowed solver: the smallest unit is one dT window
+
+
+def bench_dincae(run_dir, ckpt_glob, day, n_frames, device="cpu", batch=256):
+    """DINCAE: one forward pass produces (mu, sigma^2). A per-frame method, so
+    per-frame IS its latency.
+
+    Only the **network forward pass** is timed; input tensors are prepared
+    outside the timed region -- consistent with bench_varnet (where the windows
+    are also pre-cut). Observations arrive from the robots in the first place, so
+    counting the encoding as part of the inference time would charge the data
+    pipeline's cost to the method.
+
+    Note FRESH_OFFSETS=(-1,0,1): every frame needs the t-1/t/t+1 observations.
+    The **wait-for-data** latency this implies is not measured here; this
+    benchmark only compares compute cost.
+    """
+    from methods.dincae.checks.evaluate import build_inputs, load_models
+    from methods.dincae.encoding import FRESH_OFFSETS, observed_pair
+    from methods.dincae.state import NCH, StateStats
+    dev = torch.device(device)
+    stats = StateStats()
+    models, _, _ = load_models(run_dir, ckpt_glob, dev)
+
+    oc_sr = config.get("observation", "sensing_range")
+    with h5py.File(day, "r") as f:
+        T = min(f["grid"].shape[0], n_frames + 2 * max(FRESH_OFFSETS) + 2)
+        X = f["grid"][:T]
+        t_unix = f["time"][:T]
+    obs = om.generate_observations(
+        X, sensing_range=oc_sr, num_agents=config.get("observation", "num_agents"),
+        add_noise=True, seed=0, valid_mask=stats.valid,
+        obs_std=np.asarray(config.get("observation", "obs_std")),
+        obs_every_k=config.get("observation", "obs_every_k"))
+    scaled, invvar = observed_pair(obs["Y"][:, :NCH], obs["Omega_c"][:, :NCH],
+                                   stats.mean, stats.std)
+    lo, hi = -min(FRESH_OFFSETS), T - max(FRESH_OFFSETS)
+    idx = np.arange(lo, hi)[:n_frames]
+    H, W = X.shape[2], X.shape[3]
+    chunks = [torch.from_numpy(build_inputs(scaled, invvar, t_unix, idx[b:b + batch], H, W)).to(dev)
+              for b in range(0, len(idx), batch)]
+
+    def once():
+        with torch.no_grad():
+            for xb in chunks:
+                for m in models:
+                    m(xb)[-1]
+        if dev.type == "cuda":
+            torch.cuda.synchronize()
+    return once, once, len(idx), 1        # per-frame
+
+
+def bench_senseiver(ckpt, day, n_frames, device="cpu", batch=256):
+    """Senseiver: sensors -> field, per-frame and self-contained within a frame,
+    so per-frame is its latency.
+
+    Only `model.reconstruct(tok, pad)` is timed; tokenisation happens outside
+    the timed region -- the same convention as DINCAE/4DVarNet.
+    """
+    from methods.senseiver import dataset as sds
+    from methods.senseiver import sensors as ssens
+    from methods.senseiver.network import Senseiver     # model.py has the layers, the class is in network.py
+    dev = torch.device(device)
+    ck = torch.load(ckpt, map_location=dev, weights_only=False)
+    model = Senseiver(**ck["hparams"]).to(dev)
+    model.load_state_dict(ck["model"] if "model" in ck else ck["state_dict"])
+    model.eval()
+    _X, Y, Om = sds.load_day(day, stride=1, seed=0, frames=n_frames,
+                             obs_every_k=config.get("observation", "obs_every_k"))
+    pe = model.pos_enc.detach().cpu().numpy()
+    mean = model.in_mean.detach().cpu().numpy()
+    std = model.in_std.detach().cpu().numpy()
+    chunks = []
+    for i in range(0, Y.shape[0], batch):
+        tok, pad, _ = ssens.build_batch(Y[i:i + batch], Om[i:i + batch], pe, mean, std)
+        chunks.append((tok.to(dev), pad.to(dev)))
+
+    def once():
+        with torch.no_grad():
+            for tok, pad in chunks:
+                model.reconstruct(tok, pad)
+        if dev.type == "cuda":
+            torch.cuda.synchronize()
+    return once, once, int(Y.shape[0]), 1  # per-frame
 
 
 def bench_varnet_ensemble(ckpts, obs_npz, n_frames, device="cpu"):
@@ -264,7 +361,7 @@ def bench_varnet_ensemble(ckpts, obs_npz, n_frames, device="cpu"):
         _ = var.mean(0) + mu.var(0, unbiased=False)        # Sec. 2.4 moment matching
         if dev.type == "cuda":
             torch.cuda.synchronize()
-    return once, once, n
+    return once, once, n, dT              # windowed solver
 
 
 def main():
@@ -286,11 +383,18 @@ def main():
                          "together. Uses the k=1 observation file")
     ap.add_argument("--ens-members", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--out", default="")
+    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+                    help="which DINCAE checkpoint to use -- defaults to the same "
+                         "one as the accuracy table (ep70, picked on the validation set)")
     args = ap.parse_args()
     out = args.out or f"check_outputs/eval/bench_speed_{args.run}.json"
 
-    k1 = f"{ROOT}/check_outputs/enkf_k1_full/obs_{args.day}.npz"
-    k4 = f"{ROOT}/check_outputs/enkf_k4_full/obs_{args.day}.npz"
+    # The EnKF's exports moved from methods/varnet/check_outputs/ to under
+    # methods/enkf/ on 2026-09-03 (they are the EnKF's output). Go through
+    # paths.enkf_export(), don't reassemble it from ROOT -- hardcoding the old
+    # path here made the job FileNotFoundError during setup after the refactor.
+    k1 = os.path.join(paths.enkf_export("enkf_k1_full"), f"obs_{args.day}.npz")
+    k4 = os.path.join(paths.enkf_export("enkf_k4_full"), f"obs_{args.day}.npz")
     ck = lambda k: f"{ROOT}/runs/varnet_{args.run}_k{k}/varnet_best.pt"
     have_k = all(os.path.exists(ck(k)) for k in (1, 4))
     ens_ck = [f"{ROOT}/{args.ens_fmt.format(i)}/varnet_best.pt" for i in args.ens_members] \
@@ -300,6 +404,8 @@ def main():
             raise SystemExit(f"no checkpoint at {c} — check --ens-fmt/--ens-members")
     if not have_k and not ens_ck:
         raise SystemExit(f"no checkpoint at {ck(1)} — pass --run or --ens-fmt")
+    day_h5 = om.day_path(args.day) if hasattr(om, "day_path") else os.path.join(
+        om.GRID_CACHE, f"{args.day}_corridor_1.0s.h5")
     hw = hw_info()
     print(f"[hw] {hw['cpu']} · {hw['cores_avail']} cores · node={hw['node']} · "
           f"OMP={hw['omp_threads']} torch={hw['torch_threads']}", flush=True)
@@ -330,6 +436,23 @@ def main():
              f"4DVarNet deep ensemble, {len(ens_ck)} members + Sec. 2.4 combination",
              lambda: bench_varnet_ensemble(ens_ck, k1, args.frames, "cpu")),
         ]
+    # DINCAE and Senseiver: per-frame methods, completing the four-way
+    # comparison. If a checkpoint is missing, skip it with a note rather than
+    # failing the whole benchmark over one missing file.
+    dinc_dir = os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full")
+    dinc_ck = os.path.join(dinc_dir, args.dincae_ckpt)
+    if os.path.exists(dinc_ck):
+        jobs += [("dincae", f"DINCAE, 1 checkpoint ({args.dincae_ckpt})",
+                  lambda: bench_dincae(dinc_dir, dinc_ck, day_h5, args.frames, "cpu"))]
+    else:
+        print(f"[skip] dincae: no {dinc_ck}", flush=True)
+    sens_ck = os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt")
+    if os.path.exists(sens_ck):
+        jobs += [("senseiver", "Senseiver, 1 model (best.pt)",
+                  lambda: bench_senseiver(sens_ck, day_h5, args.frames, "cpu"))]
+    else:
+        print(f"[skip] senseiver: no {sens_ck}", flush=True)
+
     if args.gpu and torch.cuda.is_available() and have_k:
         # Reported separately, never as the head-to-head: the EnKF has no GPU path (its Kalman
         # update is host numpy), so a GPU-vs-CPU ratio would measure hardware, not method.
@@ -340,10 +463,10 @@ def main():
     print("[setup] preparing + warming up ...", flush=True)
     prepared = {}
     for name, desc, fn in jobs:
-        run_once, warm, nf = fn()
+        run_once, warm, nf, win = fn()
         warm()
-        prepared[name] = (run_once, nf, desc)
-        print(f"        {name}: ready ({nf} frames)", flush=True)
+        prepared[name] = (run_once, nf, desc, win)
+        print(f"        {name}: ready ({nf} frames, window {win})", flush=True)
 
     # INTERLEAVED, not blocked: round 1 runs every method, then round 2, then round 3.
     # Blocking (AAA BBB CCC) would let a change in the node's background load land entirely
@@ -355,15 +478,16 @@ def main():
     cpus = {n: [] for n in prepared}
     for rep in range(args.repeats):
         print(f"\n[round {rep + 1}/{args.repeats}]", flush=True)
-        for name, (run_once, nf, _) in prepared.items():
+        for name, (run_once, nf, _, _w) in prepared.items():
             w, c = measure(run_once)
             walls[name].append(w); cpus[name].append(c)
             print(f"  {name:16s} {w:8.2f} s   {w / nf * 1000:8.2f} ms/frame", flush=True)
 
-    for name, (_, nf, desc) in prepared.items():
-        res["runs"][name] = summarise(walls[name], cpus[name], nf,
-                                      per_frame_is_latency=name.startswith("enkf")
-                                      ) | {"desc": desc}
+    for name, (_, nf, desc, win) in prepared.items():
+        # window is reported by each bench function itself (per-frame=1,
+        # windowed solver=dT). Used to be guessed from the name prefix, which
+        # broke once DINCAE / Senseiver were added.
+        res["runs"][name] = summarise(walls[name], cpus[name], nf, win) | {"desc": desc}
 
     print("\n" + "=" * 92)
     print(f"{'method':16s} {'throughput ms/frame':>22s} {'latency to one frame':>22s} "

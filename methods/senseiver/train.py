@@ -1,21 +1,26 @@
 """
-train.py — Senseiver 在 ATC 上的训练
+train.py — training Senseiver on ATC
 =====================================
 
-对应参考实现的 `train.py` + `network_light.py::training_step`，但用纯 PyTorch 循环
-（理由见 `network.py` 的文件头）。训练目标与参考实现逐字一致：原始场上的四通道
-无权重 MSE（`losses.senseiver_loss`）。
+Corresponds to the reference implementation's `train.py` +
+`network_light.py::training_step`, but with a plain PyTorch loop (see
+`network.py`'s file header for why). The training objective exactly matches the
+reference implementation: unweighted 4-channel MSE on the raw field
+(`losses.senseiver_loss`).
 
-超参的默认值取自参考实现的 `s_parser.py`，两处按本问题的规模调整并在此说明：
+Hyperparameter defaults are taken from the reference implementation's
+`s_parser.py`, with two adjusted for this problem's scale, explained here:
 
-  * `--space-bands 16`（参考默认 32）。频率是 `linspace(1, dim/2, bands)`，
-    W=12 时最高频只有 6，32 个 band 纯属冗余。
-  * `--lr 1e-3`（参考的 argparse 默认是 1e-4）。README 里帧数上万的那个例子
-    （pipe）用的就是 1e-3，我们是 128 万帧的量级，同一档。
+  * `--space-bands 16` (reference default 32). The frequencies are
+    `linspace(1, dim/2, bands)`; with W=12 the highest frequency is only 6, so
+    32 bands is pure redundancy.
+  * `--lr 1e-3` (the reference argparse default is 1e-4). The README's example
+    with tens of thousands of frames (pipe) also uses 1e-3, and we are in the
+    1.28-million-frame range, the same regime.
 
-用法（**GPU 节点**）：
+Usage (**GPU node**):
     sbatch sbatch/submit_train.sbatch
-    # 冒烟
+    # smoke test
     srun -p gpu-debug --gres=gpu:1 -t 00:15:00 bash -c \
       'module load scicomp-pytorch-env/2026.1; python3 -u train.py --days 1 --steps 50'
 """
@@ -63,16 +68,16 @@ def validate(model, bank, pos_enc_np, mean, std, dev, batch, chans, max_batches=
 
 def main():
     ap = argparse.ArgumentParser(description="Senseiver on ATC")
-    # 数据
+    # Data
     ap.add_argument("--split", default="train")
-    ap.add_argument("--days", type=int, default=0, help="最多用多少天 (0 = 全部)")
-    ap.add_argument("--stride", type=int, default=4, help="抽帧步长(相邻秒高度冗余)")
+    ap.add_argument("--days", type=int, default=0, help="max number of days to use (0 = all)")
+    ap.add_argument("--stride", type=int, default=4, help="frame-subsampling stride (adjacent seconds are highly redundant)")
     ap.add_argument("--valid-days", type=int, default=3)
     ap.add_argument("--valid-stride", type=int, default=20)
     ap.add_argument("--frames", type=int, default=0,
-                    help=">0 时每天只取前 N 帧(冒烟用；观测模拟按整天跑很花时间)")
-    ap.add_argument("--obs-every-k", type=int, default=None, help="覆盖 config 的 observation.obs_every_k")
-    # 模型（默认取自 reference/Senseiver/s_parser.py）
+                    help="when >0, only take the first N frames per day (for smoke tests; simulating observations for a whole day is slow)")
+    ap.add_argument("--obs-every-k", type=int, default=None, help="overrides config's observation.obs_every_k")
+    # Model (defaults taken from reference/Senseiver/s_parser.py)
     ap.add_argument("--space-bands", type=int, default=16)
     ap.add_argument("--enc-preproc-ch", type=int, default=32)
     ap.add_argument("--num-latents", type=int, default=64)
@@ -85,12 +90,12 @@ def main():
     ap.add_argument("--dec-num-latent-channels", type=int, default=32)
     ap.add_argument("--dec-num-cross-attention-heads", type=int, default=1)
     ap.add_argument("--dropout", type=float, default=0.0)
-    # 训练
+    # Training
     ap.add_argument("--epochs", type=int, default=100)
     ap.add_argument("--batch", type=int, default=64)
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--seed", type=int, default=123)
-    ap.add_argument("--steps", type=int, default=0, help=">0 时每轮只跑这么多步(调试)")
+    ap.add_argument("--steps", type=int, default=0, help="when >0, only run this many steps per epoch (debug)")
     ap.add_argument("--amp", action="store_true")
     ap.add_argument("--out", default="runs/senseiver_A")
     ap.add_argument("--resume", action="store_true")
@@ -98,28 +103,28 @@ def main():
     args = ap.parse_args()
 
     if not torch.cuda.is_available() and not args.allow_cpu:
-        raise SystemExit("没有 GPU。本项目的规矩是 torch 只在 GPU 节点跑；"
-                         "确实要用 CPU 就加 --allow-cpu。")
+        raise SystemExit("No GPU. This project's rule is that torch only runs "
+                         "on GPU nodes; if you really need CPU, add --allow-cpu.")
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     os.makedirs(args.out, exist_ok=True)
     torch.manual_seed(args.seed)
 
     C, H, W = ds.state_shape()
     chans = ds.channels()
-    print(f"[config] 观测配置 = {ds.obs_config()}", flush=True)
+    print(f"[config] observation config = {ds.obs_config()}", flush=True)
 
-    print(f"[data] 载入 {args.split} split ...", flush=True)
+    print(f"[data] loading {args.split} split ...", flush=True)
     train_bank = ds.DayBank(ds.om.split_files(args.split), stride=args.stride,
                             seed=args.seed, max_days=args.days, frames=args.frames,
                             obs_every_k=args.obs_every_k)
-    print(f"[data] 训练样本 {train_bank.n} 帧", flush=True)
+    print(f"[data] {train_bank.n} training frames", flush=True)
     valid_bank = ds.DayBank(ds.om.split_files("valid"), stride=args.valid_stride,
                             seed=args.seed, max_days=args.valid_days, frames=args.frames,
                             obs_every_k=args.obs_every_k)
-    print(f"[data] 验证样本 {valid_bank.n} 帧", flush=True)
+    print(f"[data] {valid_bank.n} validation frames", flush=True)
 
     mean, std = train_bank.input_stats()
-    print(f"[stats] 编码器输入标准化 mean={mean} std={std}", flush=True)
+    print(f"[stats] encoder input standardisation mean={mean} std={std}", flush=True)
 
     model = Senseiver(
         im_ch=C, grid=(H, W), space_bands=args.space_bands,
@@ -133,7 +138,7 @@ def main():
         dec_num_latent_channels=args.dec_num_latent_channels,
         dec_num_cross_attention_heads=args.dec_num_cross_attention_heads,
         dropout=args.dropout, in_mean=mean, in_std=std).to(dev)
-    print(f"[model] {model.num_params:,} 参数", flush=True)
+    print(f"[model] {model.num_params:,} parameters", flush=True)
 
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     scaler = torch.amp.GradScaler("cuda", enabled=args.amp and dev.type == "cuda")
@@ -145,7 +150,7 @@ def main():
         ck = torch.load(last_p, map_location=dev, weights_only=False)
         model.load_state_dict(ck["model"]); opt.load_state_dict(ck["optimizer"])
         start_epoch = ck["epoch"] + 1; best = ck.get("best", best)
-        print(f"[resume] 从 epoch {start_epoch} 继续 (best={best:.5f})", flush=True)
+        print(f"[resume] continuing from epoch {start_epoch} (best={best:.5f})", flush=True)
 
     mpath = os.path.join(args.out, "metrics.jsonl")
     rng = np.random.default_rng(args.seed + start_epoch)

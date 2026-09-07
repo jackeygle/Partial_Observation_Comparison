@@ -42,8 +42,9 @@ def main():
     ap.add_argument("--only", default="", help="only export days whose stem contains this string")
     ap.add_argument("--outdir", default="check_outputs/enkf")
     ap.add_argument("--obs-every-k", type=int, default=None,
-                    help="覆盖 config 的 observation.obs_every_k。EnKF 的估计和观测序列绑定, "
-                         "所以 k=1 和 k=4 必须各导一份、各跑一遍")
+                    help="overrides config's observation.obs_every_k. The EnKF's "
+                         "estimate is tied to its observation sequence, so k=1 "
+                         "and k=4 each need their own export and their own run")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 

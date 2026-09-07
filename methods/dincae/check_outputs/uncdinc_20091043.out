@@ -1,0 +1,32 @@
+[members] 1 个 checkpoint: epochs [70]  dev=cuda
+  atc-20130811_corridor_1.0s.h5  39819 帧
+  atc-20130818_corridor_1.0s.h5  38883 帧
+  atc-20130825_corridor_1.0s.h5  42888 帧
+  atc-20130901_corridor_1.0s.h5  39756 帧
+  atc-20130915_corridor_1.0s.h5  39381 帧
+  atc-20130922_corridor_1.0s.h5  38840 帧
+  atc-20130929_corridor_1.0s.h5  37962 帧
+
+[pass 2] 常数 sigma 基线，sigma = all 22.5762, blind 25.2768, defined 0.6052, defined_blind 0.8634
+
+split                                 RMSE     CRPS   sigma   sp/sk   cov90
+all                                22.5762   1.3625  0.4658   0.021   83.8%
+blind                              25.2768   1.6487  0.6271   0.025   79.9%
+observed                           19.0582   1.0381  0.2830   0.015   88.2%
+defined                             0.6052   0.2232  0.4020   0.664   93.8%
+defined_blind                       0.8634   0.3575  0.6376   0.739   93.1%
+defined_observed                    0.3332   0.1327  0.2433   0.730   94.2%
+channel_density                     0.5407   0.1556  0.2600   0.481   93.6%
+channel_vx                          0.8324   0.3825  0.5030   0.604   81.9%
+channel_vy                         45.1297   4.6236  0.7614   0.017   73.2%
+channel_var                         1.0314   0.2882  0.3389   0.329   86.3%
+defined_channel_density             0.7993   0.2764  0.5017   0.628   94.8%
+defined_channel_vx                  0.8847   0.4859  0.8234   0.931   91.0%
+defined_channel_vy                  0.9653   0.5198  0.8885   0.920   88.5%
+defined_channel_var                 1.0199   0.4574  0.8566   0.840   91.6%
+all_constant_sigma_baseline        22.5762   6.1530 22.5762   1.000   99.6%
+blind_constant_sigma_baseline      25.2768   6.8867 25.2768   1.000   99.6%
+defined_constant_sigma_baseline     0.6052   0.2831  0.6052   1.000   92.6%
+defined_blind_constant_sigma_baseline  0.8634   0.4244  0.8634   1.000   92.2%
+
+[out] check_outputs/eval/uncertainty_dincae.json

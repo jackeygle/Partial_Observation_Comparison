@@ -1,43 +1,56 @@
 """
-state.py — 状态定义：四通道、有效性规则、逐通道变换、逐格统计量
+state.py — state definition: the four channels, validity rules, per-channel
+transforms, per-cell statistics
 =====================================================
 
-四件事都在这里：`CHANNELS`/`NCH`（四通道）、`channel_valid`（逐通道有效性规则）、
-`CHANNEL_TRANSFORM`/`fwd_channel`/`inv_channel`（逐通道变换）、`StateStats`（逐格统计量）。
+Four things live here: `CHANNELS`/`NCH` (the four channels), `channel_valid`
+(per-channel validity rule), `CHANNEL_TRANSFORM`/`fwd_channel`/`inv_channel`
+(per-channel transforms), `StateStats` (per-cell statistics).
 
-**逐格均值场 —— 一句话：每个格子在 32 个训练日上的平均值。**
-（论文管这一项叫 climatology / `remove_mean`，那是海洋气象的行话；本目录一律叫"逐格均值场"，
-术语对照见 README 的"术语"一节。）实测走廊内不同位置的"常态人流"差几十倍
-（最繁忙的格子平均 0.26 人/格，角落里接近 0），这个差异跨越所有 92 天都不变。
+**The per-cell mean field -- in one sentence: each cell's average over the 32
+training days.** (The paper calls this term climatology / `remove_mean`, ocean/
+meteorology jargon; this directory always calls it "the per-cell mean field", see
+the README's "Terminology" section for the correspondence.) Measured: "typical
+foot traffic" differs by dozens of times between different corridor locations
+(the busiest cell averages 0.26 people/cell, corners are near 0), and this
+difference is stable across all 92 days.
 
-DINCAE 在重建前先减掉它，网络工作在残差空间（1.0 §3 的 `remove_mean`；2.0 §2.3 对
-辅助变量也一样）。参考实现 `reference/DINCAE.jl/src/data.jl:266-276`：
+DINCAE subtracts it before reconstruction, working in the residual space (1.0
+sec.3's `remove_mean`; 2.0 sec.2.3 does the same for the auxiliary variables too).
+The reference implementation, `reference/DINCAE.jl/src/data.jl:266-276`:
 
-    meandata = sum(非 NaN 的值, dims=4) ./ sum(非 NaN, dims=4)
+    meandata = sum(non-NaN values, dims=4) ./ sum(non-NaN, dims=4)
 
-注意这是**对整个时间轴求一次均值**，每个像素每个变量一个数 —— **不按季节/时段分箱**。
-周期性是靠输入里的 `cos/sin` 通道处理的，不是靠这张均值表。我们照此办理：逐格一个均值，
-昼夜周期交给 `cos/sin(time-of-day)` 输入通道。
+Note this is **one mean taken over the entire time axis**, one number per pixel
+per variable -- **not binned by season/time-of-day**. Periodicity is handled by
+the `cos/sin` input channels, not by this mean table. We follow the same
+approach: one mean per cell, the diurnal cycle handled by the
+`cos/sin(time-of-day)` input channels.
 
-**为什么值得减**：网络因此只需判断"现在比平常多还是少"，不必再记住"这个位置平常多少人"
-（后者一张查表就能精确给出，不需要学）。更重要的是盲区的兜底 —— 有 36.9% 的格子在
-{t−1,t,t+1} 里完全没被观测到，减了均值之后输出 0 的含义是"和平常一样"，而不是"一个人
-都没有"。实测只用这张均值表当预测，就比 carry-forward 填充好 30~39%。
+**Why it is worth subtracting**: the network then only has to judge "more or less
+than usual right now," rather than also memorising "how many people are usually
+here" (the latter can be read exactly from a lookup table, no need to learn it).
+More importantly, it gives blind cells a fallback -- 36.9% of cells are never
+observed at all within {t-1,t,t+1}, and after subtracting the mean, an output of 0
+means "same as usual," not "nobody at all." Measured: using this mean table alone
+as the prediction already beats carry-forward filling by 30-39%.
 
-**逐通道有效性**（`channel_valid`）—— 均值只在该通道**有定义**的 (帧,格) 上算，否则占位
-符 0 会污染均值。这不是对论文的改动，而是论文"缺测=精度为零"这条原则在我们数据上的落实：
+**Per-channel validity** (`channel_valid`) -- the mean is computed only over
+(frame, cell) pairs where that channel **is defined**, otherwise the placeholder
+0 would pollute the mean. This is not a deviation from the paper -- it is the
+paper's own principle, "missing = zero precision," applied to our data:
 
-  density : 处处有定义（density=0 是真实测量："这里没人"）
-  vx, vy  : `density > 0` —— 空格子的速度是占位符
-            （`h5_to_grid.py`: `vel = where(density>0, vel/density, 0)`）
-  var     : `vel_var > 0` ⟺ 格内至少 2 人
-            （`h5_to_grid.py:128`: `vel_var[nnz <= 1] = 0`，1 个点的方差无定义）
+  density : defined everywhere (density=0 is a genuine measurement: "nobody is here")
+  vx, vy  : `density > 0` -- velocity on an empty cell is a placeholder
+            (`h5_to_grid.py`: `vel = where(density>0, vel/density, 0)`)
+  var     : `vel_var > 0` <=> at least 2 people in the cell
+            (`h5_to_grid.py:128`: `vel_var[nnz <= 1] = 0`, variance of 1 point is undefined)
 
-输出: artifacts/state_stats.npz —— mean[NCH,H,W]、std[NCH]、count、valid_mask
+Output: artifacts/state_stats.npz -- mean[NCH,H,W], std[NCH], count, valid_mask
 
-用法（纯 numpy/scipy，登录节点可跑）:
-    python3 state.py                # 全部 32 训练日
-    python3 state.py --days 3       # 冒烟测试
+Usage (pure numpy/scipy, the login node is fine):
+    python3 state.py                # all 32 training days
+    python3 state.py --days 3       # smoke test
 """
 from __future__ import annotations
 
@@ -49,7 +62,8 @@ import sys
 import h5py
 import numpy as np
 
-# append 而非 insert(0)：4dvarnet_enkf 里也有 losses.py，插到最前会把本目录的同名模块顶掉
+# append rather than insert(0): 4dvarnet_enkf also has a losses.py, inserting at
+# the front would shadow this directory's same-named module
 from crowdcore import navigation as nav                                         # noqa: E402
 from crowdcore import observation_model as om                                    # noqa: E402
 
@@ -59,48 +73,61 @@ NCH = len(CHANNELS)
 
 
 def channel_valid(X):
-    """(NCH, T, H, W) bool —— 每个通道在哪些 (帧, 格) 上**有定义**。见模块 docstring。
+    """(NCH, T, H, W) bool -- where each channel **is defined** (frame, cell).
+    See the module docstring.
 
-    在**原始物理值**上判定（与 CHANNEL_TRANSFORM 无关）。注意 log1p 是单调的，所以
-    `var > 0` 和 `log1p(var) > 0` 是等价条件，这里用原始值只为可读性。
+    Judged on **raw physical values** (independent of CHANNEL_TRANSFORM). Note
+    log1p is monotonic, so `var > 0` and `log1p(var) > 0` are equivalent
+    conditions; raw values are used here only for readability.
     """
     occ = X[:, 0] > 0
     return np.stack([np.ones_like(occ), occ, occ, X[:, 3] > 0])
 
 
 # --------------------------------------------------------------------------- #
-# 逐通道变换
+# Per-channel transforms
 # --------------------------------------------------------------------------- #
-#: `var` 用 log1p。1.0 结论段：这套方法"可以很容易推广到参数化概率分布，特别是用于浓度类
-#: 变量的 log-normal 分布"。`var`(格内速度方差) 正是这一类 —— 非负、重尾：它的
-#: 残差标准差只有 0.23，但拥挤格子里 `vel_var` 能超过 2，归一化后仍有大量 10σ 级样本，
-#: 少数极端点主导梯度。实测未变换时 `var` 的归一化 dev MSE 在 8~62 之间震荡
-#: （1.0 = "只输出逐格均值场"的水平），即重建比什么都不做差一个数量级。
+#: `var` goes through log1p. 1.0's conclusion section: the method "can easily be
+#: extended to parameterised probability distributions, in particular a
+#: log-normal for concentration-like variables." `var` (in-cell velocity
+#: variance) is exactly that kind -- non-negative and heavy-tailed: its residual
+#: std is only 0.23, yet crowded cells can have `vel_var` exceeding 2, so after
+#: normalising there are still plenty of 10-sigma samples, with a handful of
+#: extreme points dominating the gradient. Measured: without the transform,
+#: `var`'s normalised dev MSE oscillates between 8 and 62 (1.0 = the level of
+#: "just output the per-cell mean field"), i.e. the reconstruction is an order
+#: of magnitude worse than doing nothing.
 CHANNEL_TRANSFORM = (None, None, None, "log1p")
 
 
 def fwd_channel(v, c):
-    """原始物理值 -> 模型工作的空间（逐通道）。"""
+    """Raw physical value -> the space the model works in (per channel)."""
     if CHANNEL_TRANSFORM[c] == "log1p":
-        return np.log1p(np.maximum(v, 0.0))       # var 是方差，负值只可能来自观测噪声
+        return np.log1p(np.maximum(v, 0.0))       # var is a variance; negative values can only come from observation noise
     return v
 
 
-#: `exp(μ + σ²/2)` 的指数上限。见 inv_channel 的说明。
+#: Cap on the exponent for `exp(mu + sigma^2/2)`. See inv_channel's note.
 _INV_EXP_CAP = 20.0
 
 
 def inv_channel(v, c, var_in_space=None):
-    """模型空间 -> 原始物理值（`fwd_channel` 的逆）。
+    """Model space -> raw physical value (the inverse of `fwd_channel`).
 
-    默认返回**中位数** `expm1(μ)`。
+    By default returns the **median**, `expm1(mu)`.
 
-    `var_in_space` 传入时改用**对数正态均值** `exp(μ + σ²/2) − 1`（若 x ~ N(μ,σ²) 且
-    y = expm1(x)，这才是 E[y]）。**但默认不要用它做点估计**：σ̂² 被 Eq.6 钳在 1/µ = 1000，
-    乘回 std² 后 `0.5σ²` 能到 11，指数直接爆掉 —— 实测某次冒烟里 `var` 的物理空间 MSE
-    因此达到 10²²。数学上没错，可是几个"我不知道"的格子会用天文数字统治 MSE，所以
-    对**重尾且 σ̂ 未校准**的通道，中位数是更可用的点估计，而 `var` 的误差应主要在
-    变换后（log）空间里看。这里对指数额外加了 `_INV_EXP_CAP` 兜底，防止溢出成 inf。
+    When `var_in_space` is given, switches to the **log-normal mean**,
+    `exp(mu + sigma^2/2) - 1` (if x ~ N(mu,sigma^2) and y = expm1(x), this is
+    E[y]). **But do not use it as the default point estimate**: sigma-hat^2 is
+    clamped by Eq.6 at 1/mu = 1000, and multiplying back by std^2 can push
+    `0.5*sigma^2` up to 11, blowing the exponential up -- measured: during one
+    smoke test, `var`'s physical-space MSE reached 10^22 because of this. It is
+    mathematically correct, but a handful of "I don't know" cells would then
+    dominate the MSE with astronomical numbers, so for a channel that is
+    **heavy-tailed with an uncalibrated sigma-hat**, the median is the more
+    usable point estimate, and `var`'s error should mainly be judged in the
+    transformed (log) space. An extra `_INV_EXP_CAP` floor is applied to the
+    exponent here to keep it from overflowing to inf.
     """
     if CHANNEL_TRANSFORM[c] == "log1p":
         m = v if var_in_space is None else v + 0.5 * var_in_space
@@ -109,24 +136,30 @@ def inv_channel(v, c, var_in_space=None):
 
 
 class StateStats:
-    """state_stats.npz 的读取。
+    """Reads state_stats.npz.
 
-    `mean[c,H,W]` 逐格时间均值；`std[c]` 该通道残差的标准差（标量，在 walkable ∩
-    有定义的 (帧,格) 上算）。
+    `mean[c,H,W]` is the per-cell time mean; `std[c]` is that channel's residual
+    standard deviation (a scalar, computed over walkable ∩ defined (frame, cell)
+    pairs).
 
-    **为什么需要 std**：论文所有变量都用 `obs_err_std = 1`（代码默认），这在 SST 上没问题
-    —— 它的残差量级本身就是 O(1) °C。我们四个通道的残差方差差三个数量级
-    （density 0.036 / vx 0.53 / vy 0.13 / var 0.037），全按 σ²=1 处理会让高斯 NLL 失衡：
-    `log σ̂²` 项无下界，残差量级远小于 1 的通道可以把 σ̂² 直接压到 Eq.6 的下限白赚一截
-    负 loss，而重建并未变好（实测 train NLL 降 5 个单位、density 的 dev MSE 却从 0.0254
-    涨到 0.0419）。把各通道残差归一到单位方差后，σ²_obs=1 就和数据量级匹配了，
-    这也正是参考代码里 `normalize2`（`data.jl:111-120`）在做的事。
+    **Why std is needed**: the paper uses `obs_err_std = 1` for every variable
+    (the code default), which is fine on SST -- its residual scale is naturally
+    O(1) degC. Our four channels' residual variances differ by three orders of
+    magnitude (density 0.036 / vx 0.53 / vy 0.13 / var 0.037), and treating them
+    all as sigma^2=1 unbalances the Gaussian NLL: the `log sigma-hat^2` term has
+    no lower bound, so a channel whose residual scale is much smaller than 1 can
+    push sigma-hat^2 straight to Eq.6's floor and earn a chunk of negative loss
+    for free, without the reconstruction actually improving (measured: train NLL
+    drops by 5 units while density's dev MSE actually rises from 0.0254 to
+    0.0419). Normalising each channel's residual to unit variance makes
+    sigma^2_obs=1 match the data's scale, exactly what the reference code's
+    `normalize2` (`data.jl:111-120`) does.
     """
 
     def __init__(self, path=os.path.join(HERE, "artifacts", "state_stats.npz")):
         z = np.load(path, allow_pickle=False)
         self.mean = z["mean"].astype(np.float32)          # (NCH,H,W)
-        self.std = z["std"].astype(np.float32)            # (NCH,)  残差标准差
+        self.std = z["std"].astype(np.float32)            # (NCH,)  residual standard deviation
         self.count = z["count"]
         self.valid = z["valid_mask"].astype(bool)         # (H,W) walkable
         self.n_train_days = int(z["n_train_days"])
@@ -136,7 +169,7 @@ class StateStats:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=0, help="只用前 N 个训练日(冒烟测试)")
+    ap.add_argument("--days", type=int, default=0, help="use only the first N training days (smoke test)")
     ap.add_argument("--out", default=os.path.join(HERE, "artifacts", "state_stats"))
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
@@ -144,19 +177,20 @@ def main():
     train = om.split_files("train")
     if args.days:
         train = train[: args.days]
-    valid = nav.build_valid_mask_from_config()        # 跨日一致(训练集 visited 并集)
+    valid = nav.build_valid_mask_from_config()        # consistent across days (union of the training set's visited cells)
     H, W = valid.shape
     print(f"train days {len(train)}, walkable {valid.sum()}/{valid.size}, channels {CHANNELS}")
 
-    s = np.zeros((NCH, H, W))       # Σ x
-    sq = np.zeros((NCH, H, W))      # Σ x²   (供残差方差用)
-    n = np.zeros((NCH, H, W))       # 有定义的样本数
+    s = np.zeros((NCH, H, W))       # sum x
+    sq = np.zeros((NCH, H, W))      # sum x^2   (for the residual variance)
+    n = np.zeros((NCH, H, W))       # number of defined samples
     for k, fp in enumerate(train):
         with h5py.File(fp, "r") as f:
             X = f["grid"][:]
         cv = channel_valid(X)
         for c in range(NCH):
-            # 逐格均值场与残差标准差都在**变换后**的空间里算，与编码/损失口径一致
+            # Both the per-cell mean field and the residual std are computed in
+            # the **transformed** space, matching the encoding/loss convention
             v = np.where(cv[c], fwd_channel(X[:, c].astype(np.float64), c), 0.0)
             s[c] += v.sum(0)
             sq[c] += (v ** 2).sum(0)
@@ -164,8 +198,8 @@ def main():
         print(f"  {k + 1}/{len(train)} {os.path.basename(fp)}", flush=True)
 
     mean = np.where(n > 0, s / np.maximum(n, 1), 0.0)
-    # 残差方差（在 walkable 上汇总）：Σ_frames (x − mean_cell)² = Σx² − n·mean²
-    # 所以一次遍历就能精确得到，不必再扫一遍数据。
+    # Residual variance (aggregated over walkable cells): sum_frames (x - mean_cell)^2 = sum(x^2) - n*mean^2
+    # so one pass over the data gives it exactly, no need for a second scan.
     ss = np.where(valid[None], sq - n * mean ** 2, 0.0).sum(axis=(1, 2))
     nn = np.where(valid[None], n, 0.0).sum(axis=(1, 2))
     var_resid = ss / np.maximum(nn, 1)
@@ -184,9 +218,9 @@ def main():
                    "samples_per_cell_median": {c: float(np.median(n[i][valid]))
                                                for i, c in enumerate(CHANNELS)}}, f, indent=2)
 
-    print("\n逐格均值 + 残差标准差（归一化用）:")
+    print("\nPer-cell mean + residual std (for normalisation):")
     for i, c in enumerate(CHANNELS):
-        print("  %-8s mean %9.5f   resid_std %8.5f   每格样本数中位数 %.0f"
+        print("  %-8s mean %9.5f   resid_std %8.5f   median samples/cell %.0f"
               % (c, mean[i][valid].mean(), std[i], np.median(n[i][valid])))
     print(f"\nwrote {args.out}.npz / .json")
 

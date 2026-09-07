@@ -1,18 +1,22 @@
 """
-plot_compare3.py — 三方逐通道对比图
+plot_compare3.py — three-way per-channel comparison figure
 ====================================
 
-读 `check_outputs/eval/compare3.json`，画盲区 MSE 的三方对比。
+Reads `check_outputs/eval/compare3.json`, plots the three-way comparison of blind
+MSE.
 
-**为什么是小多组而不是分组柱状图**：四个通道量级差一个数量级（vx 0.079、var 0.006）。
-放在同一根 y 轴上，density/vy/var 三个面板会被压成看不见的细条，读者只能看出 vx 的
-差异——而那恰好是唯一 4DVarNet 领先的通道，图会给出与数据相反的印象。
-每通道一个面板、各自 y 轴，比的是"该通道内谁赢"，这正是要传达的信息。
-面板间不可比这一点写在副标题里。
+**Why small multiples rather than a grouped bar chart**: the four channels differ
+by an order of magnitude (vx 0.079, var 0.006). On a shared y-axis, the density/vy/var
+panels would flatten into invisible slivers, leaving the reader only able to see
+the difference in vx -- which happens to be the one channel where 4DVarNet leads,
+giving an impression opposite to the data. One panel per channel with its own
+y-axis compares "who wins within this channel," which is exactly the information
+to convey. That panels are not comparable to each other is stated in the subtitle.
 
-配色取自数据可视化规范的默认分类色板 1/2/3 号槽位（固定顺序，不循环）。
+Colours are the default categorical palette's slots 1/2/3 from a dataviz spec
+(fixed order, no cycling).
 
-用法: python3 checks/plot_compare3.py    (纯 matplotlib, 登录节点即可)
+Usage: python3 checks/plot_compare3.py    (pure matplotlib, the login node is fine)
 """
 from __future__ import annotations
 
@@ -25,7 +29,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# 分类色板槽位 1/2/3（light mode）
+# Categorical palette slots 1/2/3 (light mode)
 COLORS = ["#2a78d6", "#eb6834", "#1baf7a"]
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#8a8a85"
 SURFACE = "#fcfcfb"
@@ -42,7 +46,8 @@ def main():
     methods = list(d["results"].keys())
     R = d["results"]
 
-    # 各通道占「盲区总误差」的比重，按 Senseiver 算（用于说明 vx 的主导地位）
+    # Each channel's share of "total blind error", computed from Senseiver (used
+    # to explain vx's dominance)
     ref = R[methods[0]]["per_channel"]
     tot = sum(ref.values())
     share = {c: ref[c] / tot * 100 for c in chans}
@@ -66,7 +71,8 @@ def main():
         ax.set_title(p, fontsize=11, color=INK, pad=13, fontweight="bold")
         ax.text(0.5, 1.015, sub, transform=ax.transAxes, ha="center",
                 fontsize=8, color=MUTED)
-        # 刻度：固定 3 位小数 + 限制刻度数，否则两位小数会撞出重复标签(0.04 出现两次)
+        # Ticks: fixed 3 decimals + a bounded tick count, otherwise 2 decimals
+        # produce duplicate labels (0.04 showing up twice)
         ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(nbins=5, min_n_ticks=4))
         ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter("%.3f"))
         ax.grid(axis="y", color="#e6e5e1", lw=0.7, zorder=0)
@@ -89,12 +95,12 @@ def main():
     fig.savefig(args.out, facecolor=SURFACE, bbox_inches="tight")
     print(f"[out] {args.out}")
 
-    print("\n每通道的赢家:")
+    print("\nWinner per channel:")
     for p in panels:
         vals = {m: (R[m]["overall"] if p == "overall" else R[m]["per_channel"][p]) for m in methods}
         w = min(vals, key=vals.get)
         srt = sorted(vals.values())
-        print(f"  {p:<9} {w:<18} {srt[0]:.4f}  (次优 {srt[1]:.4f}, 领先 {(srt[1]-srt[0])/srt[1]*100:.1f}%)")
+        print(f"  {p:<9} {w:<18} {srt[0]:.4f}  (runner-up {srt[1]:.4f}, lead {(srt[1]-srt[0])/srt[1]*100:.1f}%)")
 
 
 if __name__ == "__main__":

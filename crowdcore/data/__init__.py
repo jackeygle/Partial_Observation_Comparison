@@ -1,4 +1,5 @@
-"""数据管线:ATC 的原始 CSV -> 每天一个 h5 -> 4 通道网格。
+"""Data pipeline: ATC's raw CSVs -> one h5 per day -> a 4-channel grid.
 
-见 DOC_data_pipeline.md。三个方法都读这一步的产物，谁都不该自己再解析 CSV。
+See DOC_data_pipeline.md. All three methods read this step's output; none should
+parse the CSVs itself.
 """

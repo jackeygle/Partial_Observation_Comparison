@@ -1,9 +1,12 @@
-"""compare — 跨方法的评测与画图，只有这里可以同时 import 多个方法。
+"""compare — cross-method evaluation and plotting. The only place allowed to import
+multiple methods at once.
 
-存在的理由:在这之前跨方法脚本散在两个地方 —— compare3/compare4 住在
-senseiver_crowd/checks/（却要读全部四方），eval_threeway_accuracy 住在
-4dvarnet_enkf/checks/。结果是同一个量有两个互相矛盾的脚本，4DVarNet 的
-盲区 RMSE 一个报 0.1912、一个报 0.2198，差 15% 至今没定位。
+Why this exists: before this, cross-method scripts were scattered in two places —
+compare3/compare4 lived under senseiver_crowd/checks/ (yet had to read all four
+methods), and eval_threeway_accuracy lived under 4dvarnet_enkf/checks/. The result
+was two mutually contradicting scripts for the same quantity: 4DVarNet's blind RMSE
+was reported as 0.1912 in one and 0.2198 in the other, a 15% gap never tracked down.
 
-一个量只应该有一处实现。新的跨方法评测放这里，不要放回某个方法的 checks/。
+Each quantity should have exactly one implementation. New cross-method evaluation
+goes here, not back into some method's checks/.
 """

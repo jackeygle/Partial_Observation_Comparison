@@ -1,0 +1,12 @@
+[members] 5 x runs/varnet_vsb0_s{}  dT=200  obs_every_k=1  dev=cuda
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/checks/eval_uncertainty.py", line 213, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/checks/eval_uncertainty.py", line 115, in main
+    valid = nav.build_valid_mask_from_config(X)
+            ^^^
+UnboundLocalError: cannot access local variable 'nav' where it is not associated with a value
+srun: error: gpu63: task 0: Exited with exit code 1
+srun: Terminating StepId=20091241.0

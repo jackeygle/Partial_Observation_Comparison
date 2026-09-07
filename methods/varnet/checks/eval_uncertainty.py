@@ -52,44 +52,24 @@ from crowdcore import config  # noqa: E402
 from crowdcore import navigation as nav  # noqa: E402
 from crowdcore import observation_model as om  # noqa: E402
 from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.dincae.state import channel_valid  # noqa: E402  -- the single definition of the defined convention
 
-SQRT2, SQRT_PI = np.sqrt(2.0), np.sqrt(np.pi)
+# The single implementation of CRPS / NLL / coverage / spread-skill lives in
+# compare/score_uncertainty.py. This file used to have a verbatim copy, and the
+# enkf side had a second one, kept in sync only by a comment saying "same as the
+# 4DVarNet side" -- DINCAE joining table B would have made a third copy, so it
+# was pulled out. Numerical equivalence checked: CRPS max|d|=6.7e-16, NLL
+# 8.9e-16, coverage 2.2e-8 (the differences come from torch.erf vs
+# scipy.norm.cdf and float32->float64).
+from compare import score_uncertainty as su                          # noqa: E402
 
-
-def crps_gaussian(mu, sigma, x):
-    """Closed-form CRPS of N(mu, sigma^2) against the observed x (Gneiting & Raftery 2007).
-
-        CRPS = sigma * [ z (2 Phi(z) - 1) + 2 phi(z) - 1/sqrt(pi) ],  z = (x - mu)/sigma
-
-    Lower is better, and it is in the units of x, so it can be read next to the RMSE.
-    """
-    z = (x - mu) / sigma
-    Phi = 0.5 * (1.0 + torch.erf(z / SQRT2))
-    phi = torch.exp(-0.5 * z ** 2) / np.sqrt(2 * np.pi)
-    return sigma * (z * (2 * Phi - 1) + 2 * phi - 1.0 / SQRT_PI)
-
-
-def nll_gaussian(mu, sigma, x):
-    return 0.5 * torch.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
-
-
-def coverage(mu, sigma, x, zs=range(10, 100, 10)):
-    """Fraction of truths inside the nominal z% Gaussian interval (their App. A.2)."""
-    from scipy.stats import norm
-    err = (x - mu).abs()
-    return {z: float((err <= norm.ppf(0.5 + z / 200) * sigma).float().mean()) for z in zs}
+crps_gaussian, nll_gaussian = su.crps_gaussian, su.nll_gaussian
 
 
 def score(mu, sigma, x, tag, out):
-    out[tag] = {
-        "rmse": float(torch.sqrt(((x - mu) ** 2).mean())),
-        "crps": float(crps_gaussian(mu, sigma, x).mean()),
-        "nll": float(nll_gaussian(mu, sigma, x).mean()),
-        "sigma_mean": float(sigma.mean()),
-        "spread_skill": float(sigma.mean() / torch.sqrt(((x - mu) ** 2).mean())),
-        "coverage": coverage(mu, sigma, x),
-        "n": int(x.numel()),
-    }
+    """Scores one slice, writing into out[tag]. Tensors are converted to numpy
+    here -- the data is already on the CPU anyway."""
+    out[tag] = su.score(mu, sigma, x)
     return out[tag]
 
 
@@ -189,6 +169,39 @@ def main():
     blind, obs = m == 0, m == 1
     for tag, sel in (("blind", blind), ("observed", obs)):
         score(mu[sel], C["sig_tot"][sel], x[sel], tag, R)
+
+    # ---- Main convention: defined = that channel is defined ∩ walkable -------------------------------
+    # Table A's main result is scored on exactly these cells, and DINCAE's
+    # sigma-hat is also scored on exactly these cells
+    # (methods/dincae/checks/eval_uncertainty_dincae.py). Without this section,
+    # table B's four rows would stand on two different cell sets and would not
+    # constitute a comparison at all.
+    # The rule is never copied: channel_valid is used directly from DINCAE's
+    # single definition (a module-level import, same source as compare5.py).
+    # **Do not write a function-local import here** -- the first version put
+    # `from crowdcore import navigation as nav` inside main(), which made nav a
+    # local name for the whole function, so the earlier use at line 115 raised
+    # an immediate UnboundLocalError and the job died in 7 seconds.
+    xn = x.numpy()
+    # channel_valid only requires the channel to be dim 1, which also holds for (N,C,T,H,W) -> (C,N,T,H,W)
+    cv = torch.from_numpy(np.ascontiguousarray(
+        channel_valid(xn).transpose(1, 0, *range(2, xn.ndim))))
+    walk = torch.from_numpy(nav.build_valid_mask_from_config()).bool()
+    dfn = cv & walk                                                     # broadcasts over the last two dims
+    for tag, sel in (("defined", dfn), ("defined_blind", dfn & blind),
+                     ("defined_observed", dfn & obs)):
+        score(mu[sel], C["sig_tot"][sel], x[sel], tag, R)
+        # each slice's own constant-sigma null model -- the baseline must use **that slice's** RMSE
+        cb = torch.full_like(x[sel], float(torch.sqrt(((x[sel] - mu[sel]) ** 2).mean())))
+        score(mu[sel], cb, x[sel], f"{tag}_constant_sigma_baseline", R)
+    # Same null model, but restricted to the blind cells. The headline accuracy table scores
+    # blind cells only, so a sigma-hat judged on blind cells has to be compared against a
+    # baseline built from the BLIND rmse -- reusing the global one above would put the metric
+    # and its own baseline on two different cell sets, which is exactly the mix-up the
+    # two-table split is meant to avoid.
+    cb = torch.full_like(C["sig_tot"][blind],
+                         float(torch.sqrt(((x[blind] - mu[blind]) ** 2).mean())))
+    score(mu[blind], cb, x[blind], "blind_constant_sigma_baseline", R)
     for c, nm in enumerate(config.get("grid", "channels")):
         score(mu[:, c], C["sig_tot"][:, c], x[:, c], f"channel_{nm}", R)
 

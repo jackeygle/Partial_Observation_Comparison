@@ -1,0 +1,176 @@
+{
+  "hw": {
+    "cpu": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+    "cores_avail": 4,
+    "node": "csl7",
+    "omp_threads": "unset",
+    "torch_threads": 4,
+    "gpu": null
+  },
+  "frames": 1000,
+  "repeats": 5,
+  "day": "atc-20130811",
+  "varnet_run": "a2",
+  "runs": {
+    "enkf_k1": {
+      "wall_mean": 194.447847732855,
+      "wall_std": 1.6984182935857202,
+      "wall_all": [
+        197.44251453317702,
+        195.13469771808013,
+        193.76749618910253,
+        192.85518708685413,
+        193.03934313706122
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.194447847732855,
+      "per_frame_std_s": 0.001698418293585723,
+      "window_frames": 1,
+      "per_frame_is_latency": true,
+      "latency_s": 0.194447847732855,
+      "latency_std_s": 0.001698418293585723,
+      "cores_used": 3.9852679239331446,
+      "desc": "EnKF k=1, optimised (bit-identical to the original)"
+    },
+    "enkf_k4": {
+      "wall_mean": 74.69097738382406,
+      "wall_std": 0.3206903641748559,
+      "wall_all": [
+        75.16667621396482,
+        74.95027213194408,
+        74.60880869207904,
+        74.38513852609321,
+        74.34399135503918
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.07469097738382405,
+      "per_frame_std_s": 0.0003206903641748574,
+      "window_frames": 1,
+      "per_frame_is_latency": true,
+      "latency_s": 0.07469097738382405,
+      "latency_std_s": 0.0003206903641748574,
+      "cores_used": 3.9852304296537384,
+      "desc": "EnKF k=4, optimised"
+    },
+    "varnet_k1": {
+      "wall_mean": 7.285220533655957,
+      "wall_std": 0.06918069127077299,
+      "wall_all": [
+        7.343737668124959,
+        7.278330230154097,
+        7.3334557770285755,
+        7.316361234057695,
+        7.154217758914456
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.0072852205336559565,
+      "per_frame_std_s": 6.918069127077294e-05,
+      "window_frames": 200,
+      "per_frame_is_latency": false,
+      "latency_s": 1.4570441067311912,
+      "latency_std_s": 0.013836138254154588,
+      "cores_used": 3.9804381586889,
+      "desc": "4DVarNet k=1 (a2)"
+    },
+    "varnet_k4": {
+      "wall_mean": 7.249400093406439,
+      "wall_std": 0.022065271535617343,
+      "wall_all": [
+        7.26066637202166,
+        7.28529190691188,
+        7.220785169862211,
+        7.243902852060273,
+        7.23635416617617
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.007249400093406438,
+      "per_frame_std_s": 2.206527153561737e-05,
+      "window_frames": 200,
+      "per_frame_is_latency": false,
+      "latency_s": 1.4498800186812877,
+      "latency_std_s": 0.004413054307123474,
+      "cores_used": 3.9838238038292517,
+      "desc": "4DVarNet k=4 (a2)"
+    },
+    "varnet_single": {
+      "wall_mean": 3.2639805119484664,
+      "wall_std": 0.014435657544820017,
+      "wall_all": [
+        3.2744409998413175,
+        3.279343819944188,
+        3.25924343499355,
+        3.2684658458456397,
+        3.238408459117636
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.003263980511948467,
+      "per_frame_std_s": 1.4435657544819991e-05,
+      "window_frames": 200,
+      "per_frame_is_latency": false,
+      "latency_s": 0.6527961023896933,
+      "latency_std_s": 0.0028871315089639984,
+      "cores_used": 3.983561881967906,
+      "desc": "4DVarNet, 1 member (runs/varnet_vsb0_s0)"
+    },
+    "varnet_ens5": {
+      "wall_mean": 15.286336941411719,
+      "wall_std": 0.2620684949718911,
+      "wall_all": [
+        15.64151558605954,
+        15.198192727053538,
+        15.379586593946442,
+        15.366848309990019,
+        14.845541490009055
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.015286336941411719,
+      "per_frame_std_s": 0.00026206849497189074,
+      "window_frames": 200,
+      "per_frame_is_latency": false,
+      "latency_s": 3.0572673882823436,
+      "latency_std_s": 0.05241369899437815,
+      "cores_used": 3.983596005285528,
+      "desc": "4DVarNet deep ensemble, 5 members + Sec. 2.4 combination"
+    },
+    "dincae": {
+      "wall_mean": 2.409298246121034,
+      "wall_std": 0.0017838987100405092,
+      "wall_all": [
+        2.410412738798186,
+        2.4102088268846273,
+        2.4112061539199203,
+        2.4062213639263064,
+        2.40844214707613
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.002409298246121034,
+      "per_frame_std_s": 1.7838987100405061e-06,
+      "window_frames": 1,
+      "per_frame_is_latency": true,
+      "latency_s": 0.002409298246121034,
+      "latency_std_s": 1.7838987100405061e-06,
+      "cores_used": 3.9866703578900355,
+      "desc": "DINCAE, 1 checkpoint (ckpt_00070.pt)"
+    },
+    "senseiver": {
+      "wall_mean": 0.6418064494151622,
+      "wall_std": 0.004769651719885467,
+      "wall_all": [
+        0.6406644589733332,
+        0.6372835740912706,
+        0.6385919409804046,
+        0.6508413860574365,
+        0.6416508869733661
+      ],
+      "n_frames": 1000,
+      "per_frame_s": 0.0006418064494151622,
+      "per_frame_std_s": 4.76965171988545e-06,
+      "window_frames": 1,
+      "per_frame_is_latency": true,
+      "latency_s": 0.0006418064494151622,
+      "latency_std_s": 4.76965171988545e-06,
+      "cores_used": 3.9843969617308006,
+      "desc": "Senseiver, 1 model (best.pt)"
+    }
+  }
+}

@@ -1,25 +1,30 @@
 """
-rewrite_sbatch.py — Phase 3：把 34 个 sbatch 脚本改成新的调用方式（一次性工具）
+rewrite_sbatch.py — Phase 3: convert 34 sbatch scripts to the new calling convention (a one-off tool)
 
-改三件事：
+Three changes:
 
   1. `module load ...`  ->  `source <root>/sbatch/_env.sh`
-     _env.sh 负责 module load、PYTHONPATH、PYTHONSAFEPATH，只有一处定义。
-     **`cd <方法目录>` 保留**（路径更新到新位置）：脚本里 118 处相对路径都相对于
-     方法目录，保留 cd 就一处都不用改。PYTHONSAFEPATH=1 已经把 cwd 挡在 sys.path
-     外，所以待在方法目录是安全的。
+     _env.sh handles module load, PYTHONPATH, PYTHONSAFEPATH -- defined in one
+     place. **`cd <method dir>` is kept** (path updated to the new location):
+     118 relative paths in the scripts are all relative to the method
+     directory, so keeping cd means none of them need to change.
+     PYTHONSAFEPATH=1 already keeps cwd off sys.path, so staying in the method
+     directory is safe.
 
-  2. `python3 -u <脚本路径>.py`  ->  `python3 -u -m <包路径>`
-     必须用 -m。`python3 methods/varnet/train.py` 会把 methods/varnet/ 塞到
-     sys.path[0]，三份同名 losses.py 互相顶掉的问题就回来了。
+  2. `python3 -u <script path>.py`  ->  `python3 -u -m <package path>`
+     -m is required. `python3 methods/varnet/train.py` would put
+     methods/varnet/ onto sys.path[0], bringing back the problem of the three
+     same-named losses.py files shadowing each other.
 
-  3. `#SBATCH --output=` 里的旧目录 -> 新目录。
+  3. The old directory in `#SBATCH --output=` -> the new directory.
 
-脚本里的相对路径（--outdir runs/varnet_b0_k1、sbatch/submit_x_chain.sbatch 的自我重投
-之类）一处都不用改，因为 cwd 仍然是方法目录。这是刻意的：第一版让 _env.sh 把 cwd 挪到
-仓库根，那会让 118 处相对路径全部指错 —— 纯风险没有收益。
+Relative paths in the scripts (--outdir runs/varnet_b0_k1, submit_x_chain.sbatch's
+self-resubmission, and the like) don't need to change at all, because cwd stays
+the method directory. This is deliberate: the first version had _env.sh move cwd
+to the repo root, which would have pointed all 118 relative paths somewhere
+wrong -- pure risk, no benefit.
 
-用法:
+Usage:
     python3 refactor_baseline/rewrite_sbatch.py            # dry-run
     python3 refactor_baseline/rewrite_sbatch.py --apply
 """
@@ -33,13 +38,13 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OLD = "/scratch/work/zhangx29/Thesis_Project"
 
-#: 旧方法目录 -> 新方法目录
+#: old method directory -> new method directory
 DIRMAP = {
     "4dvarnet_enkf": "methods/varnet",
     "dincae_crowd": "methods/dincae",
     "senseiver_crowd": "methods/senseiver",
 }
-#: 旧脚本相对路径 -> 新包路径。checks/ 里跨方法的那些已经搬到 compare/。
+#: old script relative path -> new package path. The cross-method ones from checks/ have already moved to compare/.
 MOVED_TO_COMPARE = {"eval_threeway_accuracy", "compare_channels", "plot_comparison",
                     "plot_reconstruction_enkf", "bench_speed", "plot_speed",
                     "plot_frameworks", "compare3", "compare4", "plot_compare3"}
@@ -47,13 +52,13 @@ MOVED_TO_ENKF = {"bench_enkf_opt", "bench_enkf_split", "diag_enkf_spread_growth"
                  "diag_sparsification_enkf", "eval_uncertainty_enkf", "export_obs_for_enkf",
                  "run_enkf_baseline", "score_enkf", "verify_enkf_gain_mode",
                  "verify_enkf_opt", "plot_velocity_enkf"}
-#: 顶层脚本改名
+#: top-level script rename
 RENAMED = {"train_varnet": "train"}
 
 
 def module_for(old_dir: str, script_rel: str) -> str:
     """('4dvarnet_enkf', 'checks/eval_threeway_accuracy.py') -> 'compare.eval_threeway_accuracy'"""
-    parts = script_rel[:-3].split("/")            # 去掉 .py
+    parts = script_rel[:-3].split("/")            # strip .py
     stem = parts[-1]
     if stem in MOVED_TO_COMPARE:
         return f"compare.{stem}"
@@ -81,12 +86,14 @@ def main():
             orig = s
             rel = os.path.relpath(p, ROOT)
 
-            # 找出这个脚本原来属于哪个方法
+            # figure out which method this script originally belonged to
             owner = next((d for d in DIRMAP if f"{OLD}/{d}" in s), None)
 
-            # 1) 旧目录 -> 新目录。两种形态都要管：带尾斜杠的（--output=.../runs/...）
-            # 和行尾没有斜杠的（`cd .../4dvarnet_enkf`）。第一版只替了前者，于是
-            # cd 行一个都没改到 —— 而那正是最要紧的一行。
+            # 1) old directory -> new directory. Both forms need handling: with
+            # a trailing slash (--output=.../runs/...) and without one at the
+            # end of the line (`cd .../4dvarnet_enkf`). The first version only
+            # replaced the former, so not a single cd line got fixed -- and
+            # that is the single most important line.
             for old_d, new_d in DIRMAP.items():
                 s = s.replace(f"{OLD}/{old_d}/", f"{OLD}/{new_d}/")
                 s = re.sub(rf"{re.escape(OLD)}/{re.escape(old_d)}(?=$|[\s\"'])",
@@ -101,11 +108,13 @@ def main():
 
             s = re.sub(r"(python3 (?:-u )?)([\w/]+\.py)(.*)$", fix_run, s, flags=re.M)
 
-            # 3) `module load ...` -> `source _env.sh`，**cd 保留**
+            # 3) `module load ...` -> `source _env.sh`, **cd kept**
             #
-            # _env.sh 刻意不 cd：各脚本里有 118 处相对路径（runs/、check_outputs/、
-            # sbatch/ 的自我重投）全都相对于方法目录。保留 cd 就一处都不用改；
-            # PYTHONSAFEPATH=1 已经把 cwd 挡在 sys.path 外，所以留在方法目录是安全的。
+            # _env.sh deliberately does not cd: the scripts have 118 relative
+            # paths (runs/, check_outputs/, sbatch/'s self-resubmission) all
+            # relative to the method directory. Keeping cd means none of them
+            # need to change; PYTHONSAFEPATH=1 already keeps cwd off sys.path,
+            # so staying in the method directory is safe.
             if owner:
                 s = re.sub(r"^module load [^\n]*\n",
                            f"source {OLD}/sbatch/_env.sh\n", s, count=1, flags=re.M)
@@ -119,13 +128,15 @@ def main():
                 if args.apply:
                     open(p, "w").write(s)
 
-            # cwd 仍是方法目录，相对路径参数不需要动 —— 只在没有 cd 的脚本里才要看
+            # cwd is still the method directory, relative-path arguments don't
+            # need touching -- only worth checking scripts without a cd
             if owner and f"cd {OLD}/{DIRMAP[owner]}" not in s:
-                manual.append((rel, "没有 cd 到方法目录，相对路径要确认"))
+                manual.append((rel, "no cd to the method directory, relative paths need confirming"))
 
-    print(f"\n{n} 个 sbatch 改写" + ("（已写入）" if args.apply else "（dry-run）"))
+    print(f"\n{n} sbatch scripts rewritten" + (" (written)" if args.apply else " (dry-run)"))
     if manual:
-        print(f"\ncwd 从方法目录变成了仓库根，以下相对路径参数需人工确认（{len(manual)} 处）:")
+        print(f"\ncwd changed from the method directory to the repo root; the following "
+              f"relative-path arguments need manual confirmation ({len(manual)}):")
         for rel, arg in manual:
             print(f"    {rel}: {arg}")
     return 0

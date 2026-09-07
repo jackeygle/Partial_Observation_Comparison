@@ -1,32 +1,43 @@
 """
-sensors.py — 观测 -> 变长传感器 token 集
+sensors.py — observation -> variable-length sensor token set
 ==========================================
 
-参考实现里这一步只有两行（`dataloaders.py:164-165`）：
+In the reference implementation this step is only two lines
+(`dataloaders.py:164-165`):
 
     sensor_values = self.indexed_sensors[frames,]                     # (B, Ns, C)
     sensor_values = torch.cat([sensor_values, self.sensor_positions], -1)
 
-因为它的传感器是**固定的一组格子**，Ns 是常数，位置编码可以预先 repeat 好。
-我们的传感器是**移动机器人**，每一帧看到的格子集合和数量都不同，所以这一步
-必须重做：逐帧取观测格 -> 拼位置编码 -> padding 到批内最大长度 -> 生成 pad_mask。
+because its sensors are a **fixed set of cells**, Ns is a constant, and the
+positional encoding can be pre-repeated. Our sensors are **moving robots**, and
+the set and count of cells observed differ every frame, so this step has to be
+redone: fetch this frame's observed cells -> concatenate positional encoding ->
+pad to the batch's max length -> generate a pad_mask.
 
-一个 "传感器" = 一个被观测到的格子；它的读数是该格的 C 维向量，这正是论文
-`s_i ∈ R^{N_c}`（多通道传感器）的设定。token = [C 个通道值, P 维位置编码]，
-与参考实现的拼接顺序一致。
+One "sensor" = one observed cell; its reading is that cell's C-dimensional
+vector, exactly the paper's `s_i in R^{N_c}` (multi-channel sensor) setup.
+token = [C channel values, P-dim positional encoding], matching the reference
+implementation's concatenation order.
 
-两处必须自己定的事（参考实现给不出答案）：
+Two things that had to be decided ourselves (the reference implementation gives
+no answer):
 
- 1. **输入标准化**。参考实现的 5 个数据集全是单通道，`datasets.py` 里只做了一个
-    全局标量除法（`sea /= sea.max()`、`cyl / 11.0960`）。我们有 4 个尺度差一个
-    量级以上的通道（std 分别约 0.17 / 0.46 / 0.16 / 0.11）。这里做**逐通道标准化，
-    且只作用于编码器输入**——目标与损失一律留在原始场上。理由：对比口径是原始场
-    上的四通道无权重 MSE，任何对目标的逐通道缩放都等价于偷偷给损失加权重。
-    输入侧的标准化只是特征调理，不改变被优化的量。
+ 1. **Input normalisation.** The reference implementation's 5 datasets are all
+    single-channel, and `datasets.py` only does one global scalar division
+    (`sea /= sea.max()`, `cyl / 11.0960`). We have 4 channels whose scales differ
+    by more than an order of magnitude (std about 0.17 / 0.46 / 0.16 / 0.11
+    respectively). Here we do **per-channel standardisation, applied only to the
+    encoder's input** -- the target and the loss stay on the raw field
+    throughout. Reason: the comparison convention is unweighted 4-channel MSE on
+    the raw field, and any per-channel scaling of the target would be secretly
+    adding a weight to the loss. Standardising the input is just feature
+    conditioning; it does not change the quantity being optimised.
 
- 2. **空传感器集**。`obs_every_k > 1` 时有的帧一个观测都没有，此时 cross-attention
-    的 K/V 为空，softmax 会产生 NaN。这里放一个全零的哑 token 并把它标为有效，
-    模型对这种帧只能输出一个常数场——这是信息上的事实，不是实现缺陷。
+ 2. **Empty sensor sets.** When `obs_every_k > 1`, some frames have no
+    observation at all, and empty K/V in cross-attention makes softmax produce
+    NaN. Here a single all-zero dummy token is inserted and marked valid; the
+    model can only output a constant field for such a frame -- that is an
+    informational fact, not an implementation flaw.
 """
 from __future__ import annotations
 
@@ -35,19 +46,20 @@ import torch
 
 
 def build_batch(Y_flat, Omega_flat, pos_enc, in_mean, in_std):
-    """把一批帧的观测打成 padding 好的传感器 token 批。
+    """Packs a batch of frames' observations into a padded batch of sensor tokens.
 
-    输入
-        Y_flat     (B, C, HW) float32   带噪的部分观测（未观测处为 0）
-        Omega_flat (B, HW)    bool      该帧哪些格子被观测到
-        pos_enc    (HW, P)    float32   全网格的位置编码（positional.PositionalEncoder）
-        in_mean/in_std (C,)   float32   编码器输入的逐通道标准化统计量
+    Input
+        Y_flat     (B, C, HW) float32   noisy partial observation (0 where unobserved)
+        Omega_flat (B, HW)    bool      which cells were observed in that frame
+        pos_enc    (HW, P)    float32   positional encoding for the whole grid
+                                        (positional.PositionalEncoder)
+        in_mean/in_std (C,)   float32   the encoder input's per-channel standardisation statistics
 
-    输出
+    Output
         tokens   (B, Nmax, C+P) float32 torch
-        pad_mask (B, Nmax)      bool    torch，True = padding 位（送给
-                                        nn.MultiheadAttention 的 key_padding_mask）
-        n_sens   (B,)           int     每帧真实的传感器数（诊断用）
+        pad_mask (B, Nmax)      bool    torch, True = a padding slot (fed to
+                                        nn.MultiheadAttention's key_padding_mask)
+        n_sens   (B,)           int     the actual number of sensors per frame (for diagnostics)
     """
     B, C, _ = Y_flat.shape
     P = pos_enc.shape[1]
@@ -56,13 +68,13 @@ def build_batch(Y_flat, Omega_flat, pos_enc, in_mean, in_std):
     n_max = max(1, int(n_sens.max()))
 
     tokens = np.zeros((B, n_max, C + P), dtype=np.float32)
-    pad_mask = np.ones((B, n_max), dtype=bool)              # 先全标为 padding
+    pad_mask = np.ones((B, n_max), dtype=bool)              # start with everything marked as padding
     for b, ii in enumerate(idx):
         if len(ii) == 0:
-            pad_mask[b, 0] = False                          # 空集合：留一个全零哑 token
+            pad_mask[b, 0] = False                          # empty set: leave one all-zero dummy token
             continue
         v = Y_flat[b][:, ii].T                              # (n_b, C)
-        tokens[b, :len(ii), :C] = (v - in_mean) / in_std    # 只标准化输入
+        tokens[b, :len(ii), :C] = (v - in_mean) / in_std    # only the input is standardised
         tokens[b, :len(ii), C:] = pos_enc[ii]
         pad_mask[b, :len(ii)] = False
 
@@ -71,14 +83,19 @@ def build_batch(Y_flat, Omega_flat, pos_enc, in_mean, in_std):
 
 
 def query_all(pos_enc, batch):
-    """查询整张网格。返回 (batch, HW, P)。
+    """Queries the entire grid. Returns (batch, HW, P).
 
-    参考实现每步只随机查 `batch_pixels` 个像素，因为它的域大到无法整张查
-    （3D 孔隙是 128x128x512）。ATC 只有 36x12=432 格，整张查一次的代价可以忽略，
-    所以不做像素抽样——这减少了一个与论文无关的随机性来源。
+    The reference implementation randomly queries only `batch_pixels` pixels per
+    step, because its domain is too large to query in full (a 3D porous medium
+    is 128x128x512). ATC is only 36x12=432 cells, so querying the whole grid at
+    once is negligible cost, and no pixel subsampling is done -- removing one
+    source of randomness unrelated to the paper.
 
-    参考实现的 `pix_avail`(值为 0 的格子不参与) 在这里**直接取消**：它的用途是
-    跳过"没有值可重建"的格子（海温的大陆、孔隙的固体）。ATC 网格上不存在这样的
-    格子——非 walkable 区同样有真值，评估口径也会给它打分——所以全部 432 格都要查。
+    The reference implementation's `pix_avail` (cells with value 0 do not
+    participate) is **removed outright** here: its purpose is to skip cells with
+    "nothing to reconstruct" (land in sea-temperature data, solid material in
+    porous media). No such cells exist on the ATC grid -- non-walkable regions
+    still have a ground truth, and the evaluation convention scores them too --
+    so all 432 cells must be queried.
     """
     return pos_enc[None].expand(batch, -1, -1)

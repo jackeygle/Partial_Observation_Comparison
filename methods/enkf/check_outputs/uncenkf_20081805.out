@@ -1,0 +1,22 @@
+  [k=1] est_atc-20130811.npz
+  [k=1] est_atc-20130818.npz
+  [k=1] est_atc-20130825.npz
+  [k=1] est_atc-20130901.npz
+  [k=1] est_atc-20130915.npz
+  [k=1] est_atc-20130922.npz
+  [k=1] est_atc-20130929.npz
+  [k=1] second pass, constant sigma = all 0.2388, blind 0.2150
+
+[k=1] 7 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2388   0.1472   1.673e+18   0.0025   0.011    2.24%
+blind                   0.2150   0.1326   2.572e+18   0.0025   0.012    2.78%
+observed                0.2632   0.1638   6.540e+17   0.0025   0.010    1.63%
+channel_density         0.1428   0.0743   6.223e+18   0.0006   0.004    4.76%
+channel_vx              0.3809   0.2371   5.746e+03   0.0037   0.010    1.95%
+channel_vy              0.1539   0.0978   5.602e+03   0.0016   0.010    2.13%
+channel_var             0.1973   0.1798   4.685e+17   0.0043   0.022    0.14%
+all_constant_sigma_baseline  0.2388   0.1165  -1.326e-02   0.2388   1.000   94.37%
+blind_constant_sigma_baseline  0.2150   0.1046  -1.182e-01   0.2150   1.000   95.43%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json
+

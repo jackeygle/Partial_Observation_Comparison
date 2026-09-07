@@ -1,40 +1,49 @@
 """
-calibrate_decay.py — 标定 age-dependent σ² 需要的表
+calibrate_decay.py — calibrate the tables needed for an age-dependent sigma^2
 ===================================================
 
-DINCAE 的输入是 `y/σ²` 和 `1/σ²`，缺测 = 两者皆 0（1.0 §3 / 2.0 §2.3）。我们的观测还多一个
-维度：**它有多旧**。诊断显示未观测格子上"最近一次观测"的年龄中位数是 9 s，而场 2 s 就去相关
-（见 README），所以照搬 carry-forward 会系统性地喂过期数据。
+DINCAE's input is `y/sigma^2` and `1/sigma^2`, missing = both are 0 (1.0 sec.3 /
+2.0 sec.2.3). Our observations have one more dimension: **how old they are**.
+Diagnostics show the median age of "most recent observation" on unobserved cells
+is 9 s, while the field decorrelates in 2 s (see README), so naive carry-forward
+would systematically feed in stale data.
 
-正确做法是把 age 秒前的观测按其相关性向逐格均值场收缩（BLUE）：
+The correct approach is to shrink an observation from `age` seconds ago toward
+the per-cell mean field, weighted by its correlation (BLUE):
 
-    ŷ(age)      = stats + AC(age) · (y_old − stats)
-    σ²_eff(age) = AC(age)² · σ²_obs + (1 − AC(age)²) · Var_resid
+    y_hat(age)      = stats + AC(age) * (y_old - stats)
+    sigma^2_eff(age) = AC(age)^2 * sigma^2_obs + (1 - AC(age)^2) * Var_resid
 
-age=0 时退化为 σ²_obs；age→∞ 时 AC→0，σ²_eff→Var_resid，输入自动变成"无信息"。
-本脚本产出标定这条公式所需的一切：
+At age=0 this degenerates to sigma^2_obs; as age -> infinity, AC -> 0 and
+sigma^2_eff -> Var_resid, so the input automatically becomes "uninformative".
+This script produces everything needed to calibrate this formula:
 
-  1. **逐格均值场** stats[c, cell, bin] —— 逐格 × time-of-day 分箱均值（在训练日上算）。
-     箱宽由**留出日的 MSE** 选，不是拍的。
-  2. **AC_c(lag)** —— 残差（已减逐格均值场）的时间自相关，逐通道
-  3. **Var_resid[c, cell]** —— 逐格残差方差（= AC→0 时 σ²_eff 的上限）
-  4. **P_occ(lag)** —— P(t+lag 有人 | t 有人)。速度信息衰减有两个原因：流动变了、以及
-     格子空了。AC 只管第一个，这张表管第二个。
+  1. **The per-cell mean field** stats[c, cell, bin] -- per-cell x
+     time-of-day-bin mean (computed on training days). The bin width is chosen
+     by **held-out-day MSE**, not guessed.
+  2. **AC_c(lag)** -- the temporal autocorrelation of the residual (after
+     subtracting the per-cell mean field), per channel
+  3. **Var_resid[c, cell]** -- per-cell residual variance (= the ceiling of
+     sigma^2_eff as AC -> 0)
+  4. **P_occ(lag)** -- P(occupied at t+lag | occupied at t). Velocity
+     information decays for two reasons: the flow changed, and the cell emptied
+     out. AC only accounts for the first; this table accounts for the second.
 
-**逐通道有效性**（`channel_valid`）—— 4 个通道"在哪些 (帧,格) 上有定义"各不相同，所有
-统计量都只在有定义的地方算，否则占位符 0 会污染统计：
+**Per-channel validity** (`channel_valid`) -- where each of the 4 channels "is
+defined" differs, and every statistic is computed only where defined, otherwise
+the placeholder 0 would pollute the statistics:
 
-  density : 处处有定义（density=0 是一个真实测量："这里没人"）
-  vx, vy  : `density > 0` —— 空格子的速度是占位符
-            （`h5_to_grid.py`: `vel = where(density>0, vel/density, 0)`）
-  var     : `vel_var > 0` ⟺ 格内至少 2 个人
-            （`h5_to_grid.py:128`: `vel_var[nnz <= 1] = 0`，1 个点的方差无定义）
+  density : defined everywhere (density=0 is a genuine measurement: "nobody is here")
+  vx, vy  : `density > 0` -- velocity on an empty cell is a placeholder
+            (`h5_to_grid.py`: `vel = where(density>0, vel/density, 0)`)
+  var     : `vel_var > 0` <=> at least 2 people in the cell
+            (`h5_to_grid.py:128`: `vel_var[nnz <= 1] = 0`, variance of 1 point is undefined)
 
-输出: decay_tables.npz + decay_tables.json（人类可读摘要）
+Output: decay_tables.npz + decay_tables.json (a human-readable summary)
 
-用法（纯 numpy/scipy，登录节点可跑）:
-    python3 calibrate_decay.py                  # 全部 32 训练日
-    python3 calibrate_decay.py --days 3         # 冒烟测试
+Usage (pure numpy/scipy, the login node is fine):
+    python3 calibrate_decay.py                  # all 32 training days
+    python3 calibrate_decay.py --days 3         # smoke test
 """
 from __future__ import annotations
 
@@ -46,34 +55,39 @@ import sys
 import h5py
 import numpy as np
 
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
+# Scripts in checks/ import source modules from the project root; the root must
+# be inserted at the front (so this directory's losses.py takes priority),
+# 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
+# at the front would shadow this directory's).
 from crowdcore import config                                                    # noqa: E402
 from crowdcore import navigation as nav                                         # noqa: E402
 from crowdcore import observation_model as om                                    # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# ATC 在大阪 (UTC+9)。time 是 unix 秒；time-of-day 必须用当地时间，否则分箱会跨日切断。
+# ATC is in Osaka (UTC+9). time is unix seconds; time-of-day must use local time,
+# otherwise binning would cut across day boundaries.
 TZ_OFFSET = 9 * 3600
-BASE_BIN = 300                       # 累加分辨率(s)；候选箱宽必须是它的整数倍
-#   86400 = 单箱 = 退化成"逐格全时段均值"(不做 time-of-day 分箱)，作为对照下界。
-#   候选必须两端都留出余量，否则"数据驱动"的选择只是撞到搜索范围的边界。
+BASE_BIN = 300                       # accumulation resolution (s); candidate bin widths must be integer multiples of it
+#   86400 = a single bin = degenerates to "per-cell all-time mean" (no
+#   time-of-day binning), used as a reference lower bound.
+#   Candidates must leave headroom on both ends, otherwise a "data-driven"
+#   choice is just hitting the edge of the search range.
 BIN_CANDIDATES = (300, 900, 1800, 3600, 7200, 14400, 86400)
 CHANNELS = ("density", "vx", "vy", "var")
 NCH = len(CHANNELS)
 
-# 稠密到几何递增：p90(age)=35 s，尾部留到 512 s
+# Dense then geometrically increasing: p90(age)=35 s, tail extends to 512 s
 LAGS = (0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512)
 
 
 def tod_bin(t: np.ndarray) -> np.ndarray:
-    """unix 秒 -> BASE_BIN 分辨率的 time-of-day 箱号。"""
+    """unix seconds -> time-of-day bin index at BASE_BIN resolution."""
     return (((t.astype(np.int64) + TZ_OFFSET) % 86400) // BASE_BIN).astype(np.int64)
 
 
 def channel_valid(X):
-    """(NCH, T, H, W) bool —— 每个通道在哪些 (帧, 格) 上**有定义**。见模块 docstring。"""
+    """(NCH, T, H, W) bool -- where each channel **is defined** (frame, cell). See the module docstring."""
     occ = X[:, 0] > 0
     return np.stack([np.ones_like(occ), occ, occ, X[:, 3] > 0])
 
@@ -84,13 +98,13 @@ def load_day(fp):
 
 
 # --------------------------------------------------------------------------- #
-# Pass A：累加逐格均值场（BASE_BIN 分辨率，之后池化到更宽的箱）
+# Pass A: accumulate the per-cell mean field (at BASE_BIN resolution, later pooled into wider bins)
 # --------------------------------------------------------------------------- #
 def accumulate_mean_field(files, valid):
     nbin = 86400 // BASE_BIN
     H, W = valid.shape
-    s = np.zeros((NCH, H, W, nbin))          # Σ 值（只累加有定义的）
-    n = np.zeros((NCH, H, W, nbin))          # 有定义的样本数
+    s = np.zeros((NCH, H, W, nbin))          # sum of values (only where defined)
+    n = np.zeros((NCH, H, W, nbin))          # number of defined samples
 
     for k, fp in enumerate(files):
         X, t = load_day(fp)
@@ -107,7 +121,7 @@ def accumulate_mean_field(files, valid):
 
 
 def pool_mean_field(s, n, bin_width):
-    """池化到 bin_width。样本数为 0 的箱回退到该格子的全时段均值，全无样本则 0。"""
+    """Pools to bin_width. A bin with zero samples falls back to that cell's all-time mean; if there are no samples at all, 0."""
     assert bin_width % BASE_BIN == 0
     g = bin_width // BASE_BIN
     pool = lambda a: a.reshape(*a.shape[:-1], -1, g).sum(-1)
@@ -115,16 +129,17 @@ def pool_mean_field(s, n, bin_width):
 
     stats = np.zeros_like(sp)
     tot_s, tot_n = sp.sum(-1, keepdims=True), np_.sum(-1, keepdims=True)
-    fb = np.where(tot_n > 0, tot_s / np.maximum(tot_n, 1), 0.0)     # 该格子的全时段均值
+    fb = np.where(tot_n > 0, tot_s / np.maximum(tot_n, 1), 0.0)     # that cell's all-time mean
     stats = np.where(np_ > 0, sp / np.maximum(np_, 1), fb)
     return stats
 
 
 def score_mean_field(files, valid, clims):
-    """留出日上的逐格均值场 MSE，逐通道只在**有定义**的 (帧,格) 上算。
+    """Per-cell mean field MSE on held-out days, per channel, computed only on **defined** (frame, cell) pairs.
 
-    `clims` = {bin_width: stats}。每个 dev 日**只读一次**，同时给所有候选箱宽打分
-    （否则 7 候选 × 7 天 = 49 次 280 MB 读盘）。
+    `clims` = {bin_width: stats}. Each dev day is **read only once**, scoring all
+    candidate bin widths at the same time (otherwise 7 candidates x 7 days = 49
+    reads of 280 MB each).
     """
     se = {bw: np.zeros(NCH) for bw in clims}
     cnt = {bw: np.zeros(NCH) for bw in clims}
@@ -144,14 +159,14 @@ def score_mean_field(files, valid, clims):
 
 
 # --------------------------------------------------------------------------- #
-# Pass B：残差的时间自相关 + 占用持续概率
+# Pass B: residual temporal autocorrelation + occupancy persistence probability
 # --------------------------------------------------------------------------- #
 def accumulate_autocorr(files, valid, stats, bin_width):
     g = bin_width // BASE_BIN
     nL = len(LAGS)
-    cross = np.zeros((NCH, nL))       # Σ a_t · a_{t+L}
-    e_lo = np.zeros((NCH, nL))        # Σ a_t²      （同样的配对）
-    e_hi = np.zeros((NCH, nL))        # Σ a_{t+L}²
+    cross = np.zeros((NCH, nL))       # sum a_t * a_{t+L}
+    e_lo = np.zeros((NCH, nL))        # sum a_t^2      (same pairing)
+    e_hi = np.zeros((NCH, nL))        # sum a_{t+L}^2
     cnt = np.zeros((NCH, nL))
     occ_pair = np.zeros(nL)
     occ_lo = np.zeros(nL)
@@ -176,7 +191,7 @@ def accumulate_autocorr(files, valid, stats, bin_width):
             hi = slice(None, None) if L == 0 else slice(L, None)
             occ_pair[li] += (occ[lo] & occ[hi]).sum(); occ_lo[li] += occ[lo].sum()
             for c in range(NCH):
-                m = cv[c][lo] & cv[c][hi]                          # 两端都有定义
+                m = cv[c][lo] & cv[c][hi]                          # both ends defined
                 x, y = a[c][lo], a[c][hi]
                 cross[c, li] += (x * y * m).sum()
                 e_lo[c, li] += (x * x * m).sum()
@@ -194,7 +209,7 @@ def accumulate_autocorr(files, valid, stats, bin_width):
 # --------------------------------------------------------------------------- #
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=0, help="只用前 N 个训练日(冒烟测试)")
+    ap.add_argument("--days", type=int, default=0, help="use only the first N training days (smoke test)")
     ap.add_argument("--out", default=os.path.join(ROOT, "decay_tables"))
     args = ap.parse_args()
 
@@ -204,24 +219,24 @@ def main():
         train, dev_days = train[: args.days], dev_days[:1]
     print(f"train days {len(train)}, dev days {len(dev_days)}, channels {CHANNELS}")
 
-    valid = nav.build_valid_mask_from_config()               # 跨日一致(训练集 visited 并集)
+    valid = nav.build_valid_mask_from_config()               # consistent across days (union of the training set's visited cells)
     print(f"walkable cells {valid.sum()}/{valid.size}")
 
     print("Pass A: state_stats")
     s, n = accumulate_mean_field(train, valid)
 
-    print("\n箱宽选择(dev 日 MSE，越小越好):")
+    print("\nBin width selection (dev-day MSE, lower is better):")
     clims = {bw: pool_mean_field(s, n, bw) for bw in BIN_CANDIDATES}
     scores = score_mean_field(dev_days, valid, clims)
     for bw in BIN_CANDIDATES:
-        tag = "  (= 无 time-of-day 分箱)" if bw == 86400 else ""
+        tag = "  (= no time-of-day binning)" if bw == 86400 else ""
         print("  bin %6ds : " % bw
               + "  ".join("%s %.5f" % (c, scores[bw][i]) for i, c in enumerate(CHANNELS))
               + tag)
     best = min(BIN_CANDIDATES, key=lambda bw: scores[bw][0])
     if best in (BIN_CANDIDATES[0], BIN_CANDIDATES[-1]):
-        print(f"  ! 最优落在候选范围的边界({best}s) —— 该扩大 BIN_CANDIDATES 再选一次")
-    print(f"  -> 选 bin_width = {best} s  (按 density 的 dev MSE)")
+        print(f"  ! the optimum falls on the edge of the candidate range ({best}s) -- widen BIN_CANDIDATES and reselect")
+    print(f"  -> selected bin_width = {best} s  (by density's dev MSE)")
     stats = clims[best]
 
     print("\nPass B: residual autocorrelation")
@@ -255,7 +270,7 @@ def main():
     print("P(occ|occ)" + " ".join("%6.3f" % v for v in p_occ))
     print("\nVar_resid (mean over cells): "
           + "  ".join("%s %.5f" % (c, var_cell[i].mean()) for i, c in enumerate(CHANNELS)))
-    print("σ²_obs                    : "
+    print("sigma^2_obs                : "
           + "  ".join("%s %.5f" % (c, (obs_std ** 2)[i]) for i, c in enumerate(CHANNELS)))
     print(f"\nwrote {args.out}.npz / .json")
 

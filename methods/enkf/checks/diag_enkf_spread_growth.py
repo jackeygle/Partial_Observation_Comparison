@@ -75,9 +75,9 @@ def main():
     out["injected_per_step"] = float(np.mean(PROC_STD) * 0.01)
     p = os.path.join(ROOT, args.out)
     json.dump(out, open(p, "w"), indent=2)
-    print(f"\n{args.steps} 步后离散度是初始的 {r:.3f}x  ->  模型是 {out['verdict']} 的")
-    print(f"对照: forecast() 每步注入 {out['injected_per_step']:.5f}")
-    print(f"      实测 EnKF 运行时的平衡离散度 0.0025")
+    print(f"\nafter {args.steps} steps, spread is {r:.3f}x the initial value  ->  the model is {out['verdict']}")
+    print(f"for reference: forecast() injects {out['injected_per_step']:.5f} per step")
+    print(f"      measured equilibrium spread during an actual EnKF run: 0.0025")
     print(f"[out] {p}")
 
 

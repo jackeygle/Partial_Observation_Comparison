@@ -1,29 +1,36 @@
 """
-compare3.py — 三方逐通道对比（Senseiver / 4DVarNet / EnKF），全天、k=1、同一裁剪
+compare3.py — three-way per-channel comparison (Senseiver / 4DVarNet / EnKF),
+full day, k=1, same clipping
 =================================================================================
 
-为什么要逐通道：四个通道量级差一截，单一 MSE 被 vx 主导（Senseiver 的盲区误差里
-vx 是 0.079、density 只有 0.014），密度重建得好不好被完全掩盖。
-`4dvarnet_enkf/checks/compare_channels.py` 的文件头抱怨的是同一件事。
+Why per-channel: the four channels differ by an order of magnitude, and a single
+MSE is dominated by vx (in Senseiver's blind error, vx is 0.079 while density is
+only 0.014) -- how well density is reconstructed gets completely hidden. The
+header of `4dvarnet_enkf/checks/compare_channels.py` complains about the same
+thing.
 
-口径（三方完全一致）：
-  * 全部 7 个留出日、**整天**（不是 400 帧的子集）
+Convention (identical across all three methods):
+  * All 7 held-out days, **full day** (not the 400-frame subset)
   * obs_every_k = 1
-  * 盲区 = 未观测的 (通道, 格子)，与 eval_test_days.py 的 `mask<0.5` 相同
-  * 三方都施加 EnKF 的物理裁剪（EnKF 自身已裁过，重复施加是幂等的）
+  * Blind = unobserved (channel, cell) pairs, same as eval_test_days.py's `mask<0.5`
+  * All three methods get the EnKF's physical clipping applied (the EnKF is
+    already clipped, so reapplying it is idempotent)
 
-EnKF 的估计取自 `4dvarnet_enkf/check_outputs/enkf_k1_full/`（全天 k=1 那一套）。
-注意 `check_outputs/enkf/` 是 **k=4 且只有 400 帧**，`enkf_metrics.json` 的 0.0392
-就来自那里，**不能**和全天数字并排放。
+The EnKF's estimate is taken from `4dvarnet_enkf/check_outputs/enkf_k1_full/`
+(the full-day k=1 set). Note `check_outputs/enkf/` is **k=4 with only 400
+frames** -- `enkf_metrics.json`'s 0.0392 comes from there and **must not** be
+placed side by side with the full-day numbers.
 
-本脚本只读 4dvarnet_enkf，不写入它的任何目录。
+This script only reads 4dvarnet_enkf, never writes to any of its directories.
 
-**这个口径把 DINCAE 排除在外**：它在所有格子上打分，其中速度通道有 88% 的格子是
-空格子的占位符 0，而 DINCAE 从未在那些格子上训练过。四方（含 DINCAE）的对比见
-`compare4.py`，它把同样三方搬到「有定义格子」口径上，并把本脚本的口径并排列出。
+**This convention excludes DINCAE**: it is scored on all cells, where 88% of the
+velocity channels' cells are placeholder 0s for empty cells, and DINCAE was never
+trained on those cells. For the four-way comparison (including DINCAE), see
+`compare4.py`, which brings the same three methods onto the "channel-defined
+cells" convention and lists this script's convention alongside it.
 
-用法（GPU 节点）:
-    sbatch sbatch/submit_eval.sbatch --help   # 见下方 argparse
+Usage (GPU node):
+    sbatch sbatch/submit_eval.sbatch --help   # see the argparse below
     srun -p gpu-debug --gres=gpu:1 -t 00:14:00 --mem=64G bash -c \
       'module load scicomp-pytorch-env/2026.1; python3 -u checks/compare3.py --days 2'
 """
@@ -54,7 +61,7 @@ def clip_np(x):
 
 
 class Acc:
-    """逐通道累计盲区平方误差。"""
+    """Accumulates squared blind-cell error per channel."""
 
     def __init__(self, C):
         self.se = np.zeros(C); self.n = np.zeros(C)
@@ -118,7 +125,7 @@ def main():
     sck = torch.load(args.senseiver, map_location=dev, weights_only=False)
     sm = Senseiver(**sck["hparams"]).to(dev); sm.load_state_dict(sck["model"]); sm.eval()
     solver, va, _ = load_solver(os.path.join(paths.runs(paths.VARNET), f"varnet_{args.varnet}", "varnet_best.pt"), dev)
-    print(f"[model] Senseiver {sm.num_params:,} 参数 | 4DVarNet {args.varnet} "
+    print(f"[model] Senseiver {sm.num_params:,} params | 4DVarNet {args.varnet} "
           f"dT={va['dT']} n_iter={solver.n_iter} | device={dev}", flush=True)
 
     days = ds.om.split_files("test")
@@ -147,10 +154,10 @@ def main():
             m = est.shape[0]
             accs["EnKF k1"].add(clip_np(est), z["X_true"][:m].astype(np.float32),
                                 z["Omega"][:m].astype(bool))
-        print(f"  {stem}: {n} 帧 done", flush=True)
+        print(f"  {stem}: {n} frames done", flush=True)
 
-    print(f"\n盲区 MSE（全天, k=1, 同一裁剪, {len(days)} 个留出日）\n")
-    print(f"{'方法':<18}" + "".join(f"{c:>11}" for c in chans) + f"{'合计':>11}")
+    print(f"\nBlind MSE (full day, k=1, same clipping, {len(days)} held-out days)\n")
+    print(f"{'method':<18}" + "".join(f"{c:>11}" for c in chans) + f"{'total':>11}")
     print("-" * (18 + 11 * (C + 1)))
     rows = {}
     for k, a in accs.items():

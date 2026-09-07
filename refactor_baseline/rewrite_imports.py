@@ -1,15 +1,18 @@
 """
-rewrite_imports.py — Phase 2 的机械改写（一次性工具，重构完成后可删）
+rewrite_imports.py — Phase 2's mechanical rewrite (a one-off tool, safe to delete once the refactor is done)
 
-把重构前那套 "sys.path.insert 之后裸 import" 改成包路径 import，并去掉写死的旧目录。
+Converts the pre-refactor "bare import after sys.path.insert" pattern into
+package-path imports, and removes hardcoded old directories.
 
-为什么要脚本而不是手改：涉及 90 个 .py 文件、约 200 条 import 语句，而这类改动
-**改错了不会报错** —— Python 会安静地 import 到另一个同名模块（losses.py 有三份），
-算出别的数字。脚本可以先 dry-run 看全量 diff，也保证同一条规则处处一致。
+Why a script rather than editing by hand: this touches 90 .py files and about
+200 import statements, and this class of change **raises no error when done
+wrong** -- Python will quietly import a different same-named module (losses.py
+has three copies) and compute a different number. A script can dry-run to see
+the full diff first, and guarantees the same rule is applied everywhere consistently.
 
-用法:
-    python3 refactor_baseline/rewrite_imports.py            # dry-run，只报告
-    python3 refactor_baseline/rewrite_imports.py --apply    # 真改
+Usage:
+    python3 refactor_baseline/rewrite_imports.py            # dry-run, reports only
+    python3 refactor_baseline/rewrite_imports.py --apply    # actually rewrite
 """
 from __future__ import annotations
 
@@ -20,7 +23,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 模块名 -> 它现在住在哪个包。crowdcore 的三个是全局唯一的；其余按文件所在方法解析。
+# module name -> which package it now lives in. crowdcore's three are globally
+# unique; the rest are resolved by which method the file belongs to.
 GLOBAL = {
     "config": "crowdcore.config",
     "navigation": "crowdcore.navigation",
@@ -30,12 +34,12 @@ GLOBAL = {
     "variational_solver": "methods.varnet.variational_solver",
     "model_io": "methods.varnet.checks.model_io",
 }
-# 这些名字在多个方法里都有，必须按上下文解析
+# These names exist in multiple methods and must be resolved by context
 PER_METHOD = {"losses", "dataset", "model", "train",
               "state", "encoding",                      # dincae
               "network", "sensors", "positional"}       # senseiver
 
-# compare/ 下的脚本是从哪个方法搬来的 —— 决定它的 dataset/losses 指向谁
+# which method a script under compare/ was moved from -- decides who its dataset/losses point to
 COMPARE_ORIGIN = {
     "compare3.py": "senseiver", "compare4.py": "senseiver", "plot_compare3.py": "senseiver",
     "eval_threeway_accuracy.py": "varnet", "compare_channels.py": "varnet",
@@ -69,11 +73,13 @@ TRIPLE = ('"' * 3, "'" * 3)
 
 
 def _mask_strings(text: str):
-    """把三引号字符串的内容挖空（保住行号），让正则只能命中真正的代码行。
+    """Hollows out the contents of triple-quoted strings (keeping line numbers),
+    so regexes can only match real code lines.
 
-    需要这一步的原因：crowdcore/config.py 的文档字符串里有一行 `import config`
-    （Usage 示例），第一版脚本把它当成真 import 改掉了。文档里的示例代码和真代码
-    长得一模一样，只能靠位置区分。
+    Why this step is needed: crowdcore/config.py's docstring has a line
+    `import config` (a Usage example), and the first version of this script
+    treated it as a real import and rewrote it. Example code in docs looks
+    exactly like real code; only position tells them apart.
     """
     out, i, n = [], 0, len(text)
     while i < n:
@@ -94,7 +100,7 @@ def _mask_strings(text: str):
     return "".join(out)
 
 
-#: 这两个文件的文档里**故意**提到旧路径（解释重构历史），不能改
+#: These two files' docs **deliberately** mention the old path (explaining the refactor's history); do not touch
 DOC_ONLY = {"crowdcore/__init__.py", "crowdcore/paths.py"}
 
 
@@ -127,7 +133,8 @@ def rewrite(text: str, path: str):
         rf"^([ \t]*)import ({mods})(?: as ([A-Za-z_][A-Za-z_0-9]*))?([ \t]*(?:#.*)?)$")
     re_frm = re.compile(rf"^([ \t]*)from ({mods}) import ([^\n#]+?)([ \t]*(?:#.*)?)$")
 
-    # 逐行处理：只有在 masked（文档字符串已挖空）里也匹配的行才是真代码
+    # Processed line by line: only a line that also matches in `masked` (with
+    # docstrings hollowed out) is real code
     lines, mlines = text.split("\n"), masked.split("\n")
     for i, (ln, ml) in enumerate(zip(lines, mlines)):
         if re_imp.match(ml):
@@ -136,13 +143,13 @@ def rewrite(text: str, path: str):
             lines[i] = re_frm.sub(fix_from, ln)
     text = "\n".join(lines)
 
-    # 写死的旧目录 -> paths（文档里故意提到它的文件跳过）
+    # Hardcoded old directory -> paths (files that deliberately mention it are skipped)
     if OLD_ABS in text and os.path.relpath(path, ROOT) not in DOC_ONLY:
         n = text.count(OLD_ABS)
         text = text.replace(f'"{OLD_ABS}"', "paths.method(paths.VARNET)")
         text = text.replace(f"'{OLD_ABS}'", "paths.method(paths.VARNET)")
-        text = text.replace(OLD_ABS, "<<PATHS_VARNET>>")   # 剩下的是拼在长串里的，人工看
-        notes.append(f"旧绝对路径 x{n}")
+        text = text.replace(OLD_ABS, "<<PATHS_VARNET>>")   # the rest are stitched into longer strings, for a human to check
+        notes.append(f"old absolute path x{n}")
 
     return text, notes
 
@@ -177,10 +184,11 @@ def main():
             if args.apply:
                 open(p, "w").write(new)
 
-    print(f"\n{changed} 个文件，{total_notes} 处改写"
-          + ("（已写入）" if args.apply else "（dry-run，未写入）"))
+    print(f"\n{changed} files, {total_notes} rewrites"
+          + (" (written)" if args.apply else " (dry-run, not written)"))
     if manual:
-        print(f"\n以下文件里旧路径拼在长串中，占位成 <<PATHS_VARNET>>，需人工处理:")
+        print(f"\nthe following files have the old path stitched into a longer string, "
+              f"placeholdered as <<PATHS_VARNET>>, needs manual handling:")
         for r in manual:
             print(f"    {r}")
     return 0

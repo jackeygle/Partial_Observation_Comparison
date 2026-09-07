@@ -37,13 +37,13 @@ def run():
 
 run()                                                  # warm-up
 t0 = time.perf_counter(); run(); wall = time.perf_counter() - t0
-print(f"  未插桩实测: {N} 帧 {wall:.2f}s = {wall/N*1000:.1f} ms/帧")
-print(f"  硬件: {len(os.sched_getaffinity(0))} cores, node={os.environ.get('SLURMD_NODENAME','')}\n")
+print(f"  uninstrumented measurement: {N} frames {wall:.2f}s = {wall/N*1000:.1f} ms/frame")
+print(f"  hardware: {len(os.sched_getaffinity(0))} cores, node={os.environ.get('SLURMD_NODENAME','')}\n")
 
 pr = cProfile.Profile(); pr.enable(); run(); pr.disable()
 st = pstats.Stats(pr); tot = st.total_tt
-print(f"  cProfile 总计 {tot:.2f}s(插桩有额外开销,看相对占比)")
-print(f"  {'函数':52s} {'cumtime':>9} {'占比':>7} {'调用':>7}")
+print(f"  cProfile total {tot:.2f}s (instrumentation adds overhead, look at relative share)")
+print(f"  {'function':52s} {'cumtime':>9} {'share':>7} {'calls':>7}")
 print("  " + "-"*80)
 rows = []
 for (fn, ln, name), (cc, nc, tt, ct, cal) in st.stats.items():

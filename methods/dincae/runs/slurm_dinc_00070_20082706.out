@@ -1,0 +1,72 @@
+输出平均使用 1 个 checkpoint: epochs [70]
+test split: 7 天
+  atc-20130811_corridor_1.0s  density 0.02080  vx 0.45833  vy 0.08535  var 0.04102
+  atc-20130818_corridor_1.0s  density 0.03106  vx 0.51964  vy 0.09991  var 0.05377
+  atc-20130825_corridor_1.0s  density 0.02595  vx 0.57543  vy 0.10868  var 0.06440
+  atc-20130901_corridor_1.0s  density 0.02792  vx 0.55647  vy 0.10625  var 0.06103
+  atc-20130915_corridor_1.0s  density 0.02113  vx 0.59144  vy 0.11342  var 0.05204
+  atc-20130922_corridor_1.0s  density 0.01892  vx 0.62557  vy 0.11602  var 0.05070
+  atc-20130929_corridor_1.0s  density 0.02214  vx 0.64446  vy 0.11262  var 0.06009
+
+=== MSE（两套口径）===
+口径                 density         vx         vy        var   四通道合并
+ours_blind         0.02402    0.56440    0.10559    0.05514   0.10834
+ours_all           0.01341    0.23746    0.04315    0.02414   0.05202
+ours_blind_noclip   0.02427    0.56440    0.10560    0.05590   0.10860
+ours_all_noclip    0.01359    0.23746    0.04320    0.09307   0.06187
+v4dvar_blind       0.01602    0.74615    1.49519    0.03227   0.57241
+v4dvar_all         0.01059    0.47356    1.16183    0.01860   0.41614
+
+=== 变率保持（重建 SD / 真值 SD，1 最好；<1 = 被抹平）===
+  density  truth 0.2039  rec 0.1742  ratio 0.854
+  vx       truth 0.8981  rec 0.7658  ratio 0.853
+  vy       truth 0.3317  rec 0.2651  ratio 0.799
+  var      truth 0.2326  rec 0.1673  ratio 0.719
+
+=== σ̂ 校准（盲区、归一化空间；理想是 actual ≈ pred）===
+  density  平均预测SD 0.5019  实际RMS 0.8001  全局调整因子 1.594  (n=4,000,000)
+      pred 0.0381 -> actual 0.0634  (n=1,518,826)
+      pred 0.1970 -> actual 0.2585  (n=352,127)
+      pred 0.3285 -> actual 0.4059  (n=266,986)
+      pred 0.4581 -> actual 0.5281  (n=236,429)
+      pred 0.5898 -> actual 0.6804  (n=218,808)
+      pred 0.7203 -> actual 0.8495  (n=219,865)
+      pred 0.8480 -> actual 0.9896  (n=209,548)
+      pred 0.9776 -> actual 1.1284  (n=190,727)
+      pred 1.1087 -> actual 1.2760  (n=194,736)
+      pred 1.2392 -> actual 1.3898  (n=191,948)
+  vx       平均预测SD 0.8234  实际RMS 0.8848  全局调整因子 1.075  (n=4,000,000)
+      pred 0.4613 -> actual 0.5503  (n=326,842)
+      pred 0.5352 -> actual 0.6207  (n=296,943)
+      pred 0.6114 -> actual 0.6991  (n=246,307)
+      pred 0.6866 -> actual 0.7514  (n=247,033)
+      pred 0.7623 -> actual 0.8148  (n=261,082)
+      pred 0.8367 -> actual 0.8760  (n=284,083)
+      pred 0.9127 -> actual 0.9316  (n=326,222)
+      pred 0.9864 -> actual 0.9799  (n=406,248)
+      pred 1.0607 -> actual 1.0543  (n=415,237)
+      pred 1.1345 -> actual 1.1089  (n=390,004)
+  vy       平均预测SD 0.8886  实际RMS 0.9651  全局调整因子 1.086  (n=4,000,000)
+      pred 0.5364 -> actual 0.6969  (n=215,588)
+      pred 0.6017 -> actual 0.7575  (n=189,597)
+      pred 0.6670 -> actual 0.8212  (n=180,592)
+      pred 0.7324 -> actual 0.8720  (n=173,938)
+      pred 0.7996 -> actual 0.9094  (n=217,943)
+      pred 0.8658 -> actual 0.9210  (n=305,237)
+      pred 0.9289 -> actual 0.9215  (n=768,196)
+      pred 0.9882 -> actual 0.9674  (n=490,224)
+      pred 1.0571 -> actual 1.0284  (n=347,807)
+      pred 1.1202 -> actual 1.1003  (n=310,878)
+  var      平均预测SD 0.8565  实际RMS 1.0195  全局调整因子 1.190  (n=4,000,000)
+      pred 0.4366 -> actual 0.6495  (n=190,739)
+      pred 0.5224 -> actual 0.7312  (n=219,258)
+      pred 0.6065 -> actual 0.7783  (n=273,256)
+      pred 0.6908 -> actual 0.8477  (n=297,476)
+      pred 0.7758 -> actual 0.8958  (n=307,379)
+      pred 0.8613 -> actual 0.9638  (n=333,688)
+      pred 0.9461 -> actual 1.0283  (n=385,060)
+      pred 1.0331 -> actual 1.1064  (n=398,814)
+      pred 1.1149 -> actual 1.1932  (n=373,620)
+      pred 1.2028 -> actual 1.2955  (n=420,712)
+
+wrote check_outputs/eval_single_00070/dincae_metrics_test.json

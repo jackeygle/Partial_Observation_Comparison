@@ -1,0 +1,82 @@
+[hw] Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores · node=csl4 · OMP=unset torch=4
+[gpu] none
+[cfg] 1000 frames, 5 timed repeats (+1 warm-up each), 4DVarNet = runs/varnet_a2_k*
+
+[setup] preparing + warming up ...
+        enkf_k1: ready (1000 frames)
+        enkf_k4: ready (1000 frames)
+        varnet_k1: ready (1000 frames)
+        varnet_k4: ready (1000 frames)
+        varnet_single: ready (1000 frames)
+        varnet_ens5: ready (1000 frames)
+        dincae: ready (1000 frames)
+        senseiver: ready (1000 frames)
+
+[round 1/5]
+  enkf_k1            128.95 s     128.95 ms/frame
+  enkf_k4             51.61 s      51.61 ms/frame
+  varnet_k1            5.99 s       5.99 ms/frame
+  varnet_k4            6.04 s       6.04 ms/frame
+  varnet_single        2.84 s       2.84 ms/frame
+  varnet_ens5         12.68 s      12.68 ms/frame
+  dincae               1.70 s       1.70 ms/frame
+  senseiver            0.48 s       0.48 ms/frame
+
+[round 2/5]
+  enkf_k1            129.08 s     129.08 ms/frame
+  enkf_k4             51.50 s      51.50 ms/frame
+  varnet_k1            6.05 s       6.05 ms/frame
+  varnet_k4            6.10 s       6.10 ms/frame
+  varnet_single        2.62 s       2.62 ms/frame
+  varnet_ens5         12.76 s      12.76 ms/frame
+  dincae               1.71 s       1.71 ms/frame
+  senseiver            0.48 s       0.48 ms/frame
+
+[round 3/5]
+  enkf_k1            128.72 s     128.72 ms/frame
+  enkf_k4             51.38 s      51.38 ms/frame
+  varnet_k1            6.04 s       6.04 ms/frame
+  varnet_k4            6.10 s       6.10 ms/frame
+  varnet_single        2.84 s       2.84 ms/frame
+  varnet_ens5         12.15 s      12.15 ms/frame
+  dincae               1.71 s       1.71 ms/frame
+  senseiver            0.48 s       0.48 ms/frame
+
+[round 4/5]
+  enkf_k1            128.72 s     128.72 ms/frame
+  enkf_k4             51.35 s      51.35 ms/frame
+  varnet_k1            5.86 s       5.86 ms/frame
+  varnet_k4            5.89 s       5.89 ms/frame
+  varnet_single        2.74 s       2.74 ms/frame
+  varnet_ens5         12.49 s      12.49 ms/frame
+  dincae               1.70 s       1.70 ms/frame
+  senseiver            0.48 s       0.48 ms/frame
+
+[round 5/5]
+  enkf_k1            128.42 s     128.42 ms/frame
+  enkf_k4             51.26 s      51.26 ms/frame
+  varnet_k1            5.85 s       5.85 ms/frame
+  varnet_k4            5.87 s       5.87 ms/frame
+  varnet_single        2.64 s       2.64 ms/frame
+  varnet_ens5         12.03 s      12.03 ms/frame
+  dincae               1.70 s       1.70 ms/frame
+  senseiver            0.48 s       0.48 ms/frame
+
+============================================================================================
+method              throughput ms/frame   latency to one frame  cores  vs fastest
+enkf_k1                 128.78±0.227                128.78 ms    4.0     268.8x
+enkf_k4                  51.42±0.123                 51.42 ms    4.0     107.3x
+varnet_k1                 5.96±0.088    5.96 s (whole window)    4.0      12.4x
+varnet_k4                 6.00±0.101    6.00 s (whole window)    4.0      12.5x
+varnet_single             2.74±0.095    2.74 s (whole window)    4.0       5.7x
+varnet_ens5              12.42±0.287   12.42 s (whole window)    4.0      25.9x
+dincae                    1.71±0.005                  1.71 ms    4.0       3.6x
+senseiver                 0.48±0.001                  0.48 ms    4.0       1.0x
+
+throughput = amortised cost per frame over the batch. latency = delay until a given
+frame's estimate exists: one frame for the sequential filter, one whole window solve
+for the windowed method, which is not an online/causal estimator.
+
+largest run-to-run spread: 3.5% of the mean (node was shared — see hw/node above)
+
+[out] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/bench_speed_four.json

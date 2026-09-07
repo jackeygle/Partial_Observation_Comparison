@@ -1,14 +1,14 @@
 import os, sys
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
-# checks/ 里的脚本从项目根导入源码模块；根要插在最前(本目录的 losses.py 优先)，
-# 4dvarnet_enkf 只能 append(它也有 losses.py，插到最前会把本目录的顶掉)
+# Scripts in checks/ import source modules from the project root; the root must
+# be inserted at the front (so this directory's losses.py takes priority),
+# 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
+# at the front would shadow this directory's).
 import numpy as np, h5py, glob
 from crowdcore import observation_model as d
 from crowdcore import navigation as nav
 fps=sorted(glob.glob('/scratch/work/zhangx29/data/grid_cache/atc-*_corridor_1.0s.h5'))
 Xf=h5py.File(fps[0],'r')['grid']; valid=nav.build_valid_mask_from_config(Xf[:])
-X=Xf[20000:26000]                                  # 6000 s 白天段
+X=Xf[20000:26000]                                  # 6000 s, a daytime segment
 out=d.generate_observations(X,7,3,add_noise=False,seed=0,valid_mask=valid)
 Om=out['Omega']; T=Om.shape[0]
 # age of last observation, per (t,cell)

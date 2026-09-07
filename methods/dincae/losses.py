@@ -1,29 +1,39 @@
 """
-losses.py — DINCAE 的高斯负对数似然（含 truth_uncertain 的 KL 分支）
+losses.py — DINCAE's Gaussian negative log-likelihood (including the
+truth_uncertain KL branch)
 =====================================================================
 
-对照参考实现 `reference/DINCAE.jl/src/model.jl:54-148`。论文 2.0 Eq.3：
+Follows the reference implementation `reference/DINCAE.jl/src/model.jl:54-148`.
+Paper 2.0 Eq.3:
 
-    J = 1/(2N) · Σ [ ((y − ŷ)/σ̂)² + log σ̂² + 2log√(2π) ]
+    J = 1/(2N) * sum [ ((y - y_hat)/sigma_hat)^2 + log sigma_hat^2 + 2 log sqrt(2 pi) ]
 
-代码里省掉了 1/2 和常数项（不影响梯度），并且多了两个论文里没写清的东西：
+The code drops the 1/2 and the constant term (they don't affect the gradient), and
+adds two things the paper does not spell out:
 
-  1. **无观测处的 log 项被置零**：`σ²_masked = σ²_rec·mask + (1 − mask)`，于是 log(1)=0。
-     这一步很关键 —— 否则网络可以在没有目标的格子上把 σ̂ 压到下限来降低 log 项。
-  2. **归一化用的 N 不参与求导**（`ChainRulesCore.ignore_derivatives`）。N 每个 minibatch
-     都不同（1.0 §3.1 特别强调了这点）。
+  1. **The log term at unobserved cells is zeroed**:
+     `sigma^2_masked = sigma^2_rec*mask + (1 - mask)`, so log(1)=0. This step is
+     important -- otherwise the network could push sigma-hat down to the floor on
+     cells with no target, just to shrink the log term.
+  2. **The normalising N does not participate in the gradient**
+     (`ChainRulesCore.ignore_derivatives`). N differs every minibatch (1.0
+     sec.3.1 specifically stresses this).
 
-**多变量**（`model.jl:132-148`）：每个输出变量**独立算、各自用自己的 N 归一化、然后直接相加**。
-所以通道之间的相对权重完全由学出来的 1/σ̂² 决定，不需要手工设 —— 这正是它和"手工加权"
-的本质区别（后者在本项目里失败过 8 次，见 4dvarnet_enkf 的记录）。
+**Multiple variables** (`model.jl:132-148`): each output variable is **computed
+independently, normalised by its own N, then summed directly**. So the relative
+weight between channels is entirely decided by the learned 1/sigma-hat^2, never
+set by hand -- this is exactly what sets it apart from "hand-tuned weighting"
+(which failed 8 times in this project, see the 4dvarnet_enkf record).
 
-**truth_uncertain 分支**（`model.jl:68-86`，两篇论文都没写）：当"真值"自己带不确定度 σ²_true
-时，损失换成两个高斯之间的 KL：
+**The truth_uncertain branch** (`model.jl:68-86`, in neither paper): when the
+"ground truth" itself carries an uncertainty sigma^2_true, the loss becomes the KL
+divergence between two Gaussians:
 
-    2·KL(p_true ‖ q_rec) = log(σ²_rec/σ²_true) + (σ²_true + (m_rec − m_true)²)/σ²_rec − 1
+    2*KL(p_true || q_rec) = log(sigma^2_rec/sigma^2_true) + (sigma^2_true + (m_rec - m_true)^2)/sigma^2_rec - 1
 
-对我们有用是因为网格化的 truth 本身有误差：速度的 σ²_true = `vel_var / density`
-（格内速度方差 / 人数 = 格均值的标准误），`vel_var` 就是 state 的第 4 通道。
+Useful to us because the gridded ground truth has its own error: velocity's
+sigma^2_true = `vel_var / density` (in-cell velocity variance / headcount = the
+standard error of the cell mean), and `vel_var` is exactly state's 4th channel.
 """
 from __future__ import annotations
 
@@ -31,10 +41,10 @@ import torch
 
 
 def dincae_cost_single(m_rec, s2_rec, m_true, s2_true, mask, truth_uncertain=False):
-    """单个输出变量的代价。所有张量 (B,1,H,W) 或 (B,H,W)，mask 为 0/1 float。"""
-    n = mask.sum().detach().clamp(min=1.0)          # N 不参与求导
+    """Cost for a single output variable. All tensors (B,1,H,W) or (B,H,W), mask is 0/1 float."""
+    n = mask.sum().detach().clamp(min=1.0)          # N does not participate in the gradient
     if truth_uncertain:
-        ratio = (s2_rec / s2_true) * mask + (1.0 - mask)        # 无观测处 = 1 -> log = 0
+        ratio = (s2_rec / s2_true) * mask + (1.0 - mask)        # unobserved = 1 -> log = 0
         d2 = ((m_rec - m_true) ** 2 + s2_true) * mask
         return (torch.log(ratio).sum() + (d2 / s2_rec).sum()) / n
     s2n = s2_rec * mask + (1.0 - mask)
@@ -43,30 +53,31 @@ def dincae_cost_single(m_rec, s2_rec, m_true, s2_true, mask, truth_uncertain=Fal
 
 
 def decode_target(target, s2_floor=1e-6):
-    """把 information-form 的目标解回 (m_true, σ²_true, mask)。
+    """Decode the information-form target back into (m_true, sigma^2_true, mask).
 
-    target (B, 2*nvar, H, W)：偶数片 = a/σ²_true，奇数片 = 1/σ²_true。
-    mask = (1/σ²_true ≠ 0) —— 缺测/无定义 = 精度为零（`model.jl:109-114`）。
+    target (B, 2*nvar, H, W): even slices = a/sigma^2_true, odd slices = 1/sigma^2_true.
+    mask = (1/sigma^2_true != 0) -- missing/undefined = zero precision (`model.jl:109-114`).
     """
     inv = target[:, 1::2]
     mask = (inv != 0).to(target.dtype)
-    s2 = 1.0 / torch.clamp(inv, min=s2_floor)                   # 掩掉的位置这个值无意义
+    s2 = 1.0 / torch.clamp(inv, min=s2_floor)                   # this value is meaningless where masked out
     m = target[:, 0::2] * s2
     return m * mask, s2, mask
 
 
 def dincae_loss(outs, target, loss_weights, truth_uncertain=False):
-    """全部输出级 × 全部变量的总损失（2.0 Eq.4）。
+    """Total loss over every output level x every variable (2.0 Eq.4).
 
-    outs : [(mean, σ²), ...] 每级一个，来自 DINCAE.forward
-    返回 (total, per_level)  —— per_level 便于日志里看精化步有没有起作用
+    outs : [(mean, sigma^2), ...] one per level, from DINCAE.forward
+    returns (total, per_level) -- per_level is useful in logs to see whether the
+    refinement step is doing anything
     """
     m_true, s2_true, mask = decode_target(target)
     per_level = []
     total = target.new_zeros(())
     for w, (m_rec, s2_rec) in zip(loss_weights, outs):
         lvl = target.new_zeros(())
-        for c in range(m_rec.shape[1]):                          # 逐变量独立归一化后相加
+        for c in range(m_rec.shape[1]):                          # independently normalised per variable, then summed
             lvl = lvl + dincae_cost_single(
                 m_rec[:, c], s2_rec[:, c], m_true[:, c], s2_true[:, c], mask[:, c],
                 truth_uncertain=truth_uncertain)
@@ -77,9 +88,11 @@ def dincae_loss(outs, target, loss_weights, truth_uncertain=False):
 
 @torch.no_grad()
 def residual_mse(outs, target, per_channel=True):
-    """诊断用：最后一级在有效格上的残差 MSE（和损失同口径的掩膜，但不含 σ̂ 项）。
+    """Diagnostic: the last level's residual MSE on valid cells (same mask
+    convention as the loss, but without the sigma-hat term).
 
-    这是给人看的指标 —— 训练目标是 NLL，但 MSE 才能和 4dvarnet_enkf 的数对上量级。
+    This is the human-facing metric -- the training objective is NLL, but MSE is
+    what lines up in scale with 4dvarnet_enkf's numbers.
     """
     m_true, _, mask = decode_target(target)
     m_rec, _ = outs[-1]

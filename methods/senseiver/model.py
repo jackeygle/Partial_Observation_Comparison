@@ -1,32 +1,42 @@
 """
-model.py — Senseiver 的 Encoder / Decoder
+model.py — Senseiver's Encoder / Decoder
 ==========================================
 
-移植自 `reference/Senseiver/model.py`（其自述改编自 krasserm/perceiver-io）。
-对应论文 §2 的后两个组件：
+Ported from `reference/Senseiver/model.py` (its own README says it is adapted
+from krasserm/perceiver-io). Corresponds to the paper's sec.2 last two
+components:
 
-    z    = E(a_s, s)      注意力编码器：传感器集 -> 定长 latent
-    ŝ_q  = D(z, a_q)      注意力解码器：latent + 查询位置 -> 该位置的场值
+    z    = E(a_s, s)      attention encoder: sensor set -> fixed-length latent
+    s_q  = D(z, a_q)      attention decoder: latent + query position -> the field value there
 
-Appendix A 的结构在代码里的落点：
-  * 编码块 = cross-attention(latent 当 Q，传感器当 K/V) + self-attention，
-    `num_layers` 个块**共享权重**（`layer_1` 独立 + `layer_n` 复用 num_layers-1 次，
-    这是参考实现的具体做法）。
-  * 解码 = 查询位置编码与一个可学习向量拼接当 Q，z 当 K/V，单层 cross-attention
-    后接线性输出头。
+Where Appendix A's architecture lands in the code:
+  * The encoder block = cross-attention (latent as Q, sensors as K/V) +
+    self-attention, with `num_layers` blocks **sharing weights** (`layer_1` is
+    independent + `layer_n` is reused num_layers-1 times, this is the reference
+    implementation's specific approach).
+  * Decoding = the query's positional encoding concatenated with a learnable
+    vector as Q, z as K/V, a single cross-attention layer followed by a linear
+    output head.
 
-相对参考实现的改动（README"偏离参考实现"一节有同样的清单）：
+Changes relative to the reference implementation (the README's "Deviations from
+the reference implementation" section has the same list):
 
- 1. **删掉 fairscale 的 `checkpoint_wrapper`**。参考实现里 `activation_checkpoint`
-    从未被 `s_parser.py` 暴露，恒为 False，是死代码；删掉可少一个依赖。
- 2. **`Decoder` 增加维度断言**。解码器的 cross-attention 把 `num_latent_channels`
-    当 KV 维，而实际喂进去的 z 的通道数由**编码器**决定；两者不等会静默错位。
-    参考实现没有这个检查，README 的例子恰好都把两个值设成一样，掩盖了它。
- 3. **`pad_mask` 真正接上**。这条通路在参考实现里已经存在
-    （`Encoder.forward(x, pad_mask)` -> `CrossAttention` -> `key_padding_mask`），
-    只是它的 dataloader 从不传值——因为它的传感器集是定长的。我们的传感器是
-    移动机器人，每帧数量不同，必须 padding，于是这条通路第一次被用上。
-    这里没有改结构，只是把已有能力启用，并补了空集合的保护。
+ 1. **Removed fairscale's `checkpoint_wrapper`**. In the reference
+    implementation `activation_checkpoint` is never exposed by `s_parser.py`,
+    is always False, and is dead code; removing it drops one dependency.
+ 2. **Added a dimension assertion to `Decoder`**. The decoder's cross-attention
+    treats `num_latent_channels` as the KV dimension, while the actual channel
+    count of the z fed in is decided by the **encoder**; a mismatch between the
+    two silently misaligns. The reference implementation has no such check --
+    its README's examples happen to always set the two values equal, hiding
+    this trap.
+ 3. **`pad_mask` genuinely wired up**. This path already exists in the
+    reference implementation (`Encoder.forward(x, pad_mask)` ->
+    `CrossAttention` -> `key_padding_mask`), it is just that its dataloader
+    never passes a value -- because its sensor set is fixed-length. Our sensors
+    are moving robots, with a different count each frame, requiring padding, so
+    this path is used for the first time here. No structural change was made,
+    just enabling an existing capability and adding a guard for the empty-set case.
 """
 from __future__ import annotations
 
@@ -36,7 +46,8 @@ from einops import repeat
 
 
 class Sequential(nn.Sequential):
-    """允许多参数在层间传递（第一层收 tuple，之后收单个张量）。"""
+    """Allows multiple arguments to pass between layers (the first layer takes
+    a tuple, later ones take a single tensor)."""
 
     def forward(self, *inputs):
         for module in self:
@@ -136,7 +147,8 @@ class SelfAttention(nn.Module):
 
 
 class Encoder(nn.Module):
-    """z = E(PE(χ_s), s)：把任意数量的传感器 token 压成 (num_latents, ch) 的定长 latent。"""
+    """z = E(PE(chi_s), s): compresses any number of sensor tokens into a
+    fixed-length (num_latents, ch) latent."""
 
     def __init__(self, input_ch, preproc_ch, num_latents: int, num_latent_channels: int,
                  num_layers: int = 3, num_cross_attention_heads: int = 4,
@@ -164,7 +176,7 @@ class Encoder(nn.Module):
 
         self.layer_1 = create_layer()
         if num_layers > 1:
-            self.layer_n = create_layer()          # 权重共享：后续块复用同一个 layer_n
+            self.layer_n = create_layer()          # weight sharing: later blocks reuse this same layer_n
         self.latent = nn.Parameter(torch.empty(num_latents, num_latent_channels))
         self._init_parameters()
 
@@ -184,20 +196,23 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    """ŝ_q = D(z, PE(χ_q))：查询任意坐标处的场值。"""
+    """s_q = D(z, PE(chi_q)): queries the field value at any coordinate."""
 
     def __init__(self, ff_channels: int, preproc_ch, num_latent_channels: int,
                  latent_size, num_output_channels,
                  num_cross_attention_heads: int = 4, dropout: float = 0.0,
                  enc_latent_channels: int | None = None):
         super().__init__()
-        # 改动 2：参考实现缺这个检查。cross-attention 的 KV 维取自
-        # num_latent_channels（解码器的超参），但真正喂进来的 z 的通道数由编码器决定。
+        # Change 2: the reference implementation is missing this check. The
+        # cross-attention's KV dimension is taken from num_latent_channels
+        # (the decoder's hyperparameter), but the actual channel count of the
+        # z fed in is decided by the encoder.
         if enc_latent_channels is not None and enc_latent_channels != num_latent_channels:
             raise ValueError(
-                f"dec_num_latent_channels({num_latent_channels}) 必须等于 "
-                f"enc_num_latent_channels({enc_latent_channels})：解码器的 "
-                f"cross-attention 用前者当 KV 维，而喂进去的 z 的通道数是后者。")
+                f"dec_num_latent_channels({num_latent_channels}) must equal "
+                f"enc_num_latent_channels({enc_latent_channels}): the decoder's "
+                f"cross-attention uses the former as the KV dimension, while "
+                f"the z fed in has the channel count of the latter.")
 
         q_chan = ff_channels + num_latent_channels
         q_in = preproc_ch if preproc_ch else q_chan
@@ -208,7 +223,8 @@ class Decoder(nn.Module):
                                                      num_kv_channels=num_latent_channels,
                                                      num_heads=num_cross_attention_heads,
                                                      dropout=dropout)
-        # latent_size=1 时这就是"每个查询点共享的一个可学习标记"，与位置编码拼接当 Q
+        # When latent_size=1 this is "one learnable token shared across every
+        # query point," concatenated with the positional encoding to form Q
         self.output = nn.Parameter(torch.empty(latent_size, num_latent_channels))
         self._init_parameters()
 

@@ -1,16 +1,20 @@
 """
-losses.py — 训练损失与诊断拆分
+losses.py — training loss and diagnostic breakdown
 ================================
 
-**训练损失照抄参考实现**：`network_light.py:68` 的
-`F.mse_loss(pred_values, field_values, reduction='sum')`，原始场上的四通道无权重
-平方误差。不加任何逐通道/逐格权重——那已经不是论文的方法了。
+**The training loss is copied from the reference implementation as-is**:
+`network_light.py:68`'s `F.mse_loss(pred_values, field_values, reduction='sum')`,
+unweighted 4-channel squared error on the raw field. No per-channel/per-cell
+weighting is added -- that would no longer be the paper's method.
 
-`reduction='sum'` 沿用参考实现。它相对 `'mean'` 只差一个常数因子，而在 Adam 下
-这个因子被逐参数的二阶矩归一化基本吸收掉，所以是等价的；保留 `'sum'` 是为了和
-参考实现逐字对齐。日志里记的是除以元素数之后的值（参考实现也是这么记的）。
+`reduction='sum'` follows the reference implementation. It differs from `'mean'`
+only by a constant factor, which under Adam is essentially absorbed by the
+per-parameter second-moment normalisation, so the two are equivalent; `'sum'` is
+kept to align verbatim with the reference implementation. What's logged is the
+value divided by the element count (the reference implementation logs it the
+same way).
 
-下面的拆分函数只用于**诊断**，不进入梯度。
+The breakdown functions below are for **diagnostics only** and never enter the gradient.
 """
 from __future__ import annotations
 
@@ -19,17 +23,18 @@ import torch.nn.functional as F
 
 
 def senseiver_loss(pred, target):
-    """论文/参考实现的训练损失。pred/target: (B, Nq, C) 或 (B, C, H, W)。"""
+    """The paper's/reference implementation's training loss. pred/target: (B, Nq, C) or (B, C, H, W)."""
     return F.mse_loss(pred, target, reduction="sum")
 
 
 @torch.no_grad()
 def diagnostics(pred, target, obs_mask, channels):
-    """逐通道 / 观测区 vs 盲区 的 MSE 拆分。
+    """MSE breakdown: per channel / observed region vs. blind region.
 
-    pred/target (B,C,H,W)，obs_mask (B,H,W) bool（True = 该格被观测到）。
-    另外报"占用格"(density>0) 上的密度 MSE：单一 MSE 会被大量空格子摊薄，
-    看不出模型是否只是在输出接近零的平滑场。
+    pred/target (B,C,H,W), obs_mask (B,H,W) bool (True = that cell was observed).
+    Also reports density MSE on "occupied" cells (density>0): a single MSE gets
+    diluted by a large number of empty cells, hiding whether the model is just
+    outputting a smooth field near zero.
     """
     se = (pred - target) ** 2
     obs = obs_mask[:, None].expand_as(se)

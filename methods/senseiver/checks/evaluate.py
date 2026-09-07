@@ -1,23 +1,27 @@
 """
-evaluate.py — 在留出日上评估 Senseiver，口径与 4DVarNet / EnKF 完全一致
+evaluate.py — evaluate Senseiver on held-out days, convention exactly matching 4DVarNet / EnKF
 =======================================================================
 
-指标定义**逐字复刻** `4dvarnet_enkf/checks/eval_test_days.py`，一个字都不改：
+The metric definitions are **copied verbatim** from
+`4dvarnet_enkf/checks/eval_test_days.py`, not a single thing changed:
 
-  * 盲区 MSE —— 未被观测到的 (通道, 格子) 上的平方误差（`mask < 0.5`）
-  * 全场 MSE —— 全部 4x36x12 上的平方误差（论文的 R-score）
-  * 原始场、四通道无权重、**包含非 walkable 格**
-  * 与 EnKF 相同的物理裁剪：density[0,5]、vx/vy[-5,5]、var[0,2]（默认开）
-  * 逐日算，再对 7 天取 mean/std（RMSE 先逐日开方再平均）
-  * 观测由同一份 config.yaml 现场重新生成，`obs_every_k` 从 checkpoint 的 args 里读，
-    保证模型不会被拿去打分一个它训练时从没见过的观测模式
+  * Blind MSE -- squared error on (channel, cell) pairs not observed (`mask < 0.5`)
+  * Full-field MSE -- squared error over the entire 4x36x12 (the paper's R-score)
+  * Raw field, four channels unweighted, **including non-walkable cells**
+  * Same physical clipping as the EnKF: density[0,5], vx/vy[-5,5], var[0,2] (on by default)
+  * Computed per day, then mean/std over the 7 days (RMSE is computed per day first, then averaged)
+  * Observations are freshly regenerated from the same config.yaml, with
+    `obs_every_k` read from the checkpoint's args, ensuring the model is never
+    scored against an observation pattern it never saw during training
 
-计时口径也照抄：只计模型前向，不计数据准备（数据准备是三种方法共享的常数）。
+The timing convention is also copied as-is: only the model's forward pass is
+timed, not data preparation (data preparation is a constant shared by all three methods).
 
-输出 `check_outputs/eval/senseiver_metrics<tag>.json`，字段名与
-`4dvarnet_enkf/check_outputs/eval/test_metrics_*.json` 对齐，可以直接进对比图。
+Output `check_outputs/eval/senseiver_metrics<tag>.json`, with field names aligned
+to `4dvarnet_enkf/check_outputs/eval/test_metrics_*.json`, so it can go straight
+into the comparison figures.
 
-用法（GPU 节点）:
+Usage (GPU node):
     sbatch sbatch/submit_eval.sbatch
     srun -p gpu-debug --gres=gpu:1 -t 00:14:00 bash -c \
       'module load scicomp-pytorch-env/2026.1; python3 -u checks/evaluate.py --days 1 --frames 400'
@@ -39,7 +43,7 @@ from methods.senseiver.network import Senseiver
 
 
 def clip_bounds(x):
-    """与 EnKF 的 _clip_bounds 相同的物理界（4dvarnet_enkf/checks/eval_test_days.py:44）。"""
+    """Same physical bounds as the EnKF's _clip_bounds (4dvarnet_enkf/checks/eval_test_days.py:44)."""
     x = x.clone()
     x[:, 0].clamp_(0, 5)          # density
     x[:, 1].clamp_(-5, 5)         # vx
@@ -71,12 +75,13 @@ def eval_day(model, day, dev, batch, frames, clip, obs_every_k, chans, ablate=Fa
         sl = slice(i, i + batch)
         tok, pad, _ = sensors.build_batch(Y[sl], Om[sl], pe, mean, std)
         if ablate:
-            # 对照：抹掉传感器"读数"，只保留它们的"位置"和 pad_mask。
-            # 若 blind MSE 几乎不变，说明模型没在用观测，只是背了一个平均场。
+            # Ablation: erase the sensors' "readings", keep only their
+            # "positions" and pad_mask. If blind MSE barely changes, the model
+            # isn't using the observations, it's just memorised an average field.
             tok[:, :, :C] = 0.0
         tok, pad = tok.to(dev), pad.to(dev)
         if dev.type == "cuda":
-            torch.cuda.synchronize()          # CUDA 异步：不同步就只计到 kernel launch
+            torch.cuda.synchronize()          # CUDA is async: without this we'd only time the kernel launch
         t0 = time.perf_counter()
         xr = model.reconstruct(tok, pad)
         if dev.type == "cuda":
@@ -85,8 +90,10 @@ def eval_day(model, day, dev, batch, frames, clip, obs_every_k, chans, ablate=Fa
         if clip:
             xr = clip_bounds(xr)
         xb = torch.from_numpy(X[sl]).reshape(-1, C, H, W).to(dev)
-        # Omega_c = Omega 在 4 个通道上广播（config 默认 obs_channels=None，四通道同时观测），
-        # 与 eval_test_days.py 的 `mb < 0.5` 和 score_enkf.py 的 ~Omega.repeat(4) 一致
+        # Omega_c = Omega broadcast across the 4 channels (config's default
+        # obs_channels=None means all four channels are observed together),
+        # matching eval_test_days.py's `mb < 0.5` and score_enkf.py's
+        # ~Omega.repeat(4)
         obs = torch.from_numpy(Om[sl]).reshape(-1, 1, H, W).to(dev).expand(-1, C, -1, -1)
         d2 = (xr - xb) ** 2
         se_b += float(d2[~obs].sum()); n_b += int((~obs).sum())
@@ -104,13 +111,13 @@ def main():
     ap.add_argument("--split", default="test")
     ap.add_argument("--days", type=int, default=0)
     ap.add_argument("--batch", type=int, default=256)
-    ap.add_argument("--frames", type=int, default=0, help=">0 只取每天前 N 帧")
+    ap.add_argument("--frames", type=int, default=0, help="when >0, only take the first N frames per day")
     ap.add_argument("--tag", default="")
     ap.add_argument("--no-clip", dest="clip", action="store_false")
     ap.set_defaults(clip=True)
     ap.add_argument("--outdir", default="check_outputs/eval")
     ap.add_argument("--ablate-values", action="store_true",
-                    help="对照实验：抹掉传感器读数(保留位置)，检验模型是否真在用观测")
+                    help="ablation experiment: erases sensor readings (keeps positions), to check whether the model actually uses the observations")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -124,7 +131,7 @@ def main():
     days = ds.om.split_files(args.split)
     if args.days:
         days = days[:args.days]
-    print(f"[data] {len(days)} 个 {args.split} 日（留出）\n", flush=True)
+    print(f"[data] {len(days)} held-out {args.split} days\n", flush=True)
     print(f"{'day':16s} {'blindMSE':>10} {'blindRMSE':>11} {'fullMSE':>10} {'frames':>8} {'ms/frame':>10}",
           flush=True)
     print("-" * 72, flush=True)
@@ -142,7 +149,7 @@ def main():
 
     bl = np.array([p["blind_mse"] for p in per_day])
     fu = np.array([p["full_mse"] for p in per_day])
-    rm = np.sqrt(bl)                       # 先逐日开方再平均（均值的平方根 != 平方根的均值）
+    rm = np.sqrt(bl)                       # square-root per day, then average (mean of the sqrt != sqrt of the mean)
     tot_s = sum(p["solve_s"] for p in per_day); tot_f = sum(p["n_frames"] for p in per_day)
     print("-" * 72, flush=True)
     print(f"{'MEAN':16s} {bl.mean():>10.4f} {rm.mean():>11.4f} {fu.mean():>10.4f} "

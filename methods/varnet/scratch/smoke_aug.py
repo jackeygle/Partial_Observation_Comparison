@@ -1,4 +1,4 @@
-# 从仓库根跑: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_aug
+# Run from the repo root: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_aug
 import sys, os, torch
 from methods.varnet.variational_solver import GradSolver
 from methods.varnet.prior_model import GENN

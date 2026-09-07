@@ -1,4 +1,4 @@
-# 从仓库根跑: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_grad_path
+# Run from the repo root: source sbatch/_env.sh && python3 -m methods.varnet.scratch.smoke_grad_path
 import sys, os, torch
 from methods.varnet.variational_solver import GradSolver
 from methods.varnet.prior_model import GENN
@@ -15,11 +15,11 @@ with torch.no_grad():
     S.grad_net.out_var.weight.normal_(0, 0.01)
 xr, v = S(x0, y, m, return_var=True)
 S.zero_grad(); v.sum().backward()                 # gradient ONLY from the variance branch
-print("从 sigma^2 分支回传,各处梯度:")
+print("Backprop from the sigma^2 branch, gradients everywhere:")
 for n in ("grad_net.out.weight", "grad_net.out_var.weight",
           "grad_net.lstm.gates.weight", "phi.branch_fine.psi.conv.weight"):
     g = dict(S.named_parameters()).get(n)
     if g is None:
         cand=[k for k,_ in S.named_parameters() if "psi" in k or "gates" in k]; print("  ?",n,cand[:3]); continue
     val = 0.0 if g.grad is None else g.grad.abs().sum().item()
-    print(f"  {n:32s} {val:.4e}   {'不受影响' if val==0 else '← 受影响'}")
+    print(f"  {n:32s} {val:.4e}   {'unaffected' if val==0 else '<- affected'}")

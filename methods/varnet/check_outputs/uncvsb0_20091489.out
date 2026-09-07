@@ -1,0 +1,31 @@
+[members] 5 x runs/varnet_vsb0_s{}  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1953   0.1380    0.151  0.4870   2.49   98.6%
+all_aleatoric_only              0.1953   0.1371    0.160  0.4784   2.45   98.2%
+all_epistemic_only              0.1953   0.0755    3.964  0.0651   0.33   75.0%
+all_constant_sigma_baseline     0.1953   0.0902   -0.214  0.1953   1.00   92.6%
+blind                           0.2129   0.1412    0.188  0.4898   2.30   98.1%
+observed                        0.1732   0.1343    0.109  0.4837   2.79   99.1%
+defined                         0.2730   0.1568    0.251  0.4818   1.76   96.8%
+defined_constant_sigma_baseline  0.2730   0.1282    0.121  0.2730   1.00   91.9%
+defined_blind                   0.3886   0.1982    0.500  0.4832   1.24   93.0%
+defined_blind_constant_sigma_baseline  0.3886   0.1932    0.474  0.3886   1.00   89.6%
+defined_observed                0.1519   0.1288    0.083  0.4809   3.17   99.4%
+defined_observed_constant_sigma_baseline  0.1519   0.0735   -0.466  0.1519   1.00   92.3%
+blind_constant_sigma_baseline   0.2129   0.0941   -0.128  0.2129   1.00   93.7%
+channel_density                 0.1124   0.1179    0.044  0.4588   4.08   99.2%
+channel_vx                      0.3437   0.2180    0.616  0.6386   1.86   96.3%
+channel_vy                      0.1235   0.1206    0.100  0.4568   3.70   99.2%
+channel_var                     0.0812   0.0954   -0.158  0.3936   4.85   99.7%
+
+[out] /scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/eval/uncertainty_vsb0.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%

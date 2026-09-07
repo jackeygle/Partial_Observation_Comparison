@@ -1,0 +1,26 @@
+[members] 1 个 checkpoint: epochs [70]  dev=cuda
+  atc-20130811_corridor_1.0s.h5  2998 帧
+
+[pass 2] 常数 sigma 基线，sigma = all 31.5513, blind 37.1643, defined 0.4134, defined_blind 0.5800
+
+split                                 RMSE     CRPS   sigma   sp/sk   cov90
+all                                31.5513   1.7276  0.4396   0.014   84.0%
+blind                              37.1643   2.1453  0.5894   0.016   79.2%
+observed                           23.2139   1.2332  0.2623   0.011   89.6%
+defined                             0.4134   0.1334  0.2684   0.649   96.2%
+defined_blind                       0.5800   0.2096  0.4217   0.727   95.5%
+defined_observed                    0.2158   0.0762  0.1532   0.710   96.6%
+channel_density                     0.3628   0.0857  0.1580   0.435   94.5%
+channel_vx                          0.8549   0.4086  0.5342   0.625   82.0%
+channel_vy                         63.0892   6.1619  0.7766   0.012   73.8%
+channel_var                         0.9149   0.2542  0.2897   0.317   85.5%
+defined_channel_density             0.4243   0.1377  0.3083   0.727   96.8%
+defined_channel_vx                  1.0658   0.5760  0.9432   0.885   89.0%
+defined_channel_vy                  1.0233   0.5572  0.9167   0.896   87.9%
+defined_channel_var                 0.7875   0.3195  0.7108   0.903   95.3%
+all_constant_sigma_baseline        31.5513   8.5804 31.5513   1.000   99.6%
+blind_constant_sigma_baseline      37.1643  10.1104 37.1643   1.000   99.6%
+defined_constant_sigma_baseline     0.4134   0.1804  0.4134   1.000   94.2%
+defined_blind_constant_sigma_baseline  0.5800   0.2660  0.5800   1.000   92.4%
+
+[out] check_outputs/eval/_smoke_unc_dincae.json

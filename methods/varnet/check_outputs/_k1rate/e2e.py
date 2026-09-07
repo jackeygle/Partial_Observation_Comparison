@@ -33,6 +33,6 @@ def run(root, n_frames):
 N = 12
 a, ta = run(f"{TP}/enkf_lab", N)
 b, tb = run(f"{TP}/enkf_opt", N)
-print(f"  enkf_lab (原版)   {N} 帧  {ta:6.1f}s   {ta/N:.2f} s/帧")
-print(f"  enkf_opt (向量化) {N} 帧  {tb:6.1f}s   {tb/N:.2f} s/帧   提速 {ta/tb:.0f}×")
-print(f"\n  估计值逐位相同: {'✅ 是' if np.array_equal(a, b) else '❌ 否  maxdiff=' + str(np.abs(a-b).max())}")
+print(f"  enkf_lab (original)   {N} frames  {ta:6.1f}s   {ta/N:.2f} s/frame")
+print(f"  enkf_opt (vectorised) {N} frames  {tb:6.1f}s   {tb/N:.2f} s/frame   speedup {ta/tb:.0f}x")
+print(f"\n  estimates bit-identical: {'yes' if np.array_equal(a, b) else 'NO  maxdiff=' + str(np.abs(a-b).max())}")

@@ -1,0 +1,19 @@
+  [k=1] est_atc-20130811.npz
+  [k=1] est_atc-20130818.npz
+  [k=1] est_atc-20130825.npz
+  [k=1] est_atc-20130901.npz
+  [k=1] est_atc-20130915.npz
+  [k=1] est_atc-20130922.npz
+  [k=1] est_atc-20130929.npz
+  [k=1] second pass, constant sigma = all 0.2388, blind 0.2150
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/eval_uncertainty_enkf.py", line 157, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/eval_uncertainty_enkf.py", line 147, in main
+    json.dump(res, open(p, "w"), indent=2)
+                   ^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json'
+srun: error: csl28: task 0: Exited with exit code 1
+srun: Terminating StepId=20081211.0

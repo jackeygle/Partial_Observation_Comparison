@@ -25,9 +25,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
-# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
-# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+# This script used to live under 4dvarnet_enkf/, and ROOT always pointed there
+# (runs/, check_outputs/ hang off it). After the 2026-09-03 refactor it moved to
+# the top level, where dirname(dirname(__file__)) would become the repo root, and
+# every os.path.join(ROOT, ...) would silently point somewhere wrong -- hence the
+# explicit binding.
 ROOT = paths.method(paths.VARNET)
 EV = os.path.join(ROOT, "check_outputs", "eval")
 
