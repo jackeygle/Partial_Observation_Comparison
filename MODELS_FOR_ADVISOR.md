@@ -17,8 +17,25 @@ atc-20130922  atc-20130929
 ```
 
 Grid: 36×12 cells, 4 channels (density, vx, vy, var); 290/432 cells are
-physically walkable, the rest are the obstacle region discussed in the
-meeting (see `methods/dincae/checks/measure_obstacle_region.py`).
+physically walkable, the rest (142 cells, 32.9%) are the obstacle region
+discussed in the meeting.
+
+**Result** (`methods/dincae/checks/measure_obstacle_region.py`, full 7-day
+test split, `methods/dincae/check_outputs/eval/obstacle_region.json`):
+obstacle-region truth is non-zero only 2.99–3.11% of the time across all four
+channels — matching the advisor's "3–4%" estimate almost exactly. The
+information-form baseline (`dincae_full`, obstacle cells never in its loss)
+is fine on density there (never learns a wrong bias) but is wildly wrong on
+velocity — vy MSE 3.85 there vs 0.054 on walkable cells, a >1300x gap —
+because it was never taught a target for a channel that only exists where
+`density>0`, which is never true in the obstacle region during training. The
+`--full-field-loss` ablation (`dincae_ff`, obstacle cells supervised against
+physical 0) closes almost all of that gap (vy obstacle MSE 0.0029, a
+1340x improvement) at essentially no cost to walkable-region accuracy
+(vx walkable MSE actually improves, 0.087 vs 0.133; density/var walkable
+MSE within noise). So: **not a bug, DINCAE's information form structurally
+cannot learn "obstacle = 0" unless the obstacle region is put in the loss**,
+and doing so is nearly free.
 
 ## The 4 reconstruction methods
 

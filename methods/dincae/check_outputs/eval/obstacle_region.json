@@ -1,0 +1,110 @@
+{
+  "baseline_info_form": {
+    "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_full",
+    "checkpoints": [
+      "ckpt_00040.pt",
+      "ckpt_00050.pt",
+      "ckpt_00060.pt",
+      "ckpt_00070.pt",
+      "ckpt_00080.pt",
+      "ckpt_00090.pt",
+      "ckpt_00100.pt",
+      "ckpt_00110.pt",
+      "ckpt_00120.pt",
+      "ckpt_00130.pt",
+      "ckpt_00140.pt",
+      "ckpt_00150.pt",
+      "ckpt_00160.pt",
+      "ckpt_00170.pt",
+      "ckpt_00180.pt",
+      "ckpt_00190.pt"
+    ],
+    "epochs": [
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100,
+      110,
+      120,
+      130,
+      140,
+      150,
+      160,
+      170,
+      180,
+      190
+    ],
+    "n_obstacle_cells": 142,
+    "obstacle_mse": {
+      "density": 0.0015201909311713725,
+      "vx": 0.8515009902023182,
+      "vy": 3.8469511548063573,
+      "var": 0.027856700177228022
+    },
+    "walkable_mse": {
+      "density": 0.012536834066175874,
+      "vx": 0.13269205728236416,
+      "vy": 0.05439521247298046,
+      "var": 0.006675596250208584
+    },
+    "obstacle_truth_nonzero_frac": {
+      "density": 0.031111937090294688,
+      "vx": 0.031111708716749256,
+      "vy": 0.031111708716749256,
+      "var": 0.029908408505869125
+    }
+  },
+  "full_field_ablation": {
+    "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_ff",
+    "checkpoints": [
+      "ckpt_00030.pt",
+      "ckpt_00040.pt",
+      "ckpt_00050.pt",
+      "ckpt_00060.pt",
+      "ckpt_00070.pt",
+      "ckpt_00080.pt",
+      "ckpt_00090.pt",
+      "ckpt_00100.pt",
+      "ckpt_00110.pt",
+      "ckpt_00120.pt",
+      "ckpt_00130.pt",
+      "ckpt_00140.pt"
+    ],
+    "epochs": [
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100,
+      110,
+      120,
+      130,
+      140
+    ],
+    "n_obstacle_cells": 142,
+    "obstacle_mse": {
+      "density": 0.0010507742566053337,
+      "vx": 0.007287482104712417,
+      "vy": 0.0028697251461974487,
+      "var": 0.00021702959569633258
+    },
+    "walkable_mse": {
+      "density": 0.014054671523299025,
+      "vx": 0.08718997648086729,
+      "vy": 0.01465399573495954,
+      "var": 0.007413001665110238
+    },
+    "obstacle_truth_nonzero_frac": {
+      "density": 0.031111937090294688,
+      "vx": 0.031111708716749256,
+      "vy": 0.031111708716749256,
+      "var": 0.029908408505869125
+    }
+  }
+}
