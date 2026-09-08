@@ -1,5 +1,7 @@
 # methods/senseiver — reproducing Senseiver on the ATC crowd field
 
+> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+
 **The third method route.** The first two (4DVarNet reproduction + Localized EnKF
 comparison) live in [`../varnet/`](../varnet/). This directory only
 reuses its **data pipeline and observation configuration** (`config.yaml` /
@@ -290,6 +292,12 @@ worth." Without this sentence, the table would be misread.
 
 ## Results (7 held-out days, full day, obs_every_k=1, same clipping across all three)
 
+> **Unit note.** This section reports **MSE**, under what the main tables now call
+> the `allcells` convention. The root `README.md`'s headline table reports
+> **RMSE** under two conventions side by side, so the numbers look different
+> while describing the same thing: Senseiver's 0.0284 here is 0.169 there
+> (0.169^2 = 0.0286). Do not mix the two units in one comparison.
+
 Produced by `checks/evaluate.py` (single method) and, for the cross-method
 per-channel table, `compare/compare5.py` (the three-way `compare3.py` it
 originally came from was deleted on 2026-09-08 as a duplicate implementation).
@@ -310,12 +318,14 @@ archived convention also had clipping ON.
 Senseiver beats 4DVarNet-a4 on 7/7 days, difference mean +0.00237, std 0.00030 (far
 smaller than the difference itself).
 
-> **Convention warning**: the **0.0392** in
-> `methods/varnet/check_outputs/eval/enkf_metrics.json` **must not be used** -- it
-> comes from `check_outputs/enkf/`, which is **obs_every_k=4 with only 400 frames
-> per day**. And the first 400 frames of each day are an empty field (density is
-> only 1/6.9 of the full day's), a doubly favourable subset. The full-day k=1 EnKF
-> estimate is in `check_outputs/enkf_k1_full/`, re-scored at **0.0462**.
+> **Historical warning, now resolved.** `enkf_metrics.json` used to hold
+> **0.0392**, scored from a `check_outputs/enkf/` export that was
+> **obs_every_k=4 with only 400 frames per day** — and the first 400 frames of a
+> day are an empty field (density only 1/6.9 of the full day's), so it was a
+> doubly favourable subset. That export directory was deleted on 2026-09-08 along
+> with the whole k=4 line, `score_enkf.py` now defaults to the full-day k=1
+> export, and the file has been re-scored at **0.0462**. The lesson stands: an
+> EnKF number is meaningless without its `obs_every_k` and frame range.
 
 ### Per-channel blind MSE -- the ranking is **not** consistent
 

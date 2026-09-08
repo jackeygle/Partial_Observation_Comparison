@@ -15,5 +15,11 @@ cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
 # the intent here rather than leaving the entry point broken.
 # To reproduce the reference implementation's averaging instead:
 #   sbatch sbatch/submit_eval.sbatch --average-checkpoints --ckpt-glob ''
-CKPT="/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_full/ckpt_00070.pt"
-python3 -u -m methods.dincae.checks.evaluate --ckpt-glob "$CKPT" "$@"
+ROOT=/scratch/work/zhangx29/Thesis_Project
+CKPT="$ROOT/methods/dincae/runs/dincae_full/ckpt_00070.pt"
+# --out matches the checkpoint: the published single-checkpoint result belongs in
+# eval_single_00070/, NOT in eval/, which holds the 16-checkpoint average. Writing
+# both to eval/ would silently overwrite one result with the other under the same
+# filename.
+python3 -u -m methods.dincae.checks.evaluate --ckpt-glob "$CKPT" \
+        --out "$ROOT/methods/dincae/check_outputs/eval_single_00070" "$@"

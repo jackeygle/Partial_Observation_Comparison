@@ -1,5 +1,7 @@
 # methods/dincae — reproducing DINCAE on the ATC crowd field
 
+> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+
 The second technical route. The first (4DVarNet reproduction + EnKF comparison) is
 already complete, in [`../varnet/`](../varnet/); this directory
 **does not depend on its conclusions**, only reuses its data pipeline
@@ -44,7 +46,7 @@ Identifiers in the code follow this table: `residual_mse()`, `resid_std`,
 | `dataset.py` | one day -> training samples; observation config read from `crowdcore/config.yaml`; disk cache |
 | `model.py` | U-Net + SumSkip + refinement step + sigma-hat parameterisation (Eq.6-7) |
 | `losses.py` | Gaussian NLL (Eq.3), summed after independently normalising each variable |
-| `train.py` | training loop (Adam / grad clip 5 / checkpoint used for output averaging) |
+| `train.py` | training loop (Adam / grad clip 5 / periodic checkpoints) |
 | `checks/` | self-checks, evaluation, and scripts measuring the data itself |
 | `sbatch/` | SLURM submission scripts |
 | `artifacts/` | **artifacts**: `state_stats.npz` (read by training), `decay_tables.*` (diagnostic only) |
@@ -56,8 +58,8 @@ Inside `checks/`:
 
 - `check_encoding.py` — self-checks `encoding.py`'s invariants (are both pieces 0 at
   missing cells, is the target mask correct, ...)
-- `evaluate.py` — evaluation: multi-epoch output averaging, sigma-hat calibration,
-  variance retention, both MSE conventions
+- `evaluate.py` — evaluation: sigma-hat calibration, variance retention, both MSE
+  conventions, and optional multi-epoch output averaging (`--average-checkpoints`)
 - `measure_coverage_revisit.py` / `measure_obs_age.py` / `measure_decorrelation.py`
   — measurements about **the data itself** (coverage, observation age, temporal
   autocorrelation), not on the training path
@@ -74,19 +76,22 @@ module load scicomp-pytorch-env/2026.1
 cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
 
 # 1. Per-cell statistics (once; pure numpy/scipy, login node is fine, ~8 minutes)
-python3 state.py                       # -> artifacts/state_stats.npz
+python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
 
 # 2. Encoding self-check (~2 minutes, login node is fine)
-python3 checks/check_encoding.py             # expect PASS
+python3 -m methods.dincae.checks.check_encoding   # expect PASS
 
 # 3. Training (GPU node)
 sbatch sbatch/submit_train.sbatch            # 200 epochs, self-chaining + --resume
 #   -> runs/dincae_full/{last.pt, ckpt_*.pt, metrics.jsonl}
-#   the first epoch builds cache/ (~23 GB); every epoch after that only reads it
+#   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 
 # 4. Evaluation (GPU node)
 sbatch sbatch/submit_eval.sbatch --split test
-#   -> check_outputs/eval/dincae_metrics_test.json
+#   -> check_outputs/eval_single_00070/dincae_metrics_test.json
+#   (the PUBLISHED configuration: the single epoch-70 checkpoint. The
+#    16-checkpoint average lives in check_outputs/eval/ and now needs an
+#    explicit --average-checkpoints, see "Checkpoint policy" below.)
 ```
 
 **torch only runs on GPU nodes** (`sbatch`, or
@@ -241,3 +246,17 @@ be reported separately).
 - **Do not set separate defaults for the observation config here** -- always read
   `crowdcore/config.yaml` (`dataset.obs_config`), otherwise the two technical
   routes' observation scenarios stop being comparable.
+
+## Checkpoint policy
+
+Every **published** DINCAE number comes from a single checkpoint,
+`runs/dincae_full/ckpt_00070.pt`, picked on DINCAE's own validation set —
+matching the other three methods, none of which ensemble or average.
+
+The reference implementation instead averages the outputs of checkpoints saved
+every 10 epochs, which scores ~1.7% better on RMSE. That path still exists
+behind `--average-checkpoints`, and its result is archived in
+`check_outputs/eval/`; it is reported as a measured side quantity, not as the
+headline. `load_models()` refuses to average silently — passing no
+`--ckpt-glob` now raises instead of quietly returning a number ~1.7% away from
+the reported one with nothing in the output to distinguish them.
