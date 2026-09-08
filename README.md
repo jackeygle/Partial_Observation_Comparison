@@ -427,14 +427,22 @@ Stage (2) looks load-bearing because the split lists
 but `observation_model.split_files()` only takes the filename stem and opens the
 corresponding `grid_cache` file instead. Those 36 GB are never opened.
 
-Two external paths are configured in `crowdcore/config.yaml`, and are the only
-ones to repoint on another machine:
+Two external paths are configured in `crowdcore/config.yaml`. They cover
+everything on the normal path — training, evaluation, the comparison, the
+figures — and are what to repoint on another machine:
 
 - `data.root` → `/scratch/work/zhangx29/data` (stages 2 and 3, plus the split lists)
 - `navigation.map_dir` → the real ATC map (`localization_grid.pgm` + `.yaml`,
   3.3 MB), which lives **outside both this repo and the data root**, under
   `project_analysis/.../robot_exploration/atc_map/`. This is the easiest
   dependency to miss.
+
+One exception, verified 2026-09-09: `methods/varnet/checks/check_data_pipeline.py`
+hardcodes three absolute paths as its argparse **defaults** (`DEFAULT_CSV`,
+`DEFAULT_REF_H5`, `DEFAULT_REF_CACHE`). It is the only script that still does —
+it reaches back to pipeline stages 1 and 2, which nothing else touches, and it
+accepts those paths as arguments. Everything else resolves through
+`config.yaml`.
 
 Rebuild stages 1 → 2 → 3 only if the raw CSVs or the grid resolution changed;
 see `crowdcore/data/DOC_data_pipeline.md`.

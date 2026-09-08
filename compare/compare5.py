@@ -132,7 +132,16 @@ HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 # Three cell-scope choices x clipped/unclipped. `full` is "the full field" --
 # observed + blind, all cells, the same quantity as eval_test_days.py's full_mse
 # and the removed three-way script's rmse_all; it is included so those scripts'
-# reported 0.1702 and 0.2104 for 4DVarNet can be checked against the same code path.
+# reported numbers can be put next to this one's.
+#
+# They do NOT actually agree. Measured 2026-09-09 on b0_k1: eval_test_days.py
+# reports full_mse 0.0290 and blind_mse 0.0338, this script's `full` and
+# `allcells` give 0.0317 and 0.0365 -- the same +0.0027 offset in both, so it is
+# not a cell-scope difference (that would scale differently for the two subsets).
+# Cause not established; the analogous gap against the old three-way script was
+# never tracked down either. Treat numbers from the two scripts as not
+# interchangeable, and prefer this one -- it is the only implementation that
+# computes every convention in one pass.
 # Why `_noclip` exists: the removed three-way script did not clip, test_metrics does -- that is the
 # only known convention difference between them.
 BASE_CONVENTIONS = ("defined", "defined_full", "allcells", "full")

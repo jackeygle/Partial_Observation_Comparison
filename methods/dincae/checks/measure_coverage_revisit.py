@@ -1,4 +1,5 @@
 import os, sys
+from crowdcore import observation_model as om
 # Scripts in checks/ import source modules from the project root; the root must
 # be inserted at the front (so this directory's losses.py takes priority),
 # 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
@@ -6,7 +7,9 @@ import os, sys
 import numpy as np, h5py, glob
 from crowdcore import observation_model as d
 from crowdcore import navigation as nav
-fps=sorted(glob.glob('/scratch/work/zhangx29/data/grid_cache/atc-*_corridor_1.0s.h5'))
+# grid_cache location comes from crowdcore/config.yaml's data.root, not a hardcoded
+# absolute path -- otherwise this script silently ignores a repointed data root.
+fps=sorted(glob.glob(os.path.join(om.GRID_CACHE, 'atc-*_corridor_1.0s.h5')))
 Xf=h5py.File(fps[0],'r')['grid']
 X=Xf[:4000]
 valid=nav.build_valid_mask_from_config(Xf[:])
