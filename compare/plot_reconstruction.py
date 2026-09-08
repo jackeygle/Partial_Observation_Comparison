@@ -107,11 +107,15 @@ def recon_varnet(ckpt, day_file, t, dev):
     return clip_np(xr[:, t])
 
 
-def recon_dincae(run_dir, day_file, t, dev):
+def recon_dincae(run_dir, ckpt, day_file, t, dev):
     from methods.dincae.state import StateStats
     from methods.dincae.encoding import FRESH_OFFSETS
     stats = StateStats()
-    models, epochs, ckpt_paths = dincae_load_models(run_dir, "", dev)
+    # One named checkpoint, not the ckpt_*.pt glob: the glob averages every
+    # checkpoint's outputs, which is not the configuration behind any reported
+    # DINCAE number (see evaluate.PUBLISHED_CKPT), so the panel would not show
+    # the model the tables describe.
+    models, epochs, ckpt_paths = dincae_load_models(run_dir, os.path.join(run_dir, ckpt), dev)
     Xt, rec, _, _, _ = dincae_predict_day(models, stats, day_file, dev)
     # predict_day's arrays start at frame `lo` (the smallest FRESH_OFFSETS margin), not 0
     lo = -min(FRESH_OFFSETS)
@@ -150,6 +154,8 @@ def main():
     ap.add_argument("--frame", type=int, default=-1, help="-1 = auto-pick the busiest observed frame")
     ap.add_argument("--varnet-ckpt", default=os.path.join(paths.method(paths.VARNET), "runs", "varnet_mse5_s0", "varnet_best.pt"))
     ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full"))
+    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+                    help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--out", default="")
@@ -175,7 +181,7 @@ def main():
         if m == "varnet":
             panels.append(("4DVarNet", recon_varnet(args.varnet_ckpt, day_file, t, dev)))
         elif m == "dincae":
-            panels.append(("DINCAE", recon_dincae(args.dincae_run_dir, day_file, t, dev)))
+            panels.append(("DINCAE", recon_dincae(args.dincae_run_dir, args.dincae_ckpt, day_file, t, dev)))
         elif m == "senseiver":
             panels.append(("Senseiver", recon_senseiver(args.senseiver_ckpt, day_file, t, dev)))
         elif m == "enkf":

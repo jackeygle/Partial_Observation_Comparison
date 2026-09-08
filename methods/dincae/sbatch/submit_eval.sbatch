@@ -9,4 +9,11 @@
 
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
-python3 -u -m methods.dincae.checks.evaluate "$@"
+# Defaults to the PUBLISHED configuration: the single epoch-70 checkpoint every
+# reported DINCAE number uses. Without an explicit --ckpt-glob, evaluate.py
+# matches all 16 ckpt_*.pt and now refuses to average them silently, so state
+# the intent here rather than leaving the entry point broken.
+# To reproduce the reference implementation's averaging instead:
+#   sbatch sbatch/submit_eval.sbatch --average-checkpoints --ckpt-glob ''
+CKPT="/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_full/ckpt_00070.pt"
+python3 -u -m methods.dincae.checks.evaluate --ckpt-glob "$CKPT" "$@"

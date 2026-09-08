@@ -77,11 +77,42 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CLIP = ((0.0, 5.0), (-5.0, 5.0), (-5.0, 5.0), (0.0, 2.0))
 
 
-def load_models(run_dir, ckpt_glob, dev):
-    """Loads the list of checkpoints whose outputs will be averaged."""
+#: The checkpoint every PUBLISHED DINCAE number was produced with -- single
+#: model, picked on DINCAE's own validation set. Both `compare5_final.json`
+#: (via check_outputs/eval_single_00070/) and `uncertainty_dincae.json`
+#: (`checkpoints: [70]`) use exactly this file. Multi-checkpoint averaging is
+#: the reference implementation's behaviour and scores BETTER (-1.7% RMSE),
+#: but the main table reports single models for every method, because none of
+#: the four papers ensembles and mixing the two would not be comparable.
+PUBLISHED_CKPT = "ckpt_00070.pt"
+
+
+def load_models(run_dir, ckpt_glob, dev, allow_average=False):
+    """Loads the checkpoint(s) to evaluate.
+
+    `allow_average=False` (the default) **refuses to silently average**: if the
+    glob matches more than one checkpoint it raises instead of quietly
+    returning the reference implementation's multi-checkpoint average, which is
+    a different configuration from every published number (see PUBLISHED_CKPT).
+
+    That failure mode is why the guard exists: averaging N checkpoints produces
+    a perfectly plausible number roughly 1.7% (RMSE) away from the reported
+    one, with no error and nothing in the output to say which configuration
+    produced it. Pass `allow_average=True` (CLI: `--average-checkpoints`) to
+    reproduce the reference implementation's averaging deliberately.
+    """
     paths = sorted(glob.glob(ckpt_glob or os.path.join(run_dir, "ckpt_*.pt")))
     if not paths:                                    # fall back to last.pt if there are no intermediate checkpoints
         paths = [os.path.join(run_dir, "last.pt")]
+    if len(paths) > 1 and not allow_average:
+        raise SystemExit(
+            f"[load_models] {len(paths)} checkpoints matched under {run_dir} and averaging was not "
+            f"requested.\n"
+            f"  Published configuration : --ckpt-glob '{os.path.join(run_dir, PUBLISHED_CKPT)}'\n"
+            f"  Reference-implementation averaging (a DIFFERENT number, ~1.7% better RMSE):\n"
+            f"                            --average-checkpoints\n"
+            f"  Matched: {[os.path.basename(p) for p in paths[:6]]}"
+            + (" ..." if len(paths) > 6 else ""))
     models, epochs = [], []
     for p in paths:
         st = torch.load(p, map_location=dev)
@@ -248,7 +279,17 @@ def calibration_table(sd, se, nbin=10):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_full"))
-    ap.add_argument("--ckpt-glob", default="")
+    ap.add_argument("--ckpt-glob", default="",
+                    help=f"which checkpoint(s) to evaluate. Default: every ckpt_*.pt under "
+                         f"--run-dir, which is more than one and therefore requires "
+                         f"--average-checkpoints. For the PUBLISHED configuration pass "
+                         f"--ckpt-glob '<run-dir>/{PUBLISHED_CKPT}'")
+    ap.add_argument("--average-checkpoints", action="store_true",
+                    help="average the outputs of every matched checkpoint (1.0 Fig.3, the "
+                         "reference implementation's behaviour). **Off by default**: it scores "
+                         "~1.7%% better on RMSE but is NOT the configuration any reported number "
+                         "uses, and averaging silently would make the two indistinguishable in "
+                         "the output. Kept because the gain is itself a reportable quantity.")
     ap.add_argument("--split", default="test", choices=["test", "valid"])
     ap.add_argument("--days", type=int, default=0, help="use only the first N days (debug)")
     ap.add_argument("--frames", type=int, default=0, help="use only the first N frames per day (debug)")
@@ -264,8 +305,11 @@ def main():
         print("!! no GPU -- do not run torch on the login node (see README)", flush=True)
 
     stats = StateStats()
-    models, epochs, paths = load_models(args.run_dir, args.ckpt_glob, dev)
-    print(f"output averaging over {len(models)} checkpoints: epochs {epochs}")
+    models, epochs, paths = load_models(args.run_dir, args.ckpt_glob, dev,
+                                        allow_average=args.average_checkpoints)
+    print(f"{'output averaging over' if len(models) > 1 else 'single checkpoint:'} "
+          f"{len(models) if len(models) > 1 else ''} epochs {epochs}"
+          + ("   [NOT the published configuration]" if len(models) > 1 else ""))
 
     files = om.split_files(args.split)
     if args.days:

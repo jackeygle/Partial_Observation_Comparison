@@ -109,11 +109,14 @@ def block_varnet(ckpt, X, start, N, dev):
     return clip_np(xr)
 
 
-def block_dincae(run_dir, day_file, start, N, dev):
+def block_dincae(run_dir, ckpt, day_file, start, N, dev):
     from methods.dincae.state import StateStats
     from methods.dincae.encoding import FRESH_OFFSETS
     stats = StateStats()
-    models, epochs, _ = dincae_load_models(run_dir, "", dev)
+    # A named checkpoint, never the ckpt_*.pt glob -- the glob averages every
+    # checkpoint's outputs, a different configuration from every reported
+    # DINCAE number (see evaluate.PUBLISHED_CKPT).
+    models, epochs, _ = dincae_load_models(run_dir, os.path.join(run_dir, ckpt), dev)
     lo, hi_margin = -min(FRESH_OFFSETS), max(FRESH_OFFSETS)
     # predict_day's `frames` truncates the day to T = min(T_all, frames); it also
     # needs hi_margin frames of FUTURE context past the last predicted frame, or
@@ -157,6 +160,8 @@ def main():
     ap.add_argument("--batch", type=int, default=256, help="Senseiver forward-pass chunk size")
     ap.add_argument("--varnet-ckpt", default=os.path.join(paths.method(paths.VARNET), "runs", "varnet_mse5_s0", "varnet_best.pt"))
     ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full"))
+    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+                    help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--outdir", default="")
@@ -192,7 +197,7 @@ def main():
     recon, spread = {}, None
     if "dincae" in methods:
         print("[seq] running DINCAE ...", flush=True)
-        recon["DINCAE"] = block_dincae(args.dincae_run_dir, day_file, start, N, dev)
+        recon["DINCAE"] = block_dincae(args.dincae_run_dir, args.dincae_ckpt, day_file, start, N, dev)
     if "senseiver" in methods:
         print("[seq] running Senseiver ...", flush=True)
         recon["Senseiver"] = block_senseiver(args.senseiver_ckpt, day_file, start, N, args.batch, dev)

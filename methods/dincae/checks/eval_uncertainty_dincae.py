@@ -93,8 +93,13 @@ def main():
     ap.add_argument("--ckpt-glob", default="",
                     help="the glob is a **full path pattern**, not relative to "
                          "run-dir (matching evaluate.load_models's behaviour). "
-                         "Leave empty to take every ckpt_*.pt under run-dir and "
-                         "average their outputs.")
+                         "Left empty it matches every ckpt_*.pt under run-dir, "
+                         "which now requires --average-checkpoints rather than "
+                         "averaging silently. The published uncertainty_dincae.json "
+                         "used a single checkpoint (epoch 70).")
+    ap.add_argument("--average-checkpoints", action="store_true",
+                    help="average the outputs of every matched checkpoint. Off by default: "
+                         "not the configuration any reported number uses.")
     ap.add_argument("--split", default="test", choices=["test", "valid"])
     ap.add_argument("--days", type=int, default=0)
     ap.add_argument("--frames", type=int, default=0)
@@ -109,7 +114,8 @@ def main():
         print("!! no GPU -- do not run torch on the login node", flush=True)
 
     stats = StateStats()
-    models, epochs, _ = load_models(args.run_dir, args.ckpt_glob, dev)
+    models, epochs, _ = load_models(args.run_dir, args.ckpt_glob, dev,
+                                    allow_average=args.average_checkpoints)
     print(f"[members] {len(models)} checkpoints: epochs {epochs}  dev={dev}", flush=True)
 
     # Slices: two conventions x three scopes, plus per-channel. The
