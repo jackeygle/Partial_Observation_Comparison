@@ -1,7 +1,7 @@
-# dincae_crowd — reproducing DINCAE on the ATC crowd field
+# methods/dincae — reproducing DINCAE on the ATC crowd field
 
 The second technical route. The first (4DVarNet reproduction + EnKF comparison) is
-already complete, in [`../4dvarnet_enkf/`](../4dvarnet_enkf/); this directory
+already complete, in [`../varnet/`](../varnet/); this directory
 **does not depend on its conclusions**, only reuses its data pipeline
 (`observation_model.py` / `navigation.py` / `data_pipeline/`) and the **exact same
 observation configuration**.
@@ -41,7 +41,7 @@ Identifiers in the code follow this table: `residual_mse()`, `resid_std`,
 |---|---|
 | `state.py` | **state definition**: the four channels, per-channel validity rules, per-channel transforms (`var` goes through log1p), and the **per-cell mean field** (each cell's average over the 32 training days) + residual std |
 | `encoding.py` | information-form encoding: `y/sigma^2` + `1/sigma^2`, missing = both pieces 0 |
-| `dataset.py` | one day -> training samples; observation config read from `4dvarnet_enkf/config.yaml`; disk cache |
+| `dataset.py` | one day -> training samples; observation config read from `crowdcore/config.yaml`; disk cache |
 | `model.py` | U-Net + SumSkip + refinement step + sigma-hat parameterisation (Eq.6-7) |
 | `losses.py` | Gaussian NLL (Eq.3), summed after independently normalising each variable |
 | `train.py` | training loop (Adam / grad clip 5 / checkpoint used for output averaging) |
@@ -71,7 +71,7 @@ Inside `checks/`:
 
 ```bash
 module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/dincae_crowd
+cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
 
 # 1. Per-cell statistics (once; pure numpy/scipy, login node is fine, ~8 minutes)
 python3 state.py                       # -> artifacts/state_stats.npz
@@ -200,11 +200,11 @@ two numbers are key to explaining performance, not a bug.
 ## Evaluation convention (`checks/evaluate.py`)
 
 **Both MSE conventions are reported**, because they lead to different conclusions
-(a pitfall already hit once in the 4dvarnet_enkf project):
+(a pitfall already hit once in the 4DVarNet work (methods/varnet)):
 
 - `ours` — only on cells where that channel **is defined**, restricted to walkable
   cells. The convention used during training.
-- `v4dvar` — exactly follows `4dvarnet_enkf/checks/eval_test_days.py`: the raw
+- `v4dvar` — exactly follows `methods/varnet/checks/eval_test_days.py`: the raw
   field, **all** cells (including non-walkable ones), four channels unweighted,
   blind = `mask < 0.5`, with the same physical clipping as the EnKF. This
   convention scores us on cells we were never trained on and is unfavourable to
@@ -228,9 +228,9 @@ be reported separately).
 
 ## Gotchas
 
-- **Module-name shadowing**: `4dvarnet_enkf` also has a `losses.py`. So scripts in
+- **Module-name shadowing**: `methods/varnet` also has a `losses.py`. So scripts in
   this directory always `sys.path.insert(0, project_root)` before
-  `sys.path.append(4dvarnet_enkf)` -- getting the order backwards imports the wrong
+  `sys.path.append(methods/varnet)` -- getting the order backwards imports the wrong
   file.
 - **Changing the encoding means clearing `cache/`.** The cache key includes
   `CACHE_VER` and the observation config, so changing those invalidates it
@@ -239,5 +239,5 @@ be reported separately).
 - **`/tmp` is node-local** -- a compute node cannot see the login node's `/tmp`.
   Artifacts are written inside the project instead.
 - **Do not set separate defaults for the observation config here** -- always read
-  `4dvarnet_enkf/config.yaml` (`dataset.obs_config`), otherwise the two technical
+  `crowdcore/config.yaml` (`dataset.obs_config`), otherwise the two technical
   routes' observation scenarios stop being comparable.

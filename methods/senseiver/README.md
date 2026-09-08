@@ -1,7 +1,7 @@
-# senseiver_crowd — reproducing Senseiver on the ATC crowd field
+# methods/senseiver — reproducing Senseiver on the ATC crowd field
 
 **The third method route.** The first two (4DVarNet reproduction + Localized EnKF
-comparison) live in [`../4dvarnet_enkf/`](../4dvarnet_enkf/). This directory only
+comparison) live in [`../varnet/`](../varnet/). This directory only
 reuses its **data pipeline and observation configuration** (`config.yaml` /
 `observation_model.py` / `navigation.py`), does not depend on any of its
 conclusions, and does not modify any of its lines.
@@ -22,7 +22,7 @@ reason.
 
 ```bash
 module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/senseiver_crowd
+cd /scratch/work/zhangx29/Thesis_Project/methods/senseiver
 
 # 1. Self-check (GPU node, ~1 minute)
 srun -p gpu-debug --gres=gpu:1 -t 00:14:00 --mem=16G bash -c \
@@ -51,7 +51,7 @@ never on the login node.
 | `sensors.py` | **new in this project**: observation -> variable-length sensor token set (padding + pad_mask) |
 | `network.py` | the whole model (plain PyTorch, no Lightning) |
 | `losses.py` | training loss (the reference implementation's unweighted MSE, copied as-is) + a diagnostic breakdown |
-| `dataset.py` | one day -> samples; observation config read verbatim from `4dvarnet_enkf/config.yaml` |
+| `dataset.py` | one day -> samples; observation config read verbatim from `crowdcore/config.yaml` |
 | `train.py` | training loop (Adam / AMP / `--resume`) |
 | `checks/check_model.py` | permutation invariance, padding invariance, differentiability, dimension assertions |
 | `checks/check_sensors.py` | invariants of the token construction |
@@ -104,9 +104,9 @@ inferred.
 
 ```
 1  grid_cache, one day                    (T, 4, 36, 12)   float32
-   4dvarnet_enkf's Stage-2 output, 1 frame per second
+   methods/varnet's Stage-2 output, 1 frame per second
         |
-        |  observation_model.generate_observations  <- 4dvarnet_enkf, config read from config.yaml
+        |  observation_model.generate_observations  <- crowdcore, config read from config.yaml
         v
 2  Y      (T, 4, 36, 12)   noisy partial observation, 0 where unobserved
    Omega  (T, 36, 12) bool  which cells the robots saw this second (varies per
@@ -165,7 +165,7 @@ quantity being optimised.
 four channels are summed unweighted (the paper's Eq., copied as-is), and vx's std
 is 0.54 while var's is only 0.12, so vx dominates a single MSE. This is not a bug,
 it is a property of this metric -- the header of
-`4dvarnet_enkf/checks/compare_channels.py` complains about the same thing. **Both
+`compare/compare_channels.py` complains about the same thing. **Both
 the single number and the per-channel breakdown must be reported** (`evaluate.py`
 writes both into the JSON).
 
@@ -196,7 +196,7 @@ from the checkpoint: `decoder.postproc.weight` has shape `(4, 32)`,
    regions still have a ground truth, and **the evaluation convention scores
    them**. `check_sensors.py` measures **32.1% of observed cells falling on
    non-walkable ground** (robots can see pillars they cannot drive into, see the
-   4dvarnet_enkf README) -- further reason the query set cannot be clipped to
+   methods/varnet's README) -- further reason the query set cannot be clipped to
    walkable cells.
 2. **Added dimension assertions to `Decoder`.** The decoder's cross-attention
    treats `dec_num_latent_channels` as the KV dimension, while the channel count
@@ -267,7 +267,7 @@ from the method itself:
 
 | Anchor | Approach |
 |---|---|
-| Observation parameters | read verbatim from `4dvarnet_enkf/config.yaml`'s `observation` section; this directory sets no defaults of its own |
+| Observation parameters | read verbatim from `crowdcore/config.yaml`'s `observation` section; this directory sets no defaults of its own |
 | Observation generation | calls `om.generate_observations` + `nav.build_valid_mask_from_config` directly |
 | Data split | `om.split_files()`; 32 training days / 7 validation days / 7 test days, training days strictly earlier than test days |
 | Metrics | blind MSE (`mask<0.5`) + full-field MSE, on the raw field, four channels unweighted, including non-walkable cells |
@@ -295,7 +295,7 @@ per-channel table, `compare/compare5.py` (the three-way `compare3.py` it
 originally came from was deleted on 2026-09-08 as a duplicate implementation).
 4DVarNet's numbers are **rerun by us using its own
 `eval_test_days.py`** (`--outdir` pointed at this directory, nothing written into
-4dvarnet_enkf), matching its archived values to 4 decimal places, confirming the
+methods/varnet), matching its archived values to 4 decimal places, confirming the
 archived convention also had clipping ON.
 
 ### Summary table
@@ -311,7 +311,7 @@ Senseiver beats 4DVarNet-a4 on 7/7 days, difference mean +0.00237, std 0.00030 (
 smaller than the difference itself).
 
 > **Convention warning**: the **0.0392** in
-> `4dvarnet_enkf/check_outputs/eval/enkf_metrics.json` **must not be used** -- it
+> `methods/varnet/check_outputs/eval/enkf_metrics.json` **must not be used** -- it
 > comes from `check_outputs/enkf/`, which is **obs_every_k=4 with only 400 frames
 > per day**. And the first 400 frames of each day are an empty field (density is
 > only 1/6.9 of the full day's), a doubly favourable subset. The full-day k=1 EnKF
@@ -367,7 +367,7 @@ observed cells' accuracy.
 Neither number is cheating -- both methods get the same observations, and
 recovering the observed locations is genuinely part of the task. But **leading
 with full-field MSE would significantly inflate the conclusion**; the
-4dvarnet_enkf README's choice to label blind MSE as *the real task* is justified.
+methods/varnet's README's choice to label blind MSE as *the real task* is justified.
 
 ### Ablation: how much do observations actually contribute
 
@@ -419,7 +419,7 @@ report.
 
 ## Gotchas
 
-- **`sys.path` uses `append`, not `insert(0)`**: `4dvarnet_enkf` also has a
+- **`sys.path` uses `append`, not `insert(0)`**: `methods/varnet` also has a
   `losses.py`; inserting at the front would shadow this directory's same-named
   module.
 - **`/tmp` is node-local**: what a compute node writes to `/tmp` is invisible to
@@ -428,7 +428,7 @@ report.
   `--frames 400` are noticeably over-optimistic, fine for a smoke test, not to be
   treated as a conclusion.
 - **The EnKF's 0.0392 must not be cited**:
-  `4dvarnet_enkf/check_outputs/eval/enkf_metrics.json` comes from
+  `methods/varnet/check_outputs/eval/enkf_metrics.json` comes from
   `check_outputs/enkf/`, a doubly-favourable subset with obs_every_k=**4** and only
   **400** frames per day. The full-day k=1 estimate is in
   `check_outputs/enkf_k1_full/`, re-scored at **0.0462**. Likewise

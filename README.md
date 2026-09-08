@@ -1,15 +1,30 @@
 # Partial Observation Comparison
 
-Comparing five methods for reconstructing crowd density/velocity fields from
-**partial observations** on the ATC pedestrian trajectory dataset.
+**The problem.** Three robots move through a real train-station corridor (the
+ATC pedestrian dataset, Osaka). Each senses only the people within a small
+radius of itself — that is the "partial observation". The task is to
+reconstruct the **full** crowd density and velocity field over the whole
+corridor (a 36x12 grid, one frame per second) from those sparse sightings.
 
-For step-by-step commands (training, reproducing the headline comparison,
-per-method diagnostics), see [HOW_TO_USE.md](HOW_TO_USE.md).
+**What is compared.** Four independent reconstruction methods — 4DVarNet,
+DINCAE, Senseiver and a localised ensemble Kalman filter. Three of them are
+additionally scored on whether they know *how wrong* they are (an uncertainty
+estimate), because a wrong-but-honest answer is more useful downstream than a
+wrong-and-confident one. Two of those uncertainty designs are ours, added to
+4DVarNet, which has none in the original paper.
+
+**Where to start**
+
+| If you want to | Read |
+|---|---|
+| understand what is here and why the numbers move | this file |
+| actually run something | [HOW_TO_USE.md](HOW_TO_USE.md) |
+| know which checkpoint produced which published number, or what to transfer to reproduce it | [MODELS_FOR_ADVISOR.md](MODELS_FOR_ADVISOR.md) |
 
 ## Structure
 
 ```
-crowdcore/          shared by all five methods: the method-agnostic half
+crowdcore/          shared by every method: the method-agnostic half
   config.py+yaml      single source of truth for all parameters
   navigation.py       walkable region, A* path planning, the real ATC map
   observation_model.py multi-robot sensor motion and observation generation, Omega, X0 fill-in
@@ -32,7 +47,7 @@ sbatch/_env.sh      the single environment entry point
 
 ```bash
 source sbatch/_env.sh                    # module load + PYTHONPATH + PYTHONSAFEPATH
-python3 -m compare.compare5              # five-way comparison, four conventions
+python3 -m compare.compare5              # all methods and arms, four scoring conventions
 python3 -m compare.plot_compare5         # the main results figure
 python3 -m methods.varnet.train --help
 python3 -m methods.enkf.checks.verify_enkf_opt --frames 12
@@ -51,12 +66,18 @@ sbatch methods/varnet/sbatch/submit_varnet.sbatch --days 32 --dT 200
 sbatch methods/dincae/sbatch/submit_eval.sbatch
 ```
 
-## The five methods
+## Four methods, plus two uncertainty designs of our own
+
+Counted as **four reconstruction methods**. 4DVarNet appears three times
+because we added two uncertainty designs to it that the paper does not have —
+those are variants of one method, not separate methods. This is the framing
+agreed with the supervisor on 2026-09-07.
 
 | Directory | Method | Uncertainty output |
 |---|---|---|
-| `methods/varnet/` | 4DVarNet (plain MSE, Eq.14) | none |
-| `methods/varnet/` | 4DVarNet + uncertainty head (NLL, 5-member ensemble) | learned sigma-hat + epistemic |
+| `methods/varnet/` | 4DVarNet (plain MSE, Eq.14) — the reconstruction method | none |
+| `methods/varnet/` | ... + `aug0`: sigma inside the prior operator `G(x)`, NLL (**ours**) | learned sigma-hat + epistemic |
+| `methods/varnet/` | ... + `vsb0`: sigma from a separate read-out head, NLL (**ours**, negative control) | learned sigma-hat + epistemic |
 | `methods/dincae/` | DINCAE (single checkpoint; see note below) | sigma-hat (information form) |
 | `methods/senseiver/` | Senseiver | none |
 | `methods/enkf/` | localised EnKF (+ PedPred3 forward model) | ensemble spread |
@@ -101,9 +122,13 @@ also backpropagates through autograd), so the 4th decimal place is noise — see
 ## What is not in the repo
 
 The repo holds only code, config, metrics, and figures. The following generated
-data, about 30 GB, is excluded by `.gitignore`:
+data, about 21 GB, is excluded by `.gitignore` (sizes as of 2026-09-08):
 
-- `*.pt` model weights (`methods/*/runs/`, ~1 GB)
-- `*.npz` EnKF estimated fields (`methods/varnet/check_outputs/enkf*`, ~18 GB)
-- `methods/dincae/cache/` grid cache (~13 GB)
-- `**/check_outputs/eval/seq_ppt_*/` per-frame sequence figures
+- `methods/dincae/cache/` grid encoding cache (~13 GB)
+- `*.npz` EnKF exported fields (`methods/enkf/check_outputs/`, ~6.3 GB)
+- `*.pt` model weights (`methods/*/runs/`, ~1.5 GB)
+- `**/seq_ppt_*/` per-frame sequence figures
+
+**The gridded ATC data itself is also not here** (`*.h5`, `git ls-files` returns
+zero) and is needed to run anything. See `MODELS_FOR_ADVISOR.md` for the minimal
+~1.4 GB package that reproduces the published inference.

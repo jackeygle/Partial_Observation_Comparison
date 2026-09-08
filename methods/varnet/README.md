@@ -17,25 +17,25 @@ command reads its defaults from there, and command-line flags override for one r
 ```bash
 # 0. environment (Aalto Triton)
 module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf
+cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 # 1. (data is already gridded — see "Data" below if you must rebuild from CSV)
 
 # 2. train 4DVarNet to convergence (full 32-day train split, paper window dT=200)
-sbatch sbatch/submit_train_chain.sbatch          # self-chaining to 100 epochs on an H200
-#   -> runs/varnet_full100/varnet_last.pt + metrics.jsonl
+sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1   # self-chains on an H200
+#   -> runs/varnet_b0_k1/varnet_last.pt + metrics.jsonl
 
 # 3. evaluate on the 7 held-out TEST days
 sbatch sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip   # 4DVarNet
-python3 checks/export_obs_for_enkf.py --frames 400        # export identical obs for the EnKF
-python3 checks/run_enkf_baseline.py  --frames 400         # EnKF (apt-ibex) on the SAME obs
-python3 checks/score_enkf.py                              # score EnKF vs truth
+python3 -m methods.enkf.checks.export_obs_for_enkf --frames 400        # export identical obs for the EnKF
+python3 -m methods.enkf.checks.run_enkf_baseline  --frames 400         # EnKF (apt-ibex) on the SAME obs
+python3 -m methods.enkf.checks.score_enkf                              # score EnKF vs truth
 
 # 4. figures + comparison + slide deck
-python3 checks/plot_reconstruction_enkf.py --day atc-20130811
-python3 checks/plot_velocity_enkf.py       --day atc-20130811
-python3 checks/compare_channels.py
-python3 checks/plot_comparison.py
+python3 -m compare.plot_reconstruction_enkf --day atc-20130811
+python3 -m methods.enkf.checks.plot_velocity_enkf       --day atc-20130811
+python3 -m compare.compare_channels
+python3 -m compare.plot_comparison
 python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} + _notes.md
 ```
 
@@ -51,17 +51,17 @@ python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} 
 | path | role |
 |---|---|
 | `config.yaml` | **all parameters** (data, grid, navigation/map, observation, prior, solver, training) |
-| `data_pipeline/csv_to_h5.py` | Stage 1: raw ATC CSV → trajectory H5 |
-| `data_pipeline/h5_to_grid.py` | Stage 2: trajectory H5 → grid_cache `(T,4,36,12)` |
+| `crowdcore/data/csv_to_h5.py` | Stage 1: raw ATC CSV → trajectory H5 |
+| `crowdcore/data/h5_to_grid.py` | Stage 2: trajectory H5 → grid_cache `(T,4,36,12)` |
 | `observation_model.py` | Component 1: multi-robot partial observation; `split_files`, `load_state`, `generate_observations` |
 | `navigation.py` | walkable map / obstacles / A*; `build_valid_mask_from_config` |
 | `prior_model.py` | Component 2: GENN dynamical prior Φ |
 | `variational_solver.py` | Component 3: variational cost + learned-gradient-descent solver (`GradSolver`) |
-| `train_varnet.py` | end-to-end training (Φ + solver + cost weights, one loss) |
+| `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/` | verification scripts + all figure/evaluation scripts (see below) |
 | `sbatch/` | SLURM submit scripts |
 | `slides/build_meeting4_deck.py` | builds the current meeting deck (reads numbers from config/checkpoint/JSON) |
-| `runs/varnet_full100/` | the trained checkpoint + `metrics.jsonl` |
+| `runs/varnet_b0_k1/` | the model of record: checkpoint + `metrics.jsonl` (see the repo README's method table) |
 | `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
 
 ---
@@ -71,10 +71,10 @@ python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} 
 ### Flow at a glance
 ```
 raw ATC CSV                                    (per day, ~1-4 GB)
-   │  Stage 1  data_pipeline/csv_to_h5.py       mm->m, group by timestamp
+   │  Stage 1  crowdcore/data/csv_to_h5.py       mm->m, group by timestamp
    ▼
 trajectory H5   position/velocity/index         (~650 MB/day)
-   │  Stage 2  data_pipeline/h5_to_grid.py       1 s frames, triangular kernel, rotated corridor
+   │  Stage 2  crowdcore/data/h5_to_grid.py       1 s frames, triangular kernel, rotated corridor
    ▼
 grid_cache      (T, 4, 36, 12)  [density, vx, vy, var], 1 s per frame   <- day-to-day work starts HERE
    │  Component 1  observation_model.generate_observations
@@ -82,15 +82,15 @@ grid_cache      (T, 4, 36, 12)  [density, vx, vy, var], 1 s per frame   <- day-t
 X, Y, Ω, X0     full state / partial obs / mask / init      (in memory)
    │  Components 2-3  prior_model.py + variational_solver.py
    ▼
-train_varnet.py  ->  reconstructed field  (Φ + solver trained jointly)
+train.py          ->  reconstructed field  (Φ + solver trained jointly)
 ```
 
 The `grid_cache/atc-*_corridor_1.0s.h5` files are already the Stage-2 output;
 `observation_model.load_state` reads them directly. Rebuild from CSV only if needed:
 
 ```bash
-python3 data_pipeline/csv_to_h5.py  --csv <atc-YYYYMMDD.csv> --out /tmp/day.h5
-python3 data_pipeline/h5_to_grid.py --traj-h5 /tmp/day.h5 --out /tmp/day_corridor_1.0s.h5 --subset corridor
+python3 crowdcore/data/csv_to_h5.py  --csv <atc-YYYYMMDD.csv> --out /tmp/day.h5
+python3 crowdcore/data/h5_to_grid.py --traj-h5 /tmp/day.h5 --out /tmp/day_corridor_1.0s.h5 --subset corridor
 #   add --validate <ref.h5> to either stage to check a rebuild against an existing file
 ```
 - **State** = 4 channels `[density, vx, vy, var]` on a 36×12 corridor grid, 1 s/frame.
@@ -142,13 +142,13 @@ hand-derived gradient) → `ConvLSTM2d` → `x ← x − u/n_iter`. Φ and the s
 ## Train
 
 ```bash
-sbatch sbatch/submit_train_chain.sbatch     # self-chaining --resume to 100 epochs
-#   runs: train_varnet.py --days 32 --dT 200 --n-iter 20 --epochs 100 --batch 32 --amp --loss supervised
-#   out : runs/varnet_full100/varnet_last.pt (+ optimizer/epoch for resume) + metrics.jsonl
+sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1   # self-chaining --resume
+#   runs: train.py --days 32 --dT 200 --n-iter 20 --epochs 100 --batch 32 --amp --loss supervised
+#   out : runs/varnet_b0_k1/varnet_last.pt (+ optimizer/epoch for resume) + metrics.jsonl
 
 # quick smoke test
 srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
-     bash -c 'module load scicomp-pytorch-env/2026.1; python3 -u train_varnet.py --days 1 --steps 50'
+     bash -c 'module load scicomp-pytorch-env/2026.1; python3 -u -m methods.varnet.train --days 1 --steps 50'
 ```
 - Loss: `--loss supervised` = `‖x_rec − X‖²` (paper Eq.14, unweighted MSE). `--no-noise`
   observes without sensor noise.
@@ -168,14 +168,14 @@ sbatch sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip
 #   -> check_outputs/eval/test_metrics_matched_clip.json
 
 # EnKF — export identical observations, run, score
-python3 checks/export_obs_for_enkf.py --frames 400   # -> check_outputs/enkf/obs_<day>.npz
-python3 checks/run_enkf_baseline.py  --frames 400    # -> check_outputs/enkf/est_<day>.npz  (needs the apt-ibex model)
-python3 checks/score_enkf.py                         # -> check_outputs/eval/enkf_metrics.json
+python3 -m methods.enkf.checks.export_obs_for_enkf --frames 400   # -> check_outputs/enkf/obs_<day>.npz
+python3 -m methods.enkf.checks.run_enkf_baseline  --frames 400    # -> check_outputs/enkf/est_<day>.npz  (needs the apt-ibex model)
+python3 -m methods.enkf.checks.score_enkf                         # -> check_outputs/eval/enkf_metrics.json
 
 # per-channel × per-region (observed Ω / blind ¬Ω) breakdown
-python3 checks/compare_channels.py                  # -> check_outputs/eval/channel_metrics.json + compare_channels.png
+python3 -m compare.compare_channels                  # -> check_outputs/eval/channel_metrics.json + compare_channels.png
 ```
-The EnKF driver lives **in this project** (`checks/run_enkf_baseline.py`) and imports
+The EnKF driver lives **in this project** (`methods/enkf/checks/run_enkf_baseline.py`) and imports
 `pedpred.*` from the `Partial_observation` project via `sys.path`; it does not modify it.
 
 ---
