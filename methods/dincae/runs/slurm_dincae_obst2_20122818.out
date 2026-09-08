@@ -1,0 +1,25 @@
+test split: 7 days, 142/432 cells are physically non-walkable (32.9%)
+
+=== baseline_info_form  (/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_full  ckpt_00070.pt) ===
+  checkpoint(s): ['ckpt_00070.pt']  epochs [70]
+  channel     obstacle MSE  walkable MSE  truth nonzero%
+  density          0.00482       0.01341           3.11%
+  vx               1.12610       0.15404           3.11%
+  vy               3.39451       0.06859           3.11%
+  var              0.04219       0.00705           2.99%
+
+=== full_field_ablation  (/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_ff  ckpt_00140.pt) ===
+  checkpoint(s): ['ckpt_00140.pt']  epochs [140]
+  channel     obstacle MSE  walkable MSE  truth nonzero%
+  density          0.00115       0.01510           3.11%
+  vx               0.00807       0.09243           3.11%
+  vy               0.00335       0.01577           3.11%
+  var              0.00024       0.00805           2.99%
+
+wrote /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval/obstacle_region.json
+
+=== summary: obstacle-region MSE, baseline vs full-field ===
+  density    baseline 0.00482   full-field 0.00115   baseline/full-field = 4.20x
+  vx         baseline 1.12610   full-field 0.00807   baseline/full-field = 139.58x
+  vy         baseline 3.39451   full-field 0.00335   baseline/full-field = 1014.54x
+  var        baseline 0.04219   full-field 0.00024   baseline/full-field = 177.22x
