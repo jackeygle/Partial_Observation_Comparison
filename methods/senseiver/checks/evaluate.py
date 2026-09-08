@@ -37,6 +37,7 @@ import time
 import numpy as np
 import torch
 
+from crowdcore import paths
 from methods.senseiver import dataset as ds
 from methods.senseiver import sensors
 from methods.senseiver.network import Senseiver
@@ -53,7 +54,8 @@ def clip_bounds(x):
 
 
 def load_model(path, dev):
-    ck = torch.load(path, map_location=dev, weights_only=False)
+    ck = torch.load(paths.require_ckpt(path, "Senseiver checkpoint"),
+                    map_location=dev, weights_only=False)
     m = Senseiver(**ck["hparams"]).to(dev)
     m.load_state_dict(ck["model"])
     m.eval()

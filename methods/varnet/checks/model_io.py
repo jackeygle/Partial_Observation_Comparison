@@ -21,6 +21,7 @@ from __future__ import annotations
 import torch
 
 from crowdcore import config
+from crowdcore import paths
 from methods.varnet.prior_model import GENN
 from methods.varnet.variational_solver import GradSolver
 
@@ -64,7 +65,7 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
     n_iter : override the iteration count (e.g. to time the cost of a shorter solve).
              Default = the count the model actually finished training with.
     """
-    ck = torch.load(ckpt_path, map_location="cpu")
+    ck = torch.load(paths.require_ckpt(ckpt_path, "4DVarNet checkpoint"), map_location="cpu")
     a, sd = ck["args"], ck["solver"]
     P = config.CFG["prior"]
     g = lambda k: a.get(k, P[k])                      # fall back to config for older ckpts

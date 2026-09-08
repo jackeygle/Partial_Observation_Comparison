@@ -64,6 +64,7 @@ import torch
 # 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
 # at the front would shadow this directory's).
 from crowdcore import observation_model as om                                    # noqa: E402
+from crowdcore import paths as repo_paths   # aliased: `paths` is a local variable below
 
 from methods.dincae.state import (CHANNELS, StateStats, NCH, channel_valid,  # noqa: E402
                          fwd_channel, inv_channel)
@@ -115,7 +116,7 @@ def load_models(run_dir, ckpt_glob, dev, allow_average=False):
             + (" ..." if len(paths) > 6 else ""))
     models, epochs = [], []
     for p in paths:
-        st = torch.load(p, map_location=dev)
+        st = torch.load(repo_paths.require_ckpt(p, "DINCAE checkpoint"), map_location=dev)
         a = st["args"]
         m = DINCAE(N_IN, NCH, enc_internal=tuple(a["enc"]),
                    loss_weights=tuple(a["loss_weights"]), pool=a["pool"]).to(dev)

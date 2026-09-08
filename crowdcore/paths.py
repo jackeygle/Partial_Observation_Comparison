@@ -100,3 +100,23 @@ def enkf_vendor(which: str = "enkf_lab") -> str:
     """
     assert which in ("enkf_lab", "enkf_opt"), which
     return os.path.join(METHODS, ENKF, which)
+
+def require_ckpt(path: str, what: str = "checkpoint") -> str:
+    """Return `path`, or exit with an actionable message if it does not exist.
+
+    A fresh clone has no `runs/` (gitignored) and no ATC data, so every
+    checkpoint load fails -- and torch's own FileNotFoundError arrives at the
+    bottom of a 15-line traceback naming a file the reader has never heard of.
+    This says what is actually missing and what to do instead.
+    """
+    if os.path.exists(path):
+        return path
+    raise SystemExit(
+        f"[missing {what}] {path}\n"
+        f"\n"
+        f"  runs/ is gitignored, so a fresh clone has no trained weights, and the\n"
+        f"  gridded ATC data is not in git either -- neither is needed to READ the\n"
+        f"  already-computed results: see compare/results/ and methods/*/check_outputs/.\n"
+        f"\n"
+        f"  To actually run inference you need the ~1.4 GB package described in\n"
+        f"  README.md under 'The minimal package: ~1.4 GB, not 225 GB'.")
