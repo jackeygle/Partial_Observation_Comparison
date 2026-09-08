@@ -57,9 +57,19 @@ sbatch methods/dincae/sbatch/submit_eval.sbatch
 |---|---|---|
 | `methods/varnet/` | 4DVarNet (plain MSE, Eq.14) | none |
 | `methods/varnet/` | 4DVarNet + uncertainty head (NLL, 5-member ensemble) | learned sigma-hat + epistemic |
-| `methods/dincae/` | DINCAE (16-checkpoint output averaging) | sigma-hat (information form) |
+| `methods/dincae/` | DINCAE (single checkpoint; see note below) | sigma-hat (information form) |
 | `methods/senseiver/` | Senseiver | none |
 | `methods/enkf/` | localised EnKF (+ PedPred3 forward model) | ensemble spread |
+
+**Every headline row is a single model**, default configuration, seed 0, each
+one's checkpoint picked on its own validation set — no ensembling and no
+checkpoint averaging, because neither paper reports one. DINCAE's reference
+implementation *does* average the outputs of checkpoints saved every 10 epochs,
+and `checks/evaluate.py` still supports it (that is its default `--ckpt-glob`),
+but the reported number comes from **one** checkpoint, `ckpt_00070.pt`. The
+16-checkpoint average is kept as a measured side quantity (worth 1.7%, less
+than picking the right single checkpoint), not as the headline. See
+`MODELS_FOR_ADVISOR.md` for exactly which file backs which published number.
 
 `methods/enkf/enkf_lab/` is a **byte-identical, read-only copy** of
 `/scratch/work/zhangx29/Partial_observation`, its files deliberately chmod 444. To

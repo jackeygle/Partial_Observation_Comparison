@@ -42,7 +42,7 @@ and doing so is nearly free.
 | Method | Checkpoint(s) | Eval script | Result JSON |
 |---|---|---|---|
 | 4DVarNet (plain MSE, Eq.14) | `methods/varnet/runs/varnet_mse5_s{0..4}/varnet_best.pt` (5 seeds) | `methods.varnet.checks.eval_test_days` / `compare.compare5` | `compare/results/compare5_final.json` (`"4DVarNet MSE s*"`) |
-| DINCAE (information form, 16-ckpt output averaging) | `methods/dincae/runs/dincae_full/ckpt_*.pt` | `methods.dincae.checks.evaluate` | `methods/dincae/check_outputs/eval/dincae_metrics_test.json` |
+| DINCAE (information form) | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one** checkpoint, epoch 70 | `methods.dincae.checks.evaluate --ckpt-glob '.../ckpt_00070.pt'` | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | `methods.senseiver.checks.evaluate` | folded into `compare5_final.json` (`"Senseiver"`) |
 | localised EnKF (+ PedPred3 forward model) | no learned weights — exported ensemble fields at `methods/enkf/check_outputs/enkf_k1_full/` | `methods.enkf.checks.score_enkf` | folded into `compare5_final.json` (`"EnKF k1"`) |
 
@@ -106,6 +106,38 @@ don't have this problem: their normalisation is either baked into the
 checkpoint itself (Senseiver's `in_mean`/`in_std` are model buffers, saved
 in the same `state_dict`) or not needed at inference time (4DVarNet works in
 raw physical units).
+
+## Exactly which file backs each published number
+
+"The DINCAE weights" is not a well-defined request: `runs/dincae_full/` holds
+17 checkpoint files, and which you pick changes the number. The same is true
+of `varnet_best.pt` vs `varnet_last.pt`. This table is the authoritative
+mapping — everything else in `runs/` is either an intermediate or an
+exploratory ablation.
+
+| Published as | Exact file(s) | Why this one |
+|---|---|---|
+| DINCAE | `runs/dincae_full/ckpt_00070.pt` (**single file**) | Best on DINCAE's own validation set. Recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
+| Senseiver | `runs/senseiver_A/best.pt` | Only trained model; `best.pt`, not `last.pt` |
+| 4DVarNet MSE | `runs/varnet_mse5_s{0..4}/varnet_best.pt` | `compare5_final.json`'s protocol records `ckpt: varnet_best.pt` |
+| 4DVarNet aug0 / vsb0 | `runs/varnet_aug0_s{0..4}/varnet_best.pt`, `runs/varnet_vsb0_s{0..4}/varnet_best.pt` | same convention |
+| EnKF | no weights — the exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | it is a filter, not a trained model |
+
+Two traps worth stating explicitly, because both silently produce a
+different number rather than an error:
+
+1. **Do not average DINCAE's 16 checkpoints** to reproduce the headline
+   figure. `checks/evaluate.py`'s *default* `--ckpt-glob` picks up every
+   `ckpt_*.pt` and averages their outputs (that is the reference
+   implementation's behaviour, and `check_outputs/eval/` holds that
+   16-checkpoint result). The reported number is the single epoch-70
+   checkpoint in `check_outputs/eval_single_00070/`. The gap is small (~1.7%)
+   but it is not zero.
+2. **`varnet_best.pt` vs `varnet_last.pt` is a methodological choice, not a
+   detail.** `best` is selected per-run on validation, so different arms stop
+   at different epochs; `last` is always epoch 149 and gives a same-epoch
+   comparison. The headline table uses `best`; `compare5.py --ckpt-name`
+   documents the trade-off.
 
 ## The minimal data package: ~1.4 GB, not 225 GB
 
