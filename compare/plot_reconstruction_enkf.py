@@ -33,7 +33,7 @@ from methods.varnet.checks.model_io import load_solver
 # every os.path.join(ROOT, ...) would silently point somewhere wrong -- hence the
 # explicit binding.
 ROOT = paths.method(paths.VARNET)
-ENKFDIR = paths.enkf_export("enkf")
+ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 ARROW_MIN = 0.1                                           # draw a heading arrow only where there is real crowd
 
 

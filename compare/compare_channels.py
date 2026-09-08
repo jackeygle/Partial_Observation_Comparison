@@ -28,7 +28,7 @@ from methods.varnet.checks.model_io import load_solver
 # every os.path.join(ROOT, ...) would silently point somewhere wrong -- hence the
 # explicit binding.
 ROOT = paths.method(paths.VARNET)
-ENKFDIR = paths.enkf_export("enkf")
+ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 CH = config.get("grid", "channels")
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CKPT = os.environ.get("VARNET_CKPT", "runs/varnet_b0_k1/varnet_best.pt")

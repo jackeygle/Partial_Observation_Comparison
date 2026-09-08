@@ -25,7 +25,7 @@ import numpy as np
 from crowdcore import paths
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENKFDIR = paths.enkf_export("enkf")
+ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 
 
 def main():

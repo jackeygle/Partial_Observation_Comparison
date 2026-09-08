@@ -151,7 +151,7 @@ def main():
     ap.add_argument("--out", default="check_outputs/eval/bench_enkf_opt.json")
     args = ap.parse_args()
 
-    z = np.load(os.path.join(paths.enkf_export("enkf"), f"obs_{args.day}.npz"))
+    z = np.load(os.path.join(paths.enkf_export(), f"obs_{args.day}.npz"))
     Y, Om, obs_std = z["Y"], z["Omega"], z["obs_std"]
     T = min(args.frames, Y.shape[0])
     pre = []

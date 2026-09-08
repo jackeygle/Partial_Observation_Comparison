@@ -91,9 +91,9 @@ def main():
     ap.add_argument("--out", default="check_outputs/eval/enkf_gain_mode.json")
     args = ap.parse_args()
 
-    npz = os.path.join(paths.enkf_export("enkf"), f"obs_{args.day}.npz")
+    npz = os.path.join(paths.enkf_export(), f"obs_{args.day}.npz")
     if not os.path.exists(npz):
-        npz = sorted(glob.glob(os.path.join(paths.enkf_export("enkf"), "obs_*.npz")))[0]
+        npz = sorted(glob.glob(os.path.join(paths.enkf_export(), "obs_*.npz")))[0]
     z = np.load(npz)
     X_true, Y, Om, obs_std = z["X_true"], z["Y"], z["Omega"], z["obs_std"]
     T = min(args.frames, X_true.shape[0])

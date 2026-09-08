@@ -29,7 +29,7 @@ from crowdcore import paths
 from methods.varnet.checks.model_io import load_solver
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENKFDIR = paths.enkf_export("enkf")
+ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 ARROW_MIN = 0.1                                           # arrows only where there is real crowd
 
 
