@@ -36,9 +36,9 @@ Cost, if asked: the sigma-hat is not free. aug0 is 13.9% worse than plain MSE on
 
 Own the correction plainly, then move on — it is one slide, not a defence.
 
-Interleaved, not blocked: round 1 runs every method, then round 2, and so on. Blocking would let a change in the shared node's background load land entirely on one method and be read as a difference between methods. Largest run-to-run spread here is 3.5% of the mean.
+Interleaved, not blocked: round 1 runs every method, then round 2, and so on. Blocking would let a change in the shared node's background load land entirely on one method and be read as a difference between methods. Largest run-to-run spread here is 1.7% of the mean.
 
-The caveat matters and I would rather state it than be asked: for the three per-frame methods this number IS the delay before that frame's estimate exists. For 4DVarNet it is not — one window solves in about 0.55 s. I have the latency figures measured and can show them if you want, but the amortised cost is what is on this slide.
+The caveat matters and I would rather state it than be asked: for the three per-frame methods this number IS the delay before that frame's estimate exists. For 4DVarNet it is not — one window (200 frames) solves in about 0.65 s. I have the latency figures measured and can show them if you want, but the amortised cost is what is on this slide.
 
 k=4 is not shown: in our setting the robots observe every frame. The a2 widened-prior 4DVarNet is not shown either — the bar here is the same model as the accuracy slides.
 
