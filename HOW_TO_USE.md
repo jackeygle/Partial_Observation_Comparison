@@ -191,12 +191,34 @@ retraining). Slurm logs land alongside as `runs/slurm_<job>_<id>.out` and
 **are** tracked in git, so you can always check what a past run actually did
 without re-running it.
 
-## 7. Data pipeline (already built — you should not need this)
+## 7. Where the data lives (already built — you should not need to rebuild it)
 
-The gridded `.h5` cache already exists on disk. Only rebuild it if the raw
-ATC CSVs or the grid resolution changed — see
-`crowdcore/data/DOC_data_pipeline.md` for the three stages
-(`csv_to_h5.py` → `h5_to_grid.py` → per-method encoding cache).
+Three stages, two locations, and **only the last one is read at run time**:
+
+| Stage | Location | Size | Read at run time? |
+|---|---|---|---|
+| ① raw ATC CSVs (92 days) | `/scratch/work/zhangx29/ATC/` | 225 GB | no |
+| ② trajectory H5, Sundays (46 days) | `/scratch/work/zhangx29/data/ATC/Sundays/` | 36 GB | no — naming manifest only |
+| ③ `grid_cache` 4-channel fields (46 days) | `/scratch/work/zhangx29/data/grid_cache/` | 3.0 GB | **yes** |
+
+Stage ② looks like it is used, because the split lists
+(`data/sunday_atc_{train,valid,test}.lst`) contain
+`ATC/Sundays/atc-YYYYMMDD.h5` paths — but `observation_model.split_files()`
+only takes the filename stem and opens the corresponding `grid_cache` file
+instead. Those 36 GB are never opened.
+
+Two external paths are configured in `crowdcore/config.yaml` and are the only
+ones to repoint on another machine:
+
+- `data.root` → `/scratch/work/zhangx29/data` (stages ② and ③ plus the split lists)
+- `navigation.map_dir` → the real ATC map (`localization_grid.pgm` + `.yaml`, 3.3 MB),
+  which lives **outside both this repo and the data root**, under
+  `project_analysis/.../robot_exploration/atc_map/` — the easiest dependency to miss.
+
+Only rebuild stages ① → ② → ③ if the raw CSVs or the grid resolution changed:
+see `crowdcore/data/DOC_data_pipeline.md` (`csv_to_h5.py` → `h5_to_grid.py` →
+per-method encoding cache). For what a *minimal* transferable package looks
+like (~1.4 GB, not 225 GB), see `MODELS_FOR_ADVISOR.md`.
 
 ## 8. Reproducing the headline comparison, with a way to check your answer
 

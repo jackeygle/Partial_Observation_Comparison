@@ -99,9 +99,51 @@ needs a separate transfer off `/scratch/work/zhangx29/Thesis_Project/methods/*/r
 `methods/dincae/artifacts/state_stats.npz` (17KB — per-cell mean field and
 per-channel residual std, computed once from the training data, read
 separately from the checkpoint at inference time by `state.StateStats`). It
-is currently *also* gitignored, caught by the blanket `*.npz` rule meant for
-multi-GB files, not this one — see the fix below. 4DVarNet and Senseiver
+used to be gitignored too, caught by the blanket `*.npz` rule meant for
+multi-GB files rather than this one; it is now tracked via an explicit
+negation in `.gitignore`, so a fresh clone has it. 4DVarNet and Senseiver
 don't have this problem: their normalisation is either baked into the
 checkpoint itself (Senseiver's `in_mean`/`in_std` are model buffers, saved
 in the same `state_dict`) or not needed at inference time (4DVarNet works in
 raw physical units).
+
+## The minimal data package: ~1.4 GB, not 225 GB
+
+The data on Triton spans three pipeline stages in two locations, and **only
+the last stage is read at run time**. Anyone reproducing inference needs far
+less than the raw dataset:
+
+| Stage | Location | Size | Needed to run? |
+|---|---|---|---|
+| ① raw ATC CSVs (92 recording days, the true original) | `/scratch/work/zhangx29/ATC/` | 225 GB | **No** — only to rebuild ② from scratch |
+| ② trajectory H5, Sundays only (46 days) | `/scratch/work/zhangx29/data/ATC/Sundays/` | 36 GB | **No** — see the note below |
+| ③ `grid_cache`, 4-channel 36×12 fields (46 days) | `/scratch/work/zhangx29/data/grid_cache/` | 3.0 GB | **Yes** — this is what every method opens |
+
+Note on ②: the split lists name `ATC/Sundays/atc-YYYYMMDD.h5`, but
+`observation_model.split_files()` only takes the filename stem from them and
+opens `grid_cache/<stem>_corridor_1.0s.h5` instead. Those 36 GB of
+trajectory H5 are therefore a **naming manifest only** — never opened at run
+time, and not worth transferring.
+
+So the complete package to hand over is:
+
+| Item | Path | Size |
+|---|---|---|
+| gridded fields, 7 test days only | `data/grid_cache/atc-{20130811,20130818,20130825,20130901,20130915,20130922,20130929}_corridor_1.0s.h5` | **331 MB** (55–77 MB each; all 46 days would be 3.0 GB) |
+| split lists | `data/sunday_atc_{train,valid,test}.lst` | a few KB |
+| the real ATC map (walkable/obstacle mask) | `/scratch/work/zhangx29/project_analysis/partial_observation_experiments/shared_workspace/robot_exploration/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.3 MB |
+| DINCAE normalisation stats | `methods/dincae/artifacts/state_stats.npz` | 17 KB (already in git) |
+| trained weights | `methods/*/runs/<run>/` | ~1 GB |
+| | **total** | **~1.4 GB** |
+
+**The map directory is the one people forget**: `config.yaml`'s
+`navigation.map_dir` points outside this repo *and* outside the data root,
+into a different project's directory tree. Both external paths are set in
+`crowdcore/config.yaml` (`data.root` and `navigation.map_dir`) and are the
+only two that need repointing on another machine.
+
+(`paths.REFERENCE_IMPL` → `/scratch/work/zhangx29/Partial_observation` is a
+third external path, but it is *not* a runtime dependency — the EnKF's
+vendored byte-identical copy already lives in-repo at
+`methods/enkf/enkf_lab/`; the original is referenced only for provenance
+checks and speed benchmarking.)
