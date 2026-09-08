@@ -354,7 +354,10 @@ overwrite the numbers this README quotes.
 **Expected output**, pooled **RMSE**. A rerun should land within ~0.01 of these
 (4DVarNet rows carry the reproducibility floor described above). Note the figure
 `compare5.png` plots per-channel **MSE**, so its totals are these numbers
-squared — 0.329 there appears as 0.108:
+squared — 0.329 there appears as 0.108. The 2026-09-07 deck quotes **seed 0**
+for the 4DVarNet rows (0.359 / 0.191) where this table reports the **5-seed
+mean** (0.352 / 0.186); both are stated as such, but they are not the same
+quantity:
 
 | Method | `defined` convention | `allcells` convention |
 |---|---|---|

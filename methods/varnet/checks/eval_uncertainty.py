@@ -76,7 +76,7 @@ def score(mu, sigma, x, tag, out):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--members", type=int, nargs="+", default=[0, 1, 2, 3, 4])
-    ap.add_argument("--run-fmt", default="runs/varnet_ml5_s{}")
+    ap.add_argument("--run-fmt", default="runs/varnet_aug0_s{}")
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--frames", type=int, default=0, help="0 = whole day")
     # Windows are solved in batches like checks/eval_test_days.py. A whole day at dT=200 is
@@ -85,7 +85,8 @@ def main():
     # not depend on it.
     ap.add_argument("--batch", type=int, default=2)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
-    ap.add_argument("--out", default="check_outputs/eval/uncertainty_ml5.json")
+    ap.add_argument("--out", default="check_outputs/eval/uncertainty_aug0.json",
+                    help="defaults to the PUBLISHED aug0 arm. ml5 was the earlier design and is no longer in any table -- see SUPERSEDED.md")
     args = ap.parse_args()
     dev = torch.device(args.device)
 
