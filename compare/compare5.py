@@ -1,15 +1,16 @@
 """
-compare5.py — per-channel comparison across five methods, four cell-scope
+compare5.py — per-channel comparison across four methods (+2 uncertainty designs),
+four cell-scope
 conventions side by side
 ==============================================
 
-Five methods (all on the full day of 7 held-out days, obs_every_k=1, seed=0, the
-same physical clipping):
+Four reconstruction methods plus our two 4DVarNet uncertainty designs (all on the
+full day of 7 held-out days, obs_every_k=1, seed=0, the same physical clipping):
 
     Senseiver                     sparse sensors -> field
     4DVarNet MSE   single/ensemble  Eq.14's plain squared loss
     4DVarNet NLL   single/ensemble  Gaussian NLL + sigma-hat read-out head ("the uncertainty head")
-    DINCAE                        convolutional autoencoder inpainting (16-checkpoint output average)
+    DINCAE                        convolutional autoencoder inpainting (single checkpoint, epoch 70)
     EnKF k1                       localised EnKF, a vendor copy of Partial_observation
 
 The MSE arm and NLL arm are **identical weight-for-weight** in prior/solver
@@ -21,7 +22,7 @@ single-model and ensemble level.
 Why four conventions
 ----------------------
 **Rankings flip depending on the convention.** On the same predictions, under the
-"all cells" convention Senseiver comes first and DINCAE comes last, 12x worse;
+"all cells" convention Senseiver comes first and DINCAE comes last, 4.5x worse;
 switch to "channel-defined cells" and DINCAE comes first, Senseiver third.
 
 The cause is in the velocity channels: an empty cell has no people and hence no
@@ -36,7 +37,7 @@ a convention artifact, not a property of the model.
 So all four are computed side by side, making the difference visible in one piece
 of output rather than making the reader compare several jsons themselves:
 
-    (1) defined        blind ∩ defined ∩ walkable      the main result, comparable across all five
+    (1) defined        blind ∩ defined ∩ walkable      the main result, comparable across all rows
     (2) defined_full   full field ∩ defined ∩ walkable includes observed cells
     (3) allcells        blind, all cells                the removed three-way script's convention
     (4) full            full field, all cells           eval_test_days's full_mse
@@ -66,17 +67,18 @@ Convention details
 
 The DINCAE row
 -------------
-Read from `methods/dincae/check_outputs/eval/dincae_metrics_test.json`, without
-rerunning its 16-checkpoint output averaging. Its own evaluate.py happens to
+Read from `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`
+-- the single epoch-70 checkpoint every published DINCAE number uses, not the
+16-checkpoint average in `check_outputs/eval/`. Its own evaluate.py happens to
 report exactly these four conventions, matching one-to-one
 (`ours_blind` / `ours_all` / `v4dvar_blind` / `v4dvar_all`). When combining into
 the "total", **this script's own per-channel cell counts** are used, not the
 `all_channels` value in its json -- the latter's denominator uses its own frame
 range.
 
-Fairness note: this DINCAE row is **itself an average over 16 checkpoints'
-output**, an inherent ensembling advantage -- it should be compared against the
-"ensemble" rows, not the single-model ones.
+Fairness note: this used to read the 16-checkpoint average, which gave DINCAE an
+inherent ensembling advantage over every other row. It now reads the single
+epoch-70 checkpoint, so all rows are single models and directly comparable.
 
 Reproducibility floor
 --------
@@ -231,7 +233,7 @@ def main():
                                          "senseiver_A", "best.pt"))
     ap.add_argument("--varnet", default="a4_k1,b0_k1",
                     help="comma-separated 4dvarnet run names (runs/varnet_<name>/varnet_best.pt)")
-    ap.add_argument("--arms", default="MSE=mse5_s{},NLL=vsb0_s{}",
+    ap.add_argument("--arms", default="MSE=mse5_s{},NLL=vsb0_s{},AUG=aug0_s{}",
                     help="comma-separated `label=run-name-template` entries. Each "
                          "arm produces N single-seed rows, plus one cross-seed "
                          "mean+/-std row. Leave empty to skip all arms.")
@@ -256,8 +258,11 @@ def main():
                          "(measured: 4.2%% for the MSE arm, 1.7%% for the NLL arm).")
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
-                    default=os.path.join(paths.eval_out(paths.DINCAE),
-                                         "dincae_metrics_test.json"))
+                    default=os.path.join(paths.method(paths.DINCAE), "check_outputs",
+                                         "eval_single_00070", "dincae_metrics_test.json"),
+                    help="the PUBLISHED DINCAE row: the single epoch-70 checkpoint. "
+                         "check_outputs/eval/ holds the 16-checkpoint average instead, "
+                         "which is a different configuration from every other row here.")
     ap.add_argument("--days", type=int, default=0)
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--varnet-batch", type=int, default=16)
@@ -266,7 +271,11 @@ def main():
     # it was written under senseiver_crowd/check_outputs/eval/, making people
     # think it was a Senseiver metric.
     ap.add_argument("--out", default=os.path.join(paths.COMPARE, "results",
-                                                  "compare5.json"))
+                                                  "compare5.json"),
+                    help="a rerun writes here; the PUBLISHED artefact is "
+                         "compare5_final.json, which the figure and README read. "
+                         "Separate files on purpose: a rerun must not silently "
+                         "overwrite the numbers the write-up quotes.")
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")

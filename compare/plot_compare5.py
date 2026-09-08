@@ -1,7 +1,7 @@
 """
 plot_compare5.py — the main results figure: 5 methods x 4 channels x 2 conventions
 
-Reads `compare/results/compare5.json`, draws one figure telling the whole main
+Reads `compare/results/compare5_final.json`, draws one figure telling the whole main
 result, plus the fact that "the ranking flips".
 
 **Everything is a single model, no ensembling** -- the paper never mentions
@@ -51,7 +51,8 @@ import numpy as np
 from compare import plotstyle as ps
 from crowdcore import paths
 
-#: The main table plots these five methods, **all single models** -- the paper
+#: The main table plots the four reconstruction methods plus our two 4DVarNet
+#: uncertainty designs, **all single models** -- the paper
 #: never mentions ensembling.
 #: The two 4DVarNet arms each have 5 seeds; take the cross-seed mean and draw
 #: +/-std error bars: "single model" is not one number, reporting the best seed
@@ -63,7 +64,8 @@ from crowdcore import paths
 ROWS = [
     ("row",  "DINCAE",     "DINCAE",                      "DINCAE"),
     ("seed", "MSE",        "4DVarNet (MSE loss)",         "4DVarNet MSE"),
-    ("seed", "NLL",        "4DVarNet + uncertainty head", "4DVarNet NLL"),
+    ("seed", "NLL",        "4DVarNet + sigma head (vsb0)", "4DVarNet NLL"),
+    ("seed", "AUG",        "4DVarNet + sigma in G(x) (aug0)", "4DVarNet AUG"),
     ("row",  "Senseiver",  "Senseiver",                   "Senseiver"),
     ("row",  "EnKF k1",    "EnKF",                        "EnKF k1"),
 ]
@@ -84,7 +86,7 @@ def pick(results: dict, prefix: str):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--json", default=os.path.join(paths.COMPARE, "results", "compare5.json"))
+    ap.add_argument("--json", default=os.path.join(paths.COMPARE, "results", "compare5_final.json"))
     ap.add_argument("--out", default=os.path.join(paths.COMPARE, "results", "compare5.png"))
     args = ap.parse_args()
 
@@ -164,7 +166,7 @@ def main():
 
     n_days = doc.get("protocol", {}).get("n_days", "?")
     fig.suptitle(
-        f"Per-channel reconstruction error, five methods  —  {n_days} held-out days, "
+        f"Per-channel reconstruction error  —  {n_days} held-out days, "
         "full day, obs_every_k=1, identical clipping\n"
         "Single models throughout (no ensembling). Error bars on the two 4DVarNet arms are "
         "±1 s.d. over 5 training seeds.\n"

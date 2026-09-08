@@ -139,7 +139,7 @@ files. No GPU, no Slurm, no environment setup.
 
 | What | Where |
 |---|---|
-| The main accuracy comparison figure | `compare/results/compare5.png` |
+| The main accuracy comparison figure (per-channel, **MSE**) | `compare/results/compare5.png` |
 | Raw numbers, all four scoring conventions | `compare/results/compare5_final.json` |
 | The current meeting deck (2026-09-07, 6 slides) | `slides/meeting4_deck.pdf`, speaker notes in `slides/meeting4_deck_notes.md` |
 | A reconstructed field as a picture, all 4 methods side by side | `compare/results/reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png` |
@@ -345,8 +345,16 @@ sbatch sbatch/submit_compare5.sbatch      # ~2h, needs the checkpoints above
 python3 -m compare.plot_compare5          # regenerates compare/results/compare5.png
 ```
 
-**Expected output**, pooled RMSE. A rerun should land within ~0.01 of these
-(4DVarNet rows carry the reproducibility floor described above):
+The defaults reproduce exactly the published row set — all four methods, both
+uncertainty designs, five seeds each, and DINCAE's single epoch-70 checkpoint.
+A rerun writes `compare/results/compare5.json`; the published artefact is
+`compare5_final.json`, kept as a separate file so a rerun cannot silently
+overwrite the numbers this README quotes.
+
+**Expected output**, pooled **RMSE**. A rerun should land within ~0.01 of these
+(4DVarNet rows carry the reproducibility floor described above). Note the figure
+`compare5.png` plots per-channel **MSE**, so its totals are these numbers
+squared — 0.329 there appears as 0.108:
 
 | Method | `defined` convention | `allcells` convention |
 |---|---|---|

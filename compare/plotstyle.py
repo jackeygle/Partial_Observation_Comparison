@@ -59,8 +59,9 @@ METHOD_COLORS = {
     "4DVarNet":  "#efb118",   # gold
     "Senseiver": "#ff725c",   # orange-red
     "EnKF":      "#6cc5b0",   # teal
-    "4DVarNet+var": "#a463f2",  # purple -- the uncertainty head gets its own slot,
-                                # it counts as the fifth method
+    "4DVarNet+var": "#a463f2",  # purple -- the read-out-head design (vsb0)
+    "4DVarNet+aug": "#9c6b4f",  # brown  -- sigma inside G(x) (aug0); needs a slot of
+                                # its own or it collides with the plain-MSE gold
 }
 
 #: Neutral colours: axes, text, gridlines. Three shades, do not add more.
@@ -79,8 +80,11 @@ def method_color(name: str) -> str:
     """
     n = name.strip()
     if n.startswith("4DVarNet"):
-        return METHOD_COLORS["4DVarNet+var"] if ("NLL" in n or "nll" in n) \
-            else METHOD_COLORS["4DVarNet"]
+        if "AUG" in n or "aug" in n:
+            return METHOD_COLORS["4DVarNet+aug"]
+        if "NLL" in n or "nll" in n:
+            return METHOD_COLORS["4DVarNet+var"]
+        return METHOD_COLORS["4DVarNet"]
     for k, v in METHOD_COLORS.items():
         if n.startswith(k):
             return v
