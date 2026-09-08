@@ -27,7 +27,7 @@ EV = os.path.join(ROOT, "check_outputs", "eval")
 J = lambda n: json.load(open(os.path.join(EV, n)))
 
 ML = J("uncertainty_ml5.json")["results"]
-EK = {k: J(f"uncertainty_enkf_k{k}.json")["results"] for k in (1, 4)}
+EK = {k: J(f"uncertainty_enkf_k{k}.json")["results"] for k in (1,)}   # k=4 dropped 2026-09-08
 
 INK, MUTED = "#20334d", "#5b6a7d"
 C_US, C_EK, C_IDEAL = "#0e6b8a", "#b5651d", "#8a8a8a"

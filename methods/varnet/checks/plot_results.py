@@ -8,9 +8,10 @@ plot_results.py  —  the two result figures for the model presentation
 Why the speed figure is a stacked bar rather than a single number per method: the filter
 pays for two separate operations every window — a forecast (the neural surrogate advanced
 for all 100 ensemble members) and, on frames that carry an observation, a Kalman analysis.
-Only the analysis scales with observation density, so lumping them into one bar hides the
-reason the k=1 and k=4 bars differ. The split is measured, not apportioned: see
-check_outputs/eval/enkf_time_split.json.
+Only the analysis scales with observation density, so lumping them into one bar hides
+where the EnKF's cost actually goes. The split is measured, not apportioned: see
+check_outputs/eval/enkf_time_split.json. The k=4 comparison this figure used to carry
+was dropped on 2026-09-08 with the rest of the obs_every_k=4 line.
 
 All numbers are read from the evaluation and benchmark jsons; nothing here is typed in.
 """
@@ -34,13 +35,13 @@ J = lambda n: json.load(open(os.path.join(EV, n)))
 # the deck presents the baseline configuration, so accuracy and speed must both come from it.
 RUN = "b0"
 VAR = {}
-for k in (1, 4):
+for k in (1,):
     d = J(f"test_metrics_{RUN}_k{k}.json")
     fu = np.array([r["full_mse"] for r in d["per_day"]], float)
     VAR[k] = dict(rmse=np.sqrt(fu).mean(), std=np.sqrt(fu).std(),
                   days=len(d["per_day"]),
                   frames=sum(r["n_windows"] for r in d["per_day"]) * d["dT"])
-ENK = {k: J(f"test_metrics_enkf_k{k}.json") for k in (1, 4)}
+ENK = {k: J(f"test_metrics_enkf_k{k}.json") for k in (1,)}
 SPD = J(f"bench_speed_{RUN}.json")
 SPL = J("enkf_time_split.json")
 ms = lambda k: SPD["runs"][k]["per_frame_s"] * 1000
@@ -49,23 +50,24 @@ INK, MUTED = "#20334d", "#5b6a7d"
 C_VAR, C_FORE, C_ANAL = "#0e6b8a", "#e0a370", "#b5651d"
 
 # ───────────────────────────────────────────────── accuracy
-fig, ax = plt.subplots(figsize=(9.2, 4.9))
-x = np.arange(2)
-w = 0.34
-v = [VAR[4]["rmse"], VAR[1]["rmse"]]
-e = [ENK[4]["rmse_mean"], ENK[1]["rmse_mean"]]
-ax.bar(x - w / 2, v, w, label="4DVarNet", color=C_VAR)
-ax.bar(x + w / 2, e, w, label="EnKF", color=C_ANAL)
-for xi, a, b in zip(x, v, e):
-    ax.text(xi - w / 2, a + 0.004, f"{a:.3f}", ha="center", fontsize=11, fontweight="bold")
-    ax.text(xi + w / 2, b + 0.004, f"{b:.3f}", ha="center", fontsize=11, fontweight="bold")
+# One bar per method. This used to be two GROUPS (k=1 vs k=4) with two bars each;
+# with the k=4 line dropped there is only one observation density left, so the
+# grouping axis is gone and the labels move onto the bars themselves.
+fig, ax = plt.subplots(figsize=(7.0, 4.9))
+labs = ["4DVarNet", "EnKF"]
+vals = [VAR[1]["rmse"], ENK[1]["rmse_mean"]]
+x = np.arange(len(labs))
+ax.bar(x, vals, 0.5, color=[C_VAR, C_ANAL])
+for xi, a in zip(x, vals):
+    ax.text(xi, a + 0.004, f"{a:.3f}", ha="center", fontsize=12, fontweight="bold")
 ax.set_xticks(x)
-ax.set_xticklabels(["observing every 4th frame", "observing every frame"], fontsize=11)
+ax.set_xticklabels(labs, fontsize=11.5)
+e = vals
 ax.set_ylabel("RMSE over the whole state  (lower is better)", fontsize=10.5)
 ax.set_ylim(0, max(e) * 1.22)
 ax.grid(axis="y", alpha=0.3)
-ax.legend(fontsize=10.5, frameon=False)
-ax.set_title("Reconstruction accuracy — held-out test days", fontsize=13, pad=12)
+ax.set_title("Reconstruction accuracy — held-out test days, observing every frame",
+             fontsize=13, pad=12)
 fig.text(0.012, 0.02,
          f"{VAR[1]['days']} test days (2013-08-11 to 2013-09-29), {VAR[1]['frames']:,} frames the "
          f"models never trained on. Same days, same frames, same physical bounds for both "
@@ -121,8 +123,7 @@ fig.text(0.012, 0.02,
          f"{', node ' + SPD['hw']['node'] if SPD['hw'].get('node') else ''}. Both methods on the "
          f"same CPU, in one job, interleaved: no GPU is involved, and the EnKF is its optimised "
          f"implementation. Only the analysis step scales with observation density — the forecast "
-         f"runs on every frame either way — which is why the two EnKF bars differ while "
-         f"4DVarNet's cost does not ({ms('varnet_k1'):.2f} vs {ms('varnet_k4'):.2f} ms). Split "
+         f"runs on every frame either way. Split "
          f"measured separately under the same conditions. Largest run-to-run spread across the "
          f"{SPD['repeats']} rounds: {spread:.0%} of the mean — the node was shared, so read these "
          f"as ratios between methods rather than as absolute constants.",
@@ -132,8 +133,6 @@ p = os.path.join(EV, "results_speed.png")
 fig.savefig(p, dpi=170, bbox_inches="tight", facecolor="white"); plt.close(fig)
 print(f"[figure] {p}")
 
-print(f"\n  accuracy  4DVarNet {VAR[4]['rmse']:.4f} / {VAR[1]['rmse']:.4f}   "
-      f"EnKF {ENK[4]['rmse_mean']:.4f} / {ENK[1]['rmse_mean']:.4f}")
+print(f"\n  accuracy  4DVarNet {VAR[1]['rmse']:.4f}   EnKF {ENK[1]['rmse_mean']:.4f}")
 print(f"  speed     4DVarNet {ms('varnet_k1'):.2f} ms   "
-      f"EnKF k=1 {ms('enkf_k1'):.1f} ({SPL['runs']['k1']['forecast_share']:.0%} forecast) "
-      f"k=4 {ms('enkf_k4'):.1f} ({SPL['runs']['k4']['forecast_share']:.0%} forecast)")
+      f"EnKF k=1 {ms('enkf_k1'):.1f} ({SPL['runs']['k1']['forecast_share']:.0%} forecast)")
