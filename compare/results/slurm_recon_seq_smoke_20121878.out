@@ -1,0 +1,16 @@
+[seq] day=atc-20130811 methods=['dincae', 'senseiver', 'varnet', 'enkf'] frames [14800, 15000) = 200 frames
+[seq] running DINCAE ...
+[seq] running Senseiver ...
+[seq] running 4DVarNet ...
+[seq] loading EnKF export ...
+[seq] rendering 200 frames (7 panels each) -> compare/results/seq_ppt_smoketest
+  rendered 0/200
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/compare/plot_reconstruction_sequence.py", line 228, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/compare/plot_reconstruction_sequence.py", line 210, in main
+    cells = [("partial obs", obs_t), ("true state", X[t])] + [(name, arr[t]) for name, arr in recon.items()]
+                                                                     ~~~^^^
+IndexError: index 199 is out of bounds for axis 0 with size 199

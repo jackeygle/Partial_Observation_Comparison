@@ -16,8 +16,11 @@
 # result. The rule follows the directory name, not a location.
 **/cache/
 
-# Per-frame sequence exports (1000 PNGs, 44MB, cheap to regenerate, unused in the paper)
-**/check_outputs/eval/seq_ppt_*/
+# Per-frame sequence exports (hundreds-thousands of PNGs, cheap to regenerate,
+# unused in the paper). Broadened from **/check_outputs/eval/seq_ppt_*/ once
+# compare/plot_reconstruction_sequence.py started writing its own under
+# compare/results/ too -- same naming convention, different parent directory.
+**/seq_ppt_*/
 
 # ============================================================
 # Python
