@@ -350,9 +350,9 @@ python3 -m compare.plot_compare5          # regenerates compare/results/compare5
 
 | Method | `defined` convention | `allcells` convention |
 |---|---|---|
-| Senseiver | 0.344 | 0.169 |
+| Senseiver | 0.343 | 0.168 |
 | 4DVarNet MSE (mean of 5 seeds) | 0.352 | 0.186 |
-| 4DVarNet `vsb0` (mean of 5 seeds) | 0.388 | 0.211 |
+| 4DVarNet `vsb0` (mean of 5 seeds) | 0.388 | 0.212 |
 | 4DVarNet `aug0` (mean of 5 seeds) | 0.401 | 0.229 |
 | EnKF | 0.368 | 0.215 |
 | DINCAE | 0.329 | **0.757** |
