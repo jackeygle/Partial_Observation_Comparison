@@ -30,6 +30,7 @@ JSON/PNG files — clone the repo and open these directly:
 | DINCAE's obstacle-region finding (this week's action item) | `methods/dincae/check_outputs/eval/obstacle_region.json`, written up in `MODELS_FOR_ADVISOR.md` |
 | Which checkpoint is which, and what it corresponds to | `MODELS_FOR_ADVISOR.md` |
 | Every other figure (architecture diagrams, training curves, uncertainty calibration, speed benchmarks) | `methods/*/check_outputs/**/*.png` (61 figures total, 55 of them under `methods/varnet/check_outputs/eval/`; filenames are mostly self-describing — `unc_*` = uncertainty, `mt_*` = the 4DVarNet-uncertainty meeting figures, `fw_*`/`arch_*` = architecture diagrams, `speed_*` = latency benchmarks) |
+| A reconstructed field as an actual picture, all 4 methods side by side | `compare/results/reconstruction_<day>_<methods>.png` — see §12 to generate one for a different day/method subset |
 
 No GPU, no Slurm, no environment setup needed for any of this — it's static
 output already in git.
@@ -256,6 +257,7 @@ twice differs in the 4th decimal place. That is noise, not a regression; see
 | 4DVarNet variational solver sanity (gradients, convergence) | `methods.varnet.checks.check_variational_solver` |
 | Senseiver pipeline trace (tensor shapes end to end) | `methods.senseiver.checks.trace_pipeline` |
 | Is `enkf_opt/` still bit-identical to the vendored `enkf_lab/`? | `methods.enkf.checks.verify_enkf_opt` |
+| What does a reconstructed field actually look like (not just its error number)? | `compare.plot_reconstruction` (all 4 methods) — see §12 |
 
 All take `--help`; most default to `--split test` on the 7 held-out days
 (`atc-20130811, atc-20130818, atc-20130825, atc-20130901, atc-20130915,
@@ -286,3 +288,35 @@ atc-20130922, atc-20130929` — never used in training or checkpoint selection).
   `MODELS_FOR_ADVISOR.md` has exact checkpoint-to-result mappings, and every
   script's own `--help` / module docstring documents its specific design
   decisions in detail (they're written to be read, not just skimmed).
+
+## 12. Looking at a reconstructed field as a picture, not just a number
+
+Two scripts, both save a PNG with density as a Blues heatmap and velocity as
+black heading arrows:
+
+```bash
+# All 4 methods side by side on one day (auto-picks a busy frame)
+source sbatch/_env.sh
+sbatch sbatch/submit_plot_reconstruction.sbatch --day atc-20130811
+# or just a subset:
+sbatch sbatch/submit_plot_reconstruction.sbatch --methods dincae,senseiver --day atc-20130818
+
+# 4DVarNet + EnKF specifically, in the EnKF project's own plotting style
+# (older, narrower script -- prefer submit_plot_reconstruction.sbatch above for anything new)
+srun -p gpu-debug --gres=gpu:1 -t 00:10:00 bash -c '
+  cd methods/varnet && python3 -u -m compare.plot_reconstruction_enkf \
+    --ckpt runs/varnet_mse5_s0/varnet_best.pt --day atc-20130811
+'
+```
+
+Output lands at `compare/results/reconstruction_<day>_<methods>.png` (an
+example is already committed: `reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png`).
+Panels: true state | partial obs (illustrative — see the script's docstring
+for why it isn't per-method-exact) | one panel per requested method | EnKF
+spread (only if `enkf` is in `--methods`).
+
+For a *sequence* of consecutive frames (to eyeball temporal consistency, or
+stitch into a GIF) rather than one snapshot, see
+`methods.varnet.checks.plot_reconstruction_sequence` in §6 above — that one
+is 4DVarNet(+EnKF)-only, there is no per-frame sequence version for
+DINCAE/Senseiver yet.
