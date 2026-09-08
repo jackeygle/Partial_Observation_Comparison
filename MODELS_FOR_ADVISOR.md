@@ -78,10 +78,30 @@ python3 -m compare.plot_compare5
 
 ## What is and isn't included if this repo is shared as-is
 
-The GitHub repo (code, configs, small result JSON/PNG, ~nothing over a few MB)
-is everything needed to **rerun** training/eval from scratch on the ATC data.
-It does **not** include the `.pt` checkpoint weights themselves (~1 GB) or the
-EnKF's exported `.npz` fields (~18 GB) — those are gitignored by design (see
-README's "What is not in the repo"). If the advisor wants the actual trained
-weights rather than just being able to reproduce them, that needs a separate
-transfer off `/scratch/work/zhangx29/Thesis_Project/methods/*/runs/`.
+**Correction (this line used to overclaim):** the GitHub repo (code, configs,
+small result JSON/PNG, ~nothing over a few MB) is *not* by itself enough to
+rerun anything — `git ls-files | grep '\.h5$'` returns **zero** files. The
+gridded ATC data (`*.h5`, what every method actually reads) is excluded by
+`.gitignore`'s blanket data rules and has never been in git at all, most
+likely because the underlying ATC dataset carries its own redistribution
+terms, not only because of size. So actually running inference — not just
+reading the already-computed results in `check_outputs/` — needs the code
+**and** a copy of the gridded data **and** the checkpoint, three separate
+things, not one repo clone.
+
+It also does **not** include the `.pt` checkpoint weights themselves (~1 GB)
+or the EnKF's exported `.npz` fields (~18 GB) — those are gitignored by
+design (see README's "What is not in the repo"). If the advisor wants the
+actual trained weights rather than just being able to reproduce them, that
+needs a separate transfer off `/scratch/work/zhangx29/Thesis_Project/methods/*/runs/`.
+
+**DINCAE needs one more small file that weights alone don't carry**:
+`methods/dincae/artifacts/state_stats.npz` (17KB — per-cell mean field and
+per-channel residual std, computed once from the training data, read
+separately from the checkpoint at inference time by `state.StateStats`). It
+is currently *also* gitignored, caught by the blanket `*.npz` rule meant for
+multi-GB files, not this one — see the fix below. 4DVarNet and Senseiver
+don't have this problem: their normalisation is either baked into the
+checkpoint itself (Senseiver's `in_mean`/`in_std` are model buffers, saved
+in the same `state_dict`) or not needed at inference time (4DVarNet works in
+raw physical units).

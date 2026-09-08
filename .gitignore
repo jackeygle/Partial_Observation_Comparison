@@ -10,6 +10,12 @@
 *.h5
 *.nc
 
+# Exception: DINCAE's normalisation stats (17KB, not multi-GB generated data
+# like everything else this blanket *.npz rule targets). Needed for inference
+# and not stored inside the checkpoint itself -- without it DINCAE's weights
+# are unusable even with the code, since state.StateStats reads it separately.
+!methods/dincae/artifacts/state_stats.npz
+
 # DINCAE grid cache (13G)
 # **/ instead of a hardcoded path: the 2026-09-03 directory refactor broke
 # every hardcoded path, and 1000 seq_ppt frames got staged in once as a
