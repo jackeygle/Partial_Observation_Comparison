@@ -36,7 +36,7 @@ python3 checks/plot_reconstruction_enkf.py --day atc-20130811
 python3 checks/plot_velocity_enkf.py       --day atc-20130811
 python3 checks/compare_channels.py
 python3 checks/plot_comparison.py
-python3 slides/build_meeting_deck.py       # -> slides/meeting_deck.{pptx,pdf} + meeting_notes.md
+python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} + _notes.md
 ```
 
 > **GPU, not the login node.** Anything that touches `torch` (training, evaluation,
@@ -60,7 +60,7 @@ python3 slides/build_meeting_deck.py       # -> slides/meeting_deck.{pptx,pdf} +
 | `train_varnet.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/` | verification scripts + all figure/evaluation scripts (see below) |
 | `sbatch/` | SLURM submit scripts |
-| `slides/build_meeting_deck.py` | builds the meeting deck (reads numbers from config/checkpoint/JSON) |
+| `slides/build_meeting4_deck.py` | builds the current meeting deck (reads numbers from config/checkpoint/JSON) |
 | `runs/varnet_full100/` | the trained checkpoint + `metrics.jsonl` |
 | `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
 
@@ -183,8 +183,8 @@ The EnKF driver lives **in this project** (`checks/run_enkf_baseline.py`) and im
 ## Slides
 
 ```bash
-python3 slides/build_meeting_deck.py     # GPU node (loads the checkpoint)
-#   -> slides/meeting_deck.pptx / .pdf / meeting_notes.md   (9 slides; last = architecture appendix)
+python3 -m slides.build_meeting4_deck    # login node is fine (reads JSON, no checkpoint)
+#   -> slides/meeting4_deck.pptx / .pdf / meeting4_deck_notes.md   (6 slides)
 ```
 The deck **reads every number** from `config.yaml`, the checkpoint's saved `args`, and
 the `check_outputs/eval/*.json` files — nothing is hard-coded in the slide script, so it
@@ -225,7 +225,11 @@ can never drift from what was actually trained/measured.
 
 **Map figures for the deck**: `plot_nav_mask.py` (walkable grid) and
 `plot_obstacle_map.py` (obstacle occupancy). The convergence curve, training table
-and architecture diagrams are rendered inside `slides/build_meeting_deck.py` itself.
+and architecture diagrams come from `checks/plot_architecture.py` and
+`checks/plot_training_results.py`. The eight pre-2026-09-07 decks and their build
+scripts were deleted on 2026-09-08; `slides/build_meeting4_deck.py` is the only
+deck builder left, and `methods/varnet/SUPERSEDED.md` keeps the findings that
+were only recorded in those decks' notes.
 
 ---
 

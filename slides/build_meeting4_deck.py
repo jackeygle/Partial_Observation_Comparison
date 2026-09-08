@@ -1,30 +1,41 @@
 """
-build_meeting4_deck.py — 2026-09-07 汇报，六页(标题 + 五页正文)
+build_meeting4_deck.py — the 2026-09-07 meeting, six slides (title + five body)
 
-结构照导师的要求做:**一个具体假设 -> 验证 -> 结论**，不是图的堆砌。上一次被指出
-"三方对比图没进幻灯片"以及"把 1000 帧总时间当成了推理时间"，这两条都在这一版里正面
-回应 —— 而且速度那条不是当作待修的 bug，是当作主论点的第三个实例。
+Structured the way the advisor asked for it: **one concrete hypothesis ->
+tests -> conclusion**, not a pile of figures. Two things flagged last time --
+"the three-way comparison figure never made it into the slides" and "you
+reported 1000 frames of total run time as if it were inference time" -- are
+both answered head-on here, and the speed one is presented not as a bug to fix
+but as the third instance of the main argument.
 
-主线:
+The through-line:
 
-    假设      四个方法的排名，取决于一个通常不写进论文的口径选择。
-    验证①    精度        有定义格 vs 所有格子  -> DINCAE 第 1 <-> 第 5
-    验证②    不确定性    结构性 vs 事后附加    -> 跨两套口径都稳
+    hypothesis   The ranking of the four methods is decided by a scoring
+                 convention papers usually do not state.
+    test 1       accuracy      defined cells vs all cells -> DINCAE 1st <-> 5th
+    test 2       uncertainty   structural vs bolted on    -> stable across both
+    closer       same architecture, only the supervision scope changes:
+                 allcells error drops 77%, last place becomes 2nd
 
-另有一页回应上周的 action item:**逐帧推理时间**,四方 mean ± s.d.。只报吞吐 ——
-latency 那一栏按要求撤下,但图上留了一行说明 4DVarNet 那个数是窗口摊销值,
-否则单独引用它会重现上周被指出的那个问题。
-    压轴      同一架构只换监督口径，allcells 误差掉 77%，垫底变第 2
+One slide answers last week's action item: **per-frame inference time**, four
+methods, mean +/- s.d. Throughput only -- the latency column was withdrawn as
+asked, but the figure keeps a line saying 4DVarNet's number is amortised over
+a window, since quoting it alone would reproduce exactly the problem raised
+last week.
 
-刻意**停在消融**，不加结论页:那两个原本要问导师的问题已经当面答过
-(三方 = 四个独立重建方法 + 两个我们自己的 4DVarNet 不确定性设计;窗口时延不必考虑)。
+**Deliberately stops at the ablation**, with no conclusions slide: the two
+questions this deck was going to put to the advisor were already answered in
+person (three-way = four independent reconstruction methods plus two 4DVarNet
+uncertainty designs of our own; window latency need not be considered).
 
-刻意不放的:
-  * 逐通道拆解(四通道 x 两口径 x 三切法 = 24 个数，现场讲不完，放备注里当备答)
-  * 消融表(a4_k1 加宽先验、16-ckpt 平均)，同上
-  * k=4 与 a2 加宽先验那两档速度 —— 见速度页的备注。
+Deliberately left out:
+  * the per-channel breakdown (4 channels x 2 conventions x 3 scopes = 24
+    numbers, too many to present live; kept in the notes as backup)
+  * the ablation table (a4_k1 widened prior, 16-checkpoint averaging), same reason
+  * the k=4 and a2-widened-prior speed rows -- see the speed slide's notes.
+    (k=4 was dropped from the project entirely on 2026-09-08.)
 
-用法(登录节点):
+Usage (login node):
     source sbatch/_env.sh && python3 -m slides.build_meeting4_deck
 """
 from __future__ import annotations

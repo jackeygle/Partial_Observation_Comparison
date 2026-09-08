@@ -33,9 +33,11 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.util import Inches, Pt
 
-# 这个脚本原来住在 4dvarnet_enkf/ 下，ROOT 一直指那个目录（runs/、check_outputs/
-# 都挂在它下面）。2026-09-03 重构后它搬到了顶层，dirname(dirname(__file__)) 会变成
-# 仓库根，于是每一条 os.path.join(ROOT, ...) 都会静默指错地方 —— 所以显式绑定。
+# This script used to live under 4dvarnet_enkf/, where ROOT always pointed at that
+# directory (runs/ and check_outputs/ hang off it). After the 2026-09-03 refactor it
+# moved to the top level, where dirname(dirname(__file__)) becomes the repo root and
+# every os.path.join(ROOT, ...) would silently point somewhere wrong -- hence the
+# explicit binding.
 ROOT = paths.method(paths.VARNET)
 OUTPUTS = os.path.join(ROOT, "check_outputs")             # output root of all check/plot scripts
 
@@ -191,7 +193,7 @@ def render_pdf(slides, outpath):
 # renderer 3: speaker notes as markdown
 # --------------------------------------------------------------------------- #
 def render_notes(slides, outpath):
-    lines = ["# 演讲备注 / Speaker notes\n"]
+    lines = ["# Speaker notes\n"]
     for k, spec in enumerate(slides, 1):
         title = spec.get("title", "(title slide)")
         lines.append(f"## Slide {k}: {title}\n")

@@ -1,4 +1,4 @@
-# 演讲备注 / Speaker notes
+# Speaker notes
 
 ## Slide 1: Four methods, two benchmarks — and a ranking that moves
 
