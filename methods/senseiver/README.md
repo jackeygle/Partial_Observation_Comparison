@@ -57,8 +57,6 @@ never on the login node.
 | `checks/check_sensors.py` | invariants of the token construction |
 | `checks/trace_pipeline.py` | prints the shape at every step of the data pipeline; this README's Pipeline section is its output |
 | `checks/evaluate.py` | held-out-day evaluation, metrics copied verbatim from `eval_test_days.py` |
-| `checks/compare3.py` | three-way per-channel comparison (Senseiver / 4DVarNet / EnKF), same convention, full day |
-| `checks/plot_compare3.py` | the figure for the above (small multiples, one panel per channel) |
 | `sbatch/` | SLURM submission scripts (training self-chains to resume) |
 | `runs/` `check_outputs/` | artifacts |
 
@@ -292,8 +290,10 @@ worth." Without this sentence, the table would be misread.
 
 ## Results (7 held-out days, full day, obs_every_k=1, same clipping across all three)
 
-Produced by `checks/evaluate.py` (single method) and `checks/compare3.py`
-(three-way, per channel). 4DVarNet's numbers are **rerun by us using its own
+Produced by `checks/evaluate.py` (single method) and, for the cross-method
+per-channel table, `compare/compare5.py` (the three-way `compare3.py` it
+originally came from was deleted on 2026-09-08 as a duplicate implementation).
+4DVarNet's numbers are **rerun by us using its own
 `eval_test_days.py`** (`--outdir` pointed at this directory, nothing written into
 4dvarnet_enkf), matching its archived values to 4 decimal places, confirming the
 archived convention also had clipping ON.
@@ -325,9 +325,7 @@ smaller than the difference itself).
 | 4DVarNet `a4_k1` | 0.0177 | **0.0753** | 0.0207 | 0.0111 | 0.0312 |
 | EnKF `k1` | 0.0143 | 0.1103 | 0.0209 | 0.0394 | 0.0462 |
 
-![Three-way per-channel comparison](check_outputs/eval/compare3.png)
-
-The figure uses **small multiples** rather than a grouped bar chart: the four
+The figure for this table used **small multiples** rather than a grouped bar chart: the four
 channels differ by an order of magnitude, and a shared y-axis would flatten
 density/vy/var into invisible slivers, leaving the reader only able to see the
 difference in vx -- which happens to be the one channel where 4DVarNet leads,

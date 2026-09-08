@@ -38,12 +38,12 @@ of output rather than making the reader compare several jsons themselves:
 
     (1) defined        blind ∩ defined ∩ walkable      the main result, comparable across all five
     (2) defined_full   full field ∩ defined ∩ walkable includes observed cells
-    (3) allcells        blind, all cells                compare3's old convention
+    (3) allcells        blind, all cells                the removed three-way script's convention
     (4) full            full field, all cells           eval_test_days's full_mse
 
 Each is further multiplied by "clipped/unclipped" and "pooled/day-averaged",
 because those two axes have each been mixed up before too: `test_metrics_*.json`
-reports the day average, `eval_threeway_accuracy.py` reports pooled -- the two are
+reports the day average, the removed three-way script reported pooled -- the two are
 not the same quantity.
 
 Convention details
@@ -129,9 +129,9 @@ HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 
 # Three cell-scope choices x clipped/unclipped. `full` is "the full field" --
 # observed + blind, all cells, the same quantity as eval_test_days.py's full_mse
-# and eval_threeway_accuracy.py's rmse_all; it is included so those two scripts'
+# and the removed three-way script's rmse_all; it is included so those scripts'
 # reported 0.1702 and 0.2104 for 4DVarNet can be checked against the same code path.
-# Why `_noclip` exists: threeway does not clip, test_metrics does -- that is the
+# Why `_noclip` exists: the removed three-way script did not clip, test_metrics does -- that is the
 # only known convention difference between them.
 BASE_CONVENTIONS = ("defined", "defined_full", "allcells", "full")
 CONVENTIONS = BASE_CONVENTIONS + tuple(f"{k}_noclip" for k in BASE_CONVENTIONS)
@@ -189,7 +189,7 @@ def run_senseiver(model, Y, Om, dev, batch):
 
 def run_varnet(solver, Y, Omc, X0, dT, dev, batch):
     """Returns (reconstruction (nw*dT, C, H, W), number of frames covered). Same
-    path as compare3.run_varnet."""
+    path as the removed compare3.run_varnet."""
     from crowdcore import observation_model as om
     win = lambda a: om.to_windows(a, dT)
     Yw, Mw, X0w = win(Y), win(Omc.astype(np.float32)), win(X0)
@@ -336,7 +336,7 @@ def main():
     names.append("EnKF k1")
     accs = {k: Acc(C) for k in names}
     # Per-day overall, used for the "day-averaged" convention. test_metrics_*.json
-    # / eval_test_days.py report this; eval_threeway_accuracy.py reports pooled --
+    # / eval_test_days.py report this; the removed three-way script reported pooled --
     # the two are not the same quantity, so both are given here.
     day_overall = {k: {c: [] for c in CONVENTIONS} for k in names}
     per_day = []
@@ -528,7 +528,7 @@ def main():
     for conv, title in (
             ("defined", "(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result"),
             ("defined_full", "(2) defined ∩ walkable ∩ full field (includes observed cells)"),
-            ("allcells", "(3) all cells ∩ blind  -- compare3's old convention, for reference"),
+            ("allcells", "(3) all cells ∩ blind  -- the removed three-way script's convention, for reference"),
             ("full", "(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse")):
         print(f"\n{title}\n")
         print(f"{'method':<24}" + "".join(f"{c:>11}" for c in chans)

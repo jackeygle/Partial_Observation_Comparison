@@ -33,7 +33,7 @@ Usage:
 **All text on a figure must be English.** Triton's matplotlib has only 24 fonts and
 none of them are CJK; Chinese renders as tofu boxes and throws a stream of
 "Glyph ... missing from font" warnings. Comments and docs are written in Chinese,
-figure text in English -- the existing figures (plot_compare3 etc.) already follow
+figure text in English -- the existing figures (plot_compare5 etc.) already follow
 this convention.
 
 Not this module's job: choosing a chart type for you, computing vmin/vmax for you,

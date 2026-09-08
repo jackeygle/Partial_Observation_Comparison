@@ -13,7 +13,6 @@ bit**.
 |---|---|---|
 | `compare4.json` | `senseiver_crowd/checks/compare4.py` (job 20041056) | Pooled/day-averaged error for 5 models x 6 conventions x 4 channels. This is the main result, and also the broadest single test -- it touches `config`, `navigation`, `observation_model`, Senseiver, 4DVarNet, and the EnKF's export all at once |
 | `verify_enkf_opt.out` | `4dvarnet_enkf/checks/verify_enkf_opt.py --frames 12 --ensemble 100` | `enkf_opt` is bit-identical to `enkf_lab`. `enkf_lab` is a read-only vendor copy of `Partial_observation`; this is its entire reason to exist |
-| `threeway_accuracy.json` | `4dvarnet_enkf/checks/eval_threeway_accuracy.py` | kept for the record. **Note its 4DVarNet absolute values differ from `compare4.json` by about 15%, cause not yet tracked down**, so it is not a trustworthy baseline -- it is only used to confirm the refactor did not make it *more* different |
 | `dincae_metrics_test.json` | `dincae_crowd/checks/evaluate.py` | DINCAE's four conventions |
 | `senseiver_metrics_test.json` | `senseiver_crowd/checks/evaluate.py` | Senseiver's per-day/per-channel numbers |
 
