@@ -8,7 +8,6 @@
 # A4 — the widest prior tried, as a capacity control for A2.
 #
 # Usage:  sbatch --job-name=varnet_a4_k1 sbatch/submit_a4_chain.sbatch 1
-#         sbatch --job-name=varnet_a4_k4 sbatch/submit_a4_chain.sbatch 4
 #
 # ONE variable against runs/varnet_a2_k{K}: hidden 64 -> 96.
 #

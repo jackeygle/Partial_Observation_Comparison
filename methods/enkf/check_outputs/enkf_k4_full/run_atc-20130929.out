@@ -1,4 +1,0 @@
-[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=0 dir=check_outputs/enkf_k1_full/../enkf_k4_full
-  atc-20130929: 37964 frames in 45227.8s, 6 SVD-skips -> est_atc-20130929.npz
-  timing -> check_outputs/enkf_k1_full/../enkf_k4_full/timing_atc-20130929.json  (Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz · 4 cores)
-[done]

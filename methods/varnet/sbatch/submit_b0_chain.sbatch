@@ -7,7 +7,6 @@
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
 #
 # Usage:  sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1
-#         sbatch --job-name=varnet_b0_k4 sbatch/submit_b0_chain.sbatch 4
 #
 # This is now the MODEL OF RECORD: the config.yaml defaults, and what the presentation shows.
 #

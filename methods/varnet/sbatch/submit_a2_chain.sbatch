@@ -8,7 +8,6 @@
 # A2 — a LARGER prior than the baseline, solver unchanged.
 #
 # Usage:  sbatch --job-name=varnet_a2_k1 sbatch/submit_a2_chain.sbatch 1
-#         sbatch --job-name=varnet_a2_k4 sbatch/submit_a2_chain.sbatch 4
 #
 # ONE variable against runs/varnet_b0_k{K}: the prior's capacity.
 #

@@ -53,16 +53,16 @@ under 10% and not monotonically, so the filter's inability to batch costs it not
 comparison. On a GPU it would matter — there the same sweep gave 2.9x from batch 1 to 32 —
 which is why a GPU row, if requested, is reported apart from the CPU head-to-head.
 
-  enkf_k1     EnKF, every frame observed        }  optimised implementation
-  enkf_k4     EnKF, every 4th frame observed     }
+  enkf_k1     EnKF, every frame observed (optimised implementation)
   varnet_k1   4DVarNet, the k=1 model (runs/varnet_<--run>_k1, default a2)
-  varnet_k4   4DVarNet, the k=4 model (runs/varnet_<--run>_k4)
-  (--gpu adds a GPU row for 4DVarNet, reported apart from the four rows above)
+  (--gpu adds a GPU row for 4DVarNet, reported apart from the rows above)
 
-k=1 vs k=4 is expected to make no difference to 4DVarNet: the solver runs a fixed number of
-unrolled iterations over the whole dense window, so its cost does not depend on how sparse
-Omega is. The EnKF's cost DOES — it pays a Kalman update per observed frame. That asymmetry
-is why both k are included.
+The k=4 rows were dropped on 2026-09-08 together with their exports and checkpoints:
+obs_every_k=4 is no longer studied. What they used to show is still worth knowing --
+4DVarNet's cost does not depend on how sparse Omega is (a fixed number of unrolled
+iterations over the whole dense window) while the EnKF pays a Kalman update per
+observed frame -- and the measured numbers survive in the archived
+check_outputs/eval/bench_speed_*.json.
 
 Per-frame numbers are total/n_frames for both methods, which is the honest comparison: EnKF
 assimilates frame by frame, 4DVarNet reconstructs the whole window at once, and both end up
@@ -376,7 +376,7 @@ def main():
     # fraction of the parameters. Runs must therefore be timed individually, not substituted
     # for each other.
     ap.add_argument("--run", default="a2",
-                    help="run-name stem under runs/: times runs/varnet_<run>_k1 and _k4")
+                    help="run-name stem under runs/: times runs/varnet_<run>_k1")
     ap.add_argument("--ens-fmt", default="",
                     help="run-name format for a deep ensemble, e.g. runs/varnet_vsb0_s{}. When "
                          "given, two extra rows are timed: one member alone and all members "
@@ -394,9 +394,8 @@ def main():
     # paths.enkf_export(), don't reassemble it from ROOT -- hardcoding the old
     # path here made the job FileNotFoundError during setup after the refactor.
     k1 = os.path.join(paths.enkf_export("enkf_k1_full"), f"obs_{args.day}.npz")
-    k4 = os.path.join(paths.enkf_export("enkf_k4_full"), f"obs_{args.day}.npz")
     ck = lambda k: f"{ROOT}/runs/varnet_{args.run}_k{k}/varnet_best.pt"
-    have_k = all(os.path.exists(ck(k)) for k in (1, 4))
+    have_k = os.path.exists(ck(1))
     ens_ck = [f"{ROOT}/{args.ens_fmt.format(i)}/varnet_best.pt" for i in args.ens_members] \
         if args.ens_fmt else []
     for c in ens_ck:
@@ -418,15 +417,11 @@ def main():
     jobs = [
         ("enkf_k1", "EnKF k=1, optimised (bit-identical to the original)",
          lambda: bench_enkf("opt", k1, args.frames)),
-        ("enkf_k4", "EnKF k=4, optimised",
-         lambda: bench_enkf("opt", k4, args.frames)),
     ]
     if have_k:
         jobs += [
             ("varnet_k1", f"4DVarNet k=1 ({args.run})",
              lambda: bench_varnet(ck(1), k1, args.frames, "cpu")),
-            ("varnet_k4", f"4DVarNet k=4 ({args.run})",
-             lambda: bench_varnet(ck(4), k4, args.frames, "cpu")),
         ]
     if ens_ck:
         jobs += [

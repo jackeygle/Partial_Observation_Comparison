@@ -1,3 +1,0 @@
-[enkf] ORIGINAL random init; ensemble=100 radius=7 frames=0 dir=check_outputs/enkf_k1_full/../enkf_k4_full
-  atc-20130811: 39821 frames in 50159.4s, 13 SVD-skips -> est_atc-20130811.npz
-[done]

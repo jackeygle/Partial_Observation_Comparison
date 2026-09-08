@@ -69,9 +69,10 @@ N_SOLV = sum(p.numel() for p in _G.parameters())
 assert N_GATE + N_OUT == N_SOLV, "the solver is more than its two convolutions"
 
 # observation density, from the exported masks the EnKF and the solver both read.
-# NOTE the directory names: enkf_k1_full is every-frame observation (the model of record),
-# enkf_k4_full is every-4th-frame. check_outputs/enkf_full is the k=4 export, not k=1 —
-# reading it here would put a k=4 observation pattern next to k=1 results.
+# NOTE the directory name: enkf_k1_full is every-frame observation (the model of
+# record). check_outputs/enkf_full is an old k=4 export, NOT k=1 -- reading it here
+# would put a k=4 observation pattern next to k=1 results. The k=4 line was dropped
+# on 2026-09-08 along with its exports; only k=1 is studied now.
 def _omega(sub):
     fs = sorted(glob.glob(os.path.join(ROOT, "check_outputs", sub, "obs_*.npz")))
     if not fs:
@@ -82,9 +83,6 @@ def _omega(sub):
 
 
 PF1, _DAY = _omega("enkf_k1_full")
-PF4, _DAY4 = _omega("enkf_k4_full")
-assert _DAY == _DAY4, "the two strips must be drawn from the same day"
-WIN1, WIN4 = PF1[:DT], PF4[:DT]                           # the window the strips show
 N_CELL = H * W
 SDIM = C * N_CELL                                         # the EnKF's flat state
 NENS, RAD, INFL = 100, 7, 1.02

@@ -28,7 +28,7 @@ reproduced. Anything that ends up on a slide has to be re-runnable.
 
 Method follows checks/bench_speed.py, which is the method-vs-method benchmark and the source of
 the totals those shares are applied to:
-  * measurements INTERLEAVED (k1 k4, k1 k4, ...) so drift in the node's background load spreads
+  * measurements INTERLEAVED across repeats so drift in the node's background load spreads
     over both settings instead of landing on one and reading as a difference between them;
   * one warm-up pass before the timed repeats (lazy init, allocator, first-touch faults);
   * repeats reported as mean, with the spread kept in the json;
@@ -139,8 +139,9 @@ def main():
     args = ap.parse_args()
 
     E, model = load_enkf(args.enkf_src)
+    # k=4 was dropped on 2026-09-08 with its exports; only k=1 is studied now.
     settings = {}
-    for k in (1, 4):
+    for k in (1,):
         npz = f"{ROOT}/check_outputs/enkf_k{k}_full/obs_{args.day}.npz"
         settings[k] = prepare(npz, args.frames)
 
@@ -150,14 +151,14 @@ def main():
           f"{args.repeats} interleaved repeats\n", flush=True)
 
     # Warm-up: one short pass per setting, untimed.
-    for k in (1, 4):
+    for k in (1,):
         pre, std = settings[k]
         run_once(E, model, pre[:10], std)
 
-    acc = {k: {"fore": [], "anal": []} for k in (1, 4)}
+    acc = {k: {"fore": [], "anal": []} for k in (1,)}
     n_obs_of = {}
     for r in range(args.repeats):
-        for k in (1, 4):                                  # interleaved, not k1 x3 then k4 x3
+        for k in (1,):
             pre, std = settings[k]
             fore, anal, n_obs, n_bad = run_once(E, model, pre, std)
             acc[k]["fore"].append(fore)
@@ -169,7 +170,7 @@ def main():
                   flush=True)
 
     runs = {}
-    for k in (1, 4):
+    for k in (1,):
         fo = np.array(acc[k]["fore"]) / args.frames * 1000               # ms per frame
         an = np.array(acc[k]["anal"]) / args.frames * 1000
         tot = fo.mean() + an.mean()
@@ -189,7 +190,7 @@ def main():
     json.dump(rec, open(p, "w"), indent=2)
 
     print(f"\n{'':6s}{'forecast':>12}{'analysis':>12}{'total':>10}{'obs frames':>12}")
-    for k in (1, 4):
+    for k in (1,):
         d = runs[f"k{k}"]
         print(f"k={k:<4}{d['forecast_ms']:>10.2f}ms{d['analysis_ms']:>10.2f}ms"
               f"{d['total_ms']:>8.2f}ms{d['n_observed']:>9d}/{d['n_frames']}"
