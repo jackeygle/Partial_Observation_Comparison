@@ -15,7 +15,7 @@
 # corresponding to the predicted mean and variance". Our previous design bolted a separate
 # pointwise module onto x_hat instead, and the audit showed what that cost: that head keyed off
 # distance-to-observation, a feature which predicts the true error with R^2 of roughly 0.01-0.03,
-# while ignoring |x_hat|, which predicts it with 0.21-0.45. See checks/diag_sigma_drivers.py.
+# while ignoring |x_hat|, which predicts it with 0.21-0.45. Measured by checks/diag_sigma_drivers.py, archived at tag archive-2026-09-09.
 #
 # The read-out sees h, the LSTM hidden state after the last of the 20 descent steps: it carries
 # every gradient of J taken along the way, a 3x3 spatial context per step, and all-to-all

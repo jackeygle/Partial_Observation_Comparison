@@ -13,7 +13,7 @@ It used to have a learned variance head (a single pointwise read-out, 548
 parameters). That head was **removed on purpose**: it keyed off
 distance-to-observation, a feature that predicts the true error with an R^2 of
 roughly 0.01-0.03, while ignoring |x_hat|, which predicts it with 0.21-0.45
-(`checks/diag_sigma_drivers.py`). Today's checkpoints have 23 keys and no
+(measured by `checks/diag_sigma_drivers.py`, archived at tag `archive-2026-09-09`). Today's checkpoints have 23 keys and no
 variance parameters — `var_cost.*` are variational-cost weights, unrelated.
 
 The surviving variance head is a different design, `grad_net.out_var`

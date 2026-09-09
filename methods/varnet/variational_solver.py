@@ -164,9 +164,9 @@ class GradUpdateLSTM(nn.Module):
     gradients of J and carries spatial context while x_hat is only one cell. That argument was
     right about h and wrong to exclude x_hat: measured, sigma^2 came out spatially FLAT, varying
     0.96-1.21x between empty and occupied blind cells where the true error varies 19-30x
-    (checks/diag_beta_gradient_share.py). A 24-bin 1-D lookup on |x_hat|, fitted on one day and
+    (measured by checks/diag_beta_gradient_share.py, archived at tag archive-2026-09-09). A 24-bin 1-D lookup on |x_hat|, fitted on one day and
     applied unchanged to another, beat it on every channel -- NLL -2.31 vs +9.32 on density,
-    -0.90 vs +38.14 on vx (checks/diag_sigma_headroom.py). The information was available and
+    -0.90 vs +38.14 on vx (measured by checks/diag_sigma_headroom.py, archived at tag archive-2026-09-09). The information was available and
     the read-out could not reach it, because x_hat is a 20-step accumulator (x = x - upd) and
     is not a function of h. Feeding both keeps h's context and adds what it was missing.
 
