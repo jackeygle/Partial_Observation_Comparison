@@ -56,12 +56,14 @@ def save(fig, name, pad=0.10):
 
 
 PRIOR = {"b0": 9_420, "a2": 32_076, "a4": 54_220}
-R = {r: {k: rd(f"{r}_k{k}") for k in (1, 4)} for r in PRIOR}
+# k=4 was dropped from the project on 2026-09-08 along with its exports and
+# checkpoints; only k=1 remains.
+R = {r: {k: rd(f"{r}_k{k}") for k in (1,)} for r in PRIOR}
 
 # ───────────────────────────────────────── 1. capacity vs accuracy
 fig, ax = plt.subplots(figsize=(8.2, 4.6))
 xs = [PRIOR[r] for r in ("b0", "a2", "a4")]
-for k, mk, lab in ((1, "o-", "observing every frame"), (4, "s--", "observing every 4th frame")):
+for k, mk, lab in ((1, "o-", "observing every frame"),):
     ys = [R[r][k]["full"] for r in ("b0", "a2", "a4")]
     ax.plot(xs, ys, mk, lw=2, ms=8, label=lab,
             color=C_B0 if k == 1 else C_A2)
@@ -73,8 +75,8 @@ for x, r in zip(xs, ("b0", "a2", "a4")):
                 ha="center", fontsize=11, color=INK)
 # leave headroom under the k=1 line so the run labels do not land on the tick labels
 _lo = min(R[r][1]["full"] for r in ("b0", "a2", "a4"))
-_hi = max(R[r][4]["full"] for r in ("b0", "a2", "a4"))
-ax.set_ylim(_lo - 0.006, _hi + 0.004)
+_hi = max(R[r][1]["full"] for r in ("b0", "a2", "a4"))
+ax.set_ylim(_lo - 0.006, _hi + 0.010)   # widened: the k=4 line used to set the top
 ax.set_xscale("log")
 ax.set_xticks(xs); ax.set_xticklabels([f"{v:,}" for v in xs])
 ax.minorticks_off()

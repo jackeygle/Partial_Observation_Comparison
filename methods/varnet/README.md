@@ -37,7 +37,7 @@ python3 -m methods.enkf.checks.score_enkf                              # score E
 python3 -m compare.plot_reconstruction_enkf --day atc-20130811
 python3 -m methods.enkf.checks.plot_velocity_enkf       --day atc-20130811
 python3 -m compare.compare_channels
-python3 -m compare.plot_comparison
+python3 -m compare.plot_compare5
 python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} + _notes.md
 ```
 
@@ -214,7 +214,10 @@ can never drift from what was actually trained/measured.
 
 **Evaluation / comparison pipeline** (the results):
 `eval_test_days.py`, `export_obs_for_enkf.py`, `run_enkf_baseline.py`, `score_enkf.py`,
-`compare_channels.py`, `plot_comparison.py`,
+`compare_channels.py`, `compare/compare5.py` + `compare/plot_compare5.py`
+(the cross-method comparison; `plot_comparison.py`, `plot_speed.py`,
+`plot_frameworks.py` and `plot_meeting.py` were deleted on 2026-09-09 -- their
+figures fed the pre-2026-09-07 decks and are superseded by `compare/plot_meeting4.py`),
 `plot_reconstruction_enkf.py` (density + heading arrows), `plot_velocity_enkf.py`
 (speed magnitude + heading arrows),
 `plot_reconstruction_sequence.py` (N consecutive frames as PNGs, optional EnKF panels),
