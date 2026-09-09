@@ -49,9 +49,10 @@ agreed with the supervisor on 2026-09-07.
 | `methods/senseiver/` | Senseiver | none |
 | `methods/enkf/` | localised EnKF (+ PedPred3 forward model) | ensemble spread |
 
-`aug0` is the design that works — better CRPS, and its sign is stable across
-both scoring conventions. `vsb0` is kept as the negative control showing why
-bolting uncertainty on afterwards underperforms. DINCAE and the EnKF have
+Measured against a constant-sigma null model on `defined_blind`, CRPS relative
+to that baseline is: `aug0` -19.3%, DINCAE -15.7%, `vsb0` +2.6%, EnKF +12.8%.
+Under the all-cells convention the same four are -24.3%, -76.1%, +50.1%,
++26.8% — the magnitudes change, the signs do not. DINCAE and the EnKF have
 uncertainty *built into* the method (information form, ensemble spread) rather
 than as a separate design.
 
@@ -113,7 +114,8 @@ physically walkable; the remaining 142 (32.9%) are the obstacle region.
 **Obstacle-region finding** (`methods/dincae/checks/measure_obstacle_region.py`,
 full 7-day split, both runs scored on the checkpoints their reported numbers
 use). Obstacle-region truth is non-zero only 2.99–3.11% of the time. The
-information-form baseline is wildly wrong there on the velocity channels,
+information-form baseline's velocity error there is two to three orders of
+magnitude above its walkable-cell error,
 because it is never taught a target for a quantity that only exists where
 `density>0` — which is never true in the obstacle region. The
 `--full-field-loss` ablation supervises those cells against physical 0 and
@@ -248,8 +250,8 @@ and is **not** part of any reported comparison.
 | Codename | Method | Means |
 |---|---|---|
 | `mse5` | 4DVarNet | plain MSE loss (Eq.14), 5 random seeds, no uncertainty output |
-| `aug0` | 4DVarNet | sigma **inside** the prior operator `G(x)`, NLL — ours, the design that works |
-| `vsb0` | 4DVarNet | sigma from a **separate read-out head**, NLL — ours, the negative control |
+| `aug0` | 4DVarNet | sigma **inside** the prior operator `G(x)`, NLL — ours |
+| `vsb0` | 4DVarNet | sigma from a **separate read-out head**, NLL — ours |
 | `dincae_full` | DINCAE | baseline: information-form supervision (only defined cells in the loss) |
 | `dincae_ff` | DINCAE | `--full-field-loss` ablation: every cell in the loss, obstacle target = 0 |
 | `senseiver_A` | Senseiver | the one trained model |

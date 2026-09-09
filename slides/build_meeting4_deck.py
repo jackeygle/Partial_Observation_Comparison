@@ -138,8 +138,9 @@ SLIDES = [
                "CRPS is bounded, in data units, and reduces to MAE as sigma -> 0.\n\n"
                "Robustness, the important part: under the all-cells convention the same four come "
                "out, in table order, -24.3% / -76.1% / +50.1% / +26.8%. The magnitudes move a lot — vsb0 looks "
-               "catastrophic there and merely tied here — but the SIGN does not. Structural wins, "
-               "bolt-on loses, both ways.\n\n"
+               "far from the null model there and level with it here — but the SIGN does not: "
+               "the two structural designs sit below the null model under both conventions, "
+               "the two added afterwards sit above it under both.\n\n"
                "Cost, if asked: the sigma-hat is not free. aug0 is 13.9% worse than plain MSE on "
                "accuracy, vsb0 10.2% worse; the three arms' 5-seed intervals do not overlap. So "
                "vsb0 pays and buys nothing, aug0 pays 3.7 points more and buys a usable sigma."),
@@ -182,7 +183,7 @@ SLIDES = [
              ("And the 5.9% it loses under convention A says the information form is genuinely "
               "part of why DINCAE wins there — not just its architecture.", 0),
          ])],
-         notes="This is the strongest slide. Everything before it argues the hypothesis across "
+         notes="Everything before this argues the hypothesis across "
                "methods; this proves it INSIDE one method, where architecture, data, and "
                "checkpoint rule are all held fixed.\n\n"
                "Cost: 150 epochs, ~21 GPU-hours, plus a separate 13 GB target cache. The change "

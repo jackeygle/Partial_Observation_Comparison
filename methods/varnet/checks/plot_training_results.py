@@ -5,7 +5,7 @@ plot_training_results.py  —  figures for the training-results deck
   train_curves.png     the training curves that explain why the largest one is not the choice
   train_summary.png    the model of record, the NLL variant, and the EnKF, on one axis
 
-All numbers are read from check_outputs/eval/test_metrics_*.json (test set, one convention for
+All numbers are read from compare/results/compare5_final.json (test set, one convention for
 every row) and from runs/*/metrics.jsonl (per-epoch, validation subset). Nothing is typed in.
 
 Inference cost is deliberately NOT drawn. The per-eval GPU timings were collected on different
@@ -20,6 +20,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from crowdcore import paths
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EV = os.path.join(ROOT, "check_outputs", "eval")
@@ -27,12 +28,25 @@ INK, MUTED = "#20334d", "#5b6a7d"
 C_B0, C_A2, C_A4, C_ML, C_EK = "#0e6b8a", "#4a7a4a", "#8a6d3b", "#7a4a7a", "#b5651d"
 
 
+# All numbers come from compare/results/compare5_final.json, the single
+# implementation that computes every convention in one pass. This script used to
+# read test_metrics_*.json from eval_test_days.py, a second implementation that
+# disagreed with compare5 on the same checkpoint; that script was removed on
+# 2026-09-09 rather than reconciled.
+_C5 = json.load(open(os.path.join(paths.COMPARE, "results", "compare5_final.json")))
+
+
 def rd(tag):
-    d = json.load(open(os.path.join(EV, f"test_metrics_{tag}.json")))
-    fu = np.array([r["full_mse"] for r in d["per_day"]], float)
-    bl = np.array([r["blind_mse"] for r in d["per_day"]], float)
+    """`tag` is a compare5 row name suffix: "b0_k1", "a2_k1", "ml5_s0" -> "ML s0"."""
+    row = _ROWMAP[tag]
+    fu = np.array([d[row]["full_mse"] for d in _C5["per_day"]], float)
+    bl = np.array([d[row]["defined_blind_mse"] for d in _C5["per_day"]], float)
     return dict(full=np.sqrt(fu).mean(), blind=np.sqrt(bl).mean(),
-                full_std=np.sqrt(fu).std(), epoch=d.get("epoch"))
+                full_std=np.sqrt(fu).std(), epoch=None)
+
+
+_ROWMAP = {f"{r}_k1": f"4DVarNet {r}_k1" for r in ("b0", "a2", "a4")}
+_ROWMAP.update({f"ml5_s{s}": f"4DVarNet ML s{s}" for s in range(5)})
 
 
 def curve(run):
@@ -134,7 +148,7 @@ save(fig, "train_curves.png")
 ML = [rd(f"ml5_s{s}") for s in range(5)]
 mlm = float(np.mean([m["full"] for m in ML]))
 mls = float(np.std([m["full"] for m in ML]))
-EK = json.load(open(os.path.join(EV, "test_metrics_enkf_k1.json")))["rmse_mean"]
+EK = float(np.sqrt([d["EnKF k1"]["full_mse"] for d in _C5["per_day"]]).mean())
 
 fig, ax = plt.subplots(figsize=(8.6, 4.5))
 labs = ["b0\nMSE objective", "b0 + NLL\n(5 members)", "EnKF"]

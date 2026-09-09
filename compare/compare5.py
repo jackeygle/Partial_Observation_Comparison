@@ -134,14 +134,10 @@ HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 # and the removed three-way script's rmse_all; it is included so those scripts'
 # reported numbers can be put next to this one's.
 #
-# They do NOT actually agree. Measured 2026-09-09 on b0_k1: eval_test_days.py
-# reports full_mse 0.0290 and blind_mse 0.0338, this script's `full` and
-# `allcells` give 0.0317 and 0.0365 -- the same +0.0027 offset in both, so it is
-# not a cell-scope difference (that would scale differently for the two subsets).
-# Cause not established; the analogous gap against the old three-way script was
-# never tracked down either. Treat numbers from the two scripts as not
-# interchangeable, and prefer this one -- it is the only implementation that
-# computes every convention in one pass.
+# eval_test_days.py used to compute the same two quantities and disagreed with
+# this script by a constant +0.0027 on b0_k1. Rather than reconcile two
+# implementations of one metric, it was removed on 2026-09-09 (archived at tag
+# archive-2026-09-09) and everything now reads this one.
 # Why `_noclip` exists: the removed three-way script did not clip, test_metrics does -- that is the
 # only known convention difference between them.
 BASE_CONVENTIONS = ("defined", "defined_full", "allcells", "full")

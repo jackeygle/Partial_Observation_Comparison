@@ -292,17 +292,13 @@ worth." Without this sentence, the table would be misread.
 
 ## Results (7 held-out days, full day, obs_every_k=1, same clipping across all three)
 
-> **Unit and source note.** This section reports **MSE**, under what the main
-> tables now call the `allcells` convention, and its 4DVarNet rows come from
-> `methods/varnet/checks/eval_test_days.py` rather than from `compare/compare5.py`.
-> The two do not agree: for `b0_k1` this table's 0.0338 is compare5's 0.0365
-> (a constant +0.0027 offset that also shows up in the full-field convention, so
-> it is not a cell-scope difference). The root `README.md`'s headline table uses
-> compare5 throughout, which is the implementation to prefer -- it computes every
-> convention in one pass. Do not mix rows from the two sources in one comparison. The root `README.md`'s headline table reports
-> **RMSE** under two conventions side by side, so the numbers look different
-> while describing the same thing: Senseiver's 0.0284 here is 0.169 there
-> (0.169^2 = 0.0286). Do not mix the two units in one comparison.
+> **Unit note.** This section reports **MSE**, under what the main tables now
+> call the `allcells` convention; the root `README.md`'s headline table reports
+> **RMSE**, so the same quantity appears as 0.0284 here and 0.168 there
+> (0.168^2 = 0.0282). Its 4DVarNet rows were produced by `eval_test_days.py`,
+> which was removed on 2026-09-09 in favour of `compare/compare5.py` as the
+> single implementation; the numbers below are kept as recorded at the time and
+> differ slightly from compare5's for the same models.
 
 Produced by `checks/evaluate.py` (single method) and, for the cross-method
 per-channel table, `compare/compare5.py` (the three-way `compare3.py` it
@@ -321,7 +317,7 @@ archived convention also had clipping ON.
 | 4DVarNet `b0_k1` | 0.0338 +/- 0.0040 | 0.0290 | 2,051,596 | 0.086 |
 | EnKF `k1` | 0.0462 | -- | -- | -- |
 
-Senseiver beats 4DVarNet-a4 on 7/7 days, difference mean +0.00237, std 0.00030 (far
+Senseiver's blind MSE is lower than 4DVarNet-a4's on 7/7 days, difference mean +0.00237, std 0.00030 (far
 smaller than the difference itself).
 
 > **Historical warning, now resolved.** `enkf_metrics.json` used to hold
@@ -350,7 +346,7 @@ are not comparable to each other.
 
 **Three things that must be reported alongside the summary table:**
 
-1. **4DVarNet wins on vx** (0.0753 vs 0.0788, 4.4% better), and vx accounts for
+1. **4DVarNet's vx error is lower** (0.0753 vs 0.0788, a 4.4% difference), and vx accounts for
    **69%** of total blind error. Senseiver's overall lead comes **entirely from
    the other three channels** (density -21%, vy -30%, var -42%). In other words:
    for velocity along the corridor's main direction, variational assimilation's
@@ -358,7 +354,7 @@ are not comparable to each other.
 2. **The EnKF nearly ties on density** (0.0143 vs 0.0139), despite trailing 46%
    overall -- it is dragged down by var (0.0394, 6x Senseiver's). The
    worst-overall method is competitive on the most physically meaningful channel.
-3. Reporting only the total gives the false impression that "Senseiver wins across
+3. Reporting only the total gives the false impression that "Senseiver is ahead across
    the board." **The per-channel breakdown must always be given alongside it.**
 
 ### Spatial decomposition of the error
@@ -411,7 +407,7 @@ Senseiver reconstructs frame t using only frame t's observation; 4DVarNet, when
 reconstructing frame t, can use observations from the entire dT=200 window.
 **4DVarNet strictly receives more information**, a setup unfavourable to
 Senseiver, and it still leads overall. This makes the overall-score conclusion
-stronger, but does not change point 1 above (it loses on vx).
+stronger, but does not change point 1 above (its vx error is higher).
 
 ---
 

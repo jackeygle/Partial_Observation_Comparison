@@ -28,7 +28,7 @@ One detail visible in the figure and worth having ready: the EnKF is the only me
 
 Why CRPS is the verdict column and not NLL: NLL has a (x-mu)^2/2sigma^2 term that is unbounded as sigma -> 0. The EnKF's ensemble collapses to sigma = 0.0025 while actually being wrong by 0.215, so its NLL is 1.7e18 (all-cells convention, matching the 0.215) — that cannot rank anything. CRPS is bounded, in data units, and reduces to MAE as sigma -> 0.
 
-Robustness, the important part: under the all-cells convention the same four come out, in table order, -24.3% / -76.1% / +50.1% / +26.8%. The magnitudes move a lot — vsb0 looks catastrophic there and merely tied here — but the SIGN does not. Structural wins, bolt-on loses, both ways.
+Robustness, the important part: under the all-cells convention the same four come out, in table order, -24.3% / -76.1% / +50.1% / +26.8%. The magnitudes move a lot — vsb0 looks far from the null model there and level with it here — but the SIGN does not: the two structural designs sit below the null model under both conventions, the two added afterwards sit above it under both.
 
 Cost, if asked: the sigma-hat is not free. aug0 is 13.9% worse than plain MSE on accuracy, vsb0 10.2% worse; the three arms' 5-seed intervals do not overlap. So vsb0 pays and buys nothing, aug0 pays 3.7 points more and buys a usable sigma.
 
@@ -44,7 +44,7 @@ k=4 is not shown: in our setting the robots observe every frame. The a2 widened-
 
 ## Slide 7: The ablation that settles it
 
-This is the strongest slide. Everything before it argues the hypothesis across methods; this proves it INSIDE one method, where architecture, data, and checkpoint rule are all held fixed.
+Everything before this argues the hypothesis across methods; this proves it INSIDE one method, where architecture, data, and checkpoint rule are all held fixed.
 
 Cost: 150 epochs, ~21 GPU-hours, plus a separate 13 GB target cache. The change itself is two lines in encode_target.
 

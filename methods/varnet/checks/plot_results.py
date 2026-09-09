@@ -23,6 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from crowdcore import paths
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EV = os.path.join(ROOT, "check_outputs", "eval")
@@ -34,14 +35,15 @@ J = lambda n: json.load(open(os.path.join(EV, n)))
 # config.yaml defaults. A2 (hidden 64, kt 5) scores ~2% better but is a capacity experiment;
 # the deck presents the baseline configuration, so accuracy and speed must both come from it.
 RUN = "b0"
-VAR = {}
-for k in (1,):
-    d = J(f"test_metrics_{RUN}_k{k}.json")
-    fu = np.array([r["full_mse"] for r in d["per_day"]], float)
-    VAR[k] = dict(rmse=np.sqrt(fu).mean(), std=np.sqrt(fu).std(),
-                  days=len(d["per_day"]),
-                  frames=sum(r["n_windows"] for r in d["per_day"]) * d["dT"])
-ENK = {k: J(f"test_metrics_enkf_k{k}.json") for k in (1,)}
+# From compare5_final.json, the single implementation of these metrics. The
+# eval_test_days.py path this used to read was removed on 2026-09-09.
+_C5 = json.load(open(os.path.join(paths.COMPARE, "results", "compare5_final.json")))
+_pd = _C5["per_day"]
+_rmse = lambda row: np.sqrt([d[row]["full_mse"] for d in _pd])
+VAR = {1: dict(rmse=_rmse(f"4DVarNet {RUN}_k1").mean(),
+               std=_rmse(f"4DVarNet {RUN}_k1").std(),
+               days=len(_pd), frames=sum(d["frames_scored"] for d in _pd))}
+ENK = {1: {"rmse_mean": _rmse("EnKF k1").mean()}}
 SPD = J(f"bench_speed_{RUN}.json")
 SPL = J("enkf_time_split.json")
 ms = lambda k: SPD["runs"][k]["per_frame_s"] * 1000
