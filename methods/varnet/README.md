@@ -38,7 +38,6 @@ python3 -m compare.plot_reconstruction_enkf --day atc-20130811
 python3 -m methods.enkf.checks.plot_velocity_enkf       --day atc-20130811
 python3 -m compare.compare_channels
 python3 -m compare.plot_compare5
-python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} + _notes.md
 ```
 
 > **GPU, not the login node.** Anything that touches `torch` (training, evaluation,
@@ -62,7 +61,6 @@ python3 -m slides.build_meeting4_deck      # -> slides/meeting4_deck.{pptx,pdf} 
 | `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/` | verification scripts + all figure/evaluation scripts (see below) |
 | `sbatch/` | SLURM submit scripts |
-| `slides/build_meeting4_deck.py` | builds the current meeting deck (reads numbers from config/checkpoint/JSON) |
 | `runs/varnet_b0_k1/` | the model of record: checkpoint + `metrics.jsonl` (see the repo README's method table) |
 | `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
 
@@ -185,8 +183,6 @@ The EnKF driver lives **in this project** (`methods/enkf/checks/run_enkf_baselin
 ## Slides
 
 ```bash
-python3 -m slides.build_meeting4_deck    # login node is fine (reads JSON, no checkpoint)
-#   -> slides/meeting4_deck.pptx / .pdf / meeting4_deck_notes.md   (6 slides)
 ```
 The deck **reads every number** from `config.yaml`, the checkpoint's saved `args`, and
 the `check_outputs/eval/*.json` files — nothing is hard-coded in the slide script, so it
@@ -217,7 +213,7 @@ can never drift from what was actually trained/measured.
 `compare_channels.py`, `compare/compare5.py` + `compare/plot_compare5.py`
 (the cross-method comparison; `plot_comparison.py`, `plot_speed.py`,
 `plot_frameworks.py` and `plot_meeting.py` were deleted on 2026-09-09 -- their
-figures fed the pre-2026-09-07 decks and are superseded by `compare/plot_meeting4.py`),
+figures fed decks that no longer exist),
 `plot_reconstruction_enkf.py` (density + heading arrows), `plot_velocity_enkf.py`
 (speed magnitude + heading arrows),
 `plot_reconstruction_sequence.py` (N consecutive frames as PNGs, optional EnKF panels),
@@ -232,9 +228,10 @@ figures fed the pre-2026-09-07 decks and are superseded by `compare/plot_meeting
 `plot_obstacle_map.py` (obstacle occupancy). The convergence curve, training table
 and architecture diagrams come from `checks/plot_architecture.py` and
 `checks/plot_training_results.py`. The eight pre-2026-09-07 decks and their build
-scripts were deleted on 2026-09-08; `slides/build_meeting4_deck.py` is the only
-deck builder left, and `methods/varnet/SUPERSEDED.md` keeps the findings that
-were only recorded in those decks' notes.
+scripts, and the whole of `slides/`, were deleted on 2026-09-08/09; the project
+no longer builds presentation decks from this repository.
+`methods/varnet/SUPERSEDED.md` keeps the findings that were only recorded in
+those decks' notes.
 
 ---
 

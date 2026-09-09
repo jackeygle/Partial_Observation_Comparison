@@ -144,7 +144,6 @@ files. No GPU, no Slurm, no environment setup.
 |---|---|
 | The main accuracy comparison figure (per-channel, **MSE**) | `compare/results/compare5.png` |
 | Raw numbers, all four scoring conventions | `compare/results/compare5_final.json` |
-| The current meeting deck (2026-09-07, 6 slides) | `slides/meeting4_deck.pdf`, speaker notes in `slides/meeting4_deck_notes.md` |
 | A reconstructed field as a picture, all 4 methods side by side | `compare/results/reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png` |
 | DINCAE's obstacle-region result | `methods/dincae/check_outputs/eval/obstacle_region.json` |
 | Everything else (architecture diagrams, uncertainty calibration, speed) | `methods/*/check_outputs/**/*.png` — `unc_*` uncertainty, `mt_*` uncertainty meeting figures, `arch_*`/`fw_*` architecture, `speed_*` latency |
@@ -237,7 +236,6 @@ methods/                  one subdirectory per method, none import each other
 
 compare/                  the ONLY place allowed to import more than one method
                           at once -- cross-method comparison and plots
-slides/                   the current meeting deck and its builder
 sbatch/_env.sh            the single environment entry point
 ```
 

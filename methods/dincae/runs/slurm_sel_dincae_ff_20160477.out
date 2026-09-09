@@ -1,0 +1,5 @@
+[select] runs/dincae_ff: 12 checkpoints, 7 valid days, scope=walkable blind
+
+  epoch   30  ckpt_00030.pt    0.047990
+  epoch   40  ckpt_00040.pt    0.046972
+  epoch   50  ckpt_00050.pt    0.047875

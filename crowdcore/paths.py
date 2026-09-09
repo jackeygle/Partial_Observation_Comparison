@@ -30,7 +30,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CROWDCORE = os.path.join(ROOT, "crowdcore")
 METHODS = os.path.join(ROOT, "methods")
 COMPARE = os.path.join(ROOT, "compare")
-SLIDES = os.path.join(ROOT, "slides")
 BASELINE = os.path.join(ROOT, "refactor_baseline")
 
 #: Directory names of the five methods. Kept here rather than as scattered string

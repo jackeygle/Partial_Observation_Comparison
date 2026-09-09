@@ -1,8 +1,9 @@
 # Superseded arms and overturned conclusions (4DVarNet)
 
 Facts that are easy to re-derive wrongly, or to waste time re-discovering.
-Rescued from `slides/STALE.md` when the eight pre-2026-09-07 decks it
-annotated were deleted; the decks are gone, these findings are not.
+Rescued from `slides/STALE.md` when the decks it annotated were deleted
+(all of `slides/` is gone as of 2026-09-09, archived at tag
+`archive-2026-09-09`); the decks are gone, these findings are not.
 
 ## `ml5` is NOT a learned-sigma arm any more
 
