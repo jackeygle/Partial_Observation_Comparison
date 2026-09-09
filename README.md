@@ -59,7 +59,8 @@ than as a separate design.
 one's checkpoint picked on its own validation set — no ensembling and no
 checkpoint averaging, because neither paper reports one. DINCAE's reference
 implementation *does* average the outputs of checkpoints saved every 10 epochs,
-and `checks/evaluate.py` still supports it behind `--average-checkpoints`, but
+and `methods/dincae/checks/evaluate.py` still supports it behind
+`--average-checkpoints`, but
 the reported number comes from **one** checkpoint, `ckpt_00070.pt`. The
 16-checkpoint average is kept as a measured side quantity (worth 1.7% RMSE,
 less than picking the right single checkpoint), not as the headline.
@@ -158,14 +159,14 @@ checkpoints and which you pick changes the number. Same for `varnet_best.pt` vs
 | 4DVarNet MSE | `methods/varnet/runs/varnet_mse5_s{0..4}/varnet_best.pt` | `compare/results/compare5_final.json` (`"4DVarNet MSE s*"`) | `compare5_final.json`'s protocol records `ckpt: varnet_best.pt` |
 | 4DVarNet `aug0` | `methods/varnet/runs/varnet_aug0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_aug0.json` | same convention |
 | 4DVarNet `vsb0` | `methods/varnet/runs/varnet_vsb0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_vsb0.json` | same convention |
-| DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `eval/uncertainty_dincae.json` | best on DINCAE's own validation set; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
+| DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | best on DINCAE's own validation set; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | folded into `compare5_final.json` (`"Senseiver"`) | only trained model; `best.pt`, not `last.pt` |
 | EnKF | no weights — exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | `compare5_final.json` (`"EnKF k1"`), `methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json` | it is a filter, not a trained model |
 
 Two traps, both of which silently produce a *different number* rather than an
 error:
 
-1. **Do not average DINCAE's 16 checkpoints.** `checks/evaluate.py` used to do
+1. **Do not average DINCAE's 16 checkpoints.** `methods/dincae/checks/evaluate.py` used to do
    this by default (it is the reference implementation's behaviour). It now
    refuses unless you pass `--average-checkpoints`, because the result is ~1.7%
    RMSE away from the reported one with nothing in the output to say which
