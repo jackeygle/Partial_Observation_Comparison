@@ -1,0 +1,72 @@
+single checkpoint:  epochs [140]
+test split: 7 days
+  atc-20130811_corridor_1.0s  density 0.02057  vx 0.44761  vy 0.08536  var 0.04096
+  atc-20130818_corridor_1.0s  density 0.03073  vx 0.51063  vy 0.10052  var 0.05287
+  atc-20130825_corridor_1.0s  density 0.02564  vx 0.56592  vy 0.10909  var 0.06362
+  atc-20130901_corridor_1.0s  density 0.02776  vx 0.55009  vy 0.10702  var 0.06023
+  atc-20130915_corridor_1.0s  density 0.02037  vx 0.58696  vy 0.11384  var 0.05161
+  atc-20130922_corridor_1.0s  density 0.01922  vx 0.62427  vy 0.11714  var 0.05037
+  atc-20130929_corridor_1.0s  density 0.02244  vx 0.63838  vy 0.11343  var 0.05949
+
+=== MSE (both conventions) ===
+convention         density         vx         vy        var   4-channel merged
+ours_blind         0.02385    0.55739    0.10618    0.05455   0.10733
+ours_all           0.01318    0.23479    0.04339    0.02370   0.05147
+ours_blind_noclip   0.02408    0.55739    0.10619    0.05503   0.10754
+ours_all_noclip    0.01336    0.23480    0.04344    0.23152   0.08096
+v4dvar_blind       0.01401    0.56947    1.86520    0.02788   0.61914
+v4dvar_all         0.00942    0.37388    1.44610    0.01645   0.46146
+
+=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===
+  density  truth 0.2039  rec 0.1764  ratio 0.865
+  vx       truth 0.8981  rec 0.7252  ratio 0.808
+  vy       truth 0.3317  rec 0.2744  ratio 0.827
+  var      truth 0.2326  rec 0.1733  ratio 0.745
+
+=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===
+  density  mean predicted SD 0.5101  actual RMS 0.7968  global adjustment factor 1.562  (n=4,000,000)
+      pred 0.0354 -> actual 0.0583  (n=1,482,758)
+      pred 0.1969 -> actual 0.2382  (n=327,941)
+      pred 0.3244 -> actual 0.3618  (n=276,885)
+      pred 0.4540 -> actual 0.4785  (n=215,589)
+      pred 0.5838 -> actual 0.6157  (n=208,874)
+      pred 0.7133 -> actual 0.7566  (n=225,936)
+      pred 0.8388 -> actual 0.9258  (n=222,444)
+      pred 0.9682 -> actual 1.0902  (n=208,900)
+      pred 1.0963 -> actual 1.2270  (n=210,749)
+      pred 1.2246 -> actual 1.3777  (n=219,924)
+  vx       mean predicted SD 0.7385  actual RMS 0.8793  global adjustment factor 1.191  (n=4,000,000)
+      pred 0.4328 -> actual 0.5402  (n=313,446)
+      pred 0.4957 -> actual 0.6137  (n=287,630)
+      pred 0.5593 -> actual 0.6749  (n=278,259)
+      pred 0.6228 -> actual 0.7595  (n=247,826)
+      pred 0.6868 -> actual 0.8204  (n=256,734)
+      pred 0.7506 -> actual 0.8797  (n=294,072)
+      pred 0.8137 -> actual 0.9433  (n=333,720)
+      pred 0.8767 -> actual 0.9938  (n=366,054)
+      pred 0.9404 -> actual 1.0303  (n=432,731)
+      pred 1.0016 -> actual 1.0964  (n=389,528)
+  vy       mean predicted SD 0.8806  actual RMS 0.9679  global adjustment factor 1.099  (n=4,000,000)
+      pred 0.5506 -> actual 0.6969  (n=204,568)
+      pred 0.6118 -> actual 0.7554  (n=179,010)
+      pred 0.6732 -> actual 0.8236  (n=171,991)
+      pred 0.7347 -> actual 0.8651  (n=172,722)
+      pred 0.7973 -> actual 0.8913  (n=220,702)
+      pred 0.8604 -> actual 0.9138  (n=401,057)
+      pred 0.9171 -> actual 0.9248  (n=754,135)
+      pred 0.9761 -> actual 0.9819  (n=410,127)
+      pred 1.0390 -> actual 1.0355  (n=378,476)
+      pred 1.0987 -> actual 1.1042  (n=307,212)
+  var      mean predicted SD 0.8303  actual RMS 1.0126  global adjustment factor 1.220  (n=4,000,000)
+      pred 0.4374 -> actual 0.6357  (n=190,422)
+      pred 0.5134 -> actual 0.7119  (n=206,152)
+      pred 0.5937 -> actual 0.7766  (n=254,881)
+      pred 0.6689 -> actual 0.8236  (n=325,802)
+      pred 0.7474 -> actual 0.9219  (n=252,363)
+      pred 0.8264 -> actual 0.9433  (n=296,567)
+      pred 0.9049 -> actual 1.0028  (n=339,208)
+      pred 0.9814 -> actual 1.0737  (n=419,537)
+      pred 1.0590 -> actual 1.1627  (n=470,879)
+      pred 1.1376 -> actual 1.2630  (n=444,191)
+
+wrote /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval_single_00140/dincae_metrics_test.json

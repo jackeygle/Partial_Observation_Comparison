@@ -241,6 +241,15 @@ def accumulate(acc, Xt, rec, mu_n, sd_n, M, stats):
                          ("ours_all_noclip", ours)):
             a = acc[tag][c]
             a["se"] += float(d2[sel].sum()); a["n"] += int(sel.sum())
+        # --- walkable: the physical domain, empty cells included, obstacles excluded.
+        # This is the scope the cross-method comparison reports: it drops
+        # `channel_valid` (so a cell with no people still counts, with velocity 0
+        # as its target) but keeps the walkable restriction (the map-obstacle
+        # region is a fixed known zero, not part of the reconstruction task).
+        w = np.broadcast_to(walk, blind[:, c].shape)
+        for tag, sel in (("walkable_blind", w & blind[:, c]), ("walkable_all", w)):
+            a = acc[tag][c]
+            a["se"] += float(d2c[sel].sum()); a["n"] += int(sel.sum())
         # --- v4dvar: all cells, clipped ---
         for tag, sel in (("v4dvar_blind", blind[:, c]),
                          ("v4dvar_all", np.ones_like(blind[:, c]))):
@@ -319,7 +328,7 @@ def main():
 
     mk = lambda: [{"se": 0.0, "n": 0} for _ in range(NCH)]
     TAGS = ("ours_blind", "ours_all", "ours_blind_noclip", "ours_all_noclip",
-            "v4dvar_blind", "v4dvar_all")
+            "walkable_blind", "walkable_all", "v4dvar_blind", "v4dvar_all")
     acc = {t: mk() for t in TAGS}
     acc["var_retention"] = [{"st": 0.0, "st2": 0.0, "sr": 0.0, "sr2": 0.0, "n": 0}
                             for _ in range(NCH)]

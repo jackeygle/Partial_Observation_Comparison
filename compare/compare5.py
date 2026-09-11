@@ -19,6 +19,14 @@ the NLL side's extra `grad_net.out_var` -- a 692,000-parameter sigma-hat read-ou
 head. So the loss function's effect is a clean comparison at both the
 single-model and ensemble level.
 
+IN PROGRESS as of 2026-09-10, not yet reflected in the numbers this script
+reports: the capacity sweep (runs/varnet_a4_k1) found hidden=96/kt=5 beats this
+32/3 configuration by ~7% and is being adopted as the new baseline, with the
+three arms above being retrained at 96/5 to match (runs/varnet_{mse5,vsb0,aug0}_h96_s*)
+so the headline model and the uncertainty comparison share one backbone. Update
+this figure and re-point --arms once that retrain has validation-selected
+checkpoints -- until then it would describe runs this script is not reading.
+
 Why four conventions
 ----------------------
 **Rankings flip depending on the convention.** On the same predictions, under the
@@ -37,10 +45,14 @@ a convention artifact, not a property of the model.
 So all four are computed side by side, making the difference visible in one piece
 of output rather than making the reader compare several jsons themselves:
 
-    (1) defined        blind ∩ defined ∩ walkable      the main result, comparable across all rows
+    (1) defined        blind ∩ defined ∩ walkable      the information form's own scope
     (2) defined_full   full field ∩ defined ∩ walkable includes observed cells
-    (3) allcells        blind, all cells                the removed three-way script's convention
-    (4) full            full field, all cells           eval_test_days's full_mse
+    (3) walkable       blind ∩ walkable                **the main result**: every cell of the
+                                                       physical domain, empty ones included,
+                                                       map-obstacle cells excluded
+    (4) walkable_full  full field ∩ walkable           includes observed cells
+    (5) allcells       blind, all cells                the removed three-way script's convention
+    (6) full           full field, all cells           the whole grid, obstacles included
 
 Each is further multiplied by "clipped/unclipped" and "pooled/day-averaged",
 because those two axes have each been mixed up before too: `test_metrics_*.json`
@@ -140,7 +152,8 @@ HI = np.array([5.0, 5.0, 5.0, 2.0], np.float32)
 # archive-2026-09-09) and everything now reads this one.
 # Why `_noclip` exists: the removed three-way script did not clip, test_metrics does -- that is the
 # only known convention difference between them.
-BASE_CONVENTIONS = ("defined", "defined_full", "allcells", "full")
+BASE_CONVENTIONS = ("defined", "defined_full", "walkable", "walkable_full",
+                    "allcells", "full")
 CONVENTIONS = BASE_CONVENTIONS + tuple(f"{k}_noclip" for k in BASE_CONVENTIONS)
 
 
@@ -179,6 +192,45 @@ class Acc:
         for k in CONVENTIONS:
             self.se[k] += other.se[k]
             self.n[k] += other.n[k]
+
+
+def varnet_ckpt(run_name, ckpt_name):
+    """Which checkpoint to report for runs/varnet_<run_name>, and why.
+
+    Default (ckpt_name empty): the epoch chosen on the VALIDATION split by
+    methods/varnet/checks/select_checkpoint.py, recorded per run in
+    select_valid.json. Each run gets its own epoch; all of them solve with 20
+    iterations, the final stage of the paper's Sec. 3.4 curriculum, because the
+    selector refuses candidates that do not.
+
+    This is not a preference, it is what makes the arms comparable. varnet_best.pt
+    is selected inside train.py on the first --n-eval windows of --split, and
+    --split defaults to train -- so it is model selection on training data, and it
+    lands each arm at a different epoch AND a different solver depth. It also put
+    4DVarNet out of step with the other two methods, which both select on
+    validation (Senseiver in its own train.py, DINCAE in its select_checkpoint.py).
+    """
+    rd = os.path.join(paths.runs(paths.VARNET), f"varnet_{run_name}")
+    if ckpt_name:
+        return os.path.join(rd, ckpt_name)
+    sel = os.path.join(rd, "select_valid.json")
+    if not os.path.exists(sel):
+        # Fall back rather than refuse: every headline run this README reports
+        # (mse5_s*, vsb0_s*, aug0_s*) predates checks/select_checkpoint.py and has no
+        # select_valid.json, so a hard failure here would break the documented
+        # reproduction command (`sbatch sbatch/submit_compare5.sbatch`) for every
+        # number currently in compare5_final.json. varnet_best.pt is exactly the
+        # checkpoint those numbers were produced from -- see the README's "Which
+        # file backs which published number" table -- so falling back to it
+        # reproduces the shipped table rather than reporting a different one.
+        print(f"[ckpt] {sel} not found -- falling back to varnet_best.pt for "
+              f"varnet_{run_name} (train-split selection; see train.py's --split "
+              f"default). Run methods.varnet.checks.select_checkpoint on this run "
+              f"to switch it to the validation-selected epoch.", flush=True)
+        return os.path.join(rd, "varnet_best.pt")
+    with open(sel) as f:
+        j = json.load(f)
+    return os.path.join(rd, j["selected_ckpt"])
 
 
 def run_senseiver(model, Y, Om, dev, batch):
@@ -225,6 +277,9 @@ def build_masks(X, Omf, walk, C):
     w = walk[None, None]
     base = {"defined": blind & cv & w,          # blind ∩ defined ∩ walkable
             "defined_full": cv & w,                # defined ∩ walkable, observed cells count too
+            "walkable": blind & w,                 # blind ∩ walkable -- every cell of the
+                                                   # physical domain, empty ones included
+            "walkable_full": w & np.ones_like(blind),  # walkable, observed cells count too
             "allcells": blind,                     # blind, all cells
             "full": np.ones_like(blind)}           # full field = observed + blind, all cells
     base.update({f"{k}_noclip": v for k, v in base.items()})      # same cells, scored unclipped
@@ -236,24 +291,29 @@ def main():
     ap.add_argument("--senseiver",
                     default=os.path.join(paths.runs(paths.SENSEIVER),
                                          "senseiver_A", "best.pt"))
-    ap.add_argument("--varnet", default="a4_k1,b0_k1",
-                    help="comma-separated 4dvarnet run names (runs/varnet_<name>/varnet_best.pt)")
+    ap.add_argument("--varnet", default="",
+                    help="comma-separated 4dvarnet run names to add as extra single-run rows, "
+                         "e.g. 'a4_k1'. Empty by default: the three arms below already cover "
+                         "every reported 4DVarNet number, and a2/a4/b0 are exploratory "
+                         "capacity ablations that are not part of any reported comparison.")
     ap.add_argument("--arms", default="MSE=mse5_s{},NLL=vsb0_s{},AUG=aug0_s{}",
                     help="comma-separated `label=run-name-template` entries. Each "
                          "arm produces N single-seed rows, plus one cross-seed "
                          "mean+/-std row. Leave empty to skip all arms.")
     ap.add_argument("--arm-seeds", default="0,1,2,3,4")
-    ap.add_argument("--ckpt-name", default="varnet_best.pt",
-                    help="which checkpoint to take from each run directory. "
-                         "Defaults to varnet_best.pt. Passing varnet_last.pt gives "
-                         "a **same-epoch comparison**: both arms trained 150 "
-                         "epochs, so last.pt is always epoch 149 with n_iter=20; "
-                         "which epoch best.pt lands on is decided by the "
-                         "validation set -- the NLL arm peaks at 62-93 (three of "
-                         "which are still stuck in the n_iter=15 curriculum "
-                         "stage), while the MSE arm drags on to 78-143. Comparing "
-                         "on best mixes 'the loss function's cost' with 'how fast "
-                         "it converged'.")
+    ap.add_argument("--ckpt-name", default="",
+                    help="DIAGNOSTIC ONLY: take this one checkpoint name from every run "
+                         "directory instead of the per-run choice recorded in "
+                         "select_valid.json. Empty (the default) = use the selection, which "
+                         "is what every reported number comes from.\n"
+                         "Do not pass varnet_best.pt to produce a reported number. train.py "
+                         "selects it on the first --n-eval windows of --split, and --split "
+                         "defaults to TRAIN, so it is model selection on training data -- and "
+                         "on the emptiest part of it. It also lands the arms at different "
+                         "points of the curriculum: measured on the hidden=32 runs, aug0's "
+                         "best fell at epoch 16-40 with the solver still at 5-10 iterations "
+                         "while mse5's fell at 78-143 at 20, so those two checkpoints differ "
+                         "in solver depth as well as in loss.")
     ap.add_argument("--with-ensemble", action="store_true",
                     help="additionally compute one row averaging N members' "
                          "reconstructions into an ensemble. **Off by default** -- "
@@ -303,7 +363,7 @@ def main():
     vnames = [z.strip() for z in args.varnet.split(",") if z.strip()]
     vsolvers = {}
     for vn in vnames:
-        sol, va, _ = load_solver(os.path.join(paths.runs(paths.VARNET), f"varnet_{vn}", args.ckpt_name), dev)
+        sol, va, _ = load_solver(varnet_ckpt(vn, args.ckpt_name), dev)
         vsolvers[vn] = (sol, va)
 
     # Deep ensemble. The point estimate is the mean of the members'
@@ -312,24 +372,37 @@ def main():
     # only reporting the ensemble would conflate "the benefit of averaging" with
     # "the effect of the loss function."
     #
-    # Why the two ensembles are shown side by side: mse5 and vsb0 are **identical
+    # Why the ensembles are shown side by side: mse5, vsb0 and aug0 are **identical
     # weight-for-weight** in prior/solver architecture (hidden 32, kt 3,
-    # lstm_hidden 64, GENN 9,474); the only difference is vsb0's extra
-    # grad_net.out_var, a 692,000-parameter sigma-hat read-out head. So
-    # MSE-vs-NLL is a clean comparison at both the single-model and ensemble
-    # level. (There used to be a mistaken worry that comparing b0_k1 against
-    # vsb0 would confound architecture differences -- that was a misremembering;
-    # b0_k1 was always the same architecture.)
+    # lstm_hidden 64, GENN 9,474); the only differences are vsb0's extra
+    # grad_net.out_var (a 692,000-parameter sigma-hat read-out head) and aug0's
+    # augmented state. So MSE-vs-NLL is a clean comparison at both the
+    # single-model and ensemble level. (In progress: being retrained at
+    # hidden=96/kt=5 to match the capacity sweep's winner -- see the module
+    # docstring. --arms still points at the 32/3 runs until that finishes.)
+    #
+    # The MSE ensemble is not decoration: it is Lakshminarayanan et al.'s own
+    # Table 2 baseline, M networks trained on the squared loss whose uncertainty
+    # is the EMPIRICAL VARIANCE across members rather than a learnt sigma^2.
+    # Dropping it would leave the two learnt-sigma designs comparable only to each
+    # other, with nothing to test the paper's central claim against.
     ens_members = [z.strip() for z in args.arm_seeds.split(",") if z.strip()]
     ensembles = {}                                   # label -> [solver, ...]
+    picked = {}                                      # label -> [(run, ckpt, epoch, n_iter)]
     for spec in (z.strip() for z in args.arms.split(",") if z.strip()):
         label, _, fmt = spec.partition("=")
         assert fmt, f"each --ensembles entry must be written as label=run-name-template, got {spec!r}"
         sols, edT = [], None
         for m in ens_members:
-            sol, va, _ = load_solver(
-                os.path.join(paths.runs(paths.VARNET), f"varnet_{fmt.format(m)}",
-                             args.ckpt_name), dev)
+            cp = varnet_ckpt(fmt.format(m), args.ckpt_name)
+            sol, va, ck = load_solver(cp, dev)
+            # State the epoch each member came from. Per-run validation selection means the
+            # five members of an ensemble are NOT all from the same epoch -- legitimate under
+            # Lakshminarayanan et al. (M independently initialised networks; nothing requires
+            # a shared epoch), but it has to be visible in the log rather than inferred.
+            picked.setdefault(label, []).append(
+                (fmt.format(m), os.path.basename(cp), int(ck.get("epoch", -1)),
+                 int(ck.get("n_iter_eff", -1))))
             sols.append(sol)
             edT = va["dT"]
         ensembles[label] = (sols, edT)
@@ -337,6 +410,15 @@ def main():
           + " | ".join(f"4DVarNet {vn} dT={va['dT']} n_iter={sol.n_iter}"
                        for vn, (sol, va) in vsolvers.items())
           + f" | walkable {int(walk.sum())}/{walk.size} | device={dev}", flush=True)
+    # Which checkpoint each ensemble member came from. Per-run validation selection puts the
+    # members at different epochs, so print it rather than leaving the reader to assume they
+    # are all epoch 149. n_iter is printed too because it is the quantity that has to be
+    # constant across members and arms for the comparison to mean anything.
+    for label, rows in picked.items():
+        depths = {d for *_, d in rows}
+        note = "" if len(depths) == 1 else "   <-- MIXED SOLVER DEPTH, arms are not comparable"
+        print(f"[ckpt] {label}: "
+              + ", ".join(f"{r}={c}(ep{e},{d}it)" for r, c, e, d in rows) + note, flush=True)
 
     days = ds.om.split_files("test")
     if args.days:
@@ -432,6 +514,8 @@ def main():
         dincae_by_conv = {
             "defined":      dj.get("ours_blind_mse"),      # defined ∩ walkable ∩ blind
             "defined_full": dj.get("ours_all_mse"),        # defined ∩ walkable ∩ full field
+            "walkable":      dj.get("walkable_blind_mse"),  # walkable ∩ blind (the main scope)
+            "walkable_full": dj.get("walkable_all_mse"),    # walkable ∩ full field
             "allcells":     dj.get("v4dvar_blind_mse"),    # all cells ∩ blind
             "full":         dj.get("v4dvar_all_mse"),      # all cells ∩ full field
         }
@@ -542,7 +626,10 @@ def main():
     for conv, title in (
             ("defined", "(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result"),
             ("defined_full", "(2) defined ∩ walkable ∩ full field (includes observed cells)"),
-            ("allcells", "(3) all cells ∩ blind  -- the removed three-way script's convention, for reference"),
+            ("walkable", "(3) walkable ∩ blind  -- the main result: the physical domain, "
+                         "empty cells included, map obstacles excluded"),
+            ("walkable_full", "(4) walkable ∩ full field  (includes observed cells)"),
+            ("allcells", "(5) all cells ∩ blind  -- the removed three-way script's convention, for reference"),
             ("full", "(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse")):
         print(f"\n{title}\n")
         print(f"{'method':<24}" + "".join(f"{c:>11}" for c in chans)

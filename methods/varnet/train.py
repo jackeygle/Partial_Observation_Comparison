@@ -217,6 +217,10 @@ def main():
                          "for troubleshooting: beta=0 once collapsed under an old design "
                          "(a separate head + a 0.25xMAD floor), RMSE +52%%, and neither of "
                          "those two exists anymore")
+    ap.add_argument("--ckpt-every", type=int, default=10,
+                    help="also save ckpt_<epoch>.pt every N epochs, so the reported epoch can "
+                         "be chosen afterwards on the validation split instead of on the "
+                         "training-split subset varnet_best.pt is selected on. 0 disables.")
     ap.add_argument("--outdir", default=_T["outdir"])
     ap.add_argument("--no-noise", action="store_true",
                     help="do not add noise to observations (a control experiment; the default is decided by config observation.add_noise)")
@@ -415,6 +419,27 @@ def main():
             best_mse = rec_unobs
             torch.save(ck, os.path.join(args.outdir, "varnet_best.pt"))
             print(f"           ↑ new best ({best_mse:.4f}) -> varnet_best.pt", flush=True)
+        # Periodic snapshot, so that WHICH epoch to report can be decided afterwards on the
+        # validation split rather than during training on the training split.
+        #
+        # varnet_best.pt cannot answer that question. It is selected on `Xe`, the first
+        # args.n_eval windows of --split (default: train), so it is model selection on
+        # training data -- and on the emptiest part of it, since the first windows of a day
+        # are near-empty. It also lands different runs at different points of the §3.4
+        # curriculum: measured across the hidden=32 arms, aug0's best fell at epoch 16-40 with
+        # the solver still at 5-10 iterations while mse5's fell at epoch 78-143 at 20. Those
+        # two checkpoints are not a loss-controlled comparison.
+        #
+        # varnet_last.pt is uniform (epoch 149, 20 iterations for every run) but is one
+        # sample of a noisy quantity: the spike this function's best_mse guard exists for
+        # (0.0367 -> 0.0925 in a single epoch, seen with the larger prior) can land on it.
+        #
+        # These snapshots cost ~24-46 MB each and make a proper answer possible: score them
+        # on the validation split and pick per run, the way methods/dincae's
+        # checks/select_checkpoint.py already does. Without them the choice is only between
+        # two bad options, and it cannot be revisited without retraining.
+        if args.ckpt_every > 0 and (epoch % args.ckpt_every == 0 or epoch == args.epochs - 1):
+            torch.save(ck, os.path.join(args.outdir, f"ckpt_{epoch:05d}.pt"))
         if stop:
             break
     print(f"[done] checkpoints + metrics in {args.outdir}", flush=True)

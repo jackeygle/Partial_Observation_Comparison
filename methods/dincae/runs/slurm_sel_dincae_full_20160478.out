@@ -2,3 +2,20 @@
 
   epoch   40  ckpt_00040.pt    0.149935
   epoch   50  ckpt_00050.pt    0.090428
+  epoch   60  ckpt_00060.pt    0.118837
+  epoch   70  ckpt_00070.pt    0.093943
+  epoch   80  ckpt_00080.pt    0.091802
+  epoch   90  ckpt_00090.pt    0.104857
+  epoch  100  ckpt_00100.pt    0.106033
+  epoch  110  ckpt_00110.pt    0.108640
+  epoch  120  ckpt_00120.pt    0.098759
+  epoch  130  ckpt_00130.pt    0.092142
+  epoch  140  ckpt_00140.pt    0.083765
+  epoch  150  ckpt_00150.pt    0.104756
+  epoch  160  ckpt_00160.pt    0.093777
+  epoch  170  ckpt_00170.pt    0.093930
+  epoch  180  ckpt_00180.pt    0.085224
+  epoch  190  ckpt_00190.pt    0.088904
+
+[best] epoch 140 (ckpt_00140.pt) walkable blind MSE 0.083765
+[out] /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval/select_dincae_full_valid.json

@@ -81,7 +81,7 @@ fi
 S=${1:?usage: sbatch --job-name=varnet_aug0_sM sbatch/submit_aug_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=aug0   # BETA ignored; the loss is Eq.1 as written
-OUTDIR=runs/varnet_${TAG}_s${S}
+OUTDIR=runs/varnet_${TAG}_h96_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
@@ -121,9 +121,21 @@ else
     echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 fi
 
+# PRIOR WIDTH. hidden 32 -> 96, kt 3 -> 5: the configuration runs/varnet_a4_k1 was trained
+# with, promoted to the project baseline on 2026-09-09. It was the best of the three supervised
+# capacity points (walkable RMSE 0.230 vs a2 and b0's 0.248), and the three uncertainty arms had
+# been built on b0's 32/3 instead, so the headline model and the uncertainty comparison did not
+# share a backbone. They do now. GENN goes 9.4k -> 54.2k parameters; the solver is untouched,
+# which is why per-epoch cost barely moves (97% of the model is the ConvLSTM).
+#
+# The run directory carries the h96 tag so these do not resume from -- or overwrite -- the
+# hidden=32 checkpoints of the same name. --resume matches on path, and loading a 32-channel
+# prior into a 96-channel one is a shape error, not a silent wrong answer, but only if the
+# paths are distinct.
 nvidia-smi --query-gpu=name --format=csv,noheader
 python3 -u -m methods.varnet.train --resume \
     --obs-every-k 1 \
+    --hidden 96 --kt 5 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
     --loss nll --nll-beta 0.0 --var-eps 1e-6 --augmented-var \

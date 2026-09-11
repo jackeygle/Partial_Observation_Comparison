@@ -5,11 +5,14 @@
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
-# VR — sigma^2 from the solver's SECOND OUTPUT LAYER instead of a separate module.
+# VS — sigma^2 from the solver's SECOND OUTPUT LAYER, read from [h, x_hat.detach()].
 #
-# Usage:  sbatch --job-name=varnet_vrb1_s0 sbatch/submit_vr_chain.sbatch 0 1.0
-#         sbatch --job-name=varnet_vrb0_s0 sbatch/submit_vr_chain.sbatch 0 0.0
-#         (args: init seed, nll beta)
+# Usage:  sbatch --job-name=varnet_vsb0_s0 sbatch/submit_vs_chain.sbatch 0 0.0
+#         (args: init seed, nll beta, generation [internal])
+#
+# The name and usage lines said "vr" / submit_vr_chain.sbatch until 2026-09-09: this file
+# was copied from that script. submit_vr_chain.sbatch is the narrower h-only variant and
+# is still its own file; the rationale below applies to both.
 #
 # Why. Lakshminarayanan Sec. 2.2.1 says "a network that outputs two values in the final layer,
 # corresponding to the predicted mean and variance". Our previous design bolted a separate
@@ -70,7 +73,7 @@ fi
 S=${1:?usage: sbatch --job-name=varnet_vsbN_sM sbatch/submit_vs_chain.sbatch <seed> <beta>}
 BETA=${2:?missing beta}
 TAG=$(python3 -c "print('vsb%d' % round(float('$BETA')))")
-OUTDIR=runs/varnet_${TAG}_s${S}
+OUTDIR=runs/varnet_${TAG}_h96_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
@@ -91,9 +94,21 @@ sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=aft
        sbatch/submit_vs_chain.sbatch $S $BETA $((GEN+1))
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
+# PRIOR WIDTH. hidden 32 -> 96, kt 3 -> 5: the configuration runs/varnet_a4_k1 was trained
+# with, promoted to the project baseline on 2026-09-09. It was the best of the three supervised
+# capacity points (walkable RMSE 0.230 vs a2 and b0's 0.248), and the three uncertainty arms had
+# been built on b0's 32/3 instead, so the headline model and the uncertainty comparison did not
+# share a backbone. They do now. GENN goes 9.4k -> 54.2k parameters; the solver is untouched,
+# which is why per-epoch cost barely moves (97% of the model is the ConvLSTM).
+#
+# The run directory carries the h96 tag so these do not resume from -- or overwrite -- the
+# hidden=32 checkpoints of the same name. --resume matches on path, and loading a 32-channel
+# prior into a 96-channel one is a shape error, not a silent wrong answer, but only if the
+# paths are distinct.
 nvidia-smi --query-gpu=name --format=csv,noheader
 python3 -u -m methods.varnet.train --resume \
     --obs-every-k 1 \
+    --hidden 96 --kt 5 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
     --loss nll --nll-beta $BETA --var-eps 1e-6 \

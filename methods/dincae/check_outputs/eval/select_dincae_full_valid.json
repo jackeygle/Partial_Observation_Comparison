@@ -1,0 +1,93 @@
+{
+  "run_dir": "runs/dincae_full",
+  "split": "valid",
+  "scope": "walkable blind",
+  "n_days": 7,
+  "rows": [
+    {
+      "epoch": 40,
+      "ckpt": "ckpt_00040.pt",
+      "walkable_blind_mse": 0.14993469462107226
+    },
+    {
+      "epoch": 50,
+      "ckpt": "ckpt_00050.pt",
+      "walkable_blind_mse": 0.09042761361725081
+    },
+    {
+      "epoch": 60,
+      "ckpt": "ckpt_00060.pt",
+      "walkable_blind_mse": 0.11883659388362497
+    },
+    {
+      "epoch": 70,
+      "ckpt": "ckpt_00070.pt",
+      "walkable_blind_mse": 0.09394251418012318
+    },
+    {
+      "epoch": 80,
+      "ckpt": "ckpt_00080.pt",
+      "walkable_blind_mse": 0.09180230226267415
+    },
+    {
+      "epoch": 90,
+      "ckpt": "ckpt_00090.pt",
+      "walkable_blind_mse": 0.10485707373570634
+    },
+    {
+      "epoch": 100,
+      "ckpt": "ckpt_00100.pt",
+      "walkable_blind_mse": 0.10603275412046946
+    },
+    {
+      "epoch": 110,
+      "ckpt": "ckpt_00110.pt",
+      "walkable_blind_mse": 0.10864036466610595
+    },
+    {
+      "epoch": 120,
+      "ckpt": "ckpt_00120.pt",
+      "walkable_blind_mse": 0.09875901441877837
+    },
+    {
+      "epoch": 130,
+      "ckpt": "ckpt_00130.pt",
+      "walkable_blind_mse": 0.09214239574590319
+    },
+    {
+      "epoch": 140,
+      "ckpt": "ckpt_00140.pt",
+      "walkable_blind_mse": 0.08376493240740554
+    },
+    {
+      "epoch": 150,
+      "ckpt": "ckpt_00150.pt",
+      "walkable_blind_mse": 0.10475635162314571
+    },
+    {
+      "epoch": 160,
+      "ckpt": "ckpt_00160.pt",
+      "walkable_blind_mse": 0.09377733663039207
+    },
+    {
+      "epoch": 170,
+      "ckpt": "ckpt_00170.pt",
+      "walkable_blind_mse": 0.09393006704036952
+    },
+    {
+      "epoch": 180,
+      "ckpt": "ckpt_00180.pt",
+      "walkable_blind_mse": 0.08522381327621141
+    },
+    {
+      "epoch": 190,
+      "ckpt": "ckpt_00190.pt",
+      "walkable_blind_mse": 0.08890353283674254
+    }
+  ],
+  "best": {
+    "epoch": 140,
+    "ckpt": "ckpt_00140.pt",
+    "walkable_blind_mse": 0.08376493240740554
+  }
+}

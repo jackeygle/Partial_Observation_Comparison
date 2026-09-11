@@ -1,0 +1,74 @@
+single checkpoint:  epochs [140]
+test split: 7 days
+  atc-20130811_corridor_1.0s  density 0.02056  vx 0.44763  vy 0.08535  var 0.04095
+  atc-20130818_corridor_1.0s  density 0.03074  vx 0.51069  vy 0.10052  var 0.05287
+  atc-20130825_corridor_1.0s  density 0.02564  vx 0.56596  vy 0.10909  var 0.06361
+  atc-20130901_corridor_1.0s  density 0.02776  vx 0.55012  vy 0.10702  var 0.06023
+  atc-20130915_corridor_1.0s  density 0.02036  vx 0.58698  vy 0.11383  var 0.05161
+  atc-20130922_corridor_1.0s  density 0.01921  vx 0.62427  vy 0.11714  var 0.05037
+  atc-20130929_corridor_1.0s  density 0.02244  vx 0.63842  vy 0.11343  var 0.05949
+
+=== MSE (both conventions) ===
+convention         density         vx         vy        var   4-channel merged
+ours_blind         0.02384    0.55742    0.10617    0.05455   0.10733
+ours_all           0.01318    0.23480    0.04339    0.02369   0.05147
+ours_blind_noclip   0.02408    0.55742    0.10619    0.05503   0.10754
+ours_all_noclip    0.01336    0.23481    0.04344    0.23386   0.08129
+walkable_blind     0.02384    0.20221    0.11366    0.01390   0.08840
+walkable_all       0.01318    0.13028    0.06252    0.00721   0.05330
+v4dvar_blind       0.01401    0.56950    1.86326    0.02786   0.61866
+v4dvar_all         0.00941    0.37391    1.44472    0.01644   0.46112
+
+=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===
+  density  truth 0.2039  rec 0.1762  ratio 0.864
+  vx       truth 0.8981  rec 0.7251  ratio 0.807
+  vy       truth 0.3317  rec 0.2743  ratio 0.827
+  var      truth 0.2326  rec 0.1733  ratio 0.745
+
+=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===
+  density  mean predicted SD 0.5101  actual RMS 0.7968  global adjustment factor 1.562  (n=4,000,000)
+      pred 0.0354 -> actual 0.0583  (n=1,482,440)
+      pred 0.1968 -> actual 0.2380  (n=328,035)
+      pred 0.3244 -> actual 0.3616  (n=276,902)
+      pred 0.4540 -> actual 0.4783  (n=215,585)
+      pred 0.5837 -> actual 0.6158  (n=208,854)
+      pred 0.7133 -> actual 0.7564  (n=226,074)
+      pred 0.8388 -> actual 0.9264  (n=222,388)
+      pred 0.9682 -> actual 1.0898  (n=209,048)
+      pred 1.0962 -> actual 1.2271  (n=210,672)
+      pred 1.2245 -> actual 1.3779  (n=220,002)
+  vx       mean predicted SD 0.7386  actual RMS 0.8793  global adjustment factor 1.191  (n=4,000,000)
+      pred 0.4328 -> actual 0.5402  (n=313,473)
+      pred 0.4957 -> actual 0.6137  (n=287,649)
+      pred 0.5593 -> actual 0.6749  (n=278,183)
+      pred 0.6228 -> actual 0.7595  (n=247,807)
+      pred 0.6868 -> actual 0.8204  (n=256,682)
+      pred 0.7506 -> actual 0.8797  (n=294,087)
+      pred 0.8137 -> actual 0.9432  (n=333,668)
+      pred 0.8767 -> actual 0.9938  (n=365,976)
+      pred 0.9405 -> actual 1.0302  (n=432,931)
+      pred 1.0017 -> actual 1.0964  (n=389,544)
+  vy       mean predicted SD 0.8806  actual RMS 0.9679  global adjustment factor 1.099  (n=4,000,000)
+      pred 0.5506 -> actual 0.6970  (n=204,560)
+      pred 0.6117 -> actual 0.7554  (n=179,013)
+      pred 0.6731 -> actual 0.8236  (n=171,984)
+      pred 0.7346 -> actual 0.8651  (n=172,736)
+      pred 0.7972 -> actual 0.8912  (n=220,692)
+      pred 0.8603 -> actual 0.9138  (n=400,858)
+      pred 0.9170 -> actual 0.9247  (n=753,545)
+      pred 0.9760 -> actual 0.9820  (n=410,276)
+      pred 1.0389 -> actual 1.0353  (n=378,771)
+      pred 1.0986 -> actual 1.1039  (n=307,565)
+  var      mean predicted SD 0.8302  actual RMS 1.0126  global adjustment factor 1.220  (n=4,000,000)
+      pred 0.4374 -> actual 0.6356  (n=190,484)
+      pred 0.5133 -> actual 0.7118  (n=206,211)
+      pred 0.5936 -> actual 0.7764  (n=255,053)
+      pred 0.6688 -> actual 0.8236  (n=325,697)
+      pred 0.7473 -> actual 0.9222  (n=252,271)
+      pred 0.8262 -> actual 0.9430  (n=296,583)
+      pred 0.9048 -> actual 1.0027  (n=339,363)
+      pred 0.9813 -> actual 1.0740  (n=419,517)
+      pred 1.0589 -> actual 1.1623  (n=470,660)
+      pred 1.1374 -> actual 1.2631  (n=444,161)
+
+wrote /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval_single_00140/dincae_metrics_test.json

@@ -93,8 +93,19 @@ observation:                                 # Component 1: multi-robot partial 
   init_method: prev                          # X0 fill method: zeros / prev / interp
 
 prior:                                       # Component 2: GENN dynamical prior Phi
-  hidden: 32                                 # hidden channels
-  kt: 3                                      # psi temporal kernel (odd; centre slice zeroed = zero-centre)
+  # 2026-09-09: 32/3 -> 96/5. This is the configuration runs/varnet_a4_k1 was trained with,
+  # promoted to the project baseline. It was the best of the three supervised capacity points
+  # (walkable RMSE 0.230, against 0.248 for both 64/5 and 32/3), and the three uncertainty arms
+  # had been built on 32/3, so the headline model and the uncertainty comparison did not share
+  # a backbone. Changing the default here is what makes 96/5 the baseline rather than one more
+  # flag to remember. GENN goes 9.4k -> 54.2k parameters; the solver's ConvLSTM, which is 97%
+  # of the model, is untouched.
+  #
+  # Safe for existing checkpoints: model_io.load_solver takes `hidden` from the checkpoint's
+  # own args and only falls back to these values for kt/kh/kw/n_phi_layers, which every
+  # checkpoint in runs/ records. Verified 2026-09-09 across all 26 run directories.
+  hidden: 96                                 # hidden channels
+  kt: 5                                      # psi temporal kernel (odd; centre slice zeroed = zero-centre)
   kh: 3                                      # psi spatial kernel (height)
   kw: 3                                      # psi spatial kernel (width)
   n_phi_layers: 2                            # number of phi pointwise conv layers

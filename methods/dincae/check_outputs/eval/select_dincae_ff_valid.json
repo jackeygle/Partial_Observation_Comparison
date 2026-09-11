@@ -1,0 +1,73 @@
+{
+  "run_dir": "runs/dincae_ff",
+  "split": "valid",
+  "scope": "walkable blind",
+  "n_days": 7,
+  "rows": [
+    {
+      "epoch": 30,
+      "ckpt": "ckpt_00030.pt",
+      "walkable_blind_mse": 0.0479902785019374
+    },
+    {
+      "epoch": 40,
+      "ckpt": "ckpt_00040.pt",
+      "walkable_blind_mse": 0.046971900750333986
+    },
+    {
+      "epoch": 50,
+      "ckpt": "ckpt_00050.pt",
+      "walkable_blind_mse": 0.04787497618411375
+    },
+    {
+      "epoch": 60,
+      "ckpt": "ckpt_00060.pt",
+      "walkable_blind_mse": 0.04687071744674898
+    },
+    {
+      "epoch": 70,
+      "ckpt": "ckpt_00070.pt",
+      "walkable_blind_mse": 0.048360386807946326
+    },
+    {
+      "epoch": 80,
+      "ckpt": "ckpt_00080.pt",
+      "walkable_blind_mse": 0.047222944222625095
+    },
+    {
+      "epoch": 90,
+      "ckpt": "ckpt_00090.pt",
+      "walkable_blind_mse": 0.048078111442991046
+    },
+    {
+      "epoch": 100,
+      "ckpt": "ckpt_00100.pt",
+      "walkable_blind_mse": 0.04783541000854628
+    },
+    {
+      "epoch": 110,
+      "ckpt": "ckpt_00110.pt",
+      "walkable_blind_mse": 0.04747209731350672
+    },
+    {
+      "epoch": 120,
+      "ckpt": "ckpt_00120.pt",
+      "walkable_blind_mse": 0.0475067514169175
+    },
+    {
+      "epoch": 130,
+      "ckpt": "ckpt_00130.pt",
+      "walkable_blind_mse": 0.047165182669818215
+    },
+    {
+      "epoch": 140,
+      "ckpt": "ckpt_00140.pt",
+      "walkable_blind_mse": 0.04687789943635103
+    }
+  ],
+  "best": {
+    "epoch": 60,
+    "ckpt": "ckpt_00060.pt",
+    "walkable_blind_mse": 0.04687071744674898
+  }
+}

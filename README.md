@@ -22,7 +22,7 @@ DINCAE is first under one convention and last under the other. See
 
 | Section | For |
 |---|---|
-| [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own) · [Scoring convention](#scoring-convention-read-this-before-quoting-any-number) · [Test days and the obstacle region](#test-days-and-the-obstacle-region) | understanding what is here |
+| [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own) · [Scoring convention](#scoring-convention-read-this-before-quoting-any-number) · [The dataset and how it is split](#the-dataset-and-how-it-is-split) · [Uncertainty: how it is scored](#uncertainty-how-it-is-scored) · [The obstacle region](#the-obstacle-region) | understanding what is here |
 | [Looking at results without running anything](#looking-at-results-without-running-anything) | a quick look, no cluster needed |
 | [Which file backs which published number](#which-file-backs-which-published-number) | reproducing or citing a specific number |
 | [Running things](#running-things) (environment, layout, training, evaluation, figures) | doing the work |
@@ -56,15 +56,30 @@ Under the all-cells convention the same four are -24.3%, -76.1%, +50.1%,
 uncertainty *built into* the method (information form, ensemble spread) rather
 than as a separate design.
 
-**Every headline row is a single model**, default configuration, seed 0, each
-one's checkpoint picked on its own validation set — no ensembling and no
-checkpoint averaging, because neither paper reports one. DINCAE's reference
-implementation *does* average the outputs of checkpoints saved every 10 epochs,
-and `methods/dincae/checks/evaluate.py` still supports it behind
-`--average-checkpoints`, but
-the reported number comes from **one** checkpoint, `ckpt_00070.pt`. The
-16-checkpoint average is kept as a measured side quantity (worth 1.7% RMSE,
-less than picking the right single checkpoint), not as the headline.
+**Every headline row is a single model**, default configuration, seed 0 — no
+ensembling and no checkpoint averaging, because neither paper reports one.
+DINCAE's reference implementation *does* average the outputs of checkpoints
+saved every 10 epochs, and `methods/dincae/checks/evaluate.py` still supports
+it behind `--average-checkpoints`, but the reported number comes from **one**
+checkpoint, `ckpt_00070.pt`. The 16-checkpoint average is kept as a measured
+side quantity (worth 1.7% RMSE, less than picking the right single checkpoint),
+not as the headline.
+
+**Open issue, found in review, not yet resolved.** `ckpt_00070.pt` was
+described as "best on DINCAE's own validation set", but that had never actually
+been checked: the only validation evaluation that existed covered epochs 3-5.
+`methods/dincae/checks/select_checkpoint.py` was written to check it properly —
+score every saved checkpoint on the **validation** split under the reported
+scope — and it does not confirm epoch 70: epoch 140 scores better there (0.084
+vs 0.094 walkable-blind MSE). On the **test** split, the two are within noise
+of each other (defined ≈0.43 either way; allcells 0.757 for epoch 70 vs ≈0.79
+for epoch 140, so epoch 70 if anything is *better* there) — checked by hand
+from the already-computed
+`methods/dincae/check_outputs/eval_single_{00070,00140}/dincae_metrics_test.json`,
+not by a `compare5` rerun, so treat that comparison as indicative, not exact.
+The headline number stays `ckpt_00070.pt` rather than switching without
+confirming the switch precisely; the discrepancy in how it was originally
+described is left here rather than quietly fixed.
 
 `methods/enkf/enkf_lab/` is a **byte-identical, read-only copy** of
 `/scratch/work/zhangx29/Partial_observation`, its files deliberately chmod 444.
@@ -98,15 +113,95 @@ identical config differs in the 4th decimal place. That is noise, not a
 regression. Senseiver, DINCAE and the EnKF are bit-reproducible. See
 `refactor_baseline/README.md`.
 
-## Test days and the obstacle region
+## The dataset and how it is split
 
-7 held-out days, `split=test`, never seen during training or checkpoint
-selection:
+The ATC pedestrian tracking dataset (Osaka) records a shopping-centre corridor
+on alternating Sundays and Wednesdays across roughly a year, 92 recording days
+in total. **This project uses the 46 Sundays only** — one weekday pattern, so
+crowd behaviour is comparable across days and a model is not asked to
+generalise between a Sunday and a Wednesday. The split lists that pin this down
+are `data/sunday_atc_{train,valid,test}.lst`.
+
+The split is **chronological, never shuffled**: training is the earliest
+stretch, validation the middle, test the latest. A random split would let a
+model see the same afternoon from both sides of the boundary.
+
+| Split | Days | Frames | Date range | Used for |
+|---|---|---|---|---|
+| train | 32 | 1,262,518 | 2012-10-28 → 2013-06-09 | fitting weights |
+| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing the checkpoint — for Senseiver and DINCAE; see the caveat below for 4DVarNet |
+| test | 7 | 277,543 | 2013-08-11 → 2013-09-29 | every reported number |
+| | **46** | **1,809,804** | | |
+
+The seven test days, never seen during training or checkpoint selection:
 
 ```
 atc-20130811  atc-20130818  atc-20130825  atc-20130901  atc-20130915
 atc-20130922  atc-20130929
 ```
+
+The gap at 2013-09-08 is in the source data — ATC did not record that Sunday.
+
+Each day is a full recording, roughly 38,000–43,000 frames at one frame per
+second (about 11 hours). Nothing is subsampled for the reported numbers: every
+frame of every test day is scored.
+
+## Uncertainty: how it is scored
+
+Three of the four methods also report how wrong they think they are. Judging
+that needs a reference, because a σ̂ can look plausible while carrying no
+information: **the null model replaces every cell's σ̂ with one constant, that
+split's own RMSE**. It knows how big the error is on average and nothing about
+*where* — and it scores a perfect 1.00 spread/skill for free. A useful σ̂ has to
+beat it.
+
+Scored on `defined_blind` (blind ∩ channel-defined ∩ walkable), 7 test days:
+
+| Method | σ̂ comes from | CRPS | null model | vs null | spread/skill | 50% cov. | 90% cov. |
+|---|---|---|---|---|---|---|---|
+| 4DVarNet `aug0` | σ inside the prior operator `G(x)` | 0.1612 | 0.1997 | **−19.3%** | 0.609 | 67.0% | 88.3% |
+| DINCAE | information form | 0.3575 | 0.4244 | **−15.7%** | 0.739 | 70.7% | 93.1% |
+| 4DVarNet `vsb0` | separate read-out head | 0.1982 | 0.1932 | +2.6% | 1.244 | 78.6% | 93.0% |
+| EnKF | ensemble spread | 0.2077 | 0.1841 | +12.8% | **0.004** | 1.6% | 2.0% |
+
+Under the `allcells` convention the same four are −24.3%, −76.1%, +50.1%,
++26.8%: the magnitudes move a great deal, the signs do not.
+
+**Reading the columns**
+
+- **CRPS** — Continuous Ranked Probability Score, in data units, lower is
+  better. It penalises both a wrong centre and a wrong spread, and reduces to
+  MAE as σ → 0. NLL is also computed but is not used as the verdict: its
+  `(x−μ)²/2σ²` term is unbounded as σ → 0, so the EnKF's collapsed ensemble
+  produces an NLL of order 1e18, which cannot rank anything.
+- **vs null** — CRPS relative to the constant-σ null model. Negative means the
+  σ̂ carries spatial information the constant does not.
+- **spread/skill** — mean predicted σ̂ over actual RMSE. 1.0 is calibrated,
+  below 1 is overconfident, above 1 underconfident.
+- **coverage** — the fraction of cells whose truth falls inside the nominal
+  50% / 90% interval. 90% coverage of 88.3% is close to calibrated; 2.0% is not.
+
+The EnKF's row is a collapse, not a miscalibration: its ensemble spread settles
+around 0.0025 while its actual error is 0.368, a ratio of 0.004. The forecast
+model damps member disagreement about 65% per step regardless of injected
+noise — measured directly in
+`methods/varnet/check_outputs/eval/enkf_spread_growth.json`, verdict
+`contractive`. Senseiver is absent from this table because it is a
+deterministic decoder and produces no σ̂ at all.
+
+**Reproduce**
+
+```bash
+sbatch methods/varnet/sbatch/submit_unc_aug.sbatch      # -> uncertainty_aug0.json
+sbatch methods/varnet/sbatch/submit_unc_vsb0.sbatch     # -> uncertainty_vsb0.json
+sbatch methods/dincae/sbatch/submit_unc_dincae.sbatch   # -> uncertainty_dincae.json
+sbatch methods/enkf/sbatch/submit_unc_enkf.sbatch       # -> uncertainty_enkf_k1.json
+```
+
+The shared scoring code is `compare/score_uncertainty.py`; each method's wrapper
+only supplies its own σ̂.
+
+## The obstacle region
 
 Grid: 36x12 cells, 4 channels (density, vx, vy, var). 290 of the 432 cells are
 physically walkable; the remaining 142 (32.9%) are the obstacle region.
@@ -160,7 +255,7 @@ checkpoints and which you pick changes the number. Same for `varnet_best.pt` vs
 | 4DVarNet MSE | `methods/varnet/runs/varnet_mse5_s{0..4}/varnet_best.pt` | `compare/results/compare5_final.json` (`"4DVarNet MSE s*"`) | `compare5_final.json`'s protocol records `ckpt: varnet_best.pt` |
 | 4DVarNet `aug0` | `methods/varnet/runs/varnet_aug0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_aug0.json` | same convention |
 | 4DVarNet `vsb0` | `methods/varnet/runs/varnet_vsb0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_vsb0.json` | same convention |
-| DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | best on DINCAE's own validation set; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
+| DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | not confirmed best on validation — see the open issue above; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | folded into `compare5_final.json` (`"Senseiver"`) | only trained model; `best.pt`, not `last.pt` |
 | EnKF | no weights — exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | `compare5_final.json` (`"EnKF k1"`), `methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json` | it is a filter, not a trained model |
 
@@ -172,10 +267,28 @@ error:
    refuses unless you pass `--average-checkpoints`, because the result is ~1.7%
    RMSE away from the reported one with nothing in the output to say which
    configuration produced it.
-2. **`varnet_best.pt` vs `varnet_last.pt` is a methodological choice.** `best`
-   is selected per-run on validation, so different arms stop at different
-   epochs; `last` is always epoch 149 and gives a same-epoch comparison. The
-   headline table uses `best`; `compare5.py --ckpt-name` documents the trade-off.
+2. **`varnet_best.pt` is selected on the training split, not validation — a known limitation, not a design choice.**
+   `train.py`'s `--split` defaults to `train` (`config.yaml`'s `training.split`),
+   and `varnet_best.pt` is the checkpoint with the lowest blind MSE on that
+   split's own fixed evaluation subset (the first `--n-eval` windows). So
+   despite the name, choosing it is model selection **on training data**, on
+   the emptiest part of it (the first windows of a recording day carry about
+   1/6.9 of the full-day mean density). It also lands each arm at a different
+   epoch **and a different point of the §3.4 iteration curriculum** — measured
+   on these runs, `aug0`'s best fell at epoch 16-40 with the solver still at
+   5-10 of its eventual 20 iterations, while `mse5`'s fell at 78-143 already at
+   20. Those checkpoints differ in solver depth as well as in loss, which is
+   not a controlled comparison.
+   `varnet_last.pt` sidesteps the epoch mismatch (always epoch 149, always 20
+   iterations) but is one sample of a noisy quantity, with no
+   claim to be the best the run produced.
+   The headline table uses `best`, because that is what actually produced the
+   published numbers; `methods/varnet/checks/select_checkpoint.py` scores every
+   checkpoint of a run on the **validation** split with the iteration count
+   fixed at 20, the way Senseiver and DINCAE already select — but it needs
+   periodic checkpoints (`train.py --ckpt-every`, added 2026-09-09) that the
+   runs behind today's headline numbers predate, so it has not been applied to
+   them yet. `compare5.py --ckpt-name` picks which checkpoint to score.
 
 The EnKF's overconfidence is diagnosed separately in
 `methods/varnet/check_outputs/eval/enkf_spread_growth.json` (via

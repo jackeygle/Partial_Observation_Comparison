@@ -5,34 +5,14 @@
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
 #SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
-# VR — sigma^2 from the solver's SECOND OUTPUT LAYER instead of a separate module.
+# MSE5 — the MSE arm of the three-way uncertainty comparison.
 #
-# Usage:  sbatch --job-name=varnet_vrb1_s0 sbatch/submit_vr_chain.sbatch 0 1.0
-#         sbatch --job-name=varnet_vrb0_s0 sbatch/submit_vr_chain.sbatch 0 0.0
-#         (args: init seed, nll beta)
+# Usage:  sbatch --job-name=varnet_mse5_s0 sbatch/submit_mse5_chain.sbatch 0 0
+#         (args: init seed, beta [ignored], generation [internal])
 #
-# Why. Lakshminarayanan Sec. 2.2.1 says "a network that outputs two values in the final layer,
-# corresponding to the predicted mean and variance". Our previous design bolted a separate
-# pointwise module onto x_hat instead, and the audit showed what that cost: that head keyed off
-# distance-to-observation, a feature which predicts the true error with R^2 of roughly 0.01-0.03,
-# while ignoring |x_hat|, which predicts it with 0.21-0.45. Measured by checks/diag_sigma_drivers.py, archived at tag archive-2026-09-09.
-#
-# The read-out sees h, the LSTM hidden state after the last of the 20 descent steps: it carries
-# every gradient of J taken along the way, a 3x3 spatial context per step, and all-to-all
-# mixing across the 200 frames. A pointwise head on x_hat sees one cell.
-#
-# sigma^2 is deliberately NOT put into the iterated state. It has no term in J -- the
-# observation term has no sigma^2 component and Phi maps state channels to state channels -- so
-# an augmented state would leave it unconstrained by the cost. Constraining it properly needs a
-# prior on the covariance itself; Beauchamp et al. (AIES 2025) use an SPDE prior for that, which
-# is a different piece of work.
-#
-# Controlled against runs/varnet_nf5_s0: identical config, identical seeds, identical 150
-# epochs. The ONLY difference is where sigma^2 is read from. Any change is attributable.
-#
-# beta: 1.0 reproduces nf5's loss exactly, so it isolates the read-out. 0.0 is Eq.1 verbatim,
-# which is what we would rather present -- but the NLL is unbounded below as sigma^2 -> 0, so
-# --var-eps 1e-6 is doing real work there and this run may still misbehave. Watch epoch 1-10.
+# Lines 8-35 of this file used to hold submit_vs_chain.sbatch's rationale verbatim -- the
+# file was copied from that one and the header was never rewritten, so it argued about a
+# sigma^2 read-out that this run does not have. Removed 2026-09-09.
 source /etc/profile 2>/dev/null
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
@@ -66,7 +46,7 @@ fi
 S=${1:?usage: sbatch --job-name=varnet_mse5_sM sbatch/submit_mse5_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=mse5   # BETA is ignored here; kept so the chain's argument list is unchanged
-OUTDIR=runs/varnet_${TAG}_s${S}
+OUTDIR=runs/varnet_${TAG}_h96_s${S}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
@@ -87,9 +67,21 @@ sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=aft
        sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1))
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
+# PRIOR WIDTH. hidden 32 -> 96, kt 3 -> 5: the configuration runs/varnet_a4_k1 was trained
+# with, promoted to the project baseline on 2026-09-09. It was the best of the three supervised
+# capacity points (walkable RMSE 0.230 vs a2 and b0's 0.248), and the three uncertainty arms had
+# been built on b0's 32/3 instead, so the headline model and the uncertainty comparison did not
+# share a backbone. They do now. GENN goes 9.4k -> 54.2k parameters; the solver is untouched,
+# which is why per-epoch cost barely moves (97% of the model is the ConvLSTM).
+#
+# The run directory carries the h96 tag so these do not resume from -- or overwrite -- the
+# hidden=32 checkpoints of the same name. --resume matches on path, and loading a 32-channel
+# prior into a 96-channel one is a shape error, not a silent wrong answer, but only if the
+# paths are distinct.
 nvidia-smi --query-gpu=name --format=csv,noheader
 python3 -u -m methods.varnet.train --resume \
     --obs-every-k 1 \
+    --hidden 96 --kt 5 \
     --init-seed $S --data-seed 0 \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
     --loss supervised \
