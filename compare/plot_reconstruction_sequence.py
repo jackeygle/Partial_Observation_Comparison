@@ -54,7 +54,7 @@ from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from crowdcore import paths
 
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 from methods.dincae.checks.evaluate import load_models as dincae_load_models, \
     predict_day as dincae_predict_day, clip_bounds as dincae_clip_bounds
 from methods.senseiver.checks.evaluate import load_model as senseiver_load_model, \
@@ -158,7 +158,9 @@ def main():
     ap.add_argument("--n", type=int, default=5000, help="number of consecutive frames")
     ap.add_argument("--start", type=int, default=-1, help="start frame; -1 = auto-pick the busiest N-frame block")
     ap.add_argument("--batch", type=int, default=256, help="Senseiver forward-pass chunk size")
-    ap.add_argument("--varnet-ckpt", default=os.path.join(paths.method(paths.VARNET), "runs", "varnet_mse5_s0", "varnet_best.pt"))
+    ap.add_argument("--varnet-ckpt", default=None,
+                    help="default: the reported 4DVarNet model (model_io.baseline_ckpt) -- it used to be "
+                         "runs/varnet_mse5_s0/varnet_best.pt, a hidden=32 run at a train-split-selected epoch")
     ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full"))
     ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
                     help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
@@ -203,7 +205,7 @@ def main():
         recon["Senseiver"] = block_senseiver(args.senseiver_ckpt, day_file, start, N, args.batch, dev)
     if "varnet" in methods:
         print("[seq] running 4DVarNet ...", flush=True)
-        recon["4DVarNet"] = block_varnet(args.varnet_ckpt, Xall, start, N, dev)
+        recon["4DVarNet"] = block_varnet((args.varnet_ckpt or baseline_ckpt()), Xall, start, N, dev)
     if "enkf" in methods:
         print("[seq] loading EnKF export ...", flush=True)
         est, spread = block_enkf(args.enkf_dir, args.day, start, N)

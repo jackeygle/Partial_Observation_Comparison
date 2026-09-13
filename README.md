@@ -67,7 +67,7 @@ DINCAE's reference implementation *does* average the outputs of checkpoints
 saved every 10 epochs, and `methods/dincae/checks/evaluate.py` still supports
 it behind `--average-checkpoints`, but the reported number comes from **one**
 checkpoint, `ckpt_00070.pt`. The 16-checkpoint average is kept as a measured
-side quantity (worth 1.7% RMSE, less than picking the right single checkpoint),
+side quantity (1.7% lower `defined` RMSE than epoch 70 alone, 0.324 vs 0.329),
 not as the headline.
 
 **Open issue, found in review, not yet resolved.** `ckpt_00070.pt` was
@@ -76,12 +76,11 @@ been checked: the only validation evaluation that existed covered epochs 3-5.
 `methods/dincae/checks/select_checkpoint.py` was written to check it properly —
 score every saved checkpoint on the **validation** split under the reported
 scope — and it does not confirm epoch 70: epoch 140 scores better there (0.084
-vs 0.094 walkable-blind MSE). On the **test** split, the two are within noise
-of each other (defined ≈0.43 either way; allcells 0.757 for epoch 70 vs ≈0.79
-for epoch 140, so epoch 70 if anything is *better* there) — checked by hand
-from the already-computed
-`methods/dincae/check_outputs/eval_single_{00070,00140}/dincae_metrics_test.json`,
-not by a `compare5` rerun, so treat that comparison as indicative, not exact.
+vs 0.094 walkable-blind MSE). On the **test** split the two are close: pooled RMSE 0.329 vs 0.328 under
+`defined`, and 0.757 vs 0.787 under `allcells`, where epoch 70 is the better of
+the two. Read from the pooled fields of the already-computed
+`methods/dincae/check_outputs/eval_single_{00070,00140}/dincae_metrics_test.json`
+(epoch 70's match `compare5_final.json` exactly).
 The headline number stays `ckpt_00070.pt` rather than switching without
 confirming the switch precisely; the discrepancy in how it was originally
 described is left here rather than quietly fixed.
@@ -217,7 +216,8 @@ not.
   50% / 90% interval. 90% coverage of 89.0% is close to calibrated; 2.0% is not.
 
 The EnKF's row is a collapse, not a miscalibration: its ensemble spread settles
-around 0.0025 while its actual error is 0.368, a ratio of 0.004. The forecast
+around 0.0015 on these cells while its actual error is 0.368, a ratio of 0.004
+(over all cells: 0.0025 against an error of 0.239). The forecast
 model damps member disagreement about 65% per step regardless of injected
 noise — measured directly in
 `methods/varnet/check_outputs/eval/enkf_spread_growth.json`, verdict
@@ -465,8 +465,9 @@ sbatch methods/senseiver/sbatch/submit_train.sbatch --out runs/senseiver_A
 
 The EnKF has no training step — it is a filter, not a learned model. It does
 need *exporting*: simulate the robots' observations per day, then run the filter
-over them. CPU-only (no GPU helps a Kalman filter) and genuinely slow — one real
-day took ~53 CPU-hours in the run that produced `enkf_k1_full/`. Submit one job
+over them. CPU-only (no GPU helps a Kalman filter) and genuinely slow — each test day took
+48–54 hours of wall-clock time on 4 cores in the run that produced `enkf_k1_full/`
+(`timing_<day>.json` there). Submit one job
 per day so the seven run in parallel:
 
 ```bash
@@ -574,7 +575,7 @@ time**:
 |---|---|---|---|
 | (1) raw ATC CSVs, 92 recording days | `/scratch/work/zhangx29/ATC/` | 225 GB | no |
 | (2) trajectory H5, Sundays only, 46 days | `/scratch/work/zhangx29/data/ATC/Sundays/` | 36 GB | no — naming manifest only |
-| (3) `grid_cache`, 4-channel 36x12 fields, 46 days | `/scratch/work/zhangx29/data/grid_cache/` | 3.0 GB | **yes** |
+| (3) `grid_cache`, 4-channel 36x12 fields, 46 days | `/scratch/work/zhangx29/data/grid_cache/` | 3.2 GB | **yes** |
 
 Stage (2) looks load-bearing because the split lists
 (`data/sunday_atc_{train,valid,test}.lst`) name `ATC/Sundays/atc-YYYYMMDD.h5` —
@@ -587,7 +588,7 @@ figures — and are what to repoint on another machine:
 
 - `data.root` → `/scratch/work/zhangx29/data` (stages 2 and 3, plus the split lists)
 - `navigation.map_dir` → the real ATC map (`localization_grid.pgm` + `.yaml`,
-  3.3 MB), which lives **outside both this repo and the data root**, under
+  3.4 MB), which lives **outside both this repo and the data root**, under
   `project_analysis/.../robot_exploration/atc_map/`. This is the easiest
   dependency to miss.
 
@@ -603,12 +604,13 @@ see `crowdcore/data/DOC_data_pipeline.md`.
 
 ## What is not in the repo
 
-Code, config, metrics and figures are tracked. About 21 GB of generated data is
-not (sizes as of 2026-09-08):
+Code, config, metrics and figures are tracked. About 31 GB of generated data is
+not (sizes as of 2026-09-13):
 
 - `methods/dincae/cache/` grid encoding cache (~13 GB)
-- `*.npz` EnKF exported fields (`methods/enkf/check_outputs/`, ~6.3 GB)
-- `*.pt` model weights (`methods/*/runs/`, ~1.5 GB)
+- `*.npz` EnKF exported fields (`methods/enkf/check_outputs/`, ~6.7 GB)
+- `*.pt` model weights (`methods/*/runs/`, ~11 GB — mostly the periodic `ckpt_<epoch>.pt`
+  snapshots of the 15 hidden=96 runs; the reported numbers need 0.54 GB of them, see below)
 - `**/seq_ppt_*/` per-frame sequence figures
 
 **The gridded ATC data itself is also not in git** — `git ls-files | grep '\.h5$'`
@@ -618,16 +620,16 @@ opposed to reading the already-computed results in `check_outputs/`) needs the
 code **and** a copy of the gridded data **and** the checkpoints: three separate
 things, not one repo clone.
 
-## The minimal package: ~1.4 GB, not 225 GB
+## The minimal package: ~1.0 GB, not 225 GB
 
 | Item | Path | Size |
 |---|---|---|
-| gridded fields, 7 test days only | `data/grid_cache/atc-{20130811,20130818,20130825,20130901,20130915,20130922,20130929}_corridor_1.0s.h5` | **331 MB** (all 46 days would be 3.0 GB) |
+| gridded fields, 7 test days only | `data/grid_cache/atc-{20130811,20130818,20130825,20130901,20130915,20130922,20130929}_corridor_1.0s.h5` | **483 MB** (all 46 days would be 3.2 GB) |
 | split lists | `data/sunday_atc_{train,valid,test}.lst` | a few KB |
-| the real ATC map | `.../robot_exploration/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.3 MB |
+| the real ATC map | `.../robot_exploration/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.4 MB |
 | DINCAE normalisation stats | `methods/dincae/artifacts/state_stats.npz` | 17 KB (already in git) |
-| trained weights | `methods/*/runs/<run>/` | ~1 GB |
-| | **total** | **~1.4 GB** |
+| trained weights | the reported checkpoints only: the 15 `methods/varnet/runs/varnet_*_h96_s*/ckpt_<epoch>.pt` named in each run's `select_valid.json`, `methods/dincae/runs/dincae_full/ckpt_00070.pt`, `methods/senseiver/runs/senseiver_A/best.pt` | 0.54 GB |
+| | **total** | **~1.0 GB** |
 
 **DINCAE needs that one extra small file that weights alone do not carry.**
 `state_stats.npz` holds the per-cell mean field and per-channel residual std,
