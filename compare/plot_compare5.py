@@ -1,8 +1,8 @@
 """
-plot_compare5.py — the main results figure: 4 methods x 4 channels, walkable scope
+plot_compare5.py — the main results figure: 4 methods x 4 channels, two walkable scopes
 
-Reads `compare/results/compare5_final.json` and draws the reported result: blind cells
-inside the walkable region, per channel.
+Reads `compare/results/compare5_final.json` and draws both reported scopes, per channel:
+blind walkable cells (top row) and all walkable cells, observed ones included (bottom row).
 
 **One model per method, no ensembling, no seed averaging.** DINCAE, Senseiver
 and the EnKF each contribute one model; 4DVarNet contributes the MSE seed whose
@@ -12,7 +12,7 @@ model would give it five times the training. The uncertainty designs (vsb0, aug0
 are not in this figure: they answer a different question and are compared, as
 ensembles, in the README's uncertainty table.
 
-Layout: **1 row x 5 columns of small multiples** -- density / vx / vy / var / total.
+Layout: **2 rows x 5 columns of small multiples** -- one row per scope; density / vx / vy / var / total.
 
 Why small multiples rather than a grouped bar chart: the four channels differ by
 an order of magnitude (vx 0.50, var 0.04). On a shared y-axis, the density/vy/var
@@ -51,7 +51,8 @@ ROWS = [
 ]
 
 PANELS = [
-    ("walkable", "walkable cells"),
+    ("walkable",      "blind walkable cells"),
+    ("walkable_full", "all walkable cells"),
 ]
 
 
@@ -128,7 +129,7 @@ def main():
             ax.set_title(ch if r == 0 else "", fontsize=ps.FS_LABEL, fontweight="bold",
                          color=ps.INK, pad=8)
             if c == 0:
-                ax.set_ylabel(f"{conv_title}\nblind MSE", fontsize=7.4, color=ps.INK)
+                ax.set_ylabel(f"{conv_title}\nMSE", fontsize=7.4, color=ps.INK)
 
     # Legend placed in a row at the bottom, one colour swatch per method -- no
     # need to repeat labels inside each panel

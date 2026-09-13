@@ -72,19 +72,26 @@ comparison in `methods/enkf/checks/verify_enkf_opt.py` (`np.array_equal`, not
 
 ## Scoring scope: walkable cells
 
-Every reported number is scored on the same cells: the **blind** cells (not seen
-by any robot in that frame) inside the **walkable** region, all four channels,
-every frame of every test day. The walkable region is 290 of the 432 grid cells;
-the other 142 (32.9%) are map obstacles — walls and the stalls lining the
-corridor — which nobody can stand in and no method is asked to reconstruct.
-Empty walkable cells are included: their true density and velocity are 0, and
-getting "nobody is here" right is part of the task. Squared errors are pooled
-over all scored cells before the square root, and every method's predictions are
-clipped to the same physical bounds.
+Every reported number is scored inside the **walkable** region: 290 of the 432 grid cells.
+The other 142 (32.9%) are map obstacles — walls and the stalls lining the corridor — which
+nobody can stand in and no method is asked to reconstruct. All four channels, every frame of
+every test day. Each result is reported on two cell sets:
 
-`compare/compare5.py` also computes other cell sets (observed cells included,
-obstacle cells included, only cells where a velocity is defined) and keeps them
-in `compare5_final.json` for reference; none of them is reported.
+- **blind walkable cells** — the cells no robot sees in that frame (about 44% of all
+  walkable cell-frames). This is the reconstruction task proper: there is no observation there.
+- **all walkable cells** — observed cells included, so a method must also stay faithful to
+  what the robots do see.
+
+Empty walkable cells are included in both: their true density and velocity are 0, and
+getting "nobody is here" right is part of the task. Squared errors are pooled over all
+scored cells before the square root, and every method's predictions are clipped to the
+same physical bounds.
+
+The result files name the two differently: `compare5_final.json` calls them `walkable`
+(blind) and `walkable_full` (all); the uncertainty JSONs call them `walkable_blind` and
+`walkable`. `compare/compare5.py` also computes other cell sets (obstacle cells included,
+only cells where a velocity is defined) and keeps them in `compare5_final.json` for
+reference; none of them is reported.
 
 Also: 4DVarNet's numbers carry a **~4e-4 reproducibility floor**. Its inference
 pass itself backpropagates through autograd, and conv backward's reduction uses
@@ -142,23 +149,33 @@ split's own RMSE**. It knows how big the error is on average and nothing about
 *where* — and it scores a perfect 1.00 spread/skill for free. A useful σ̂ has to
 beat it.
 
-Scored on `walkable_blind` (the scope above: blind cells inside the walkable region), 7 test days:
+**Blind walkable cells** (no robot sees them in that frame), 7 test days:
 
-| Method | σ̂ comes from | RMSE | vs MSE ensemble | CRPS | null model | vs null | spread/skill | 50% cov. | 90% cov. |
-|---|---|---|---|---|---|---|---|---|---|
-| 4DVarNet MSE, 5-seed ensemble | none — accuracy reference | 0.228 | — | — | — | — | — | — | — |
-| 4DVarNet `vsb0`, 5-seed ensemble | learned σ̂ from a read-out head, + member spread | 0.266 | +16.9% | 0.1598 | 0.1238 | +29.1% | 1.912 | 89.8% | 97.1% |
-| 4DVarNet `aug0`, 5-seed ensemble | learned σ̂ iterated inside `G(x)`, + member spread | 0.290 | +27.5% | 0.1047 | 0.1354 | **−22.7%** | 0.755 | 79.0% | 94.8% |
-| EnKF | ensemble spread (100 members) | 0.263 | +15.7% | 0.1623 | 0.1287 | +26.0% | 0.010 | 1.0% | 1.6% |
-| DINCAE ‡ | **one model, not an ensemble** — the network's own σ̂ output | 0.227 | −0.4% | 0.1948† | 0.2542† | **−23.3%** | 0.640 | 76.5% | 94.3% |
+| Method | RMSE | vs MSE ensemble | vs null | spread/skill | 90% cov. |
+|---|---|---|---|---|---|
+| 4DVarNet MSE, 5-seed ensemble (no σ̂) | 0.228 | — | — | — | — |
+| 4DVarNet `vsb0`, 5-seed ensemble | 0.266 | +16.9% | +29.1% | 1.912 | 97.1% |
+| 4DVarNet `aug0`, 5-seed ensemble | 0.290 | +27.5% | **−22.7%** | 0.755 | 94.8% |
+| EnKF, 100 members | 0.263 | +15.7% | +26.0% | 0.010 | 1.6% |
+| DINCAE ‡ (one model) | 0.227 | −0.4% | **−23.3%** | 0.640 | 94.3% |
+
+**All walkable cells** (observed cells included), 7 test days:
+
+| Method | RMSE | vs MSE ensemble | vs null | spread/skill | 90% cov. |
+|---|---|---|---|---|---|
+| 4DVarNet MSE, 5-seed ensemble (no σ̂) | 0.189 | — | — | — | — |
+| 4DVarNet `vsb0`, 5-seed ensemble | 0.217 | +14.6% | +43.4% | 2.302 | 98.1% |
+| 4DVarNet `aug0`, 5-seed ensemble | 0.230 | +21.5% | **−15.1%** | 0.956 | 95.9% |
+| EnKF, 100 members | 0.275 | +45.4% | +26.4% | 0.009 | 1.3% |
+| DINCAE ‡ (one model) | 0.182 | −3.7% | **−25.8%** | 0.591 | 94.1% |
+
+Where each σ̂ comes from is in the [method table](#the-four-methods-plus-two-uncertainty-designs-of-our-own).
 
 ‡ **DINCAE is not an ensemble.** It is here as the reference for what one
 model's own σ̂ achieves; its row is a different mechanism, not a like-for-like
-comparison with the ensemble rows.
-† DINCAE's σ̂ lives in its normalised space (log1p on density/var, then
-per-channel standardisation), so its CRPS and null-model CRPS are **not in data
-units** and cannot be compared with the other rows' absolute CRPS. Its *vs null*,
-spread/skill and coverage are ratios and do compare.
+comparison with the ensemble rows. Its σ̂ is scored in its normalised space (log1p on
+density/var, then per-channel standardisation); every column except RMSE is a ratio or a
+coverage, so the row still compares, and its RMSE comes from compare5 in data units.
 
 **The MSE ensemble has no σ̂**; it is in the table for its RMSE. `vsb0` and
 `aug0` are the same network trained with an NLL loss instead of MSE, so for them
@@ -166,34 +183,33 @@ spread/skill and coverage are ratios and do compare.
 accuracy. For the EnKF and DINCAE the same column is a different method measured
 against the same yardstick, not a cost of anything.
 
-The RMSE column is compare5's `walkable` RMSE for the same predictor (the
-ensemble mean for the three 4DVarNet rows), so it agrees with the accuracy
-table. The uncertainty scripts also compute an RMSE, on unclipped predictions
-over every frame; for `vsb0`/`aug0` it differs from compare5's by 0.9% / 0.8%.
+The RMSE column is compare5's RMSE on the same cells (the ensemble mean for the three
+4DVarNet rows), so it agrees with the accuracy table. The uncertainty scripts also compute
+an RMSE, on unclipped predictions; for `vsb0`/`aug0` it differs from compare5's by at most
+1.3%.
 
 **Reading the columns**
 
-- **CRPS** — Continuous Ranked Probability Score, in data units, lower is
-  better. It penalises both a wrong centre and a wrong spread, and reduces to
-  MAE as σ → 0. NLL is also computed but is not used as the verdict: its
-  `(x−μ)²/2σ²` term is unbounded as σ → 0, so the EnKF's collapsed ensemble
-  produces an NLL of order 1e18, which cannot rank anything.
-- **vs MSE ensemble** — RMSE relative to the 4DVarNet MSE ensemble's.
+- **RMSE** — reconstruction error of the ensemble mean (DINCAE: its single prediction).
+- **vs MSE ensemble** — RMSE relative to the 4DVarNet MSE ensemble's on the same cells.
   Positive means worse reconstruction.
-- **vs null** — CRPS relative to the constant-σ null model. Negative means the
-  σ̂ carries spatial information the constant does not.
+- **vs null** — CRPS relative to the constant-σ null model on the same cells. Negative
+  means the σ̂ carries spatial information the constant does not. CRPS (Continuous Ranked
+  Probability Score) scores the whole predicted distribution, centre and spread together,
+  and reduces to MAE as σ → 0; the absolute values are in the JSONs. NLL is also computed
+  but not used: its `(x−μ)²/2σ²` term is unbounded as σ → 0, so the EnKF's collapsed
+  ensemble produces an NLL of order 1e18, which cannot rank anything.
 - **spread/skill** — mean predicted σ̂ over actual RMSE. 1.0 is calibrated,
   below 1 is overconfident, above 1 underconfident.
-- **coverage** — the fraction of cells whose truth falls inside the nominal
-  50% / 90% interval. A 90% interval that covers 94.8% of truths is slightly too wide;
-  one that covers 1.6% has collapsed.
+- **90% cov.** — the fraction of cells whose truth falls inside the nominal 90% interval.
+  94.8% is slightly too wide; 1.6% means the interval has collapsed.
 
 The EnKF's row is a collapse, not a miscalibration: its ensemble spread settles
-around 0.0025 on these cells while its actual error is 0.263, a ratio of 0.01. The forecast
+around 0.0025 while its actual error is 0.263 on blind cells, a ratio of 0.01. The forecast
 model damps member disagreement about 65% per step regardless of injected
 noise — measured directly in
 `methods/varnet/check_outputs/eval/enkf_spread_growth.json`, verdict
-`contractive`. Senseiver is absent from this table because it is a
+`contractive`. Senseiver is absent from these tables because it is a
 deterministic decoder and produces no σ̂ at all.
 
 **Reproduce**
@@ -218,7 +234,7 @@ files. No GPU, no Slurm, no environment setup.
 | What | Where |
 |---|---|
 | The main accuracy comparison figure (per-channel, **MSE**) | `compare/results/compare5.png` |
-| Raw numbers (`walkable` is the reported scope; other cell sets are kept for reference) | `compare/results/compare5_final.json` |
+| Raw numbers (`walkable` = blind walkable cells, `walkable_full` = all walkable cells; other cell sets are kept for reference) | `compare/results/compare5_final.json` |
 | A reconstructed field as a picture, all 4 methods side by side | `compare/results/reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png` |
 | Everything else | `methods/varnet/check_outputs/eval/unc_spread_decay.png` (why the EnKF's ensemble cannot hold a spread), `methods/varnet/check_outputs/eval/de_*.png` (the variational cost and solver drawn as diagrams), `methods/varnet/check_outputs/navigation/` (walkable mask and obstacles on the real map) |
 
@@ -459,18 +475,19 @@ file and epoch every 4DVarNet member was scored at.
 [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own)).
 A rerun should land within ~0.01 of these (4DVarNet rows carry the
 reproducibility floor described above). The figure `compare5.png` plots
-per-channel **MSE**, so its totals are these numbers squared — DINCAE's 0.227 there
-appears as 0.051.
+per-channel **MSE** (top row blind walkable cells, bottom row all walkable
+cells), so its totals are these numbers squared — DINCAE's 0.227 there appears
+as 0.051.
 
-| Method | `walkable` RMSE |
-|---|---|
-| Senseiver | 0.222 |
-| DINCAE | 0.227 |
-| 4DVarNet MSE (one model: seed 3, validation-best) | 0.230 |
-| EnKF | 0.263 |
+| Method | blind walkable cells | all walkable cells |
+|---|---|---|
+| Senseiver | 0.222 | 0.156 |
+| DINCAE | 0.227 | 0.182 |
+| 4DVarNet MSE (one model: seed 3, validation-best) | 0.230 | 0.192 |
+| EnKF | 0.263 | 0.275 |
 
 The uncertainty designs `vsb0` and `aug0` are not in this table. What they cost
-in accuracy is in the [uncertainty table](#uncertainty-how-it-is-scored), next to
+in accuracy is in the [uncertainty tables](#uncertainty-how-it-is-scored), next to
 the MSE ensemble they are measured against.
 
 Off by 2x or more means something is broken — check the scope first.

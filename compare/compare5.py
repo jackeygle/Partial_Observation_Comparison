@@ -31,8 +31,9 @@ Two outputs feed two different tables:
 
 Why several conventions
 ----------------------
-The reported scope is `walkable` (blind cells inside the walkable region, all four
-channels). The others are computed alongside for reference only; they are not reported.
+The reported scopes are `walkable` (blind cells inside the walkable region) and
+`walkable_full` (all walkable cells, observed included), all four channels. The others are
+computed alongside for reference only; they are not reported.
 
 They are computed side by side, making the difference visible in one piece
 of output rather than making the reader compare several jsons themselves:
@@ -42,7 +43,7 @@ of output rather than making the reader compare several jsons themselves:
     (3) walkable       blind ∩ walkable                **the main result**: every cell of the
                                                        physical domain, empty ones included,
                                                        map-obstacle cells excluded
-    (4) walkable_full  full field ∩ walkable           includes observed cells
+    (4) walkable_full  full field ∩ walkable           includes observed cells -- **also reported**
     (5) allcells       blind, all cells                the removed three-way script's convention
     (6) full           full field, all cells           the whole grid, obstacles included
 
