@@ -1,6 +1,6 @@
 # methods/dincae — reproducing DINCAE on the ATC crowd field
 
-> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring scope (blind cells inside the walkable region), and which checkpoint backs which published number.
 
 The second technical route. The first (4DVarNet reproduction + EnKF comparison) is
 already complete, in [`../varnet/`](../varnet/); this directory
@@ -58,8 +58,8 @@ Inside `checks/`:
 
 - `check_encoding.py` — self-checks `encoding.py`'s invariants (are both pieces 0 at
   missing cells, is the target mask correct, ...)
-- `evaluate.py` — evaluation: sigma-hat calibration, variance retention, both MSE
-  conventions, and optional multi-epoch output averaging (`--average-checkpoints`)
+- `evaluate.py` — evaluation: sigma-hat calibration, variance retention, MSE on the
+  reported walkable scope (plus reference cell sets), and optional multi-epoch output averaging (`--average-checkpoints`)
 - `measure_coverage_revisit.py` / `measure_obs_age.py` / `measure_decorrelation.py`
   — measurements about **the data itself** (coverage, observation age, temporal
   autocorrelation), not on the training path
@@ -83,15 +83,16 @@ python3 -m methods.dincae.checks.check_encoding   # expect PASS
 
 # 3. Training (GPU node)
 sbatch sbatch/submit_train.sbatch            # 200 epochs, self-chaining + --resume
-#   -> runs/dincae_full/{last.pt, ckpt_*.pt, metrics.jsonl}
+#   -> runs/dincae_ff/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
 #   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 
 # 4. Evaluation (GPU node)
+python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff   # pick the epoch on validation
 sbatch sbatch/submit_eval.sbatch --split test
-#   -> check_outputs/eval_single_00070/dincae_metrics_test.json
-#   (the PUBLISHED configuration: the single epoch-70 checkpoint. The
-#    16-checkpoint average lives in check_outputs/eval/ and now needs an
-#    explicit --average-checkpoints, see "Checkpoint policy" below.)
+#   -> check_outputs/eval_ff_00060/dincae_metrics_test.json
+#   (the PUBLISHED configuration: runs/dincae_ff at the single epoch-60 checkpoint
+#    chosen on the validation split. Averaging checkpoints needs an explicit
+#    --average-checkpoints, see "Checkpoint policy" below.)
 ```
 
 **torch only runs on GPU nodes** (`sbatch`, or
@@ -123,13 +124,15 @@ in the paper**.
 
 **30 input channels**: row, col (2) + cos/sin of the diurnal and weekly cycle (4) +
 `dt in {-1,0,+1}` x (residual[4], mask[4]) (24). **8 target channels**: one
-(residual*mask, mask) pair per channel.
+(residual, weight) pair per channel. Training uses **full-field supervision**
+(`--full-field-loss`, the default): every cell is a target with weight 1, empty and
+obstacle cells included, whose true value is 0 in physical units.
 
 ### Per-channel validity (`state.channel_valid`)
 
-Where each of the four channels "is defined" differs, and every statistic and loss
-term only operates where it is defined. This is not a deviation from the paper --
-it is the paper's own principle, "missing = zero precision," applied to our data:
+Where each of the four channels "is defined" differs. The per-cell statistics in
+`state.py` only use cells where a channel is defined; the loss does not use this rule,
+because full-field supervision puts every cell in it:
 
 ```
 density : defined everywhere (density=0 is a genuine measurement: "nobody is here")
@@ -191,7 +194,6 @@ covered at least once within 3-frame window: 63.1%  -> 36.9% of cells have both
                                                         slices at 0, relying only
                                                         on coordinates + clock +
                                                         per-cell mean
-target-defined fraction  density: 67.1%    vx/vy: 13.2%    var: 12.8%
 ```
 
 The paper's data is **one snapshot per day**; "previous day / today / next day"
@@ -202,20 +204,14 @@ two numbers are key to explaining performance, not a bug.
 
 ---
 
-## Evaluation convention (`checks/evaluate.py`)
+## Evaluation scope (`checks/evaluate.py`)
 
-**Both MSE conventions are reported**, because they lead to different conclusions
-(a pitfall already hit once in the 4DVarNet work (methods/varnet)):
+The reported number is `walkable_blind`: blind cells inside the walkable region, all
+four channels, with the same physical clipping as every other method -- the scope
+`compare/compare5.py` reports. `evaluate.py` also writes other cell sets (`ours_*`,
+`v4dvar_*`, all cells, observed cells included) for reference; they are not reported.
 
-- `ours` — only on cells where that channel **is defined**, restricted to walkable
-  cells. The convention used during training.
-- `v4dvar` — exactly follows `methods/varnet/checks/eval_test_days.py`: the raw
-  field, **all** cells (including non-walkable ones), four channels unweighted,
-  blind = `mask < 0.5`, with the same physical clipping as the EnKF. This
-  convention scores us on cells we were never trained on and is unfavourable to
-  us; it is reported for comparability.
-
-Both are given in `_noclip` variants too. **The gap between `noclip` and `clip` is
+The scores are given in `_noclip` variants too. **The gap between `noclip` and `clip` is
 itself a convergence diagnostic**: in the information form, `m = x1*sigma-hat^2`
 and sigma-hat^2 is capped at `1/mu = 1000` (Eq.6 clamping), so an unconverged model
 can output mu~1000, and after inverting `var`'s transform that becomes an
@@ -250,13 +246,13 @@ be reported separately).
 ## Checkpoint policy
 
 Every **published** DINCAE number comes from a single checkpoint,
-`runs/dincae_full/ckpt_00070.pt`, picked on DINCAE's own validation set —
-matching the other three methods, none of which ensemble or average.
+`runs/dincae_ff/ckpt_00060.pt`, chosen on the **validation** split by
+`checks/select_checkpoint.py` (walkable-blind MSE; result in
+`check_outputs/eval/select_dincae_ff_valid.json`) -- matching the other methods, none
+of which ensemble or average.
 
 The reference implementation instead averages the outputs of checkpoints saved
-every 10 epochs, which scores ~1.7% better on RMSE. That path still exists
-behind `--average-checkpoints`, and its result is archived in
-`check_outputs/eval/`; it is reported as a measured side quantity, not as the
-headline. `load_models()` refuses to average silently — passing no
-`--ckpt-glob` now raises instead of quietly returning a number ~1.7% away from
-the reported one with nothing in the output to distinguish them.
+every 10 epochs. That path still exists behind `--average-checkpoints`, and it is
+not reported. `load_models()` refuses to average silently -- passing no
+`--ckpt-glob` raises instead of quietly returning a different number with nothing in
+the output to distinguish it from the reported one.

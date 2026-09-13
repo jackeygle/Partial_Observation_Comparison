@@ -72,7 +72,7 @@ def parse_args():
                    help="encoding cache directory (deterministic encoding, built once). Empty string = no cache")
     p.add_argument("--amp", action="store_true", help="bf16 autocast")
     p.add_argument("--resume", action="store_true")
-    p.add_argument("--full-field-loss", action="store_true",
+    p.add_argument("--full-field-loss", action=argparse.BooleanOptionalAction, default=True,
                    help="ABLATION: supervise every cell (the target on undefined "
                         "cells is physical 0), instead of the information form's "
                         "valid cells. This trains DINCAE under the same "

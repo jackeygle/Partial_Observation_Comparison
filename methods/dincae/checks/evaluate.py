@@ -80,12 +80,12 @@ CLIP = ((0.0, 5.0), (-5.0, 5.0), (-5.0, 5.0), (0.0, 2.0))
 
 #: The checkpoint every PUBLISHED DINCAE number was produced with -- single
 #: model, picked on DINCAE's own validation set. Both `compare5_final.json`
-#: (via check_outputs/eval_single_00070/) and `uncertainty_dincae.json`
+#: (via check_outputs/eval_ff_00060/) and `uncertainty_dincae.json`
 #: (`checkpoints: [70]`) use exactly this file. Multi-checkpoint averaging is
 #: the reference implementation's behaviour and scores BETTER (-1.7% RMSE),
 #: but the main table reports single models for every method, because none of
 #: the four papers ensembles and mixing the two would not be comparable.
-PUBLISHED_CKPT = "ckpt_00070.pt"
+PUBLISHED_CKPT = "ckpt_00060.pt"
 
 
 def load_models(run_dir, ckpt_glob, dev, allow_average=False):
@@ -288,7 +288,7 @@ def calibration_table(sd, se, nbin=10):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_full"))
+    ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_ff"))
     ap.add_argument("--ckpt-glob", default="",
                     help=f"which checkpoint(s) to evaluate. Default: every ckpt_*.pt under "
                          f"--run-dir, which is more than one and therefore requires "

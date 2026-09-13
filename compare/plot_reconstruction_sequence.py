@@ -33,10 +33,6 @@ Usage (GPU node):
     # fewer methods / a specific block instead of auto-picking the busiest one:
     python3 -m compare.plot_reconstruction_sequence --methods dincae,senseiver --day atc-20130811 --n 500 --start 10000
 
-Turning the result into an actual video to watch, rather than 5000 files to
-scroll through:
-    ffmpeg -framerate 10 -i compare/results/seq_ppt_atc-20130811/frame_%05d.png \
-           -pix_fmt yuv420p compare/results/seq_ppt_atc-20130811.mp4
 """
 from __future__ import annotations
 
@@ -161,8 +157,8 @@ def main():
     ap.add_argument("--varnet-ckpt", default=None,
                     help="default: the reported 4DVarNet model (model_io.baseline_ckpt) -- it used to be "
                          "runs/varnet_mse5_s0/varnet_best.pt, a hidden=32 run at a train-split-selected epoch")
-    ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full"))
-    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+    ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_ff"))
+    ap.add_argument("--dincae-ckpt", default="ckpt_00060.pt",
                     help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))

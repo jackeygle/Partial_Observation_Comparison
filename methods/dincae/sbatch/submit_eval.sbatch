@@ -9,17 +9,11 @@
 
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
-# Defaults to the PUBLISHED configuration: the single epoch-70 checkpoint every
-# reported DINCAE number uses. Without an explicit --ckpt-glob, evaluate.py
-# matches all 16 ckpt_*.pt and now refuses to average them silently, so state
-# the intent here rather than leaving the entry point broken.
-# To reproduce the reference implementation's averaging instead:
-#   sbatch sbatch/submit_eval.sbatch --average-checkpoints --ckpt-glob ''
+# Defaults to the PUBLISHED configuration: runs/dincae_ff (full-field supervision), the
+# single epoch-60 checkpoint chosen on the validation split (select_dincae_ff_valid.json).
+# --run-dir is passed explicitly: evaluate.py records it in the JSON, and a default left
+# pointing elsewhere once labelled this very result with the wrong run.
 ROOT=/scratch/work/zhangx29/Thesis_Project
-CKPT="$ROOT/methods/dincae/runs/dincae_full/ckpt_00070.pt"
-# --out matches the checkpoint: the published single-checkpoint result belongs in
-# eval_single_00070/, NOT in eval/, which holds the 16-checkpoint average. Writing
-# both to eval/ would silently overwrite one result with the other under the same
-# filename.
-python3 -u -m methods.dincae.checks.evaluate --ckpt-glob "$CKPT" \
-        --out "$ROOT/methods/dincae/check_outputs/eval_single_00070" "$@"
+RUN="$ROOT/methods/dincae/runs/dincae_ff"
+python3 -u -m methods.dincae.checks.evaluate --run-dir "$RUN" --ckpt-glob "$RUN/ckpt_00060.pt" \
+        --out "$ROOT/methods/dincae/check_outputs/eval_ff_00060" "$@"

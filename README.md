@@ -13,21 +13,15 @@ estimate), because a wrong-but-honest answer is more useful downstream than a
 wrong-and-confident one. Two of those uncertainty designs are ours, added to
 4DVarNet, which has none in the original paper.
 
-**The headline finding.** The ranking of these four methods is decided by a
-scoring convention that most papers do not state. Same predictions, same days:
-DINCAE is first under one convention and last under the other. See
-[Scoring convention](#scoring-convention-read-this-before-quoting-any-number).
-
 ## Contents
 
 | Section | For |
 |---|---|
-| [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own) · [Scoring convention](#scoring-convention-read-this-before-quoting-any-number) · [The dataset and how it is split](#the-dataset-and-how-it-is-split) · [Uncertainty: how it is scored](#uncertainty-how-it-is-scored) · [The obstacle region](#the-obstacle-region) | understanding what is here |
+| [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own) · [Scoring scope](#scoring-scope-walkable-cells) · [The dataset and how it is split](#the-dataset-and-how-it-is-split) · [Uncertainty: how it is scored](#uncertainty-how-it-is-scored) | understanding what is here |
 | [Looking at results without running anything](#looking-at-results-without-running-anything) | a quick look, no cluster needed |
 | [Which file backs which published number](#which-file-backs-which-published-number) | reproducing or citing a specific number |
 | [Running things](#running-things) (environment, layout, training, evaluation, figures) | doing the work |
 | [Data, and the minimal package to transfer](#data-and-the-minimal-package-to-transfer) | moving this to another machine or person |
-| [Troubleshooting](#troubleshooting) | when something misbehaves |
 
 ---
 
@@ -45,14 +39,14 @@ agreed with the supervisor on 2026-09-07.
 | `methods/varnet/` | 4DVarNet (plain MSE, Eq.14) — the reconstruction method | none |
 | `methods/varnet/` | ... + `aug0`: sigma inside the prior operator `G(x)`, NLL (**ours**) | learned sigma-hat + epistemic |
 | `methods/varnet/` | ... + `vsb0`: sigma from a separate read-out head, NLL (**ours**, negative control) | learned sigma-hat + epistemic |
-| `methods/dincae/` | DINCAE (single checkpoint, see below) | sigma-hat (information form) |
+| `methods/dincae/` | DINCAE, trained with full-field supervision (single checkpoint, see below) | sigma-hat (the network's own variance output) |
 | `methods/senseiver/` | Senseiver | none |
 | `methods/enkf/` | localised EnKF (+ PedPred3 forward model) | ensemble spread |
 
 How good each σ̂ is, and what asking for one costs in reconstruction
 accuracy, is in [Uncertainty: how it is scored](#uncertainty-how-it-is-scored) —
 kept in one place so two copies of the numbers cannot drift apart. DINCAE and
-the EnKF have uncertainty *built into* the method (information form, ensemble
+the EnKF have uncertainty *built into* the method (a variance output, ensemble
 spread) rather than as a separate design.
 
 **Every row of the accuracy table is one model** — no ensembling, no seed
@@ -66,24 +60,8 @@ single model would give 4DVarNet five times the training.
 DINCAE's reference implementation *does* average the outputs of checkpoints
 saved every 10 epochs, and `methods/dincae/checks/evaluate.py` still supports
 it behind `--average-checkpoints`, but the reported number comes from **one**
-checkpoint, `ckpt_00070.pt`. The 16-checkpoint average is kept as a measured
-side quantity (1.7% lower `defined` RMSE than epoch 70 alone, 0.324 vs 0.329),
-not as the headline.
-
-**Open issue, found in review, not yet resolved.** `ckpt_00070.pt` was
-described as "best on DINCAE's own validation set", but that had never actually
-been checked: the only validation evaluation that existed covered epochs 3-5.
-`methods/dincae/checks/select_checkpoint.py` was written to check it properly —
-score every saved checkpoint on the **validation** split under the reported
-scope — and it does not confirm epoch 70: epoch 140 scores better there (0.084
-vs 0.094 walkable-blind MSE). On the **test** split the two are close: pooled RMSE 0.329 vs 0.328 under
-`defined`, and 0.757 vs 0.787 under `allcells`, where epoch 70 is the better of
-the two. Read from the pooled fields of the already-computed
-`methods/dincae/check_outputs/eval_single_{00070,00140}/dincae_metrics_test.json`
-(epoch 70's match `compare5_final.json` exactly).
-The headline number stays `ckpt_00070.pt` rather than switching without
-confirming the switch precisely; the discrepancy in how it was originally
-described is left here rather than quietly fixed.
+checkpoint, `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, chosen on the validation
+split by `methods/dincae/checks/select_checkpoint.py`.
 
 `methods/enkf/enkf_lab/` is a **byte-identical, read-only copy** of
 `/scratch/work/zhangx29/Partial_observation`, its files deliberately chmod 444.
@@ -91,24 +69,21 @@ To change anything, edit `enkf_opt/` instead, and it must pass the bit-identical
 comparison in `methods/enkf/checks/verify_enkf_opt.py` (`np.array_equal`, not
 `isclose`).
 
-## Scoring convention: read this before quoting any number
+## Scoring scope: walkable cells
 
-**Rankings flip depending on the convention.** Take DINCAE's own two numbers,
-same model, same predictions, same days: pooled RMSE **0.329** under one
-convention and **0.757** under the other, more than double.
+Every reported number is scored on the same cells: the **blind** cells (not seen
+by any robot in that frame) inside the **walkable** region, all four channels,
+every frame of every test day. The walkable region is 290 of the 432 grid cells;
+the other 142 (32.9%) are map obstacles — walls and the stalls lining the
+corridor — which nobody can stand in and no method is asked to reconstruct.
+Empty walkable cells are included: their true density and velocity are 0, and
+getting "nobody is here" right is part of the task. Squared errors are pooled
+over all scored cells before the square root, and every method's predictions are
+clipped to the same physical bounds.
 
-- `defined` — only cells where that physical quantity exists (velocity needs
-  density > 0 there). DINCAE was trained exactly this way, so it comes first.
-- `allcells` — every cell, including the **88.4%** of blind velocity cells that
-  are empty. An empty cell has no people, hence no velocity, and the `0` the
-  pipeline stores there is a placeholder, not a measurement. The three methods
-  trained on the full field learned to output 0 there and get that part for
-  free; DINCAE was never trained to, and is crushed by this term.
-
-**So any single number quoted without saying which cells it scores is
-incomplete** — not wrong exactly, but not comparable to a number computed the
-other way. `compare/compare5.py` always reports both side by side; the single
-definition of the rule lives in `methods/dincae/state.py:channel_valid()`.
+`compare/compare5.py` also computes other cell sets (observed cells included,
+obstacle cells included, only cells where a velocity is defined) and keeps them
+in `compare5_final.json` for reference; none of them is reported.
 
 Also: 4DVarNet's numbers carry a **~4e-4 reproducibility floor**. Its inference
 pass itself backpropagates through autograd, and conv backward's reduction uses
@@ -133,7 +108,7 @@ model see the same afternoon from both sides of the boundary.
 | Split | Days | Frames | Date range | Used for |
 |---|---|---|---|---|
 | train | 32 | 1,262,518 | 2012-10-28 → 2013-06-09 | fitting weights |
-| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing the checkpoint — for Senseiver and DINCAE; see the caveat below for 4DVarNet |
+| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing the checkpoint |
 | test | 7 | 277,543 | 2013-08-11 → 2013-09-29 | every reported number |
 | | **46** | **1,809,804** | | |
 
@@ -158,7 +133,7 @@ EnKF's σ̂ is the spread of its 100 members, and each 4DVarNet design is a 5-se
 deep ensemble whose σ̂ combines each member's own learned variance with the
 members' disagreement (Lakshminarayanan et al. 2017, Sec. 2.4). DINCAE is the
 exception and is marked as such: one model that outputs σ̂ directly
-(information form), kept as the non-ensemble reference.
+(a mean and a variance for every cell), kept as the non-ensemble reference.
 
 Judging a σ̂ needs a reference, because it can look plausible while carrying no
 information: **the null model replaces every cell's σ̂ with one constant, that
@@ -166,15 +141,15 @@ split's own RMSE**. It knows how big the error is on average and nothing about
 *where* — and it scores a perfect 1.00 spread/skill for free. A useful σ̂ has to
 beat it.
 
-Scored on `defined_blind` (blind ∩ channel-defined ∩ walkable), 7 test days:
+Scored on `walkable_blind` (the scope above: blind cells inside the walkable region), 7 test days:
 
 | Method | σ̂ comes from | RMSE | vs MSE ensemble | CRPS | null model | vs null | spread/skill | 50% cov. | 90% cov. |
 |---|---|---|---|---|---|---|---|---|---|
-| 4DVarNet MSE, 5-seed ensemble | none — accuracy reference | 0.333 | — | — | — | — | — | — | — |
-| 4DVarNet `vsb0`, 5-seed ensemble | learned σ̂ from a read-out head, + member spread | 0.384 | +15.2% | 0.2028 | 0.1916 | +5.9% | 1.364 | 80.3% | 93.6% |
-| 4DVarNet `aug0`, 5-seed ensemble | learned σ̂ iterated inside `G(x)`, + member spread | 0.399 | +19.8% | 0.1577 | 0.1972 | **−20.0%** | 0.652 | 68.6% | 89.0% |
-| EnKF | ensemble spread (100 members) | 0.368 | +10.4% | 0.2077 | 0.1841 | +12.8% | 0.004 | 1.6% | 2.0% |
-| DINCAE ‡ | **one model, not an ensemble** — information form | 0.329 | −1.1% | 0.3575† | 0.4244† | **−15.7%** | 0.739 | 70.7% | 93.1% |
+| 4DVarNet MSE, 5-seed ensemble | none — accuracy reference | 0.228 | — | — | — | — | — | — | — |
+| 4DVarNet `vsb0`, 5-seed ensemble | learned σ̂ from a read-out head, + member spread | 0.266 | +16.9% | 0.1598 | 0.1238 | +29.1% | 1.912 | 89.8% | 97.1% |
+| 4DVarNet `aug0`, 5-seed ensemble | learned σ̂ iterated inside `G(x)`, + member spread | 0.290 | +27.5% | 0.1047 | 0.1354 | **−22.7%** | 0.755 | 79.0% | 94.8% |
+| EnKF | ensemble spread (100 members) | 0.263 | +15.7% | 0.1623 | 0.1287 | +26.0% | 0.010 | 1.0% | 1.6% |
+| DINCAE ‡ | **one model, not an ensemble** — the network's own σ̂ output | 0.227 | −0.4% | 0.1948† | 0.2542† | **−23.3%** | 0.640 | 76.5% | 94.3% |
 
 ‡ **DINCAE is not an ensemble.** It is here as the reference for what one
 model's own σ̂ achieves; its row is a different mechanism, not a like-for-like
@@ -190,14 +165,10 @@ spread/skill and coverage are ratios and do compare.
 accuracy. For the EnKF and DINCAE the same column is a different method measured
 against the same yardstick, not a cost of anything.
 
-The RMSE column is compare5's `defined` RMSE for the same predictor (the
+The RMSE column is compare5's `walkable` RMSE for the same predictor (the
 ensemble mean for the three 4DVarNet rows), so it agrees with the accuracy
 table. The uncertainty scripts also compute an RMSE, on unclipped predictions
-over every frame; for `vsb0`/`aug0` it differs from compare5's by 0.3% / 0.6%.
-
-Under the `allcells` convention (blind cells, each method's own blind null
-model) the four are: 4DVarNet `vsb0` +54.8%, 4DVarNet `aug0` −28.2%, EnKF +26.8%, DINCAE −76.1% — the magnitudes move a great deal, the signs do
-not.
+over every frame; for `vsb0`/`aug0` it differs from compare5's by 0.9% / 0.8%.
 
 **Reading the columns**
 
@@ -213,11 +184,11 @@ not.
 - **spread/skill** — mean predicted σ̂ over actual RMSE. 1.0 is calibrated,
   below 1 is overconfident, above 1 underconfident.
 - **coverage** — the fraction of cells whose truth falls inside the nominal
-  50% / 90% interval. 90% coverage of 89.0% is close to calibrated; 2.0% is not.
+  50% / 90% interval. A 90% interval that covers 94.8% of truths is slightly too wide;
+  one that covers 1.6% has collapsed.
 
 The EnKF's row is a collapse, not a miscalibration: its ensemble spread settles
-around 0.0015 on these cells while its actual error is 0.368, a ratio of 0.004
-(over all cells: 0.0025 against an error of 0.239). The forecast
+around 0.0025 on these cells while its actual error is 0.263, a ratio of 0.01. The forecast
 model damps member disagreement about 65% per step regardless of injected
 noise — measured directly in
 `methods/varnet/check_outputs/eval/enkf_spread_growth.json`, verdict
@@ -236,33 +207,6 @@ sbatch methods/enkf/sbatch/submit_unc_enkf.sbatch       # -> uncertainty_enkf_k1
 The shared scoring code is `compare/score_uncertainty.py`; each method's wrapper
 only supplies its own σ̂.
 
-## The obstacle region
-
-Grid: 36x12 cells, 4 channels (density, vx, vy, var). 290 of the 432 cells are
-physically walkable; the remaining 142 (32.9%) are the obstacle region.
-
-**Obstacle-region finding** (`methods/dincae/checks/measure_obstacle_region.py`,
-full 7-day split, both runs scored on the checkpoints their reported numbers
-use). Obstacle-region truth is non-zero only 2.99–3.11% of the time. The
-information-form baseline's velocity error there is two to three orders of
-magnitude above its walkable-cell error,
-because it is never taught a target for a quantity that only exists where
-`density>0` — which is never true in the obstacle region. The
-`--full-field-loss` ablation supervises those cells against physical 0 and
-closes almost all of the gap:
-
-| channel | baseline obstacle MSE | full-field obstacle MSE | ratio |
-|---|---|---|---|
-| density | 0.00482 | 0.00115 | 4.2x |
-| vx | 1.12610 | 0.00807 | 140x |
-| vy | 3.39451 | 0.00335 | **1015x** |
-| var | 0.04219 | 0.00024 | 177x |
-
-At essentially no cost on walkable cells (vx walkable MSE actually *improves*,
-0.092 vs 0.154). So this is **not a bug**: DINCAE's information form
-structurally cannot learn "obstacle = 0" unless the obstacle region is put in
-the loss, and doing so is nearly free.
-
 ---
 
 # Looking at results without running anything
@@ -273,14 +217,13 @@ files. No GPU, no Slurm, no environment setup.
 | What | Where |
 |---|---|
 | The main accuracy comparison figure (per-channel, **MSE**) | `compare/results/compare5.png` |
-| Raw numbers, all four scoring conventions | `compare/results/compare5_final.json` |
+| Raw numbers (`walkable` is the reported scope; other cell sets are kept for reference) | `compare/results/compare5_final.json` |
 | A reconstructed field as a picture, all 4 methods side by side | `compare/results/reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png` |
-| DINCAE's obstacle-region result | `methods/dincae/check_outputs/eval/obstacle_region.json` |
 | Everything else | `methods/varnet/check_outputs/eval/unc_spread_decay.png` (why the EnKF's ensemble cannot hold a spread), `methods/varnet/check_outputs/eval/de_*.png` (the variational cost and solver drawn as diagrams), `methods/varnet/check_outputs/navigation/` (walkable mask and obstacles on the real map) |
 
 # Which file backs which published number
 
-"The DINCAE weights" is not a well-defined request: `runs/dincae_full/` holds 17
+"The DINCAE weights" is not a well-defined request: `runs/dincae_ff/` holds 12
 checkpoints and which you pick changes the number. Same for a 4DVarNet run's
 periodic `ckpt_<epoch>.pt` snapshots. This table is the authoritative mapping; everything else under
 `runs/` is an intermediate or an exploratory ablation.
@@ -290,17 +233,17 @@ periodic `ckpt_<epoch>.pt` snapshots. This table is the authoritative mapping; e
 | 4DVarNet MSE | `methods/varnet/runs/varnet_mse5_h96_s{0..4}/ckpt_<epoch>.pt`, epoch per run in that directory's `select_valid.json` | `compare/results/compare5_final.json`: `"4DVarNet MSE s<seed>"` for the accuracy table, seed = `single_model.MSE.seed`; `"4DVarNet MSE ens5"` for the uncertainty table's RMSE | chosen on the validation split; every member's file and epoch is in `compare5_final.json` → `protocol.checkpoints` |
 | 4DVarNet `aug0` | `methods/varnet/runs/varnet_aug0_h96_s{0..4}/ckpt_<epoch>.pt`, per `select_valid.json` | σ̂: `methods/varnet/check_outputs/eval/uncertainty_aug0.json`; RMSE: `compare5_final.json` `"4DVarNet AUG ens5"` | same selection; the uncertainty job's log lists each member's file and epoch |
 | 4DVarNet `vsb0` | `methods/varnet/runs/varnet_vsb0_h96_s{0..4}/ckpt_<epoch>.pt`, per `select_valid.json` | σ̂: `methods/varnet/check_outputs/eval/uncertainty_vsb0.json`; RMSE: `compare5_final.json` `"4DVarNet NLL ens5"` | same selection |
-| DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | not confirmed best on validation — see the open issue above; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
+| DINCAE | `methods/dincae/runs/dincae_ff/ckpt_00060.pt` — **one file** | `methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | chosen on the validation split (`methods/dincae/check_outputs/eval/select_dincae_ff_valid.json`); recorded in `compare5_final.json` as `source: .../eval_ff_00060/...` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | folded into `compare5_final.json` (`"Senseiver"`) | only trained model; `best.pt`, not `last.pt` |
 | EnKF | no weights — exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | `compare5_final.json` (`"EnKF k1"`), `methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json` | it is a filter, not a trained model |
 
 Two traps, both of which silently produce a *different number* rather than an
 error:
 
-1. **Do not average DINCAE's 16 checkpoints.** `methods/dincae/checks/evaluate.py` used to do
+1. **Do not average DINCAE's checkpoints.** `methods/dincae/checks/evaluate.py` used to do
    this by default (it is the reference implementation's behaviour). It now
-   refuses unless you pass `--average-checkpoints`, because the result is ~1.7%
-   RMSE away from the reported one with nothing in the output to say which
+   refuses unless you pass `--average-checkpoints`, because the result is a
+   different number from the reported one with nothing in the output to say which
    configuration produced it.
 2. **Do not score a 4DVarNet run at `varnet_best.pt`.** Despite the name it is
    selected on the **training** split (`train.py`'s `--split` defaults to
@@ -391,8 +334,7 @@ and is **not** part of any reported comparison.
 | `mse5_h96` | 4DVarNet | plain MSE loss (Eq.14), 5 random seeds, no uncertainty output |
 | `aug0_h96` | 4DVarNet | sigma **inside** the prior operator `G(x)`, NLL — ours |
 | `vsb0_h96` | 4DVarNet | sigma from a **separate read-out head**, NLL — ours |
-| `dincae_full` | DINCAE | baseline: information-form supervision (only defined cells in the loss) |
-| `dincae_ff` | DINCAE | `--full-field-loss` ablation: every cell in the loss, obstacle target = 0 |
+| `dincae_ff` | DINCAE | full-field supervision: every cell in the loss (`--full-field-loss`, the default) |
 | `senseiver_A` | Senseiver | the one trained model |
 | `enkf_k1_full` | EnKF | exported ensemble fields, `obs_every_k=1`, full 7-day test split |
 
@@ -455,9 +397,9 @@ done
 # ~11 min per run on one GPU; RUNS= splits the 15 across parallel jobs, see the script header
 sbatch methods/varnet/sbatch/submit_select.sbatch
 
-# DINCAE -- baseline and the obstacle-region ablation (~16-27 GPU-hours each)
-sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_full
-sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_ff --full-field-loss
+# DINCAE -- full-field supervision (~16-27 GPU-hours), then choose its checkpoint on validation
+sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_ff
+python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff
 
 # Senseiver (up to 1 day)
 sbatch methods/senseiver/sbatch/submit_train.sbatch --out runs/senseiver_A
@@ -499,7 +441,7 @@ python3 -m compare.plot_compare5          # regenerates compare/results/compare5
 The defaults reproduce exactly the published JSON: all four methods; each
 4DVarNet arm's five seeds at their validation-selected checkpoints, plus its
 5-member ensemble (`ens5`, which the uncertainty table uses); DINCAE's single
-epoch-70 checkpoint; and `single_model`, the MSE seed the accuracy table
+validation-selected checkpoint; and `single_model`, the MSE seed the accuracy table
 reports. A rerun writes `compare/results/compare5.json`; the published artefact
 is `compare5_final.json`, kept as a separate file so a rerun cannot silently
 overwrite the numbers this README quotes. Its `protocol.checkpoints` lists the
@@ -509,28 +451,27 @@ file and epoch every 4DVarNet member was scored at.
 [The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own)).
 A rerun should land within ~0.01 of these (4DVarNet rows carry the
 reproducibility floor described above). The figure `compare5.png` plots
-per-channel **MSE**, so its totals are these numbers squared — 0.329 there
-appears as 0.108.
+per-channel **MSE**, so its totals are these numbers squared — DINCAE's 0.227 there
+appears as 0.051.
 
-| Method | `defined` convention | `allcells` convention |
-|---|---|---|
-| DINCAE | 0.329 | **0.757** |
-| 4DVarNet MSE (one model: seed 3, validation-best) | 0.335 | 0.177 |
-| Senseiver | 0.343 | 0.168 |
-| EnKF | 0.368 | 0.215 |
+| Method | `walkable` RMSE |
+|---|---|
+| Senseiver | 0.222 |
+| DINCAE | 0.227 |
+| 4DVarNet MSE (one model: seed 3, validation-best) | 0.230 |
+| EnKF | 0.263 |
 
 The uncertainty designs `vsb0` and `aug0` are not in this table. What they cost
 in accuracy is in the [uncertainty table](#uncertainty-how-it-is-scored), next to
 the MSE ensemble they are measured against.
 
-Off by 2x or more means something is broken — check the convention first.
+Off by 2x or more means something is broken — check the scope first.
 
 ## Per-method diagnostics
 
 | Question | Script |
 |---|---|
 | DINCAE accuracy + sigma-hat calibration + variance retention | `methods.dincae.checks.evaluate` |
-| Does full-field supervision fix DINCAE's obstacle-region behaviour? | `methods.dincae.checks.measure_obstacle_region` |
 | Is a method's uncertainty better than "just guess the average error"? (CRPS/NLL/spread vs a constant-sigma null model) | `methods.dincae.checks.eval_uncertainty_dincae`, `methods.enkf.checks.eval_uncertainty_enkf`, `methods.varnet.checks.eval_uncertainty` |
 | Does the EnKF's ensemble sustain spread, or collapse? | `methods.enkf.checks.diag_enkf_spread_growth` |
 | 4DVarNet variational solver sanity (gradients, convergence) | `methods.varnet.checks.check_variational_solver` |
@@ -549,18 +490,13 @@ Density as a Blues heatmap, velocity as black heading arrows.
 sbatch sbatch/submit_plot_reconstruction.sbatch --day atc-20130811
 sbatch sbatch/submit_plot_reconstruction.sbatch --methods dincae,senseiver --day atc-20130818
 
-# N consecutive frames, one PNG per frame (for temporal consistency, or a video)
+# N consecutive frames, one PNG per frame (for temporal consistency)
 sbatch sbatch/submit_plot_reconstruction_sequence.sbatch --day atc-20130811 --n 5000
 ```
 
 Single frames land in `compare/results/reconstruction_<day>_<methods>.png`;
 sequences in `compare/results/seq_ppt_<day>/` (gitignored — 5000 frames is
-~600 MB, cheap to regenerate). To watch a sequence rather than scroll it:
-
-```bash
-ffmpeg -framerate 10 -i compare/results/seq_ppt_atc-20130811/frame_%05d.png \
-       -pix_fmt yuv420p compare/results/seq_ppt_atc-20130811.mp4
-```
+~600 MB, cheap to regenerate).
 
 ---
 
@@ -628,7 +564,7 @@ things, not one repo clone.
 | split lists | `data/sunday_atc_{train,valid,test}.lst` | a few KB |
 | the real ATC map | `.../robot_exploration/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.4 MB |
 | DINCAE normalisation stats | `methods/dincae/artifacts/state_stats.npz` | 17 KB (already in git) |
-| trained weights | the reported checkpoints only: the 15 `methods/varnet/runs/varnet_*_h96_s*/ckpt_<epoch>.pt` named in each run's `select_valid.json`, `methods/dincae/runs/dincae_full/ckpt_00070.pt`, `methods/senseiver/runs/senseiver_A/best.pt` | 0.54 GB |
+| trained weights | the reported checkpoints only: the 15 `methods/varnet/runs/varnet_*_h96_s*/ckpt_<epoch>.pt` named in each run's `select_valid.json`, `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, `methods/senseiver/runs/senseiver_A/best.pt` | 0.54 GB |
 | | **total** | **~1.0 GB** |
 
 **DINCAE needs that one extra small file that weights alone do not carry.**
@@ -645,29 +581,3 @@ external path but **not** a runtime dependency: the EnKF's byte-identical vendor
 copy already lives in-repo at `methods/enkf/enkf_lab/`. The original is
 referenced only for provenance checks and speed benchmarking.)
 
----
-
-# Troubleshooting
-
-- **`ModuleNotFoundError` on the first import** → you forgot
-  `source sbatch/_env.sh` in this shell.
-- **A number matches a *different* method's expected result** → you ran
-  `python3 methods/<x>/train.py` instead of `python3 -m methods.<x>.train`. The
-  three methods each ship their own `losses.py`/`dataset.py`/`model.py`; a bare
-  path puts that directory first on `sys.path` and silently imports the wrong
-  one. This is the single most common way to get a confusing result here.
-- **Numbers differ from another run of "the same" model** → check you are
-  comparing the same scoring convention, and that you are not comparing a
-  16-checkpoint DINCAE average against the single published checkpoint.
-- **`RuntimeError: CUDA not available` / training refuses to start** → you are on
-  the login node. Use `sbatch` or `srun -p gpu-debug --gres=gpu:1`. `--allow-cpu`
-  exists but is off by default on purpose: a silent CPU fallback under a GPU
-  allocation costs ~30x the wall-clock.
-- **`enkf_opt/` edits do nothing** → you may be editing `enkf_lab/`, the
-  read-only (chmod 444) byte-identical vendor copy. Edit `enkf_opt/`, then re-run
-  `methods.enkf.checks.verify_enkf_opt` to confirm it still matches.
-- **Still stuck** → every script's `--help` and module docstring documents its
-  own design decisions in detail; they are written to be read, not skimmed.
-  `methods/*/README.md` covers each method's deviations from its reference
-  implementation, and `methods/varnet/SUPERSEDED.md` records arms and
-  conclusions that no longer hold.

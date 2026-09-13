@@ -12,7 +12,7 @@
 # (USR1 received 1200s early), queues a successor first and resumes with --resume
 # (train.py saves last.pt, including optimizer state, every epoch).
 # Usage: sbatch sbatch/submit_train.sbatch [extra train.py args]
-#   Env vars: EPOCHS (default 200)  OUT (default runs/dincae_full)
+#   Env vars: EPOCHS (default 200)  OUT (default runs/dincae_ff)
 
 set -uo pipefail
 DIR=/scratch/work/zhangx29/Thesis_Project/methods/dincae
@@ -20,7 +20,7 @@ cd "$DIR"
 source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 
 EPOCHS=${EPOCHS:-200}
-OUT=${OUT:-$DIR/runs/dincae_full}
+OUT=${OUT:-$DIR/runs/dincae_ff}
 RESUME=""
 [ -f "$OUT/last.pt" ] && RESUME="--resume"
 

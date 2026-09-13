@@ -384,9 +384,9 @@ def main():
                          "together. Uses the k=1 observation file")
     ap.add_argument("--ens-members", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--out", default="")
-    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+    ap.add_argument("--dincae-ckpt", default="ckpt_00060.pt",
                     help="which DINCAE checkpoint to use -- defaults to the same "
-                         "one as the accuracy table (ep70, picked on the validation set)")
+                         "one as the accuracy table (runs/dincae_ff, ep60, picked on the validation set)")
     args = ap.parse_args()
     # imported here, like the other model_io imports in this file, not at module level
     from methods.varnet.checks.model_io import baseline_ckpt, reported_ckpt
@@ -440,7 +440,7 @@ def main():
     # DINCAE and Senseiver: per-frame methods, completing the four-way
     # comparison. If a checkpoint is missing, skip it with a note rather than
     # failing the whole benchmark over one missing file.
-    dinc_dir = os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full")
+    dinc_dir = os.path.join(paths.method(paths.DINCAE), "runs", "dincae_ff")
     dinc_ck = os.path.join(dinc_dir, args.dincae_ckpt)
     if os.path.exists(dinc_ck):
         jobs += [("dincae", f"DINCAE, 1 checkpoint ({args.dincae_ckpt})",

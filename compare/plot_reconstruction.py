@@ -155,8 +155,8 @@ def main():
     ap.add_argument("--varnet-ckpt", default=None,
                     help="default: the reported 4DVarNet model (model_io.baseline_ckpt) -- it used to be "
                          "runs/varnet_mse5_s0/varnet_best.pt, a hidden=32 run at a train-split-selected epoch")
-    ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_full"))
-    ap.add_argument("--dincae-ckpt", default="ckpt_00070.pt",
+    ap.add_argument("--dincae-run-dir", default=os.path.join(paths.method(paths.DINCAE), "runs", "dincae_ff"))
+    ap.add_argument("--dincae-ckpt", default="ckpt_00060.pt",
                     help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))

@@ -29,25 +29,15 @@ Two outputs feed two different tables:
     that is what its sigma-hat is computed from (eval_uncertainty.py, Sec. 2.4
     moment matching); an RMSE column there has to describe the same predictor.
 
-Why four conventions
+Why several conventions
 ----------------------
-**Rankings flip depending on the convention.** On the same predictions, under the
-"all cells" convention Senseiver comes first and DINCAE comes last, 4.5x worse;
-switch to "channel-defined cells" and DINCAE comes first, Senseiver third.
+The reported scope is `walkable` (blind cells inside the walkable region, all four
+channels). The others are computed alongside for reference only; they are not reported.
 
-The cause is in the velocity channels: an empty cell has no people and hence no
-velocity, and the `0` the data pipeline stores there is a placeholder, not a
-measurement -- and 88.4% of blind cells are empty. The three methods trained on
-the full field learned to output 0 on empty cells and get that part for free;
-DINCAE was only ever trained on defined cells and gets crushed by this term -- its
-`vy` is 0.1026 under its own convention and jumps to 1.6489 (16x) under the
-all-cells convention, while `vx` barely moves (0.546 -> 0.571). This asymmetry is
-a convention artifact, not a property of the model.
-
-So all four are computed side by side, making the difference visible in one piece
+They are computed side by side, making the difference visible in one piece
 of output rather than making the reader compare several jsons themselves:
 
-    (1) defined        blind ∩ defined ∩ walkable      the information form's own scope
+    (1) defined        blind ∩ defined ∩ walkable      channel-defined cells only    
     (2) defined_full   full field ∩ defined ∩ walkable includes observed cells
     (3) walkable       blind ∩ walkable                **the main result**: every cell of the
                                                        physical domain, empty ones included,
@@ -81,8 +71,9 @@ Convention details
 
 The DINCAE row
 -------------
-Read from `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`
--- the single epoch-70 checkpoint every published DINCAE number uses, not the
+Read from `methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json`
+-- runs/dincae_ff (full-field supervision) at the single epoch-60 checkpoint chosen on
+the validation split, which every published DINCAE number uses, not the
 16-checkpoint average in `check_outputs/eval/`. Its own evaluate.py happens to
 report exactly these four conventions, matching one-to-one
 (`ours_blind` / `ours_all` / `v4dvar_blind` / `v4dvar_all`). When combining into
@@ -308,8 +299,9 @@ def main():
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
                     default=os.path.join(paths.method(paths.DINCAE), "check_outputs",
-                                         "eval_single_00070", "dincae_metrics_test.json"),
-                    help="the PUBLISHED DINCAE row: the single epoch-70 checkpoint. "
+                                         "eval_ff_00060", "dincae_metrics_test.json"),
+                    help="the PUBLISHED DINCAE row: runs/dincae_ff (full-field supervision), the single "
+                         "epoch-60 checkpoint chosen on the validation split. "
                          "check_outputs/eval/ holds the 16-checkpoint average instead, "
                          "which is a different configuration from every other row here.")
     ap.add_argument("--days", type=int, default=0)

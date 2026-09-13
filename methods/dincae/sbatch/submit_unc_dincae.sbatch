@@ -16,5 +16,6 @@ cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
 # Defaults to the PUBLISHED configuration (single epoch-70 checkpoint), which is
 # what uncertainty_dincae.json holds. Without this, evaluate.load_models matches
 # all 16 ckpt_*.pt and refuses to average silently, so the entry point would fail.
-CKPT=/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_full/ckpt_00070.pt
-srun python3 -u -m methods.dincae.checks.eval_uncertainty_dincae --ckpt-glob "$CKPT" "$@"
+RUN=/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_ff
+CKPT=$RUN/ckpt_00060.pt
+srun python3 -u -m methods.dincae.checks.eval_uncertainty_dincae --run-dir "$RUN" --ckpt-glob "$CKPT" "$@"

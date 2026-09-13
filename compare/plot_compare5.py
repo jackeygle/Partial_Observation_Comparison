@@ -1,8 +1,8 @@
 """
-plot_compare5.py — the main results figure: 4 methods x 4 channels x 2 conventions
+plot_compare5.py — the main results figure: 4 methods x 4 channels, walkable scope
 
-Reads `compare/results/compare5_final.json`, draws one figure telling the whole main
-result, plus the fact that "the ranking flips".
+Reads `compare/results/compare5_final.json` and draws the reported result: blind cells
+inside the walkable region, per channel.
 
 **One model per method, no ensembling, no seed averaging.** DINCAE, Senseiver
 and the EnKF each contribute one model; 4DVarNet contributes the MSE seed whose
@@ -12,11 +12,7 @@ model would give it five times the training. The uncertainty designs (vsb0, aug0
 are not in this figure: they answer a different question and are compared, as
 ensembles, in the README's uncertainty table.
 
-Layout: **2 rows x 5 columns of small multiples**
-
-    rows = convention   top: channel-defined cells ∩ walkable ∩ blind (comparable across all five)
-                         bottom: all cells ∩ blind (the old convention, for reference)
-    columns = channel   density / vx / vy / var / total
+Layout: **1 row x 5 columns of small multiples** -- density / vx / vy / var / total.
 
 Why small multiples rather than a grouped bar chart: the four channels differ by
 an order of magnitude (vx 0.50, var 0.04). On a shared y-axis, the density/vy/var
@@ -26,16 +22,8 @@ giving an impression opposite to the data. One panel per channel with its own
 y-axis compares "who wins within this channel," which is exactly the information
 to convey. That panels are not comparable to each other is stated in the subtitle.
 
-Why the two rows must be in one figure: **the ranking flips with the convention**
-(top row DINCAE first, bottom row it comes last, 12x worse). Splitting into two
-figures in different sections would leave the reader believing "the ranking
-flips" only because the text says so; side by side, the flip is visible.
-
-The y-axis is always linear, auto-scaled per panel, never log, never truncated. In
-the bottom row's vy panel DINCAE is 1.65 while the rest are 0.02, so the other four
-bars sit nearly flat against the axis -- that is simply the fact, and every bar has
-its value labelled on top, so no information is lost. Switching to log to make the
-small bars look nicer would soften the "80x difference" conclusion.
+The y-axis is always linear, auto-scaled per panel, never log, never truncated, and every
+bar has its value labelled on top.
 
 Usage (the login node is fine, pure matplotlib):
     source sbatch/_env.sh
@@ -63,8 +51,7 @@ ROWS = [
 ]
 
 PANELS = [
-    ("defined",  "channel-defined cells\n(blind, walkable)"),
-    ("allcells", "all cells\n(blind, old convention)"),
+    ("walkable", "walkable cells"),
 ]
 
 
@@ -159,7 +146,9 @@ def main():
         "Each panel has its own y axis: the four channels differ by an order of magnitude, "
         "so a shared axis would flatten density/vy/var under vx. Panels are not comparable "
         "to each other.",
-        fontsize=ps.FS_TICK, color=ps.INK_MUTED, y=1.04)
+        # With a single row the figure is short, so a fixed y=1.04 put the third subtitle line on
+        # top of the panel titles. Push it up by an amount that shrinks as rows are added.
+        fontsize=ps.FS_TICK, color=ps.INK_MUTED, y=1.04 + 0.16 / len(PANELS))
 
     ps.save(fig, args.out)
 

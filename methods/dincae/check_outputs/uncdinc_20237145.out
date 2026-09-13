@@ -1,0 +1,36 @@
+[members] 1 checkpoints: epochs [60]  dev=cuda
+  atc-20130811_corridor_1.0s.h5  39819 frames
+  atc-20130818_corridor_1.0s.h5  38883 frames
+  atc-20130825_corridor_1.0s.h5  42888 frames
+  atc-20130901_corridor_1.0s.h5  39756 frames
+  atc-20130915_corridor_1.0s.h5  39381 frames
+  atc-20130922_corridor_1.0s.h5  38840 frames
+  atc-20130929_corridor_1.0s.h5  37962 frames
+
+[pass 2] constant-sigma baseline, sigma = all 0.3819, blind 0.4305, defined 0.6716, defined_blind 0.8717, walkable 0.4551, walkable_blind 0.5642
+
+split                                 RMSE     CRPS   sigma   sp/sk   cov90
+all                                 0.3819   0.1115  0.2013   0.527   95.5%
+blind                               0.4305   0.1220  0.2279   0.529   96.2%
+observed                            0.3180   0.0996  0.1712   0.538   94.7%
+defined                             0.6716   0.2675  0.3985   0.593   88.5%
+defined_blind                       0.8717   0.3726  0.5302   0.608   86.4%
+defined_observed                    0.4930   0.1967  0.3098   0.628   89.9%
+walkable                            0.4551   0.1499  0.2689   0.591   94.1%
+walkable_blind                      0.5642   0.1948  0.3612   0.640   94.3%
+channel_density                     0.5310   0.1481  0.2691   0.507   96.4%
+channel_vx                          0.3022   0.1046  0.1802   0.596   94.1%
+channel_vy                          0.3213   0.1193  0.2189   0.681   94.7%
+channel_var                         0.3271   0.0739  0.1370   0.419   96.8%
+defined_channel_density             0.7848   0.2714  0.4972   0.633   95.3%
+defined_channel_vx                  0.9503   0.5895  0.5855   0.616   63.2%
+defined_channel_vy                  1.0084   0.5911  0.5820   0.577   67.5%
+defined_channel_var                 1.0276   0.4216  0.5826   0.567   86.3%
+all_constant_sigma_baseline         0.3819   0.1628  0.3819   1.000   94.0%
+blind_constant_sigma_baseline       0.4305   0.1817  0.4305   1.000   93.9%
+defined_constant_sigma_baseline     0.6716   0.3235  0.6716   1.000   92.1%
+defined_blind_constant_sigma_baseline  0.8717   0.4323  0.8717   1.000   92.3%
+walkable_constant_sigma_baseline    0.4551   0.2019  0.4551   1.000   93.2%
+walkable_blind_constant_sigma_baseline  0.5642   0.2542  0.5642   1.000   92.5%
+
+[out] /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval/uncertainty_dincae.json

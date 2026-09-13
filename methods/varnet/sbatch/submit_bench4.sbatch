@@ -14,5 +14,5 @@ source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 srun python3 -u -m compare.bench_speed --frames 1000 --repeats 5 \
      --ens-fmt "runs/varnet_vsb0_s{}" --ens-members 0 1 2 3 4 \
-     --dincae-ckpt ckpt_00070.pt \
+     --dincae-ckpt ckpt_00060.pt \
      --out check_outputs/eval/bench_speed_four.json

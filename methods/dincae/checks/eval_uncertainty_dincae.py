@@ -5,16 +5,12 @@ as the other three methods
 
 Why this script is needed
 ------------------
-DINCAE is the **only method besides 4DVarNet that natively outputs a variance**
-(the second slice of the information form IS the precision 1/sigma^2), but its own
-`evaluate.py` only reports `calibration` (predicted-SD-binned vs. actual RMS) and
-`var_retention` -- that is the geoscience-inpainting community's convention, and
-matches none of table B's CRPS / spread-skill / coverage / constant-sigma
-baseline. So DINCAE had always been missing from table B, while a rough estimate
-from its calibration block already puts its spread/skill at ~0.84, the closest to
-1.0 of any method. Without filling this gap, the conclusion "uncertainty built
-natively into the model vs. bolted on afterwards as a read-out head" is missing
-its most important data point.
+DINCAE is the only method besides 4DVarNet whose network outputs a variance (the
+model's second output slice is the precision 1/sigma^2, see `model.py`). Its own
+`evaluate.py` reports only `calibration` (predicted-SD-binned vs. actual RMS) and
+`var_retention` -- the geoscience-inpainting convention, which matches none of the
+uncertainty table's CRPS / spread-skill / coverage / constant-sigma null model.
+This script scores it on those metrics.
 
 Which space the scoring happens in
 ------------------
@@ -42,34 +38,22 @@ space. So:
   * **coverage is strictly comparable** -- a monotonic transform preserves
     "whether the truth falls inside the interval," so log1p has no effect on it.
 
-Why only the defined slice matters (don't use the all/blind rows)
-------------------------------------------------------
-Measured (ckpt_00070, 1 day): in normalised space, `channel_vy`'s all-cells RMSE
-is **63.09**, while `defined_channel_vy` is only **1.02**. The difference is not
-a bug -- `evaluate.py`'s physical metrics go through `clip_bounds` (physical
-priors like density>=0, var in [0,2]), which is absent here, because clipping
-would change mu without changing sigma, breaking the Gaussian assumption. So
-DINCAE's unconstrained raw output on undefined cells goes straight into the
-average, and a handful of extreme values dominate the whole slice.
-
-This is itself the phenomenon table A records (DINCAE is 4.5x worse under the
-all-cells convention), but it means the all/blind slices have no comparative
-value for **uncertainty**. **The main table only uses `defined_*`**, the rest go
-into the json for reference.
-
-Main convention
+Reported scope
 ------
-`defined ∩ walkable ∩ blind`, the same cells as table A's main convention
-(`channel_valid` ∩ `stats.valid`). all/observed and per-channel are also
-reported, along with each slice's **own** constant-sigma baseline -- the baseline
-must use that slice's own RMSE; using the full-field RMSE as the baseline for a
-blind slice would put the metric and its baseline on two different cell sets.
+`walkable_blind`: blind cells inside the walkable region, all four channels, empty
+cells included -- the same cells as the other methods' uncertainty rows. The other
+slices (all, blind, defined_*, per-channel) go into the json for reference only.
+
+No physical clipping is applied here: clipping would change mu without changing
+sigma, breaking the Gaussian assumption. Each slice is scored against its **own**
+constant-sigma null model (sigma = that slice's RMSE) -- using another slice's RMSE
+would put the metric and its null model on two different cell sets.
 
 Usage:
     source sbatch/_env.sh
     cd methods/dincae
     python3 -u -m methods.dincae.checks.eval_uncertainty_dincae \\
-        --ckpt-glob "$PWD/runs/dincae_full/ckpt_00070.pt"
+        --run-dir "$PWD/runs/dincae_ff" --ckpt-glob "$PWD/runs/dincae_ff/ckpt_00060.pt"
 """
 from __future__ import annotations
 
@@ -89,14 +73,14 @@ from methods.dincae.state import CHANNELS, NCH, StateStats, channel_valid, fwd_c
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_full"))
+    ap.add_argument("--run-dir", default=os.path.join(ROOT, "runs", "dincae_ff"))
     ap.add_argument("--ckpt-glob", default="",
                     help="the glob is a **full path pattern**, not relative to "
                          "run-dir (matching evaluate.load_models's behaviour). "
                          "Left empty it matches every ckpt_*.pt under run-dir, "
                          "which now requires --average-checkpoints rather than "
                          "averaging silently. The published uncertainty_dincae.json "
-                         "used a single checkpoint (epoch 70).")
+                         "used a single checkpoint (epoch 60 of runs/dincae_ff).")
     ap.add_argument("--average-checkpoints", action="store_true",
                     help="average the outputs of every matched checkpoint. Off by default: "
                          "not the configuration any reported number uses.")
@@ -121,7 +105,8 @@ def main():
     # Slices: two conventions x three scopes, plus per-channel. The
     # constant-sigma baseline needs a second pass, so only the real metrics are
     # accumulated first.
-    tags = ["all", "blind", "observed", "defined", "defined_blind", "defined_observed"]
+    tags = ["all", "blind", "observed", "defined", "defined_blind", "defined_observed",
+            "walkable", "walkable_blind"]
     acc = {t: su.Accumulator() for t in tags}
     acc |= {f"channel_{c}": su.Accumulator() for c in CHANNELS}
     acc |= {f"defined_channel_{c}": su.Accumulator() for c in CHANNELS}
@@ -130,15 +115,19 @@ def main():
     files = om.split_files(args.split)[:args.days] if args.days else om.split_files(args.split)
 
     def slices(Xt, M):
-        """Returns {tag: (NCH,n,H,W) bool}. cv/walk come from the same source as table A's main convention."""
+        """Returns {tag: (NCH,n,H,W) bool}. cv/walk come from the same source as compare5's scopes."""
         cv = channel_valid(Xt)                       # (NCH,n,H,W)
         walk = stats.valid[None][None]               # (1,1,H,W) -> broadcasts
         dfn = cv & walk
         blind = ~M.transpose(1, 0, 2, 3)             # (NCH,n,H,W)
         obs = ~blind
         one = np.ones_like(blind)
+        # walkable = the reported scope: every cell of the walkable region, empty ones included,
+        # map-obstacle cells excluded -- the same cells as compare5's `walkable`.
+        wk = np.broadcast_to(walk, blind.shape)
         return {"all": one, "blind": blind, "observed": obs,
-                "defined": dfn, "defined_blind": dfn & blind, "defined_observed": dfn & obs}
+                "defined": dfn, "defined_blind": dfn & blind, "defined_observed": dfn & obs,
+                "walkable": wk, "walkable_blind": wk & blind}
 
     def day(fp):
         """One day -> (mu_n, sd, tgt, slices). Target moved to normalised space, same convention as encode_target."""
@@ -171,7 +160,8 @@ def main():
     # float32 arrays plus six bool masks is about 1.24 GB/day, 8.7 GB for seven
     # days. Rerunning inference costs only about 3 more minutes of GPU, cheaper
     # than carrying that memory around.
-    base_tags = [t for t in ("all", "blind", "defined", "defined_blind") if t in res]
+    base_tags = [t for t in ("all", "blind", "defined", "defined_blind", "walkable", "walkable_blind")
+                 if t in res]
     bacc = {t: su.Accumulator() for t in base_tags}
     print("\n[pass 2] constant-sigma baseline, sigma = "
           + ", ".join(f"{t} {res[t]['rmse']:.4f}" for t in base_tags), flush=True)

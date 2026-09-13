@@ -95,7 +95,12 @@ def main():
         if not ests:
             print(f"[k={k}] no est_*.npz in {d} — skipped"); continue
         acc = {t: Acc() for t in ["all", "blind", "observed",
-                                  "defined", "defined_blind", "defined_observed"]}
+                                  "defined", "defined_blind", "defined_observed",
+                                  "walkable", "walkable_blind"]}
+        # walkable = the reported scope: every cell of the walkable region, empty ones
+        # included, map-obstacle cells excluded -- the same cells as compare5's `walkable`.
+        from crowdcore import navigation as nav
+        WALK = nav.build_valid_mask_from_config()[None, None].astype(bool)
         acc |= {f"channel_{c}": Acc() for c in channels}
         days = 0
         for nm_, Est, S, X, Om in days_of(ests):
@@ -109,6 +114,9 @@ def main():
             acc["defined"].add(Est[D], S[D], X[D])
             acc["defined_blind"].add(Est[D & ~Om], S[D & ~Om], X[D & ~Om])
             acc["defined_observed"].add(Est[D & Om], S[D & Om], X[D & Om])
+            W = np.broadcast_to(WALK, Om.shape)
+            acc["walkable"].add(Est[W], S[W], X[W])
+            acc["walkable_blind"].add(Est[W & ~Om], S[W & ~Om], X[W & ~Om])
             for c, nm in enumerate(channels):
                 acc[f"channel_{nm}"].add(Est[:, c], S[:, c], X[:, c])
             days += 1
@@ -121,7 +129,8 @@ def main():
         # skips the per-channel work.
         if args.const_baseline:
             cs = {t: acc[t].result()["rmse"]
-                  for t in ("all", "blind", "defined", "defined_blind") if acc[t].result()}
+                  for t in ("all", "blind", "defined", "defined_blind", "walkable", "walkable_blind")
+                  if acc[t].result()}
             for t in cs:
                 acc[f"{t}_constant_sigma_baseline"] = Acc()
             print(f"  [k={k}] second pass, constant sigma = "
@@ -135,7 +144,9 @@ def main():
                     acc["blind_constant_sigma_baseline"].add(
                         Eb, np.full_like(Eb, cs["blind"]), X[~Om])
                 D = _defined(X)
-                for t, sel in (("defined", D), ("defined_blind", D & ~Om)):
+                W = np.broadcast_to(WALK, Om.shape)
+                for t, sel in (("defined", D), ("defined_blind", D & ~Om),
+                               ("walkable", W), ("walkable_blind", W & ~Om)):
                     if t in cs:
                         E = Est[sel]
                         acc[f"{t}_constant_sigma_baseline"].add(

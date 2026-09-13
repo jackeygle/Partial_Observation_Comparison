@@ -201,6 +201,14 @@ def main():
         # each slice's own constant-sigma null model -- the baseline must use **that slice's** RMSE
         cb = torch.full_like(x[sel], float(torch.sqrt(((x[sel] - mu[sel]) ** 2).mean())))
         score(mu[sel], cb, x[sel], f"{tag}_constant_sigma_baseline", R)
+    # ---- Reported convention: walkable = every cell of the walkable region, empty ones
+    # included, map-obstacle cells excluded. The same cells as compare5's `walkable`, so the
+    # accuracy table and the uncertainty table score one cell set.
+    wk = walk.expand(x.shape)
+    for tag, sel in (("walkable", wk), ("walkable_blind", wk & blind)):
+        score(mu[sel], C["sig_tot"][sel], x[sel], tag, R)
+        cb = torch.full_like(x[sel], float(torch.sqrt(((x[sel] - mu[sel]) ** 2).mean())))
+        score(mu[sel], cb, x[sel], f"{tag}_constant_sigma_baseline", R)
     # Same null model, but restricted to the blind cells. The headline accuracy table scores
     # blind cells only, so a sigma-hat judged on blind cells has to be compared against a
     # baseline built from the BLIND rmse -- reusing the global one above would put the metric
