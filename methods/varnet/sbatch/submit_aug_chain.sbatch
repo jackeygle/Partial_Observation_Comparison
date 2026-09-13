@@ -4,10 +4,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # AUG — log sigma^2 is ITERATED as part of the solver state, not read off a hidden layer.
 #
-# Usage:  sbatch --job-name=varnet_aug0_s0 sbatch/submit_aug_chain.sbatch 0 0
+# Usage:  sbatch --job-name=varnet_aug0_s0 methods/varnet/sbatch/submit_aug_chain.sbatch 0 0
 #         (args: init seed, nll beta [ignored], generation [internal])
 #
 # STATUS 2026-09-03: this configuration DOES NOT TRAIN. 251 jobs were submitted between
@@ -23,7 +23,7 @@
 #
 # RUN IT WITHOUT THE CHAIN FIRST:
 #     sbatch --export=ALL,NOCHAIN=1 --job-name=varnet_aug0_s0 --time=00:35:00 \
-#            sbatch/submit_aug_chain.sbatch 0 0
+#            methods/varnet/sbatch/submit_aug_chain.sbatch 0 0
 #   NOCHAIN=1 skips only the successor submission; training still runs, so the failure lands
 #   in one log instead of two hundred and fifty missing ones.
 #
@@ -37,8 +37,8 @@
 # used to sit here; it argued the OPPOSITE -- that sigma^2 should stay out of the
 # iterated state -- because this file was copied from that one. Removed 2026-09-03.)
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
 # AUGMENTED STATE: log sigma^2 is iterated as part of the state, not read off a hidden layer.
 #
@@ -78,7 +78,7 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_aug0_sM sbatch/submit_aug_chain.sbatch <seed> 0}
+S=${1:?usage: sbatch --job-name=varnet_aug0_sM methods/varnet/sbatch/submit_aug_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=aug0   # BETA ignored; the loss is Eq.1 as written
 OUTDIR=runs/varnet_${TAG}_h96_s${S}
@@ -115,9 +115,11 @@ mkdir -p "$OUTDIR" && echo "$EPOCH_NOW" > "$STAMP"
 if [ "${NOCHAIN:-0}" = "1" ]; then
     echo "[chain] NOCHAIN=1 -- running only this segment, no successor queued"
 else
+    cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
     sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME \
            --dependency=afterany:$SLURM_JOB_ID \
-           sbatch/submit_aug_chain.sbatch $S $BETA $((GEN+1))
+           methods/varnet/sbatch/submit_aug_chain.sbatch $S $BETA $((GEN+1))
+    cd "$THESIS_ROOT/methods/varnet"
     echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 fi
 

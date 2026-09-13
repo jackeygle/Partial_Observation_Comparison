@@ -6,25 +6,25 @@
 #SBATCH --mem=64G
 #SBATCH --time=1-00:00:00
 #SBATCH --signal=B:USR1@1200
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/slurm_%x_%j.out
+#SBATCH --output=methods/dincae/runs/slurm_%x_%j.out
 #
 # Self-chaining: exits normally once --epochs is reached; if close to the wall clock
 # (USR1 received 1200s early), queues a successor first and resumes with --resume
 # (train.py saves last.pt, including optimizer state, every epoch).
-# Usage: sbatch sbatch/submit_train.sbatch [extra train.py args]
+# Usage: sbatch methods/dincae/sbatch/submit_train.sbatch [extra train.py args]
 #   Env vars: EPOCHS (default 200)  OUT (default runs/dincae_ff)
 
 set -uo pipefail
-DIR=/scratch/work/zhangx29/Thesis_Project/methods/dincae
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+DIR="$THESIS_ROOT/methods/dincae"
 cd "$DIR"
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
 
 EPOCHS=${EPOCHS:-200}
 OUT=${OUT:-$DIR/runs/dincae_ff}
 RESUME=""
 [ -f "$OUT/last.pt" ] && RESUME="--resume"
 
-chain() { EPOCHS="$EPOCHS" OUT="$OUT" sbatch "$0" "$@" || true; }
+chain() { (cd "$THESIS_ROOT" && EPOCHS="$EPOCHS" OUT="$OUT" sbatch methods/dincae/sbatch/submit_train.sbatch "$@") || true; }
 trap 'echo "[chain] close to wall clock, queuing successor"; chain "$@"' USR1
 
 python3 -u -m methods.dincae.train --amp --epochs "$EPOCHS" --out "$OUT" $RESUME "$@" &

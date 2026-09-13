@@ -10,10 +10,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # ML5 — one member of a deep ensemble (Lakshminarayanan et al. 2017, arXiv:1612.01474).
 #
-# Usage:  sbatch --job-name=varnet_ml5_s0 sbatch/submit_ml5_chain.sbatch 0
+# Usage:  sbatch --job-name=varnet_ml5_s0 methods/varnet/sbatch/submit_ml5_chain.sbatch 0
 #         ...                        s1                                  1   ... up to s4
 #         (second argument is --init-seed; k is fixed at 1, see below)
 #
@@ -40,7 +40,7 @@
 # with observation noise.
 #
 # NOTE these runs were trained when VarianceHead still had a per-channel sigma^2 floor. The
-# floor has since been removed from the model; sbatch/submit_nf5_chain.sbatch is the retrained
+# floor has since been removed from the model; methods/varnet/sbatch/submit_nf5_chain.sbatch is the retrained
 # version without it. These checkpoints still load, with the stale buffer dropped.
 #
 # --nll-beta 1.0, not the paper's Eq.1 as written (beta=0). The first attempt at beta=0 was
@@ -62,8 +62,8 @@
 #                 finishes OR is killed at the time limit;
 #             (3) train with --resume.
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
 # GENERATION CAP. The successor is submitted BEFORE training starts, so that a job killed by
 # the time limit still has one queued. The cost is that a job which crashes in the first second
@@ -78,7 +78,7 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_ml5_sN sbatch/submit_ml5_chain.sbatch <init_seed>}
+S=${1:?usage: sbatch --job-name=varnet_ml5_sN methods/varnet/sbatch/submit_ml5_chain.sbatch <init_seed>}
 # k=1 only for now: the EnKF reliability diagram we compare against was computed at k=1, and
 # doing both k would double an already 79-GPU-hour experiment. k=4 is a follow-up.
 K=1
@@ -98,8 +98,10 @@ fi
 # one's environment and then runs `module load` again, so PATH and LD_LIBRARY_PATH gain one
 # more copy of the module's paths per generation. After ~6 generations the environment
 # exceeded ARG_MAX and every command failed with "Argument list too long".
+cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
 sbatch --export=NONE --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_ml5_chain.sbatch $S
+       methods/varnet/sbatch/submit_ml5_chain.sbatch $S
+cd "$THESIS_ROOT/methods/varnet"
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # (3) train. --init-seed varies, --data-seed pinned to 0 across all members.

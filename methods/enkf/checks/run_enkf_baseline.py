@@ -37,10 +37,9 @@ ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 PROC_STD = (0.02829307, 0.31263075, 0.12325809, 0.41680932)
 INIT_STD = (0.2290, 1.2660, 0.3429, 0.0259)
 
-# Which copy of the EnKF to drive. All three expose the same package layout (an in-package
+# Which copy of the EnKF to drive. Both copies expose the same package layout (an in-package
 # `pedpred -> .` symlink, so the filter's own relative imports resolve) and, by construction,
 # the same numerics — `opt` is verified bit-identical to `lab` before use.
-#   orig : /scratch/work/zhangx29/Partial_observation — the untouched original project
 #   lab  : enkf_lab  — pristine vendored copy of it, read-only, the correctness reference
 #   opt  : enkf_opt  — same numerics, optimised: _localization_matrix vectorised (round 1, 18x;
 #                      the original spent 96% of runtime in that one Python quadruple loop) plus
@@ -50,12 +49,11 @@ INIT_STD = (0.2290, 1.2660, 0.3429, 0.0259)
 #                      switches the gain to its Woodbury form: ~2.4x faster again, and the same
 #                      gain, but a different rounding — see enkf_opt/README.md before using it
 #                      for anything that gets reported.
-SRC = {"orig": "/scratch/work/zhangx29/Partial_observation",
-       "lab": os.path.join(ROOT, "enkf_lab"),
+SRC = {"lab": os.path.join(ROOT, "enkf_lab"),
        "opt": os.path.join(ROOT, "enkf_opt")}
 # Resolved before argparse because the import has to happen at module level; argparse still
 # declares --enkf-src so it shows up in --help and is validated there.
-_src = "orig"
+_src = "lab"
 for _i, _a in enumerate(sys.argv):
     if _a == "--enkf-src" and _i + 1 < len(sys.argv):
         _src = sys.argv[_i + 1]
@@ -125,9 +123,8 @@ def main():
     ap.add_argument("--radius", type=int, default=7)
     ap.add_argument("--only", default="")
     ap.add_argument("--dir", default=ENKFDIR, help="dir holding obs_*.npz to read and est_*.npz to write")
-    ap.add_argument("--enkf-src", default="orig", choices=sorted(SRC),
-                    help="drive which copy of the EnKF: orig=Partial_observation (untouched), "
-                         "lab=enkf_lab (pristine vendored copy), opt=enkf_opt (optimised, "
+    ap.add_argument("--enkf-src", default="lab", choices=sorted(SRC),
+                    help="drive which copy of the EnKF: lab=enkf_lab (pristine vendored copy), opt=enkf_opt (optimised, "
                          "verified bit-identical to lab; ENKF_GAIN_MODE=ensemble makes it "
                          "faster still at a different rounding)")
     ap.add_argument("--timing", default="", help="if set, also save per-frame cumulative wall time to this JSON path")

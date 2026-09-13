@@ -5,15 +5,15 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=48G
 #SBATCH --time=01:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/slurm_%x_%j.out
+#SBATCH --output=methods/dincae/runs/slurm_%x_%j.out
 
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/dincae"
 # Defaults to the PUBLISHED configuration: runs/dincae_ff (full-field supervision), the
 # single epoch-60 checkpoint chosen on the validation split (select_dincae_ff_valid.json).
 # --run-dir is passed explicitly: evaluate.py records it in the JSON, and a default left
 # pointing elsewhere once labelled this very result with the wrong run.
-ROOT=/scratch/work/zhangx29/Thesis_Project
+ROOT="$THESIS_ROOT"
 RUN="$ROOT/methods/dincae/runs/dincae_ff"
 python3 -u -m methods.dincae.checks.evaluate --run-dir "$RUN" --ckpt-glob "$RUN/ckpt_00060.pt" \
         --out "$ROOT/methods/dincae/check_outputs/eval_ff_00060" "$@"

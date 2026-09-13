@@ -1,0 +1,15 @@
+# Python 3.12. Pinned to the versions in Aalto Triton's scicomp-pytorch-env/2026.1 module,
+# which sbatch/_env.sh loads and which produced every reported number.
+torch==2.10.0
+numpy==2.4.2
+scipy==1.17.1
+h5py==3.15.1
+matplotlib==3.10.8
+pillow==12.1.1
+PyYAML==6.0.3
+einops==0.8.2
+tqdm==4.67.3
+# used by the vendored EnKF code (methods/enkf/enkf_*/pedpred)
+gpytorch==1.15.2
+ConfigArgParse==1.7.5
+# not listed: moviepy, imported by pedpred/grid.py only inside plot_anim(), which nothing here calls

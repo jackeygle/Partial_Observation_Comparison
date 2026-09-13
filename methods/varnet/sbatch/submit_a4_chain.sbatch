@@ -4,10 +4,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # A4 — the widest prior tried, as a capacity control for A2.
 #
-# Usage:  sbatch --job-name=varnet_a4_k1 sbatch/submit_a4_chain.sbatch 1
+# Usage:  sbatch --job-name=varnet_a4_k1 methods/varnet/sbatch/submit_a4_chain.sbatch 1
 #
 # ONE variable against runs/varnet_a2_k{K}: hidden 64 -> 96.
 #
@@ -18,10 +18,10 @@
 # so that b0's 2% deficit against A2 can be read as "the prior is saturated here" rather
 # than "we did not make it big enough". Neither A2 nor A4 buys enough to displace b0.
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
-K=${1:?usage: sbatch --job-name=varnet_a4_kN sbatch/submit_a4_chain.sbatch <obs_every_k>}
+K=${1:?usage: sbatch --job-name=varnet_a4_kN methods/varnet/sbatch/submit_a4_chain.sbatch <obs_every_k>}
 OUTDIR=runs/varnet_a4_k${K}
 EPOCHS=100
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
@@ -39,8 +39,10 @@ fi
 # more copy of the module's paths per generation. After ~6 generations the environment
 # exceeded ARG_MAX and every command failed with "Argument list too long" — that is how the
 # first C1 attempt died at epoch 59.
+cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
 sbatch --export=NONE --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_a4_chain.sbatch $K
+       methods/varnet/sbatch/submit_a4_chain.sbatch $K
+cd "$THESIS_ROOT/methods/varnet"
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # (3) train — no --lstm-hidden on purpose (solver stays at the config default, identical to

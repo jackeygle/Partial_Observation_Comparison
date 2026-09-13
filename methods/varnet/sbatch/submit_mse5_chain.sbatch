@@ -4,18 +4,18 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # MSE5 — the MSE arm of the three-way uncertainty comparison.
 #
-# Usage:  sbatch --job-name=varnet_mse5_s0 sbatch/submit_mse5_chain.sbatch 0 0
+# Usage:  sbatch --job-name=varnet_mse5_s0 methods/varnet/sbatch/submit_mse5_chain.sbatch 0 0
 #         (args: init seed, beta [ignored], generation [internal])
 #
 # Lines 8-35 of this file used to hold submit_vs_chain.sbatch's rationale verbatim -- the
 # file was copied from that one and the header was never rewritten, so it argued about a
 # sigma^2 read-out that this run does not have. Removed 2026-09-09.
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
 # The MSE arm of the three-way comparison, and Lakshminarayanan et al.'s own Table 2 baseline:
 # M networks trained on the plain squared loss, whose uncertainty is the EMPIRICAL VARIANCE
@@ -43,7 +43,7 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_mse5_sM sbatch/submit_mse5_chain.sbatch <seed> 0}
+S=${1:?usage: sbatch --job-name=varnet_mse5_sM methods/varnet/sbatch/submit_mse5_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=mse5   # BETA is ignored here; kept so the chain's argument list is unchanged
 OUTDIR=runs/varnet_${TAG}_h96_s${S}
@@ -63,8 +63,10 @@ fi
 # placed there falls back to CPU. TRANSIENT -- remove this once the node is healthy. The real
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
+cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
 sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1))
+       methods/varnet/sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1))
+cd "$THESIS_ROOT/methods/varnet"
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # PRIOR WIDTH. hidden 32 -> 96, kt 3 -> 5: the configuration runs/varnet_a4_k1 was trained

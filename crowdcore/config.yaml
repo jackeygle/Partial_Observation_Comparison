@@ -23,7 +23,7 @@ grid:                                        # grid conventions (determined by t
   period: 1.0                                # seconds/frame (T window unit = 1 s, confirmed with supervisor)
 
 navigation:                                  # walkable area (valid mask) — straight from the REAL ATC map
-  map_dir: /scratch/work/zhangx29/project_analysis/partial_observation_experiments/shared_workspace/robot_exploration/atc_map
+  map_dir: crowdcore/assets/atc_map                 # in the repo; a relative path is resolved against the repo root
   # Supervisor's rule (Maryam, 2026-07): keep the map at the SAME 1 m resolution as the
   #   state; a 1 m cell is an OBSTACLE iff >=50% of it is obstacle (uniform 50%
   #   occupancy threshold). Obstacle pixels follow ROS semantics (as in the original

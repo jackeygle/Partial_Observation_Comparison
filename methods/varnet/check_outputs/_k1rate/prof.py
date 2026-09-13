@@ -1,5 +1,5 @@
 import cProfile, pstats, sys, os, io
-sys.path.insert(0, "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf")
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..")))  # repo root
 sys.argv = ["run_enkf_baseline.py", "--dir", "check_outputs/_k1rate", "--frames", "20"]
 import runpy
 pr = cProfile.Profile(); pr.enable()

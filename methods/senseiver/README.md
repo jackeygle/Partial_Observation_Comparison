@@ -23,19 +23,19 @@ reason.
 ## End to end
 
 ```bash
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/methods/senseiver
+cd path/to/this/repo && source sbatch/_env.sh   # the repo root; module load + PYTHONPATH
+cd methods/senseiver            # python below runs from here; sbatch from the repo root
 
 # 1. Self-check (GPU node, ~1 minute)
 srun -p gpu-debug --gres=gpu:1 -t 00:14:00 --mem=16G bash -c \
   'module load scicomp-pytorch-env/2026.1; python3 -u checks/check_model.py; python3 -u checks/check_sensors.py'
 
 # 2. Training (self-chains to 100 epochs)
-sbatch sbatch/submit_train.sbatch
+(cd ../.. && sbatch methods/senseiver/sbatch/submit_train.sbatch)
 #   -> runs/senseiver_A/{last.pt, best.pt, metrics.jsonl}
 
 # 3. Evaluate on the 7 held-out days (convention exactly matches 4DVarNet / EnKF)
-sbatch sbatch/submit_eval.sbatch --ckpt runs/senseiver_A/best.pt --tag _test
+(cd ../.. && sbatch methods/senseiver/sbatch/submit_eval.sbatch --ckpt runs/senseiver_A/best.pt --tag _test)
 #   -> check_outputs/eval/senseiver_metrics_test.json
 ```
 

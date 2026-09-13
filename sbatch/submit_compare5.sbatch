@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=128G
 #SBATCH --time=0-02:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/compare/results/slurm_%x_%j.out
+#SBATCH --output=compare/results/slurm_%x_%j.out
 # Per-channel comparison across five methods, four cell-scope conventions side by side.
 #
 # This job script lives in the top-level sbatch/, not under any one method's sbatch/:
@@ -20,7 +20,7 @@
 #   sbatch sbatch/submit_compare5.sbatch                          # full run
 #   sbatch sbatch/submit_compare5.sbatch --days 1 --ensembles ""  # smoke test
 set -euo pipefail
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
 cd "$THESIS_ROOT"
 mkdir -p compare/results
 python3 -u -m compare.compare5 "$@"

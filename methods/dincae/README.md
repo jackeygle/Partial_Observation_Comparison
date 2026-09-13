@@ -72,8 +72,8 @@ Inside `checks/`:
 ## End to end
 
 ```bash
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/methods/dincae
+cd path/to/this/repo && source sbatch/_env.sh   # the repo root; module load + PYTHONPATH
+cd methods/dincae               # python below runs from here; sbatch from the repo root
 
 # 1. Per-cell statistics (once; pure numpy/scipy, login node is fine, ~8 minutes)
 python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
@@ -82,13 +82,13 @@ python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
 python3 -m methods.dincae.checks.check_encoding   # expect PASS
 
 # 3. Training (GPU node)
-sbatch sbatch/submit_train.sbatch            # 200 epochs, self-chaining + --resume
+(cd ../.. && sbatch methods/dincae/sbatch/submit_train.sbatch) # 200 epochs, self-chaining + --resume
 #   -> runs/dincae_ff/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
 #   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 
 # 4. Evaluation (GPU node)
 python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff   # pick the epoch on validation
-sbatch sbatch/submit_eval.sbatch --split test
+(cd ../.. && sbatch methods/dincae/sbatch/submit_eval.sbatch --split test)
 #   -> check_outputs/eval_ff_00060/dincae_metrics_test.json
 #   (the PUBLISHED configuration: runs/dincae_ff at the single epoch-60 checkpoint
 #    chosen on the validation split. Averaging checkpoints needs an explicit

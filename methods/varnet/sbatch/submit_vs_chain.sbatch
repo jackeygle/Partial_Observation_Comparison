@@ -4,10 +4,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # VS — sigma^2 from the solver's SECOND OUTPUT LAYER, read from [h, x_hat.detach()].
 #
-# Usage:  sbatch --job-name=varnet_vsb0_s0 sbatch/submit_vs_chain.sbatch 0 0.0
+# Usage:  sbatch --job-name=varnet_vsb0_s0 methods/varnet/sbatch/submit_vs_chain.sbatch 0 0.0
 #         (args: init seed, nll beta, generation [internal])
 #
 # The name and usage lines said "vr" / submit_vr_chain.sbatch until 2026-09-09: this file
@@ -37,8 +37,8 @@
 # which is what we would rather present -- but the NLL is unbounded below as sigma^2 -> 0, so
 # --var-eps 1e-6 is doing real work there and this run may still misbehave. Watch epoch 1-10.
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
 # The sigma^2 read-out here takes [h, x_hat.detach()] -- var_sees_state, the default. The
 # narrow h-only version is submit_vr_chain.sbatch, and runs/varnet_vrb0_s0 is the baseline this
@@ -70,7 +70,7 @@ if [ "$GEN" -gt "$MAX_GEN" ]; then
     exit 1
 fi
 
-S=${1:?usage: sbatch --job-name=varnet_vsbN_sM sbatch/submit_vs_chain.sbatch <seed> <beta>}
+S=${1:?usage: sbatch --job-name=varnet_vsbN_sM methods/varnet/sbatch/submit_vs_chain.sbatch <seed> <beta>}
 BETA=${2:?missing beta}
 TAG=$(python3 -c "print('vsb%d' % round(float('$BETA')))")
 OUTDIR=runs/varnet_${TAG}_h96_s${S}
@@ -90,8 +90,10 @@ fi
 # placed there falls back to CPU. TRANSIENT -- remove this once the node is healthy. The real
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
+cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
 sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       sbatch/submit_vs_chain.sbatch $S $BETA $((GEN+1))
+       methods/varnet/sbatch/submit_vs_chain.sbatch $S $BETA $((GEN+1))
+cd "$THESIS_ROOT/methods/varnet"
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
 # PRIOR WIDTH. hidden 32 -> 96, kt 3 -> 5: the configuration runs/varnet_a4_k1 was trained

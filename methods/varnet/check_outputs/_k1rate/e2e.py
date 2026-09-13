@@ -1,7 +1,8 @@
 """End-to-end check: run the SAME frames through enkf_lab (pristine) and enkf_opt
 (vectorised) and require the estimates to be bit-identical."""
 import sys, time, numpy as np, importlib, torch
-TP = "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
+import os
+TP = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "enkf"))  # methods/enkf
 
 def run(root, n_frames):
     for m in [k for k in list(sys.modules) if k.startswith(("pedpred", "tools"))]:

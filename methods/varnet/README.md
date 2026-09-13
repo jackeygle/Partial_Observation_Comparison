@@ -18,21 +18,21 @@ command reads its defaults from there, and command-line flags override for one r
 
 ```bash
 # 0. environment (Aalto Triton)
-module load scicomp-pytorch-env/2026.1
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+cd path/to/this/repo && source sbatch/_env.sh   # the repo root; module load + PYTHONPATH
+cd methods/varnet               # python below runs from here; sbatch from the repo root
 
 # 1. (data is already gridded — see "Data" below if you must rebuild from CSV)
 
 # 2. train 4DVarNet to convergence (full 32-day train split, paper window dT=200), 5 seeds,
 #    then choose every run's epoch on the validation split
 for s in 0 1 2 3 4; do
-  sbatch --job-name=varnet_mse5_h96_s$s sbatch/submit_mse5_chain.sbatch $s 0   # self-chains
+  (cd ../.. && sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0) # self-chains
 done
 #   -> runs/varnet_mse5_h96_s<seed>/ckpt_<epoch>.pt + metrics.jsonl
-sbatch sbatch/submit_select.sbatch      # -> runs/varnet_*_h96_s*/select_valid.json
+(cd ../.. && sbatch methods/varnet/sbatch/submit_select.sbatch) # -> runs/varnet_*_h96_s*/select_valid.json
 
 # 3. evaluate on the 7 held-out TEST days
-sbatch sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip   # 4DVarNet
+(cd ../.. && sbatch methods/varnet/sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip) # 4DVarNet
 python3 -m methods.enkf.checks.export_obs_for_enkf --frames 400        # export identical obs for the EnKF
 python3 -m methods.enkf.checks.run_enkf_baseline  --frames 400         # EnKF (apt-ibex) on the SAME obs
 python3 -m methods.enkf.checks.score_enkf                              # score EnKF vs truth
@@ -146,7 +146,7 @@ hand-derived gradient) → `ConvLSTM2d` → `x ← x − u/n_iter`. Φ and the s
 ## Train
 
 ```bash
-sbatch --job-name=varnet_mse5_h96_s0 sbatch/submit_mse5_chain.sbatch 0 0   # one seed, self-chaining --resume
+(cd ../.. && sbatch --job-name=varnet_mse5_h96_s0 methods/varnet/sbatch/submit_mse5_chain.sbatch 0 0) # one seed, self-chaining --resume
 #   runs: train.py --hidden 96 --kt 5 --days 32 --dT 200 --epochs 150 --batch 32 --amp --loss supervised
 #         --iter-schedule 0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4   (§3.4 curriculum)
 #   out : runs/varnet_mse5_h96_s0/ckpt_<epoch>.pt every 10 epochs, varnet_last.pt (resume) + metrics.jsonl
@@ -165,11 +165,11 @@ srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
 
 Both methods use the **same test days, observations, noise, frames, metric, and clip
 bounds**, and **neither is initialised from truth** (4DVarNet: obs-based `X0`; EnKF:
-its original random ensemble — the `Partial_observation` project is left unmodified).
+its original random ensemble — the vendored EnKF code in `methods/enkf/enkf_lab/` is left unmodified).
 
 ```bash
 # 4DVarNet — blind-zone & full-state MSE on the 7 test days (clip on to match the EnKF)
-sbatch sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip
+(cd ../.. && sbatch methods/varnet/sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip)
 #   -> check_outputs/eval/test_metrics_matched_clip.json
 
 # EnKF — export identical observations, run, score
@@ -181,7 +181,7 @@ python3 -m methods.enkf.checks.score_enkf                         # -> check_out
 python3 -m compare.compare_channels                  # -> check_outputs/eval/channel_metrics.json + compare_channels.png
 ```
 The EnKF driver lives **in this project** (`methods/enkf/checks/run_enkf_baseline.py`) and imports
-`pedpred.*` from the `Partial_observation` project via `sys.path`; it does not modify it.
+`pedpred.*` from the in-repo copy `methods/enkf/enkf_lab/` via `sys.path`; it does not modify it.
 
 ---
 
@@ -249,6 +249,6 @@ those decks' notes.
   (incl. the session scratchpad). Write compute-node outputs to the shared project
   filesystem (`check_outputs/`, `runs/`, …), not `/tmp`.
 - **Two projects, two `config.py`** — the EnKF driver imports only `pedpred.*` from
-  `Partial_observation`, never that project's `config`, to avoid a module-name clash.
+  `methods/enkf/enkf_lab/`, never that copy's `config`, to avoid a module-name clash.
 - Reconstruction/velocity figures need the EnKF outputs (`check_outputs/enkf/est_<day>.npz`)
   to exist first (run the EnKF step before them).

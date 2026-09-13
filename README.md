@@ -64,7 +64,8 @@ checkpoint, `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, chosen on the validat
 split by `methods/dincae/checks/select_checkpoint.py`.
 
 `methods/enkf/enkf_lab/` is a **byte-identical, read-only copy** of
-`/scratch/work/zhangx29/Partial_observation`, its files deliberately chmod 444.
+the original `Partial_observation` EnKF code, trained surrogate weights included, its
+files deliberately chmod 444.
 To change anything, edit `enkf_opt/` instead, and it must pass the bit-identical
 comparison in `methods/enkf/checks/verify_enkf_opt.py` (`np.array_equal`, not
 `isclose`).
@@ -275,9 +276,15 @@ to report as-is.
 ## Environment
 
 ```bash
-cd /scratch/work/zhangx29/Thesis_Project
+cd path/to/this/repo           # the repo root
 source sbatch/_env.sh          # module load + PYTHONPATH + PYTHONSAFEPATH=1
 ```
+
+Submit every `sbatch` command from the repo root, as written below: job scripts find the
+repo through `$SLURM_SUBMIT_DIR`, and their `#SBATCH --output` paths are relative to it.
+
+`_env.sh` loads Aalto Triton's `scicomp-pytorch-env/2026.1` module (Python 3.12). On any
+other machine, install the same package versions instead: `pip install -r requirements.txt`.
 
 Once per shell, and afterwards always invoke code as `python3 -m <package.module>`.
 
@@ -518,15 +525,15 @@ Stage (2) looks load-bearing because the split lists
 but `observation_model.split_files()` only takes the filename stem and opens the
 corresponding `grid_cache` file instead. Those 36 GB are never opened.
 
-Two external paths are configured in `crowdcore/config.yaml`. They cover
-everything on the normal path — training, evaluation, the comparison, the
-figures — and are what to repoint on another machine:
+The data is the only thing outside the repo. One path in `crowdcore/config.yaml` points to
+it, and it is what to repoint on another machine:
 
 - `data.root` → `/scratch/work/zhangx29/data` (stages 2 and 3, plus the split lists)
-- `navigation.map_dir` → the real ATC map (`localization_grid.pgm` + `.yaml`,
-  3.4 MB), which lives **outside both this repo and the data root**, under
-  `project_analysis/.../robot_exploration/atc_map/`. This is the easiest
-  dependency to miss.
+
+Everything else the code reads is in the repo: the real ATC map
+(`crowdcore/assets/atc_map/`, `localization_grid.pgm` + `.yaml`, 3.4 MB — the walkable
+mask and line of sight are computed from it), the EnKF's code and its trained surrogate
+weights (`methods/enkf/enkf_lab/`, 14 MB), and DINCAE's normalisation stats.
 
 One exception, verified 2026-09-09: `methods/varnet/checks/check_data_pipeline.py`
 hardcodes three absolute paths as its argparse **defaults** (`DEFAULT_CSV`,
@@ -562,7 +569,7 @@ things, not one repo clone.
 |---|---|---|
 | gridded fields, 7 test days only | `data/grid_cache/atc-{20130811,20130818,20130825,20130901,20130915,20130922,20130929}_corridor_1.0s.h5` | **483 MB** (all 46 days would be 3.2 GB) |
 | split lists | `data/sunday_atc_{train,valid,test}.lst` | a few KB |
-| the real ATC map | `.../robot_exploration/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.4 MB |
+| the real ATC map | `crowdcore/assets/atc_map/` (`localization_grid.pgm` + `.yaml`) | 3.4 MB (already in git) |
 | DINCAE normalisation stats | `methods/dincae/artifacts/state_stats.npz` | 17 KB (already in git) |
 | trained weights | the reported checkpoints only: the 15 `methods/varnet/runs/varnet_*_h96_s*/ckpt_<epoch>.pt` named in each run's `select_valid.json`, `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, `methods/senseiver/runs/senseiver_A/best.pt` | 0.54 GB |
 | | **total** | **~1.0 GB** |
@@ -576,8 +583,7 @@ negation, so a fresh clone has it. 4DVarNet and Senseiver do not have this
 problem: Senseiver's `in_mean`/`in_std` are model buffers saved in the same
 `state_dict`, and 4DVarNet works in raw physical units.
 
-(`paths.REFERENCE_IMPL` → `/scratch/work/zhangx29/Partial_observation` is a third
-external path but **not** a runtime dependency: the EnKF's byte-identical vendor
-copy already lives in-repo at `methods/enkf/enkf_lab/`. The original is
-referenced only for provenance checks and speed benchmarking.)
+The EnKF's surrogate weights, `methods/enkf/enkf_lab/apt-ibex_train_model_28D.pth` (14 MB),
+are tracked through an explicit `.gitignore` negation like `state_stats.npz`;
+`enkf_opt/` links to the same file. Without them the filter cannot run.
 

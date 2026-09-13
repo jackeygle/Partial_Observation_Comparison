@@ -12,7 +12,7 @@ configuration.
 
 | Directory | Role |
 |---|---|
-| `enkf_lab/` | **pristine, read-only** byte-for-byte copy of the EnKF baseline from `/scratch/work/zhangx29/Partial_observation`. Files are chmod 444 deliberately. This is the reference. |
+| `enkf_lab/` | **pristine, read-only** byte-for-byte copy of the EnKF baseline from the original `Partial_observation` project, trained surrogate weights included. Files are chmod 444 deliberately. This is the reference. |
 | `enkf_opt/` | the copy we are allowed to modify. Every change must be **bit-identical** to `enkf_lab` on real data — `np.array_equal`, not `np.isclose`. |
 
 Verify before trusting any change to `enkf_opt/`:

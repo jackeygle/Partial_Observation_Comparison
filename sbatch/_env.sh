@@ -1,6 +1,6 @@
 # sbatch/_env.sh — the single environment entry point for every job script
 #
-#   source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
+#   source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh"   # jobs are submitted from the repo root
 #   cd "$THESIS_ROOT/methods/varnet"          # each script cd's into its own method dir
 #   python3 -u -m methods.varnet.train "$@"
 #

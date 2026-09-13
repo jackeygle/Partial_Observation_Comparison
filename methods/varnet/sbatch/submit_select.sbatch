@@ -6,17 +6,17 @@
 #SBATCH --mem=128G
 #SBATCH --time=08:00:00
 #SBATCH --exclude=gpu51
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/slurm_%x_%j.out
+#SBATCH --output=methods/varnet/runs/slurm_%x_%j.out
 # Choose the reported epoch for every uncertainty-arm run, on the VALIDATION split.
 #
-#   sbatch sbatch/submit_select.sbatch                  # all 15 runs, all 7 valid days
-#   sbatch sbatch/submit_select.sbatch --days 3         # quicker, for a first look
+#   sbatch methods/varnet/sbatch/submit_select.sbatch                  # all 15 runs, all 7 valid days
+#   sbatch methods/varnet/sbatch/submit_select.sbatch --days 3         # quicker, for a first look
 #
 # To split the 15 runs across several parallel jobs (each run is independent and
 # ~11 min serially on one GPU; 15 in one job is ~2.75h with no parallelism at all):
-#   sbatch --export=ALL,RUNS="mse5_h96_s4" sbatch/submit_select.sbatch
-#   sbatch --export=ALL,RUNS="vsb0_h96_s0 vsb0_h96_s1 vsb0_h96_s2 vsb0_h96_s3 vsb0_h96_s4" sbatch/submit_select.sbatch
-#   sbatch --export=ALL,RUNS="aug0_h96_s0 aug0_h96_s1 aug0_h96_s2 aug0_h96_s3 aug0_h96_s4" sbatch/submit_select.sbatch
+#   sbatch --export=ALL,RUNS="mse5_h96_s4" methods/varnet/sbatch/submit_select.sbatch
+#   sbatch --export=ALL,RUNS="vsb0_h96_s0 vsb0_h96_s1 vsb0_h96_s2 vsb0_h96_s3 vsb0_h96_s4" methods/varnet/sbatch/submit_select.sbatch
+#   sbatch --export=ALL,RUNS="aug0_h96_s0 aug0_h96_s1 aug0_h96_s2 aug0_h96_s3 aug0_h96_s4" methods/varnet/sbatch/submit_select.sbatch
 # RUNS is space-separated "<arm>_h96_s<seed>" names (must match the run directory
 # suffix exactly -- runs/varnet_<name>/ -- or select_checkpoint.py fails fast with
 # "no ckpt_*.pt", it does not silently score the wrong run); unset/empty = all 15.
@@ -25,8 +25,8 @@
 # without each run's select_valid.json -- see checks/select_checkpoint.py for why
 # varnet_best.pt cannot be used for this.
 source /etc/profile 2>/dev/null
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 
 if [ -z "${RUNS:-}" ]; then
     RUNS=""

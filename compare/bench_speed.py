@@ -99,7 +99,7 @@ H, W, F = 36, 12, 4
 TOTAL, STATE_DIM = H * W, F * H * W
 PROC_STD = (0.02829307, 0.31263075, 0.12325809, 0.41680932)
 INIT_STD = (0.2290, 1.2660, 0.3429, 0.0259)
-SRC = {"orig": "/scratch/work/zhangx29/Partial_observation",
+SRC = {"lab": paths.enkf_vendor("enkf_lab"),
        "opt": paths.enkf_vendor("enkf_opt")}
 
 

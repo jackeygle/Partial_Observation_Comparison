@@ -1,7 +1,7 @@
 """Where does the time go in the CURRENT (optimised) EnKF? Same node/cores as the benchmark."""
 import cProfile, io, os, pstats, sys, time
 import numpy as np, torch
-ROOT = "/scratch/work/zhangx29/Thesis_Project/4dvarnet_enkf"
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "enkf"))  # methods/enkf
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "enkf_opt"))
 from pedpred.ENKF import LocalizedEnsembleKalmanFilter
 from pedpred.utils import load_model

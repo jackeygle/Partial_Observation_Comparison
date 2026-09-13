@@ -8,9 +8,10 @@ never raises an error, it just makes a script read no file, or someone else's fi
 So paths are centralised here, deriving the repo root from **this file's own
 location** and following the repo wherever it moves.
 
-The data itself (ATC's h5 files, grid_cache, the real map) is not here -- it lives
-outside the repo, with its path in `config.yaml`'s `data.root` / `navigation.map_dir`,
-which is user-editable configuration, not a code constant.
+The ATC data itself (h5 files, grid_cache) is not here -- it lives outside the repo,
+with its path in `config.yaml`'s `data.root`, which is user-editable configuration,
+not a code constant. Everything else the code reads, the real ATC map included
+(`crowdcore/assets/atc_map/`), is inside the repo.
 
 Usage:
     from crowdcore import paths
@@ -18,7 +19,6 @@ Usage:
     paths.runs("varnet")                    -> <root>/methods/varnet/runs
     paths.check_outputs("dincae")           -> <root>/methods/dincae/check_outputs
     paths.enkf_export("enkf_k1_full")       -> <root>/methods/varnet/check_outputs/enkf_k1_full
-    paths.REFERENCE_IMPL                    -> /scratch/work/zhangx29/Partial_observation
 """
 from __future__ import annotations
 
@@ -35,11 +35,6 @@ BASELINE = os.path.join(ROOT, "refactor_baseline")
 #: Directory names of the five methods. Kept here rather than as scattered string
 #: literals, so a rename only touches one place.
 VARNET, ENKF, DINCAE, SENSEIVER = "varnet", "enkf", "dincae", "senseiver"
-
-#: The reference implementation (Kazemi Eskeri et al., IROS 2025 workshop).
-#: **Outside this repo** -- we only read it, never write to it; methods/enkf/enkf_lab/
-#: is a read-only vendor copy of it.
-REFERENCE_IMPL = "/scratch/work/zhangx29/Partial_observation"
 
 
 def method(name: str) -> str:

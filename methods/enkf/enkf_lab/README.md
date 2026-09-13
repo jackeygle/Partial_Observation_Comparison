@@ -1,6 +1,6 @@
 # `enkf_lab/` — pristine copy of the EnKF baseline (DO NOT EDIT)
 
-A byte-for-byte copy of the EnKF baseline from `/scratch/work/zhangx29/Partial_observation`,
+A byte-for-byte copy of the EnKF baseline from the original `Partial_observation` project,
 vendored here so experiments never touch that project. **This copy is the reference: it must
 stay identical to the original.** The `.py`/`.yaml` files are chmod'd read-only on purpose.
 
@@ -19,7 +19,7 @@ Dependency closure of `ENKF.py`, nothing more:
     Parameters.yaml               read at import time by ENKF.py:8 — required
     pedpred -> .                  self-link, so in-package `from pedpred.X import Y` resolves
                                   (mirrors the original project's own layout)
-    apt-ibex_train_model_28D.pth  symlink to the original (14 MB, not duplicated)
+    apt-ibex_train_model_28D.pth  the surrogate's trained weights (14 MB), copied from the original
 
 ## Provenance
 

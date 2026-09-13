@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=120G
 #SBATCH --time=06:00:00
-#SBATCH --output=/scratch/work/zhangx29/Thesis_Project/methods/varnet/check_outputs/uncaug_%j.out
+#SBATCH --output=methods/varnet/check_outputs/uncaug_%j.out
 # The other half of the augmented-state result. Its per-cell RANKING is measured
 # (sparsification_aug0.json: Spearman 0.435/0.449/0.416/0.440 against the read-out's
 # 0.036/0.035/0.002/0.040) but nothing yet says whether the variance is on the right SCALE.
@@ -17,8 +17,8 @@
 # its spread/skill 0.447 was the aleatoric half alone and was NOT comparable to vsb0/ml5 at M=5.
 # The aleatoric-only number survives this overwrite: eval_uncertainty.py still reports the
 # all_aleatoric_only split, which is exactly what the M=1 run measured.
-source /scratch/work/zhangx29/Thesis_Project/sbatch/_env.sh
-cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
+source "${SLURM_SUBMIT_DIR:-.}/sbatch/_env.sh" || { echo "submit from the repo root" >&2; exit 1; }
+cd "$THESIS_ROOT/methods/varnet"
 # hidden=96/kt=5 runs (2026-09-13). Each member is scored at the checkpoint
 # checks/select_checkpoint.py chose on the VALIDATION split (select_valid.json),
 # the same one compare5 scores -- resolved by model_io.reported_ckpt.

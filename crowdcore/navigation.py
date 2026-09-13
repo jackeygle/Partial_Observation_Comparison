@@ -35,6 +35,17 @@ import numpy as np
 # --------------------------------------------------------------------------- #
 # Real ATC localization map -> per-cell obstacle fraction / walkable mask
 # --------------------------------------------------------------------------- #
+def resolve_map_dir(map_dir=None):
+    """Directory holding localization_grid.{pgm,yaml}.
+
+    `map_dir` if given, else config.yaml's navigation.map_dir. A relative path is taken
+    from the repo root, not the cwd: job scripts cd into their method directory.
+    """
+    from crowdcore import config as _cfg, paths
+    map_dir = map_dir or _cfg.get("navigation", "map_dir")
+    return map_dir if os.path.isabs(map_dir) else os.path.join(paths.ROOT, map_dir)
+
+
 def load_atc_map(map_dir=None):
     """Load the real ATC localization map in ROS format (PGM + YAML).
 
@@ -47,8 +58,7 @@ def load_atc_map(map_dir=None):
     """
     import yaml
     from PIL import Image
-    from crowdcore import config as _cfg
-    map_dir = map_dir or _cfg.get("navigation", "map_dir")
+    map_dir = resolve_map_dir(map_dir)
     with open(os.path.join(map_dir, "localization_grid.yaml")) as f:
         meta = yaml.safe_load(f)
     img = np.asarray(Image.open(os.path.join(map_dir, meta["image"])))
@@ -115,7 +125,7 @@ def _obstacle_pixels(map_dir=None, solid=True):
     """
     import yaml
     from crowdcore import config as _cfg
-    map_dir = map_dir or _cfg.get("navigation", "map_dir")
+    map_dir = resolve_map_dir(map_dir)
     with open(os.path.join(map_dir, "localization_grid.yaml")) as f:
         meta = yaml.safe_load(f)
     img, _, _ = load_atc_map(map_dir)

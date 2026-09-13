@@ -1,6 +1,6 @@
 """EnKF baseline — not written by us, vendored in.
 
-  enkf_lab/   a byte-identical, read-only copy of /scratch/work/zhangx29/Partial_observation.
+  enkf_lab/   a byte-identical, read-only copy of the original Partial_observation EnKF code.
               **Do not edit** — the files are deliberately chmod 444.
   enkf_opt/   a copy that may be modified; any change must pass the bit-identical
               comparison in checks/verify_enkf_opt.py (np.array_equal, not isclose).
