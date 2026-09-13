@@ -1,6 +1,6 @@
 # Partial Observation Comparison
 
-**The problem.** Three robots move through a real train-station corridor (the
+**The problem.** Three robots move through a real shopping-centre corridor (the
 ATC pedestrian dataset, Osaka). Each senses only the people within a small
 radius of itself — that is the "partial observation". The task is to
 reconstruct the **full** crowd density and velocity field over the whole
@@ -280,13 +280,13 @@ cd path/to/this/repo           # the repo root
 source sbatch/_env.sh          # module load + PYTHONPATH + PYTHONSAFEPATH=1
 ```
 
+Once per shell, and afterwards always invoke code as `python3 -m <package.module>`.
+
 Submit every `sbatch` command from the repo root, as written below: job scripts find the
 repo through `$SLURM_SUBMIT_DIR`, and their `#SBATCH --output` paths are relative to it.
 
 `_env.sh` loads Aalto Triton's `scicomp-pytorch-env/2026.1` module (Python 3.12). On any
 other machine, install the same package versions instead: `pip install -r requirements.txt`.
-
-Once per shell, and afterwards always invoke code as `python3 -m <package.module>`.
 
 **Never use a bare script path.** `python3 methods/varnet/train.py` puts
 `methods/varnet/` on `sys.path[0]`, and the three methods each ship their own
@@ -309,6 +309,7 @@ crowdcore/                shared by every method, method-agnostic
                             (grid resolution, robot count, sensing radius,
                             noise level, time-window length, ...)
   navigation.py             the real ATC map -> which cells are walkable
+  assets/atc_map/           that map: a ROS occupancy grid (.pgm image + .yaml)
   observation_model.py      simulates the 3 robots sensing the crowd
   paths.py                  single source of truth for in-repo paths
   data/                     raw CSV -> gridded .h5 pipeline
@@ -406,7 +407,7 @@ sbatch methods/varnet/sbatch/submit_select.sbatch
 
 # DINCAE -- full-field supervision (~16-27 GPU-hours), then choose its checkpoint on validation
 sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_ff
-python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff
+python3 -m methods.dincae.checks.select_checkpoint     # defaults to runs/dincae_ff
 
 # Senseiver (up to 1 day)
 sbatch methods/senseiver/sbatch/submit_train.sbatch --out runs/senseiver_A
@@ -420,7 +421,7 @@ over them. CPU-only (no GPU helps a Kalman filter) and genuinely slow — each t
 per day so the seven run in parallel:
 
 ```bash
-python3 -m methods.enkf.checks.export_obs_for_enkf --outdir check_outputs/enkf_k1_full --obs-every-k 1 --frames 0
+python3 -m methods.enkf.checks.export_obs_for_enkf --outdir methods/enkf/check_outputs/enkf_k1_full --obs-every-k 1 --frames 0
 for day in atc-20130811 atc-20130818 atc-20130825 atc-20130901 atc-20130915 atc-20130922 atc-20130929; do
   sbatch --wrap="source sbatch/_env.sh && cd methods/enkf && python3 -u -m methods.enkf.checks.run_enkf_baseline \
     --dir check_outputs/enkf_k1_full --only $day --ensemble 100 --radius 7 --frames 0" \
@@ -431,7 +432,7 @@ done
 `run_enkf_baseline.py --help` does **not** list `--dir`/`--frames`/`--ensemble`/
 `--radius`/`--only`: it parses vendor config args first and prints that parser's
 help before reaching its own `argparse.ArgumentParser()` further down
-(`checks/run_enkf_baseline.py:123-133`). The flags above are real.
+(`checks/run_enkf_baseline.py:120-131`). The flags above are real.
 
 Checkpoints land in each method's `runs/<name>/` (gitignored). Slurm logs land
 alongside as `runs/slurm_<job>_<id>.out` and **are** tracked, so you can always
