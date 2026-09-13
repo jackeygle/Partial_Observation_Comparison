@@ -1,0 +1,50 @@
+
+==================== runs/varnet_vsb0_h96_s3 ====================
+[select] varnet_vsb0_h96_s3: 8 candidates (epochs 80..149, all at 20 iterations) | 7 valid days | walkable 290/432 | cuda
+  atc-20130616: best epoch 80 (0.066608)
+  atc-20130623: best epoch 140 (0.067078)
+  atc-20130630: best epoch 140 (0.063360)
+  atc-20130707: best epoch 140 (0.074242)
+  atc-20130714: best epoch 80 (0.080344)
+  atc-20130721: best epoch 140 (0.079692)
+  atc-20130728: best epoch 140 (0.067324)
+
+  epoch   walkable blind MSE      RMSE
+     80             0.071297    0.2670
+     90             0.072044    0.2684
+    100             0.071549    0.2675
+    110             0.071993    0.2683
+    120             0.071314    0.2670
+    130             0.071449    0.2673
+    140             0.071266    0.2670  <-- selected
+    149             0.071404    0.2672
+
+[select] epoch 140  MSE 0.071266  RMSE 0.2670
+[select] spread across the 8 candidates: 0.000778 (1.1% of the winner) -- if this is small, the choice of epoch barely matters and any of them would do.
+[select] wrote /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_vsb0_h96_s3/select_valid.json
+
+==================== runs/varnet_vsb0_h96_s4 ====================
+[select] varnet_vsb0_h96_s4: 8 candidates (epochs 80..149, all at 20 iterations) | 7 valid days | walkable 290/432 | cuda
+  atc-20130616: best epoch 140 (0.073553)
+  atc-20130623: best epoch 140 (0.073189)
+  atc-20130630: best epoch 140 (0.069682)
+  atc-20130707: best epoch 140 (0.081126)
+  atc-20130714: best epoch 140 (0.087395)
+  atc-20130721: best epoch 140 (0.087708)
+  atc-20130728: best epoch 140 (0.074598)
+
+  epoch   walkable blind MSE      RMSE
+     80             0.079381    0.2817
+     90             0.079837    0.2826
+    100             0.081698    0.2858
+    110             0.081079    0.2847
+    120             0.079716    0.2823
+    130             0.079710    0.2823
+    140             0.078180    0.2796  <-- selected
+    149             0.078912    0.2809
+
+[select] epoch 140  MSE 0.078180  RMSE 0.2796
+[select] spread across the 8 candidates: 0.003518 (4.5% of the winner) -- if this is small, the choice of epoch barely matters and any of them would do.
+[select] wrote /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_vsb0_h96_s4/select_valid.json
+
+[select] all 15 runs selected — compare.compare5 can run now

@@ -21,7 +21,7 @@ import numpy as np, torch
 from crowdcore import config
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARROW_MIN = 0.1
@@ -55,7 +55,7 @@ def panel(ax, state, vmax):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ckpt", default="runs/varnet_b0_k1/varnet_best.pt")
+    ap.add_argument("--ckpt", default=None, help="default: the reported 4DVarNet model")
     ap.add_argument("--day", default="atc-20130811")
     ap.add_argument("--n", type=int, default=1000, help="number of consecutive frames")
     ap.add_argument("--start", type=int, default=-1, help="start frame; -1 = auto-pick busiest block")
@@ -63,7 +63,7 @@ def main():
     ap.add_argument("--outdir", default="")
     args = ap.parse_args()
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    solver, a = build_solver(args.ckpt, dev); dT = a["dT"]
+    solver, a = build_solver(args.ckpt or baseline_ckpt(), dev); dT = a["dT"]
     N = (args.n // dT) * dT                               # whole number of windows
     outdir = args.outdir or os.path.join(ROOT, "check_outputs", "eval", f"seq_{args.day}")
     os.makedirs(outdir, exist_ok=True)

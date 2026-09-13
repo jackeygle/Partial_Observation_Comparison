@@ -29,14 +29,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from crowdcore import config                                                        # noqa: E402
 from crowdcore import observation_model as om                                       # noqa: E402
 from crowdcore import navigation as nav                                             # noqa: E402
-from methods.varnet.checks.model_io import load_solver                                     # noqa: E402
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt                                     # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval", "channel_budget.json")
 CHAN = list(config.get("grid", "channels"))
 OBS_STD = list(config.get("observation", "obs_std"))
 
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-S, A, _ = load_solver(os.path.join(ROOT, "runs/varnet_b0_k1/varnet_best.pt"), DEV)
+S, A, _ = load_solver(baseline_ckpt(), DEV)
 S.eval()
 print(f"[device] {DEV}"
       + (f"  {torch.cuda.get_device_name(0)}" if DEV.type == "cuda" else "  (SLOW)"))

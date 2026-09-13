@@ -20,7 +20,7 @@ from crowdcore import config
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from crowdcore import paths
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 
 # This script used to live under 4dvarnet_enkf/, and ROOT always pointed there
 # (runs/, check_outputs/ hang off it). After the 2026-09-03 refactor it moved to
@@ -31,7 +31,7 @@ ROOT = paths.method(paths.VARNET)
 ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
 CH = config.get("grid", "channels")
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CKPT = os.environ.get("VARNET_CKPT", "runs/varnet_b0_k1/varnet_best.pt")
+CKPT = os.environ.get("VARNET_CKPT") or baseline_ckpt()
 solver, a, ck = load_solver(CKPT, dev)
 
 

@@ -26,7 +26,7 @@ from crowdcore import config
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from crowdcore import paths
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
@@ -64,13 +64,13 @@ def clip_np(x):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ckpt", default="runs/varnet_b0_k1/varnet_best.pt")
+    ap.add_argument("--ckpt", default=None, help="default: the reported 4DVarNet model")
     ap.add_argument("--day", default="atc-20130811")
     ap.add_argument("--frames", type=int, default=400)
     ap.add_argument("--outdir", default="check_outputs/eval")
     args = ap.parse_args()
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    solver, a = build_solver(args.ckpt, dev); dT = a["dT"]
+    solver, a = build_solver(args.ckpt or baseline_ckpt(), dev); dT = a["dT"]
 
     day = [d for d in om.split_files("test") if args.day in d][0]
     X, _ = om.load_state(day); X = np.asarray(X)[:args.frames]

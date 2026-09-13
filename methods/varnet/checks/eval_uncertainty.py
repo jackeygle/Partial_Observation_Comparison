@@ -51,7 +51,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from crowdcore import config  # noqa: E402
 from crowdcore import navigation as nav  # noqa: E402
 from crowdcore import observation_model as om  # noqa: E402
-from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.varnet.checks.model_io import load_solver, reported_ckpt  # noqa: E402
 from methods.dincae.state import channel_valid  # noqa: E402  -- the single definition of the defined convention
 
 # The single implementation of CRPS / NLL / coverage / spread-skill lives in
@@ -93,8 +93,14 @@ def main():
     # ---- members -------------------------------------------------------------
     solvers, A = [], None
     for s in args.members:
-        p = os.path.join(ROOT, args.run_fmt.format(s), "varnet_best.pt")
+        # The same checkpoint compare5's accuracy table scores for this run -- see
+        # model_io.reported_ckpt. This used to be a hardcoded varnet_best.pt, which is
+        # selected on the training split and would have put the two tables on different
+        # checkpoints of the same run.
+        p = reported_ckpt(os.path.join(ROOT, args.run_fmt.format(s)))
         sol, A, ck = load_solver(p, dev)
+        print(f"  member {s}: {os.path.relpath(p, ROOT)}  epoch={ck.get('epoch')}  "
+              f"n_iter={ck.get('n_iter_eff')}", flush=True)
         solvers.append(sol)
     # An MSE-trained ensemble has no learnt sigma^2 at all, and that is a configuration the
     # paper itself evaluates: Table 2's "Ensemble-M (MSE)" takes the EMPIRICAL VARIANCE across

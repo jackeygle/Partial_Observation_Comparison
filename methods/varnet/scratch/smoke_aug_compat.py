@@ -2,7 +2,7 @@
 import sys, os, torch
 from methods.varnet.checks.model_io import load_solver
 d=torch.device("cuda" if torch.cuda.is_available() else "cpu")
-for ck in ("runs/varnet_vsb0_s0","runs/varnet_vrb0_s0","runs/varnet_ml5_s0","runs/varnet_b0_k1"):
+for ck in ("runs/varnet_vsb0_s0","runs/varnet_vrb0_s0","runs/varnet_ml5_s0","runs/varnet_mse5_h96_s0"):
     p=os.path.join(R,ck,"varnet_best.pt")
     if not os.path.exists(p): print("  absent:",ck); continue
     S,a,_=load_solver(p,d)

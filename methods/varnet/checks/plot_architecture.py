@@ -22,10 +22,10 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import torch                                                        # noqa: E402
-from methods.varnet.checks.model_io import load_solver                                    # noqa: E402
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt                                    # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval")
-CK = os.path.join(ROOT, "runs", "varnet_a2_k1", "varnet_best.pt")
+CK = baseline_ckpt()
 solver, A, _ = load_solver(CK, "cpu")
 NP = lambda m: sum(p.numel() for p in m.parameters())
 C, T, H, W = 4, A["dT"], 36, 12

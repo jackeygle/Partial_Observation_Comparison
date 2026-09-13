@@ -23,9 +23,13 @@ cd /scratch/work/zhangx29/Thesis_Project/methods/varnet
 
 # 1. (data is already gridded — see "Data" below if you must rebuild from CSV)
 
-# 2. train 4DVarNet to convergence (full 32-day train split, paper window dT=200)
-sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1   # self-chains on an H200
-#   -> runs/varnet_b0_k1/varnet_last.pt + metrics.jsonl
+# 2. train 4DVarNet to convergence (full 32-day train split, paper window dT=200), 5 seeds,
+#    then choose every run's epoch on the validation split
+for s in 0 1 2 3 4; do
+  sbatch --job-name=varnet_mse5_h96_s$s sbatch/submit_mse5_chain.sbatch $s 0   # self-chains
+done
+#   -> runs/varnet_mse5_h96_s<seed>/ckpt_<epoch>.pt + metrics.jsonl
+sbatch sbatch/submit_select.sbatch      # -> runs/varnet_*_h96_s*/select_valid.json
 
 # 3. evaluate on the 7 held-out TEST days
 sbatch sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip   # 4DVarNet
@@ -61,7 +65,7 @@ python3 -m compare.plot_compare5
 | `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/` | verification scripts + all figure/evaluation scripts (see below) |
 | `sbatch/` | SLURM submit scripts |
-| `runs/varnet_b0_k1/` | the model of record: checkpoint + `metrics.jsonl` (see the repo README's method table) |
+| `runs/varnet_mse5_h96_s<seed>/` | the reported model: the seed recorded as `single_model.MSE` in `compare/results/compare5_final.json`, at the epoch in that run's `select_valid.json` (`checks/model_io.py:baseline_ckpt`) |
 | `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
 
 ---
@@ -142,9 +146,10 @@ hand-derived gradient) → `ConvLSTM2d` → `x ← x − u/n_iter`. Φ and the s
 ## Train
 
 ```bash
-sbatch --job-name=varnet_b0_k1 sbatch/submit_b0_chain.sbatch 1   # self-chaining --resume
-#   runs: train.py --days 32 --dT 200 --n-iter 20 --epochs 100 --batch 32 --amp --loss supervised
-#   out : runs/varnet_b0_k1/varnet_last.pt (+ optimizer/epoch for resume) + metrics.jsonl
+sbatch --job-name=varnet_mse5_h96_s0 sbatch/submit_mse5_chain.sbatch 0 0   # one seed, self-chaining --resume
+#   runs: train.py --hidden 96 --kt 5 --days 32 --dT 200 --epochs 150 --batch 32 --amp --loss supervised
+#         --iter-schedule 0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4   (§3.4 curriculum)
+#   out : runs/varnet_mse5_h96_s0/ckpt_<epoch>.pt every 10 epochs, varnet_last.pt (resume) + metrics.jsonl
 
 # quick smoke test
 srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
@@ -225,9 +230,11 @@ figures fed decks that no longer exist),
 (shape / zero-centre / differentiability).
 
 **Map figures for the deck**: `plot_nav_mask.py` (walkable grid) and
-`plot_obstacle_map.py` (obstacle occupancy). The convergence curve, training table
-and architecture diagrams come from `checks/plot_architecture.py` and
-`checks/plot_training_results.py`. The eight pre-2026-09-07 decks and their build
+`plot_obstacle_map.py` (obstacle occupancy). The architecture diagrams come from
+`checks/plot_architecture.py`, drawn from the reported model
+(`checks/model_io.py:baseline_ckpt`). `plot_training_results.py` and
+`plot_results.py`, which plotted the hidden=32 capacity sweep (b0/a2/a4) and b0's
+speed, were deleted with those runs on 2026-09-13. The eight pre-2026-09-07 decks and their build
 scripts, and the whole of `slides/`, were deleted on 2026-09-08/09; the project
 no longer builds presentation decks from this repository.
 `methods/varnet/SUPERSEDED.md` keeps the findings that were only recorded in

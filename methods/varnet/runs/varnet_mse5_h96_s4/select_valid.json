@@ -1,0 +1,29 @@
+{
+  "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96_s4",
+  "split": "valid",
+  "min_epoch": 75,
+  "n_iter": 20,
+  "days": [
+    "atc-20130616_corridor_1.0s.h5",
+    "atc-20130623_corridor_1.0s.h5",
+    "atc-20130630_corridor_1.0s.h5",
+    "atc-20130707_corridor_1.0s.h5",
+    "atc-20130714_corridor_1.0s.h5",
+    "atc-20130721_corridor_1.0s.h5",
+    "atc-20130728_corridor_1.0s.h5"
+  ],
+  "scope": "walkable (blind cells inside the walkable region, clipped)",
+  "mse_by_epoch": {
+    "80": 0.054719585671736286,
+    "90": 0.05549771462922203,
+    "100": 0.05510468183269832,
+    "110": 0.0556972228625767,
+    "120": 0.05672139163590479,
+    "130": 0.056653900754045555,
+    "140": 0.05630422488578484,
+    "149": 0.05766069485412993
+  },
+  "selected_epoch": 80,
+  "selected_mse": 0.054719585671736286,
+  "selected_ckpt": "ckpt_00080.pt"
+}

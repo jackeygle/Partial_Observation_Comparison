@@ -1,0 +1,44 @@
+Submitted batch job 20187705
+[chain] submitted successor (afterany:20175757)
+NVIDIA H200
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,788,342 (GENN prior 54,220 = 1.94%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=3  data=0
+[var read-out] 692,000 params on the last hidden state   sigma^2 = softplus(out_var(h)) + 1e-06   beta=0.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_vsb0_h96_s3/varnet_last.pt: continuing from epoch 48 (step 9456)
+[best] previous best blind MSE = 0.0407
+[schedule] epoch 48: n_iter -> 10, lr -> 0.0007
+[epoch  48] loss=-2.3739  blind_MSE=0.0409  density=0.0173 vx=0.1149 vy=0.0225 var=0.0088
+[epoch  49] loss=-2.3158  blind_MSE=0.0408  density=0.0178 vx=0.1146 vy=0.0222 var=0.0088
+[schedule] epoch 50: n_iter -> 15, lr -> 0.0005
+[epoch  50] loss=-2.3212  blind_MSE=0.0405  density=0.0175 vx=0.1138 vy=0.0219 var=0.0088
+           ↑ new best (0.0405) -> varnet_best.pt
+[epoch  51] loss=-2.3402  blind_MSE=0.0405  density=0.0175 vx=0.1138 vy=0.0219 var=0.0088
+[epoch  52] loss=-2.3755  blind_MSE=0.0405  density=0.0175 vx=0.1137 vy=0.0220 var=0.0088
+[epoch  53] loss=-2.4234  blind_MSE=0.0406  density=0.0174 vx=0.1142 vy=0.0220 var=0.0088
+[epoch  54] loss=-2.3739  blind_MSE=0.0406  density=0.0175 vx=0.1142 vy=0.0220 var=0.0088
+[epoch  55] loss=-2.3658  blind_MSE=0.0404  density=0.0173 vx=0.1135 vy=0.0220 var=0.0088
+           ↑ new best (0.0404) -> varnet_best.pt
+[epoch  56] loss=-2.3287  blind_MSE=0.0404  density=0.0174 vx=0.1133 vy=0.0219 var=0.0088
+           ↑ new best (0.0404) -> varnet_best.pt
+[epoch  57] loss=-2.4299  blind_MSE=0.0405  density=0.0175 vx=0.1137 vy=0.0220 var=0.0088
+[epoch  58] loss=-2.3015  blind_MSE=0.0407  density=0.0178 vx=0.1142 vy=0.0221 var=0.0088
+[epoch  59] loss=-2.3897  blind_MSE=0.0403  density=0.0174 vx=0.1132 vy=0.0220 var=0.0088
+           ↑ new best (0.0403) -> varnet_best.pt
+[epoch  60] loss=-2.3789  blind_MSE=0.0404  density=0.0175 vx=0.1134 vy=0.0219 var=0.0088
+[epoch  61] loss=-2.3924  blind_MSE=0.0404  density=0.0174 vx=0.1136 vy=0.0218 var=0.0088
+[epoch  62] loss=-2.2821  blind_MSE=0.0404  density=0.0174 vx=0.1134 vy=0.0219 var=0.0088
+[epoch  63] loss=-2.3672  blind_MSE=0.0404  density=0.0175 vx=0.1135 vy=0.0219 var=0.0088
+[epoch  64] loss=-2.3825  blind_MSE=0.0403  density=0.0174 vx=0.1131 vy=0.0219 var=0.0088
+           ↑ new best (0.0403) -> varnet_best.pt
+[epoch  65] loss=-2.4825  blind_MSE=0.0404  density=0.0174 vx=0.1134 vy=0.0219 var=0.0088
+[epoch  66] loss=-2.4669  blind_MSE=0.0404  density=0.0175 vx=0.1133 vy=0.0219 var=0.0088
+[epoch  67] loss=-2.4228  blind_MSE=0.0404  density=0.0173 vx=0.1137 vy=0.0219 var=0.0088
+[epoch  68] loss=-2.4260  blind_MSE=0.0403  density=0.0173 vx=0.1133 vy=0.0219 var=0.0088
+[epoch  69] loss=-2.4030  blind_MSE=0.0404  density=0.0174 vx=0.1134 vy=0.0219 var=0.0088
+[epoch  70] loss=-2.4112  blind_MSE=0.0405  density=0.0176 vx=0.1136 vy=0.0220 var=0.0088
+[epoch  71] loss=-2.4686  blind_MSE=0.0405  density=0.0176 vx=0.1135 vy=0.0219 var=0.0088
+[epoch  72] loss=-2.3543  blind_MSE=0.0404  density=0.0176 vx=0.1133 vy=0.0219 var=0.0088
+[2026-09-10T04:52:23.008] error: *** JOB 20175757 ON gpu54 CANCELLED AT 2026-09-10T04:52:23 DUE TO TIME LIMIT ***

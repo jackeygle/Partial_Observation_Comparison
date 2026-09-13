@@ -375,8 +375,9 @@ def main():
     # one of the solver's 20 iterations, so a wider psi is not free even though it is a small
     # fraction of the parameters. Runs must therefore be timed individually, not substituted
     # for each other.
-    ap.add_argument("--run", default="a2",
-                    help="run-name stem under runs/: times runs/varnet_<run>_k1")
+    ap.add_argument("--run", default="",
+                    help="run name under runs/, e.g. mse5_h96_s3: times runs/varnet_<run> at its "
+                         "validation-selected checkpoint. Default: the reported 4DVarNet model")
     ap.add_argument("--ens-fmt", default="",
                     help="run-name format for a deep ensemble, e.g. runs/varnet_vsb0_s{}. When "
                          "given, two extra rows are timed: one member alone and all members "
@@ -387,6 +388,11 @@ def main():
                     help="which DINCAE checkpoint to use -- defaults to the same "
                          "one as the accuracy table (ep70, picked on the validation set)")
     args = ap.parse_args()
+    # imported here, like the other model_io imports in this file, not at module level
+    from methods.varnet.checks.model_io import baseline_ckpt, reported_ckpt
+    varnet_ck = (reported_ckpt(os.path.join(ROOT, "runs", f"varnet_{args.run}")) if args.run
+                 else baseline_ckpt())
+    args.run = os.path.basename(os.path.dirname(varnet_ck)).replace("varnet_", "", 1)
     out = args.out or f"check_outputs/eval/bench_speed_{args.run}.json"
 
     # The EnKF's exports moved from methods/varnet/check_outputs/ to under
@@ -394,9 +400,9 @@ def main():
     # paths.enkf_export(), don't reassemble it from ROOT -- hardcoding the old
     # path here made the job FileNotFoundError during setup after the refactor.
     k1 = os.path.join(paths.enkf_export("enkf_k1_full"), f"obs_{args.day}.npz")
-    ck = lambda k: f"{ROOT}/runs/varnet_{args.run}_k{k}/varnet_best.pt"
+    ck = lambda k: varnet_ck                  # k=1 only; the k=4 line was dropped 2026-09-08
     have_k = os.path.exists(ck(1))
-    ens_ck = [f"{ROOT}/{args.ens_fmt.format(i)}/varnet_best.pt" for i in args.ens_members] \
+    ens_ck = [reported_ckpt(os.path.join(ROOT, args.ens_fmt.format(i))) for i in args.ens_members] \
         if args.ens_fmt else []
     for c in ens_ck:
         if not os.path.exists(c):
@@ -410,7 +416,7 @@ def main():
           f"OMP={hw['omp_threads']} torch={hw['torch_threads']}", flush=True)
     print(f"[gpu] {hw['gpu'] or 'none'}", flush=True)
     print(f"[cfg] {args.frames} frames, {args.repeats} timed repeats (+1 warm-up each), "
-          f"4DVarNet = runs/varnet_{args.run}_k*\n", flush=True)
+          f"4DVarNet = {varnet_ck}\n", flush=True)
 
     res = {"hw": hw, "frames": args.frames, "repeats": args.repeats, "day": args.day,
            "varnet_run": args.run, "runs": {}}

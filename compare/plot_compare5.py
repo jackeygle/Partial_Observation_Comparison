@@ -1,15 +1,16 @@
 """
-plot_compare5.py — the main results figure: 5 methods x 4 channels x 2 conventions
+plot_compare5.py — the main results figure: 4 methods x 4 channels x 2 conventions
 
 Reads `compare/results/compare5_final.json`, draws one figure telling the whole main
 result, plus the fact that "the ranking flips".
 
-**Everything is a single model, no ensembling** -- the paper never mentions
-ensembling. The two 4DVarNet arms each have 5 training seeds; bar height is the
-cross-seed mean, error bars are +/-1 std: "single model" is not one number,
-reporting the best seed would be systematically over-optimistic, reporting s0
-would be arbitrary. The other three methods each have only one model, no error
-bars.
+**One model per method, no ensembling, no seed averaging.** DINCAE, Senseiver
+and the EnKF each contribute one model; 4DVarNet contributes the MSE seed whose
+checkpoint scored lowest on the VALIDATION split, recorded by compare5 as
+`single_model["MSE"]`. Averaging 4DVarNet's 5 seeds against everyone else's single
+model would give it five times the training. The uncertainty designs (vsb0, aug0)
+are not in this figure: they answer a different question and are compared, as
+ensembles, in the README's uncertainty table.
 
 Layout: **2 rows x 5 columns of small multiples**
 
@@ -51,23 +52,14 @@ import numpy as np
 from compare import plotstyle as ps
 from crowdcore import paths
 
-#: The main table plots the four reconstruction methods plus our two 4DVarNet
-#: uncertainty designs, **all single models** -- the paper
-#: never mentions ensembling.
-#: The two 4DVarNet arms each have 5 seeds; take the cross-seed mean and draw
-#: +/-std error bars: "single model" is not one number, reporting the best seed
-#: would be systematically over-optimistic, reporting s0 would be arbitrary.
-#:
-#: Triple = (how to read it from compare5.json, legend label, key used for colour)
-#:   ("row",  row-name prefix)   read directly from results[...]
-#:   ("seed", arm label)         read mean+/-std from seed_summary[...]
+#: The four reconstruction methods, one model each.
+#:   ("row",    row name prefix)  read directly from results[...]
+#:   ("single", arm label)        the arm's validation-best seed, from single_model[...]
 ROWS = [
-    ("row",  "DINCAE",     "DINCAE",                      "DINCAE"),
-    ("seed", "MSE",        "4DVarNet (MSE loss)",         "4DVarNet MSE"),
-    ("seed", "NLL",        "4DVarNet + sigma head (vsb0)", "4DVarNet NLL"),
-    ("seed", "AUG",        "4DVarNet + sigma in G(x) (aug0)", "4DVarNet AUG"),
-    ("row",  "Senseiver",  "Senseiver",                   "Senseiver"),
-    ("row",  "EnKF k1",    "EnKF",                        "EnKF k1"),
+    ("row",    "DINCAE",    "DINCAE",              "DINCAE"),
+    ("single", "MSE",       "4DVarNet (MSE loss)", "4DVarNet MSE"),
+    ("row",    "Senseiver", "Senseiver",           "Senseiver"),
+    ("row",    "EnKF k1",   "EnKF",                "EnKF k1"),
 ]
 
 PANELS = [
@@ -95,20 +87,22 @@ def main():
     results, chans = doc["results"], doc["channels"]
     cols = chans + ["total"]
 
-    seeds = doc.get("seed_summary", {})
-    rows = []                      # (label, color, kind, payload)
+    single = doc.get("single_model", {})
+    rows = []                      # (label, color, payload)
     for kind, ref, label, ckey in ROWS:
-        if kind == "seed":
-            if ref not in seeds:
-                print(f"  [warn] {args.json} has no {ref} in seed_summary, skipping this row")
+        if kind == "single":
+            sm = single.get(ref)
+            if sm is None or sm["row"] not in results:
+                print(f"  [warn] {args.json} has no single_model[{ref!r}], skipping this row")
                 continue
-            rows.append((label, ps.method_color(ckey), "seed", seeds[ref]))
+            rows.append((f"{label}, seed {sm['seed']}", ps.method_color(sm["row"]),
+                         results[sm["row"]]))
         else:
             key, entry = pick(results, ref)
             if entry is None:
                 print(f"  [warn] {args.json} has no {ref}*, skipping this row")
                 continue
-            rows.append((label, ps.method_color(key), "row", entry))
+            rows.append((label, ps.method_color(key), entry))
 
     ps.use()
     # wspace given generously: each panel has its own y-axis, and the tick labels
@@ -123,24 +117,16 @@ def main():
     for r, (conv, conv_title) in enumerate(PANELS):
         for c, ch in enumerate(cols):
             ax = axes[r, c]
-            vals, errs, colors = [], [], []
-            for label, color, kind, payload in rows:
+            vals, colors = [], []
+            for label, color, payload in rows:
                 q = payload.get(conv)
                 if q is None:
                     continue
-                if kind == "seed":
-                    vals.append(q["overall_mean"] if ch == "total"
-                                else q["per_channel_mean"][ch])
-                    errs.append(q["overall_std"] if ch == "total"
-                                else q["per_channel_std"][ch])
-                else:
-                    vals.append(q["overall"] if ch == "total" else q["per_channel"][ch])
-                    errs.append(0.0)                  # single-model methods have no seed spread
+                vals.append(q["overall"] if ch == "total" else q["per_channel"][ch])
                 colors.append(color)
 
-            bars = ax.bar(range(len(vals)), vals, yerr=errs, color=colors, width=0.66,
-                          zorder=3, error_kw=dict(ecolor=ps.INK, lw=0.9, capsize=2.5))
-            hi = max(v + e for v, e in zip(vals, errs)) if vals else 1.0
+            bars = ax.bar(range(len(vals)), vals, color=colors, width=0.66, zorder=3)
+            hi = max(vals) if vals else 1.0
             # Values labelled vertically: 5 bars x 4 decimal places will always
             # collide horizontally (the first version collided into
             # ".0242.0246"). Vertical labels each only take up one bar's width.
@@ -160,7 +146,7 @@ def main():
     # Legend placed in a row at the bottom, one colour swatch per method -- no
     # need to repeat labels inside each panel
     handles = [__import__("matplotlib").patches.Patch(facecolor=col, label=lab)
-               for lab, col, _, _ in rows]
+               for lab, col, _ in rows]
     fig.legend(handles=handles, loc="lower center", ncol=len(rows), frameon=False,
                bbox_to_anchor=(0.5, -0.035), fontsize=ps.FS_TICK)
 
@@ -168,8 +154,8 @@ def main():
     fig.suptitle(
         f"Per-channel reconstruction error  —  {n_days} held-out days, "
         "full day, obs_every_k=1, identical clipping\n"
-        "Single models throughout (no ensembling). Error bars on the two 4DVarNet arms are "
-        "±1 s.d. over 5 training seeds.\n"
+        "One model per method, no ensembling or seed averaging; 4DVarNet is its "
+        "validation-best MSE seed.\n"
         "Each panel has its own y axis: the four channels differ by an order of magnitude, "
         "so a shared axis would flatten density/vy/var under vx. Panels are not comparable "
         "to each other.",

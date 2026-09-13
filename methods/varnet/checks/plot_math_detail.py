@@ -33,10 +33,10 @@ EV = os.path.join(ROOT, "check_outputs", "eval")
 INK, MUTED = "#20334d", "#5b6a7d"
 C_EK, C_VN, C_OBS, C_UN = "#b5651d", "#0e6b8a", "#4a7a4a", "#7a4a7a"
 
-from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt  # noqa: E402
 
 # ───────────────────────── everything read from the artefacts ─────────────────────────
-_S, _A, _CK = load_solver(os.path.join(ROOT, "runs/varnet_b0_k1/varnet_best.pt"), "cpu")
+_S, _A, _CK = load_solver(baseline_ckpt(), "cpu")
 DT, N_IT = _A["dT"], _S.n_iter
 C, H, W = 4, 36, 12
 CHAN = ["density", "vx", "vy", "var"]

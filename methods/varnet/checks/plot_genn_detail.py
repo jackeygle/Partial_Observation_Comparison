@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt  # noqa: E402
 
 OUT = os.path.join(ROOT, "check_outputs", "eval")
 
@@ -33,7 +33,7 @@ OUT = os.path.join(ROOT, "check_outputs", "eval")
 # explain away. A2 (hidden 64, kt 5) scores better but is a capacity experiment; presenting the
 # baseline configuration keeps the story about the GENN definition rather than about our tuning.
 # Flip this one path to re-target every figure.
-CKPT = os.path.join(ROOT, "runs/varnet_b0_k1/varnet_best.pt")
+CKPT = baseline_ckpt()
 S, A, _ = load_solver(CKPT, "cpu")
 NP = lambda m: sum(p.numel() for p in m.parameters())
 C, T, H, W = 4, A["dT"], 36, 12

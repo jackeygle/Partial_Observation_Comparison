@@ -1,0 +1,39 @@
+Submitted batch job 20185792
+[chain] submitted successor (afterany:20168318)
+NVIDIA H200
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,788,342 (GENN prior 54,220 = 1.94%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=2  data=0
+[var read-out] 692,000 params on the last hidden state   sigma^2 = softplus(out_var(h)) + 1e-06   beta=0.0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_vsb0_h96_s2/varnet_last.pt: continuing from epoch 48 (step 9456)
+[best] previous best blind MSE = 0.0432
+[schedule] epoch 48: n_iter -> 10, lr -> 0.0007
+[epoch  48] loss=-2.4095  blind_MSE=0.0436  density=0.0186 vx=0.1244 vy=0.0226 var=0.0088
+[epoch  49] loss=-2.4195  blind_MSE=0.0436  density=0.0185 vx=0.1243 vy=0.0226 var=0.0088
+[schedule] epoch 50: n_iter -> 15, lr -> 0.0005
+[epoch  50] loss=-2.3673  blind_MSE=0.0435  density=0.0183 vx=0.1244 vy=0.0226 var=0.0088
+[epoch  51] loss=-2.4744  blind_MSE=0.0435  density=0.0184 vx=0.1238 vy=0.0228 var=0.0088
+[epoch  52] loss=-2.4535  blind_MSE=0.0436  density=0.0183 vx=0.1248 vy=0.0226 var=0.0088
+[epoch  53] loss=-2.4448  blind_MSE=0.0436  density=0.0185 vx=0.1243 vy=0.0228 var=0.0088
+[epoch  54] loss=-2.5445  blind_MSE=0.0436  density=0.0188 vx=0.1242 vy=0.0227 var=0.0089
+[epoch  55] loss=-2.5042  blind_MSE=0.0437  density=0.0185 vx=0.1246 vy=0.0227 var=0.0088
+[epoch  56] loss=-2.5291  blind_MSE=0.0435  density=0.0185 vx=0.1240 vy=0.0227 var=0.0088
+[epoch  57] loss=-2.4868  blind_MSE=0.0436  density=0.0185 vx=0.1243 vy=0.0227 var=0.0088
+[epoch  58] loss=-2.3900  blind_MSE=0.0436  density=0.0186 vx=0.1243 vy=0.0226 var=0.0088
+[epoch  59] loss=-2.4063  blind_MSE=0.0439  density=0.0185 vx=0.1255 vy=0.0227 var=0.0088
+[epoch  60] loss=-2.4589  blind_MSE=0.0435  density=0.0185 vx=0.1242 vy=0.0226 var=0.0088
+[epoch  61] loss=-2.4359  blind_MSE=0.0436  density=0.0185 vx=0.1243 vy=0.0226 var=0.0088
+[epoch  62] loss=-2.4769  blind_MSE=0.0437  density=0.0185 vx=0.1247 vy=0.0227 var=0.0088
+[epoch  63] loss=-2.5030  blind_MSE=0.0437  density=0.0185 vx=0.1247 vy=0.0226 var=0.0088
+[epoch  64] loss=-2.4960  blind_MSE=0.0436  density=0.0185 vx=0.1245 vy=0.0226 var=0.0088
+[epoch  65] loss=-2.5270  blind_MSE=0.0438  density=0.0186 vx=0.1248 vy=0.0227 var=0.0088
+[epoch  66] loss=-2.4641  blind_MSE=0.0437  density=0.0185 vx=0.1246 vy=0.0227 var=0.0088
+[epoch  67] loss=-2.4527  blind_MSE=0.0437  density=0.0186 vx=0.1245 vy=0.0228 var=0.0088
+[epoch  68] loss=-2.4457  blind_MSE=0.0436  density=0.0184 vx=0.1246 vy=0.0227 var=0.0088
+[epoch  69] loss=-2.4142  blind_MSE=0.0436  density=0.0187 vx=0.1243 vy=0.0227 var=0.0088
+[epoch  70] loss=-2.4773  blind_MSE=0.0435  density=0.0186 vx=0.1239 vy=0.0227 var=0.0088
+[epoch  71] loss=-2.5149  blind_MSE=0.0436  density=0.0184 vx=0.1246 vy=0.0226 var=0.0088
+[epoch  72] loss=-2.5070  blind_MSE=0.0436  density=0.0186 vx=0.1245 vy=0.0227 var=0.0088
+[2026-09-10T03:33:52.006] error: *** JOB 20168318 ON gpu60 CANCELLED AT 2026-09-10T03:33:52 DUE TO TIME LIMIT ***

@@ -14,18 +14,20 @@ full day of 7 held-out days, obs_every_k=1, seed=0, the same physical clipping):
     EnKF k1                       localised EnKF, a vendor copy of Partial_observation
 
 The MSE arm and NLL arm are **identical weight-for-weight** in prior/solver
-architecture (hidden 32, kt 3, lstm_hidden 64, GENN 9,474); the only difference is
+architecture (hidden 96, kt 5, lstm_hidden 64, GENN 54,220); the only difference is
 the NLL side's extra `grad_net.out_var` -- a 692,000-parameter sigma-hat read-out
 head. So the loss function's effect is a clean comparison at both the
-single-model and ensemble level.
+single-model and ensemble level. (Retrained at 96/5 on 2026-09-09..13, the
+configuration the capacity sweep picked; before that the arms were 32/3.)
 
-IN PROGRESS as of 2026-09-10, not yet reflected in the numbers this script
-reports: the capacity sweep (runs/varnet_a4_k1) found hidden=96/kt=5 beats this
-32/3 configuration by ~7% and is being adopted as the new baseline, with the
-three arms above being retrained at 96/5 to match (runs/varnet_{mse5,vsb0,aug0}_h96_s*)
-so the headline model and the uncertainty comparison share one backbone. Update
-this figure and re-point --arms once that retrain has validation-selected
-checkpoints -- until then it would describe runs this script is not reading.
+Two outputs feed two different tables:
+  * the ACCURACY table reads ONE model per method. For 4DVarNet that is the MSE
+    seed with the lowest validation error (`single_model` in the JSON) -- the same
+    rule DINCAE's and Senseiver's checkpoints are chosen by. Averaging 5 seeds
+    against the other methods' single model would give 4DVarNet 5x the training.
+  * the UNCERTAINTY table reads each arm's 5-member ensemble (`ens5` rows), because
+    that is what its sigma-hat is computed from (eval_uncertainty.py, Sec. 2.4
+    moment matching); an RMSE column there has to describe the same predictor.
 
 Why four conventions
 ----------------------
@@ -122,7 +124,7 @@ from methods.senseiver import dataset as ds
 from methods.senseiver import sensors
 from methods.senseiver.network import Senseiver
 
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, reported_ckpt
 from crowdcore import navigation as nav
 # The single definition of the "channel-defined cells" rule. Before the
 # 2026-09-03 refactor this was an importlib.spec_from_file_location hack --
@@ -213,24 +215,7 @@ def varnet_ckpt(run_name, ckpt_name):
     rd = os.path.join(paths.runs(paths.VARNET), f"varnet_{run_name}")
     if ckpt_name:
         return os.path.join(rd, ckpt_name)
-    sel = os.path.join(rd, "select_valid.json")
-    if not os.path.exists(sel):
-        # Fall back rather than refuse: every headline run this README reports
-        # (mse5_s*, vsb0_s*, aug0_s*) predates checks/select_checkpoint.py and has no
-        # select_valid.json, so a hard failure here would break the documented
-        # reproduction command (`sbatch sbatch/submit_compare5.sbatch`) for every
-        # number currently in compare5_final.json. varnet_best.pt is exactly the
-        # checkpoint those numbers were produced from -- see the README's "Which
-        # file backs which published number" table -- so falling back to it
-        # reproduces the shipped table rather than reporting a different one.
-        print(f"[ckpt] {sel} not found -- falling back to varnet_best.pt for "
-              f"varnet_{run_name} (train-split selection; see train.py's --split "
-              f"default). Run methods.varnet.checks.select_checkpoint on this run "
-              f"to switch it to the validation-selected epoch.", flush=True)
-        return os.path.join(rd, "varnet_best.pt")
-    with open(sel) as f:
-        j = json.load(f)
-    return os.path.join(rd, j["selected_ckpt"])
+    return reported_ckpt(rd)
 
 
 def run_senseiver(model, Y, Om, dev, batch):
@@ -296,7 +281,7 @@ def main():
                          "e.g. 'a4_k1'. Empty by default: the three arms below already cover "
                          "every reported 4DVarNet number, and a2/a4/b0 are exploratory "
                          "capacity ablations that are not part of any reported comparison.")
-    ap.add_argument("--arms", default="MSE=mse5_s{},NLL=vsb0_s{},AUG=aug0_s{}",
+    ap.add_argument("--arms", default="MSE=mse5_h96_s{},NLL=vsb0_h96_s{},AUG=aug0_h96_s{}",
                     help="comma-separated `label=run-name-template` entries. Each "
                          "arm produces N single-seed rows, plus one cross-seed "
                          "mean+/-std row. Leave empty to skip all arms.")
@@ -314,13 +299,12 @@ def main():
                          "best fell at epoch 16-40 with the solver still at 5-10 iterations "
                          "while mse5's fell at 78-143 at 20, so those two checkpoints differ "
                          "in solver depth as well as in loss.")
-    ap.add_argument("--with-ensemble", action="store_true",
-                    help="additionally compute one row averaging N members' "
-                         "reconstructions into an ensemble. **Off by default** -- "
-                         "the paper never mentions ensembling, so the main table "
-                         "reports single models. This switch is kept because the "
-                         "ensembling gain is itself a reportable quantity "
-                         "(measured: 4.2%% for the MSE arm, 1.7%% for the NLL arm).")
+    ap.add_argument("--with-ensemble", action=argparse.BooleanOptionalAction, default=True,
+                    help="also compute one row averaging each arm's members into an "
+                         "ensemble (`4DVarNet <arm> ens5`). **On by default**: the "
+                         "uncertainty table's sigma-hat comes from that ensemble, so its "
+                         "RMSE column must too. The accuracy table does not use these "
+                         "rows -- it reads `single_model`. --no-with-ensemble skips them.")
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
     ap.add_argument("--dincae-json",
                     default=os.path.join(paths.method(paths.DINCAE), "check_outputs",
@@ -536,7 +520,11 @@ def main():
         "walkable_cells": int(walk.sum()), "grid_cells": int(walk.size),
         "frame_range": f"[{FRAME_LO}, T-{FRAME_HI_PAD})  (aligned with DINCAE's FRESH_OFFSETS)",
         "obs_every_k": 1, "seed": 0, "clip": "EnKF's physical bounds",
-        "ckpt": args.ckpt_name,
+        "ckpt": args.ckpt_name or "per run: select_valid.json (validation split, 20 iterations)",
+        # One entry per member. Without this the JSON cannot say which epoch a number came
+        # from, and with per-run selection the five members are not all the same epoch.
+        "checkpoints": {label: [{"run": r, "ckpt": c, "epoch": e, "n_iter": d}
+                                for r, c, e, d in rows] for label, rows in picked.items()},
         "pooling": "accumulate squared error and cell count per channel, divide once at the end",
         "n_days": len(days)},
         "per_day": per_day, "channels": chans, "results": {}}
@@ -589,6 +577,28 @@ def main():
                 "per_channel_std": {c: float(np.std(v)) for c, v in pc.items()},
             }
         res["seed_summary"][label] = entry
+
+    # --- The single model per arm the ACCURACY table reports ------------------------
+    # The seed whose selected checkpoint scored lowest on the VALIDATION split
+    # (select_valid.json's selected_mse, walkable-blind). Decided here, recorded in the
+    # JSON, and read by plot_compare5 and the README -- so "which seed" is chosen by one
+    # rule in one place rather than typed into three files.
+    res["single_model"] = {}
+    for label, rows in picked.items():
+        scored = []
+        for m, (run, *_rest) in zip(ens_members, rows):
+            sv = os.path.join(paths.runs(paths.VARNET), f"varnet_{run}", "select_valid.json")
+            if not os.path.exists(sv):
+                scored = []
+                break
+            with open(sv) as f:
+                scored.append((json.load(f)["selected_mse"], m, run))
+        if scored:
+            v, m, run = min(scored)
+            res["single_model"][label] = {
+                "seed": int(m), "run": run, "row": f"4DVarNet {label} s{m}",
+                "valid_walkable_blind_mse": float(v),
+                "rule": "lowest validation walkable-blind MSE among the members' selected checkpoints"}
 
     # DINCAE's total is recomputed using this script's own cell counts, see the file header for why
     if dincae_pc:

@@ -1,0 +1,31 @@
+Submitted batch job 20225750
+[chain] submitted successor (afterany:20223795)
+NVIDIA H200
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=3,990,742 (GENN prior 54,220 = 1.36%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=3  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_aug0_h96_s3/varnet_last.pt: continuing from epoch 109 (step 21473)
+[best] previous best blind MSE = 0.0478
+[schedule] epoch 109: n_iter -> 20, lr -> 0.0003
+[epoch 109] loss=-2.3234  blind_MSE=0.0484  density=0.0177 vx=0.1430 vy=0.0241 var=0.0087
+[epoch 110] loss=-2.1292  blind_MSE=0.0500  density=0.0183 vx=0.1478 vy=0.0250 var=0.0088
+[epoch 111] loss=-2.2198  blind_MSE=0.0489  density=0.0180 vx=0.1450 vy=0.0241 var=0.0087
+[epoch 112] loss=-2.2404  blind_MSE=0.0488  density=0.0178 vx=0.1446 vy=0.0240 var=0.0087
+[epoch 113] loss=-2.2631  blind_MSE=0.0487  density=0.0176 vx=0.1442 vy=0.0242 var=0.0087
+[epoch 114] loss=-2.3188  blind_MSE=0.0486  density=0.0177 vx=0.1439 vy=0.0241 var=0.0087
+[epoch 115] loss=-2.3896  blind_MSE=0.0485  density=0.0177 vx=0.1435 vy=0.0241 var=0.0087
+[epoch 116] loss=-2.3134  blind_MSE=0.0484  density=0.0177 vx=0.1431 vy=0.0241 var=0.0087
+[epoch 117] loss=-2.3410  blind_MSE=0.0485  density=0.0177 vx=0.1433 vy=0.0243 var=0.0087
+[epoch 118] loss=-2.3142  blind_MSE=0.0484  density=0.0177 vx=0.1433 vy=0.0239 var=0.0087
+[epoch 119] loss=-2.3346  blind_MSE=0.0485  density=0.0178 vx=0.1436 vy=0.0240 var=0.0087
+[epoch 120] loss=-2.3393  blind_MSE=0.0482  density=0.0178 vx=0.1423 vy=0.0240 var=0.0087
+[epoch 121] loss=-2.3796  blind_MSE=0.0484  density=0.0178 vx=0.1429 vy=0.0241 var=0.0087
+[epoch 122] loss=-2.3572  blind_MSE=0.0483  density=0.0177 vx=0.1428 vy=0.0242 var=0.0087
+[epoch 123] loss=-2.3559  blind_MSE=0.0482  density=0.0177 vx=0.1424 vy=0.0240 var=0.0087
+[epoch 124] loss=-2.2672  blind_MSE=0.0485  density=0.0179 vx=0.1430 vy=0.0242 var=0.0087
+[epoch 125] loss=-2.3509  blind_MSE=0.0482  density=0.0176 vx=0.1426 vy=0.0239 var=0.0087
+[epoch 126] loss=-2.3111  blind_MSE=0.0487  density=0.0177 vx=0.1442 vy=0.0240 var=0.0087
+[2026-09-12T16:32:54.004] error: *** JOB 20223795 ON gpu60 CANCELLED AT 2026-09-12T16:32:54 DUE TO TIME LIMIT ***

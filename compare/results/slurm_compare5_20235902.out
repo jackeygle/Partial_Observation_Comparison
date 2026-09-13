@@ -1,0 +1,214 @@
+[model] Senseiver 65,892 params |  | walkable 290/432 | device=cuda
+[ckpt] MSE: mse5_h96_s0=ckpt_00080.pt(ep80,20it), mse5_h96_s1=ckpt_00090.pt(ep90,20it), mse5_h96_s2=ckpt_00080.pt(ep80,20it), mse5_h96_s3=ckpt_00080.pt(ep80,20it), mse5_h96_s4=ckpt_00080.pt(ep80,20it)
+[ckpt] NLL: vsb0_h96_s0=ckpt_00080.pt(ep80,20it), vsb0_h96_s1=ckpt_00090.pt(ep90,20it), vsb0_h96_s2=ckpt_00149.pt(ep149,20it), vsb0_h96_s3=ckpt_00140.pt(ep140,20it), vsb0_h96_s4=ckpt_00140.pt(ep140,20it)
+[ckpt] AUG: aug0_h96_s0=ckpt_00149.pt(ep149,20it), aug0_h96_s1=ckpt_00100.pt(ep100,20it), aug0_h96_s2=ckpt_00100.pt(ep100,20it), aug0_h96_s3=ckpt_00149.pt(ep149,20it), aug0_h96_s4=ckpt_00130.pt(ep130,20it)
+  atc-20130811: 39821 frames, scored [1,39820)  Senseiver full=0.0138  4DVarNet MSE ens5 full=0.0233  4DVarNet MSE s0 full=0.0244  4DVarNet MSE s1 full=0.0240  4DVarNet MSE s2 full=0.0244  4DVarNet MSE s3 full=0.0238  4DVarNet MSE s4 full=0.0245  4DVarNet NLL ens5 full=0.0308  4DVarNet NLL s0 full=0.0320  4DVarNet NLL s1 full=0.0320  4DVarNet NLL s2 full=0.0338  4DVarNet NLL s3 full=0.0322  4DVarNet NLL s4 full=0.0333  4DVarNet AUG ens5 full=0.0345  4DVarNet AUG s0 full=0.0367  4DVarNet AUG s1 full=0.0377  4DVarNet AUG s2 full=0.0380  4DVarNet AUG s3 full=0.0354  4DVarNet AUG s4 full=0.0350  EnKF k1 full=0.0473
+  atc-20130818: 38885 frames, scored [1,38884)  Senseiver full=0.0196  4DVarNet MSE ens5 full=0.0291  4DVarNet MSE s0 full=0.0306  4DVarNet MSE s1 full=0.0302  4DVarNet MSE s2 full=0.0310  4DVarNet MSE s3 full=0.0298  4DVarNet MSE s4 full=0.0310  4DVarNet NLL ens5 full=0.0383  4DVarNet NLL s0 full=0.0398  4DVarNet NLL s1 full=0.0397  4DVarNet NLL s2 full=0.0420  4DVarNet NLL s3 full=0.0399  4DVarNet NLL s4 full=0.0412  4DVarNet AUG ens5 full=0.0432  4DVarNet AUG s0 full=0.0458  4DVarNet AUG s1 full=0.0472  4DVarNet AUG s2 full=0.0471  4DVarNet AUG s3 full=0.0442  4DVarNet AUG s4 full=0.0438  EnKF k1 full=0.0609
+  atc-20130825: 42890 frames, scored [1,42889)  Senseiver full=0.0169  4DVarNet MSE ens5 full=0.0267  4DVarNet MSE s0 full=0.0279  4DVarNet MSE s1 full=0.0275  4DVarNet MSE s2 full=0.0283  4DVarNet MSE s3 full=0.0273  4DVarNet MSE s4 full=0.0283  4DVarNet NLL ens5 full=0.0353  4DVarNet NLL s0 full=0.0367  4DVarNet NLL s1 full=0.0367  4DVarNet NLL s2 full=0.0387  4DVarNet NLL s3 full=0.0369  4DVarNet NLL s4 full=0.0381  4DVarNet AUG ens5 full=0.0399  4DVarNet AUG s0 full=0.0422  4DVarNet AUG s1 full=0.0435  4DVarNet AUG s2 full=0.0438  4DVarNet AUG s3 full=0.0409  4DVarNet AUG s4 full=0.0405  EnKF k1 full=0.0563
+  atc-20130901: 39758 frames, scored [1,39757)  Senseiver full=0.0187  4DVarNet MSE ens5 full=0.0285  4DVarNet MSE s0 full=0.0298  4DVarNet MSE s1 full=0.0294  4DVarNet MSE s2 full=0.0302  4DVarNet MSE s3 full=0.0291  4DVarNet MSE s4 full=0.0303  4DVarNet NLL ens5 full=0.0375  4DVarNet NLL s0 full=0.0390  4DVarNet NLL s1 full=0.0389  4DVarNet NLL s2 full=0.0410  4DVarNet NLL s3 full=0.0392  4DVarNet NLL s4 full=0.0405  4DVarNet AUG ens5 full=0.0423  4DVarNet AUG s0 full=0.0449  4DVarNet AUG s1 full=0.0461  4DVarNet AUG s2 full=0.0464  4DVarNet AUG s3 full=0.0433  4DVarNet AUG s4 full=0.0430  EnKF k1 full=0.0601
+  atc-20130915: 39383 frames, scored [1,39382)  Senseiver full=0.0162  4DVarNet MSE ens5 full=0.0260  4DVarNet MSE s0 full=0.0273  4DVarNet MSE s1 full=0.0268  4DVarNet MSE s2 full=0.0276  4DVarNet MSE s3 full=0.0266  4DVarNet MSE s4 full=0.0275  4DVarNet NLL ens5 full=0.0348  4DVarNet NLL s0 full=0.0361  4DVarNet NLL s1 full=0.0361  4DVarNet NLL s2 full=0.0381  4DVarNet NLL s3 full=0.0363  4DVarNet NLL s4 full=0.0375  4DVarNet AUG ens5 full=0.0392  4DVarNet AUG s0 full=0.0416  4DVarNet AUG s1 full=0.0428  4DVarNet AUG s2 full=0.0431  4DVarNet AUG s3 full=0.0402  4DVarNet AUG s4 full=0.0400  EnKF k1 full=0.0552
+  atc-20130922: 38842 frames, scored [1,38841)  Senseiver full=0.0154  4DVarNet MSE ens5 full=0.0256  4DVarNet MSE s0 full=0.0268  4DVarNet MSE s1 full=0.0263  4DVarNet MSE s2 full=0.0270  4DVarNet MSE s3 full=0.0261  4DVarNet MSE s4 full=0.0270  4DVarNet NLL ens5 full=0.0344  4DVarNet NLL s0 full=0.0357  4DVarNet NLL s1 full=0.0356  4DVarNet NLL s2 full=0.0377  4DVarNet NLL s3 full=0.0358  4DVarNet NLL s4 full=0.0370  4DVarNet AUG ens5 full=0.0389  4DVarNet AUG s0 full=0.0413  4DVarNet AUG s1 full=0.0426  4DVarNet AUG s2 full=0.0428  4DVarNet AUG s3 full=0.0399  4DVarNet AUG s4 full=0.0395  EnKF k1 full=0.0550
+  atc-20130929: 37964 frames, scored [1,37963)  Senseiver full=0.0192  4DVarNet MSE ens5 full=0.0293  4DVarNet MSE s0 full=0.0307  4DVarNet MSE s1 full=0.0303  4DVarNet MSE s2 full=0.0312  4DVarNet MSE s3 full=0.0300  4DVarNet MSE s4 full=0.0313  4DVarNet NLL ens5 full=0.0393  4DVarNet NLL s0 full=0.0407  4DVarNet NLL s1 full=0.0407  4DVarNet NLL s2 full=0.0430  4DVarNet NLL s3 full=0.0409  4DVarNet NLL s4 full=0.0421  4DVarNet AUG ens5 full=0.0445  4DVarNet AUG s0 full=0.0470  4DVarNet AUG s1 full=0.0487  4DVarNet AUG s2 full=0.0486  4DVarNet AUG s3 full=0.0455  4DVarNet AUG s4 full=0.0451  EnKF k1 full=0.0647
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.1308      0.1306        0.1305          0.1304
+4DVarNet MSE ens5           0.1640      0.1640        0.1651          0.1651
+4DVarNet MSE s0             0.1679      0.1679        0.1689          0.1688
+4DVarNet MSE s1             0.1667      0.1666        0.1678          0.1678
+4DVarNet MSE s2             0.1688      0.1688        0.1701          0.1700
+4DVarNet MSE s3             0.1658      0.1658        0.1670          0.1669
+4DVarNet MSE s4             0.1689      0.1689        0.1704          0.1703
+4DVarNet NLL ens5           0.1890      0.1890        0.1895          0.1894
+4DVarNet NLL s0             0.1926      0.1926        0.1932          0.1931
+4DVarNet NLL s1             0.1925      0.1925        0.1931          0.1931
+4DVarNet NLL s2             0.1978      0.1978        0.1983          0.1983
+4DVarNet NLL s3             0.1930      0.1930        0.1936          0.1935
+4DVarNet NLL s4             0.1962      0.1961        0.1967          0.1967
+4DVarNet AUG ens5           0.2008      0.2007        0.2014          0.2014
+4DVarNet AUG s0             0.2068      0.2067        0.2076          0.2075
+4DVarNet AUG s1             0.2098      0.2098        0.2106          0.2105
+4DVarNet AUG s2             0.2103      0.2103        0.2111          0.2110
+4DVarNet AUG s3             0.2032      0.2032        0.2040          0.2039
+4DVarNet AUG s4             0.2023      0.2023        0.2031          0.2030
+EnKF k1                     0.2388      0.2387        0.2388          0.2387
+DINCAE                      0.6451           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0242     0.6334     0.1108     0.0543     0.1180      0.3435
+4DVarNet MSE ens5            0.0308     0.5080     0.1267     0.0774     0.1109      0.3330
+4DVarNet MSE s0              0.0321     0.5297     0.1305     0.0772     0.1149      0.3390
+4DVarNet MSE s1              0.0309     0.5312     0.1283     0.0775     0.1141      0.3379
+4DVarNet MSE s2              0.0312     0.5409     0.1271     0.0776     0.1154      0.3397
+4DVarNet MSE s3              0.0308     0.5182     0.1263     0.0773     0.1121      0.3348
+4DVarNet MSE s4              0.0312     0.5362     0.1281     0.0774     0.1149      0.3390
+4DVarNet NLL ens5            0.0340     0.7680     0.1314     0.0785     0.1472      0.3836
+4DVarNet NLL s0              0.0334     0.7801     0.1325     0.0783     0.1485      0.3854
+4DVarNet NLL s1              0.0340     0.7783     0.1323     0.0786     0.1487      0.3856
+4DVarNet NLL s2              0.0361     0.7972     0.1369     0.0790     0.1531      0.3913
+4DVarNet NLL s3              0.0348     0.7812     0.1346     0.0785     0.1498      0.3870
+4DVarNet NLL s4              0.0353     0.7859     0.1345     0.0783     0.1507      0.3882
+4DVarNet AUG ens5            0.0355     0.8441     0.1408     0.0785     0.1592      0.3990
+4DVarNet AUG s0              0.0351     0.8627     0.1439     0.0782     0.1617      0.4022
+4DVarNet AUG s1              0.0386     0.8878     0.1507     0.0786     0.1681      0.4100
+4DVarNet AUG s2              0.0364     0.8796     0.1455     0.0786     0.1650      0.4062
+4DVarNet AUG s3              0.0348     0.8423     0.1382     0.0783     0.1582      0.3977
+4DVarNet AUG s4              0.0352     0.8457     0.1409     0.0781     0.1592      0.3990
+EnKF k1                      0.0246     0.7435     0.1207     0.0661     0.1352      0.3677
+DINCAE                       0.0240     0.5644     0.1056     0.0551     0.1083      0.3292
+4DVarNet MSE single model     0.0313     0.5312     0.1281     0.0774     0.1143      0.3381   ± 0.0012 (5 seeds)
+4DVarNet NLL single model     0.0347     0.7845     0.1342     0.0785     0.1502      0.3875   ± 0.0017 (5 seeds)
+4DVarNet AUG single model     0.0360     0.8636     0.1438     0.0784     0.1624      0.4030   ± 0.0037 (5 seeds)
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0120     0.2517     0.0445     0.0231     0.0534      0.2310
+4DVarNet MSE ens5            0.0152     0.2402     0.0522     0.0294     0.0555      0.2357
+4DVarNet MSE s0              0.0158     0.2499     0.0538     0.0294     0.0576      0.2399
+4DVarNet MSE s1              0.0154     0.2513     0.0533     0.0295     0.0574      0.2397
+4DVarNet MSE s2              0.0155     0.2568     0.0531     0.0295     0.0583      0.2414
+4DVarNet MSE s3              0.0153     0.2461     0.0524     0.0294     0.0565      0.2377
+4DVarNet MSE s4              0.0156     0.2548     0.0536     0.0295     0.0581      0.2411
+4DVarNet NLL ens5            0.0162     0.3468     0.0530     0.0298     0.0719      0.2681
+4DVarNet NLL s0              0.0161     0.3563     0.0540     0.0298     0.0733      0.2708
+4DVarNet NLL s1              0.0163     0.3554     0.0536     0.0299     0.0733      0.2708
+4DVarNet NLL s2              0.0173     0.3645     0.0557     0.0300     0.0755      0.2748
+4DVarNet NLL s3              0.0168     0.3567     0.0550     0.0298     0.0740      0.2720
+4DVarNet NLL s4              0.0171     0.3625     0.0560     0.0298     0.0751      0.2741
+4DVarNet AUG ens5            0.0167     0.3700     0.0555     0.0298     0.0759      0.2755
+4DVarNet AUG s0              0.0167     0.3839     0.0570     0.0297     0.0781      0.2795
+4DVarNet AUG s1              0.0183     0.4002     0.0597     0.0298     0.0819      0.2861
+4DVarNet AUG s2              0.0173     0.3925     0.0579     0.0298     0.0799      0.2827
+4DVarNet AUG s3              0.0165     0.3733     0.0553     0.0297     0.0763      0.2762
+4DVarNet AUG s4              0.0167     0.3734     0.0559     0.0297     0.0765      0.2766
+EnKF k1                      0.0295     0.6853     0.0989     0.0625     0.1402      0.3744
+DINCAE                       0.0134     0.2375     0.0431     0.0241     0.0520      0.2281
+4DVarNet MSE single model     0.0155     0.2518     0.0532     0.0295     0.0576      0.2400   ± 0.0006 (5 seeds)
+4DVarNet NLL single model     0.0167     0.3591     0.0548     0.0299     0.0743      0.2725   ± 0.0009 (5 seeds)
+4DVarNet AUG single model     0.0171     0.3847     0.0572     0.0298     0.0785      0.2802   ± 0.0021 (5 seeds)
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0242     0.1380     0.0238     0.0115     0.0494      0.2222
+4DVarNet MSE ens5            0.0308     0.1245     0.0321     0.0198     0.0518      0.2276
+4DVarNet MSE s0              0.0321     0.1328     0.0334     0.0199     0.0545      0.2335
+4DVarNet MSE s1              0.0309     0.1310     0.0328     0.0198     0.0536      0.2316
+4DVarNet MSE s2              0.0312     0.1370     0.0327     0.0199     0.0552      0.2350
+4DVarNet MSE s3              0.0308     0.1292     0.0319     0.0198     0.0529      0.2301
+4DVarNet MSE s4              0.0312     0.1378     0.0330     0.0199     0.0555      0.2355
+4DVarNet NLL ens5            0.0340     0.1969     0.0319     0.0204     0.0708      0.2660
+4DVarNet NLL s0              0.0334     0.2037     0.0323     0.0204     0.0725      0.2692
+4DVarNet NLL s1              0.0340     0.2040     0.0326     0.0204     0.0727      0.2697
+4DVarNet NLL s2              0.0361     0.2146     0.0346     0.0204     0.0764      0.2765
+4DVarNet NLL s3              0.0348     0.2028     0.0336     0.0204     0.0729      0.2700
+4DVarNet NLL s4              0.0353     0.2069     0.0339     0.0205     0.0741      0.2723
+4DVarNet AUG ens5            0.0355     0.2441     0.0371     0.0201     0.0842      0.2902
+4DVarNet AUG s0              0.0351     0.2564     0.0390     0.0201     0.0876      0.2960
+4DVarNet AUG s1              0.0386     0.2601     0.0417     0.0202     0.0901      0.3002
+4DVarNet AUG s2              0.0364     0.2667     0.0396     0.0201     0.0907      0.3012
+4DVarNet AUG s3              0.0348     0.2483     0.0358     0.0202     0.0848      0.2911
+4DVarNet AUG s4              0.0352     0.2453     0.0375     0.0201     0.0845      0.2907
+EnKF k1                      0.0246     0.1822     0.0307     0.0400     0.0694      0.2634
+DINCAE                       0.0240     0.2357     0.1252     0.0134     0.0996      0.3156
+4DVarNet MSE single model     0.0313     0.1336     0.0328     0.0199     0.0544      0.2332   ± 0.0010 (5 seeds)
+4DVarNet NLL single model     0.0347     0.2064     0.0334     0.0204     0.0737      0.2715   ± 0.0015 (5 seeds)
+4DVarNet AUG single model     0.0360     0.2553     0.0387     0.0201     0.0875      0.2959   ± 0.0026 (5 seeds)
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0120     0.0680     0.0118     0.0060     0.0245      0.1564
+4DVarNet MSE ens5            0.0152     0.0998     0.0193     0.0092     0.0359      0.1894
+4DVarNet MSE s0              0.0158     0.1046     0.0200     0.0092     0.0374      0.1934
+4DVarNet MSE s1              0.0154     0.1038     0.0199     0.0092     0.0371      0.1925
+4DVarNet MSE s2              0.0155     0.1076     0.0200     0.0092     0.0381      0.1951
+4DVarNet MSE s3              0.0153     0.1030     0.0193     0.0092     0.0367      0.1916
+4DVarNet MSE s4              0.0156     0.1078     0.0202     0.0092     0.0382      0.1954
+4DVarNet NLL ens5            0.0162     0.1441     0.0187     0.0094     0.0471      0.2170
+4DVarNet NLL s0              0.0161     0.1503     0.0192     0.0095     0.0487      0.2208
+4DVarNet NLL s1              0.0163     0.1501     0.0192     0.0095     0.0488      0.2208
+4DVarNet NLL s2              0.0173     0.1573     0.0204     0.0094     0.0511      0.2261
+4DVarNet NLL s3              0.0168     0.1497     0.0199     0.0095     0.0490      0.2213
+4DVarNet NLL s4              0.0171     0.1544     0.0207     0.0096     0.0505      0.2246
+4DVarNet AUG ens5            0.0167     0.1652     0.0206     0.0093     0.0529      0.2301
+4DVarNet AUG s0              0.0167     0.1754     0.0217     0.0093     0.0558      0.2362
+4DVarNet AUG s1              0.0183     0.1797     0.0231     0.0093     0.0576      0.2400
+4DVarNet AUG s2              0.0173     0.1824     0.0222     0.0093     0.0578      0.2404
+4DVarNet AUG s3              0.0165     0.1698     0.0204     0.0093     0.0540      0.2324
+4DVarNet AUG s4              0.0167     0.1678     0.0210     0.0093     0.0537      0.2318
+EnKF k1                      0.0295     0.2033     0.0307     0.0398     0.0758      0.2754
+DINCAE                       0.0134     0.1540     0.0686     0.0071     0.0608      0.2465
+4DVarNet MSE single model     0.0155     0.1054     0.0199     0.0092     0.0375      0.1936   ± 0.0006 (5 seeds)
+4DVarNet NLL single model     0.0167     0.1524     0.0199     0.0095     0.0496      0.2227   ± 0.0010 (5 seeds)
+4DVarNet AUG single model     0.0171     0.1750     0.0217     0.0093     0.0558      0.2362   ± 0.0017 (5 seeds)
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0139     0.0788     0.0144     0.0064     0.0284      0.1685
+4DVarNet MSE ens5            0.0176     0.0732     0.0203     0.0112     0.0306      0.1749
+4DVarNet MSE s0              0.0186     0.0787     0.0213     0.0112     0.0325      0.1801
+4DVarNet MSE s1              0.0177     0.0770     0.0208     0.0111     0.0317      0.1780
+4DVarNet MSE s2              0.0179     0.0805     0.0207     0.0112     0.0326      0.1805
+4DVarNet MSE s3              0.0176     0.0760     0.0201     0.0111     0.0312      0.1767
+4DVarNet MSE s4              0.0179     0.0809     0.0209     0.0112     0.0327      0.1809
+4DVarNet NLL ens5            0.0192     0.1191     0.0199     0.0114     0.0424      0.2059
+4DVarNet NLL s0              0.0190     0.1241     0.0202     0.0115     0.0437      0.2090
+4DVarNet NLL s1              0.0193     0.1241     0.0204     0.0115     0.0438      0.2093
+4DVarNet NLL s2              0.0205     0.1318     0.0218     0.0115     0.0464      0.2154
+4DVarNet NLL s3              0.0197     0.1235     0.0210     0.0114     0.0439      0.2096
+4DVarNet NLL s4              0.0202     0.1264     0.0215     0.0116     0.0449      0.2120
+4DVarNet AUG ens5            0.0201     0.1489     0.0231     0.0113     0.0508      0.2255
+4DVarNet AUG s0              0.0199     0.1577     0.0244     0.0113     0.0533      0.2309
+4DVarNet AUG s1              0.0219     0.1606     0.0261     0.0113     0.0550      0.2344
+4DVarNet AUG s2              0.0206     0.1644     0.0248     0.0113     0.0553      0.2351
+4DVarNet AUG s3              0.0197     0.1525     0.0224     0.0113     0.0515      0.2269
+4DVarNet AUG s4              0.0200     0.1497     0.0234     0.0113     0.0511      0.2260
+EnKF k1                      0.0143     0.1103     0.0209     0.0394     0.0462      0.2150
+DINCAE                       0.0160     0.7462     1.4952     0.0323     0.5724      0.7566
+4DVarNet MSE single model     0.0179     0.0786     0.0208     0.0112     0.0321      0.1792   ± 0.0006 (5 seeds)
+4DVarNet NLL single model     0.0197     0.1260     0.0210     0.0115     0.0445      0.2111   ± 0.0010 (5 seeds)
+4DVarNet AUG single model     0.0204     0.1570     0.0242     0.0113     0.0532      0.2307   ± 0.0017 (5 seeds)
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0084     0.0473     0.0087     0.0041     0.0171      0.1308
+4DVarNet MSE ens5            0.0106     0.0757     0.0150     0.0063     0.0269      0.1640
+4DVarNet MSE s0              0.0113     0.0795     0.0157     0.0063     0.0282      0.1679
+4DVarNet MSE s1              0.0108     0.0785     0.0155     0.0063     0.0278      0.1667
+4DVarNet MSE s2              0.0109     0.0812     0.0156     0.0063     0.0285      0.1688
+4DVarNet MSE s3              0.0107     0.0779     0.0151     0.0063     0.0275      0.1658
+4DVarNet MSE s4              0.0109     0.0812     0.0157     0.0063     0.0285      0.1689
+4DVarNet NLL ens5            0.0113     0.1108     0.0144     0.0064     0.0357      0.1890
+4DVarNet NLL s0              0.0112     0.1159     0.0148     0.0065     0.0371      0.1926
+4DVarNet NLL s1              0.0114     0.1156     0.0148     0.0065     0.0371      0.1925
+4DVarNet NLL s2              0.0121     0.1222     0.0158     0.0064     0.0391      0.1978
+4DVarNet NLL s3              0.0117     0.1155     0.0154     0.0064     0.0373      0.1930
+4DVarNet NLL s4              0.0121     0.1192     0.0161     0.0066     0.0385      0.1962
+4DVarNet AUG ens5            0.0116     0.1275     0.0159     0.0063     0.0403      0.2008
+4DVarNet AUG s0              0.0116     0.1363     0.0168     0.0063     0.0428      0.2068
+4DVarNet AUG s1              0.0127     0.1392     0.0178     0.0063     0.0440      0.2098
+4DVarNet AUG s2              0.0120     0.1414     0.0172     0.0063     0.0442      0.2103
+4DVarNet AUG s3              0.0115     0.1316     0.0158     0.0063     0.0413      0.2032
+4DVarNet AUG s4              0.0116     0.1295     0.0163     0.0064     0.0409      0.2023
+EnKF k1                      0.0204     0.1451     0.0237     0.0389     0.0570      0.2388
+DINCAE                       0.0106     0.4736     1.1618     0.0186     0.4161      0.6451
+4DVarNet MSE single model     0.0109     0.0797     0.0155     0.0063     0.0281      0.1676   ± 0.0004 (5 seeds)
+4DVarNet NLL single model     0.0117     0.1177     0.0154     0.0065     0.0378      0.1945   ± 0.0008 (5 seeds)
+4DVarNet AUG single model     0.0119     0.1356     0.0168     0.0063     0.0427      0.2065   ± 0.0014 (5 seeds)
+
+[out] /scratch/work/zhangx29/Thesis_Project/compare/results/compare5.json

@@ -28,7 +28,7 @@ Aggregation: BOTH are reported, because the two existing conventions disagree sl
 
 Run on a GPU node:
     python3 checks/eval_comprehensive.py
-    python3 checks/eval_comprehensive.py --add a2=runs/varnet_a2_k1/varnet_best.pt
+    python3 checks/eval_comprehensive.py --add aug0=/path/to/runs/varnet_aug0_h96_s0/ckpt_<epoch>.pt
 """
 from __future__ import annotations
 import argparse, glob, json, os, sys
@@ -37,7 +37,7 @@ from crowdcore import config
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from crowdcore import paths
-from methods.varnet.checks.model_io import load_solver
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENKFDIR = paths.enkf_export()   # default: enkf_k1_full, the model of record
@@ -93,7 +93,8 @@ def day_scores(pred, true, unobs):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mse-ckpt", default="runs/varnet_b0_k1/varnet_best.pt")
+    ap.add_argument("--mse-ckpt", default=None,
+                    help="default: the reported 4DVarNet model, model_io.baseline_ckpt()")
     ap.add_argument("--add", action="append", default=[],
                     help="extra model as name=path/to/varnet_last.pt (repeatable)")
     ap.add_argument("--dir", default=ENKFDIR,
@@ -104,7 +105,7 @@ def main():
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     models = {}
-    for spec in [f"4DVarNet-MSE={args.mse_ckpt}"] + args.add:
+    for spec in [f"4DVarNet-MSE={args.mse_ckpt or baseline_ckpt()}"] + args.add:
         name, path = spec.split("=", 1)
         if os.path.exists(path):
             s, a, ep = build_solver(path, dev)

@@ -314,7 +314,6 @@ archived convention also had clipping ON.
 |---|---|---|---|---|
 | **Senseiver** | **0.0284 +/- 0.0034** | **0.0171** | **65,892** | **0.047** |
 | 4DVarNet `a4_k1` | 0.0308 +/- 0.0036 | 0.0272 | 2,096,432 | 0.184 |
-| 4DVarNet `b0_k1` | 0.0338 +/- 0.0040 | 0.0290 | 2,051,596 | 0.086 |
 | EnKF `k1` | 0.0462 | -- | -- | -- |
 
 Senseiver's blind MSE is lower than 4DVarNet-a4's on 7/7 days, difference mean +0.00237, std 0.00030 (far

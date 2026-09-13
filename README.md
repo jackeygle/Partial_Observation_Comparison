@@ -49,15 +49,20 @@ agreed with the supervisor on 2026-09-07.
 | `methods/senseiver/` | Senseiver | none |
 | `methods/enkf/` | localised EnKF (+ PedPred3 forward model) | ensemble spread |
 
-Measured against a constant-sigma null model on `defined_blind`, CRPS relative
-to that baseline is: `aug0` -19.3%, DINCAE -15.7%, `vsb0` +2.6%, EnKF +12.8%.
-Under the all-cells convention the same four are -24.3%, -76.1%, +50.1%,
-+26.8% — the magnitudes change, the signs do not. DINCAE and the EnKF have
-uncertainty *built into* the method (information form, ensemble spread) rather
-than as a separate design.
+How good each σ̂ is, and what asking for one costs in reconstruction
+accuracy, is in [Uncertainty: how it is scored](#uncertainty-how-it-is-scored) —
+kept in one place so two copies of the numbers cannot drift apart. DINCAE and
+the EnKF have uncertainty *built into* the method (information form, ensemble
+spread) rather than as a separate design.
 
-**Every headline row is a single model**, default configuration, seed 0 — no
-ensembling and no checkpoint averaging, because neither paper reports one.
+**Every row of the accuracy table is one model** — no ensembling, no seed
+averaging, no checkpoint averaging, because none of the papers reports one — and
+every model is chosen on the **validation** split: DINCAE's and Senseiver's
+checkpoint, and for 4DVarNet both each seed's epoch
+(`methods/varnet/checks/select_checkpoint.py`) and which of its five MSE seeds
+represents it (the lowest validation error, recorded by `compare5` as
+`single_model`). The mean of five 4DVarNet seeds next to the other methods'
+single model would give 4DVarNet five times the training.
 DINCAE's reference implementation *does* average the outputs of checkpoints
 saved every 10 epochs, and `methods/dincae/checks/evaluate.py` still supports
 it behind `--average-checkpoints`, but the reported number comes from **one**
@@ -148,8 +153,15 @@ frame of every test day is scored.
 
 ## Uncertainty: how it is scored
 
-Three of the four methods also report how wrong they think they are. Judging
-that needs a reference, because a σ̂ can look plausible while carrying no
+Three of the four methods also report how wrong they think they are. They are
+compared here **as ensembles**, because that is how two of them produce σ̂: the
+EnKF's σ̂ is the spread of its 100 members, and each 4DVarNet design is a 5-seed
+deep ensemble whose σ̂ combines each member's own learned variance with the
+members' disagreement (Lakshminarayanan et al. 2017, Sec. 2.4). DINCAE is the
+exception and is marked as such: one model that outputs σ̂ directly
+(information form), kept as the non-ensemble reference.
+
+Judging a σ̂ needs a reference, because it can look plausible while carrying no
 information: **the null model replaces every cell's σ̂ with one constant, that
 split's own RMSE**. It knows how big the error is on average and nothing about
 *where* — and it scores a perfect 1.00 spread/skill for free. A useful σ̂ has to
@@ -157,15 +169,36 @@ beat it.
 
 Scored on `defined_blind` (blind ∩ channel-defined ∩ walkable), 7 test days:
 
-| Method | σ̂ comes from | CRPS | null model | vs null | spread/skill | 50% cov. | 90% cov. |
-|---|---|---|---|---|---|---|---|
-| 4DVarNet `aug0` | σ inside the prior operator `G(x)` | 0.1612 | 0.1997 | **−19.3%** | 0.609 | 67.0% | 88.3% |
-| DINCAE | information form | 0.3575 | 0.4244 | **−15.7%** | 0.739 | 70.7% | 93.1% |
-| 4DVarNet `vsb0` | separate read-out head | 0.1982 | 0.1932 | +2.6% | 1.244 | 78.6% | 93.0% |
-| EnKF | ensemble spread | 0.2077 | 0.1841 | +12.8% | **0.004** | 1.6% | 2.0% |
+| Method | σ̂ comes from | RMSE | vs MSE ensemble | CRPS | null model | vs null | spread/skill | 50% cov. | 90% cov. |
+|---|---|---|---|---|---|---|---|---|---|
+| 4DVarNet MSE, 5-seed ensemble | none — accuracy reference | 0.333 | — | — | — | — | — | — | — |
+| 4DVarNet `vsb0`, 5-seed ensemble | learned σ̂ from a read-out head, + member spread | 0.384 | +15.2% | 0.2028 | 0.1916 | +5.9% | 1.364 | 80.3% | 93.6% |
+| 4DVarNet `aug0`, 5-seed ensemble | learned σ̂ iterated inside `G(x)`, + member spread | 0.399 | +19.8% | 0.1577 | 0.1972 | **−20.0%** | 0.652 | 68.6% | 89.0% |
+| EnKF | ensemble spread (100 members) | 0.368 | +10.4% | 0.2077 | 0.1841 | +12.8% | 0.004 | 1.6% | 2.0% |
+| DINCAE ‡ | **one model, not an ensemble** — information form | 0.329 | −1.1% | 0.3575† | 0.4244† | **−15.7%** | 0.739 | 70.7% | 93.1% |
 
-Under the `allcells` convention the same four are −24.3%, −76.1%, +50.1%,
-+26.8%: the magnitudes move a great deal, the signs do not.
+‡ **DINCAE is not an ensemble.** It is here as the reference for what one
+model's own σ̂ achieves; its row is a different mechanism, not a like-for-like
+comparison with the ensemble rows.
+† DINCAE's σ̂ lives in its normalised space (log1p on density/var, then
+per-channel standardisation), so its CRPS and null-model CRPS are **not in data
+units** and cannot be compared with the other rows' absolute CRPS. Its *vs null*,
+spread/skill and coverage are ratios and do compare.
+
+**The MSE ensemble has no σ̂**; it is in the table for its RMSE. `vsb0` and
+`aug0` are the same network trained with an NLL loss instead of MSE, so for them
+*vs MSE ensemble* reads directly as what asking for a σ̂ costs in reconstruction
+accuracy. For the EnKF and DINCAE the same column is a different method measured
+against the same yardstick, not a cost of anything.
+
+The RMSE column is compare5's `defined` RMSE for the same predictor (the
+ensemble mean for the three 4DVarNet rows), so it agrees with the accuracy
+table. The uncertainty scripts also compute an RMSE, on unclipped predictions
+over every frame; for `vsb0`/`aug0` it differs from compare5's by 0.3% / 0.6%.
+
+Under the `allcells` convention (blind cells, each method's own blind null
+model) the four are: 4DVarNet `vsb0` +54.8%, 4DVarNet `aug0` −28.2%, EnKF +26.8%, DINCAE −76.1% — the magnitudes move a great deal, the signs do
+not.
 
 **Reading the columns**
 
@@ -174,12 +207,14 @@ Under the `allcells` convention the same four are −24.3%, −76.1%, +50.1%,
   MAE as σ → 0. NLL is also computed but is not used as the verdict: its
   `(x−μ)²/2σ²` term is unbounded as σ → 0, so the EnKF's collapsed ensemble
   produces an NLL of order 1e18, which cannot rank anything.
+- **vs MSE ensemble** — RMSE relative to the 4DVarNet MSE ensemble's.
+  Positive means worse reconstruction.
 - **vs null** — CRPS relative to the constant-σ null model. Negative means the
   σ̂ carries spatial information the constant does not.
 - **spread/skill** — mean predicted σ̂ over actual RMSE. 1.0 is calibrated,
   below 1 is overconfident, above 1 underconfident.
 - **coverage** — the fraction of cells whose truth falls inside the nominal
-  50% / 90% interval. 90% coverage of 88.3% is close to calibrated; 2.0% is not.
+  50% / 90% interval. 90% coverage of 89.0% is close to calibrated; 2.0% is not.
 
 The EnKF's row is a collapse, not a miscalibration: its ensemble spread settles
 around 0.0025 while its actual error is 0.368, a ratio of 0.004. The forecast
@@ -246,15 +281,15 @@ files. No GPU, no Slurm, no environment setup.
 # Which file backs which published number
 
 "The DINCAE weights" is not a well-defined request: `runs/dincae_full/` holds 17
-checkpoints and which you pick changes the number. Same for `varnet_best.pt` vs
-`varnet_last.pt`. This table is the authoritative mapping; everything else under
+checkpoints and which you pick changes the number. Same for a 4DVarNet run's
+periodic `ckpt_<epoch>.pt` snapshots. This table is the authoritative mapping; everything else under
 `runs/` is an intermediate or an exploratory ablation.
 
 | Published as | Exact file(s) | Result JSON | Why this one |
 |---|---|---|---|
-| 4DVarNet MSE | `methods/varnet/runs/varnet_mse5_s{0..4}/varnet_best.pt` | `compare/results/compare5_final.json` (`"4DVarNet MSE s*"`) | `compare5_final.json`'s protocol records `ckpt: varnet_best.pt` |
-| 4DVarNet `aug0` | `methods/varnet/runs/varnet_aug0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_aug0.json` | same convention |
-| 4DVarNet `vsb0` | `methods/varnet/runs/varnet_vsb0_s{0..4}/varnet_best.pt` | `methods/varnet/check_outputs/eval/uncertainty_vsb0.json` | same convention |
+| 4DVarNet MSE | `methods/varnet/runs/varnet_mse5_h96_s{0..4}/ckpt_<epoch>.pt`, epoch per run in that directory's `select_valid.json` | `compare/results/compare5_final.json`: `"4DVarNet MSE s<seed>"` for the accuracy table, seed = `single_model.MSE.seed`; `"4DVarNet MSE ens5"` for the uncertainty table's RMSE | chosen on the validation split; every member's file and epoch is in `compare5_final.json` → `protocol.checkpoints` |
+| 4DVarNet `aug0` | `methods/varnet/runs/varnet_aug0_h96_s{0..4}/ckpt_<epoch>.pt`, per `select_valid.json` | σ̂: `methods/varnet/check_outputs/eval/uncertainty_aug0.json`; RMSE: `compare5_final.json` `"4DVarNet AUG ens5"` | same selection; the uncertainty job's log lists each member's file and epoch |
+| 4DVarNet `vsb0` | `methods/varnet/runs/varnet_vsb0_h96_s{0..4}/ckpt_<epoch>.pt`, per `select_valid.json` | σ̂: `methods/varnet/check_outputs/eval/uncertainty_vsb0.json`; RMSE: `compare5_final.json` `"4DVarNet NLL ens5"` | same selection |
 | DINCAE | `methods/dincae/runs/dincae_full/ckpt_00070.pt` — **one file** | `methods/dincae/check_outputs/eval_single_00070/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | not confirmed best on validation — see the open issue above; recorded in `compare5_final.json` as `source: .../eval_single_00070/...` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | folded into `compare5_final.json` (`"Senseiver"`) | only trained model; `best.pt`, not `last.pt` |
 | EnKF | no weights — exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | `compare5_final.json` (`"EnKF k1"`), `methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json` | it is a filter, not a trained model |
@@ -267,28 +302,21 @@ error:
    refuses unless you pass `--average-checkpoints`, because the result is ~1.7%
    RMSE away from the reported one with nothing in the output to say which
    configuration produced it.
-2. **`varnet_best.pt` is selected on the training split, not validation — a known limitation, not a design choice.**
-   `train.py`'s `--split` defaults to `train` (`config.yaml`'s `training.split`),
-   and `varnet_best.pt` is the checkpoint with the lowest blind MSE on that
-   split's own fixed evaluation subset (the first `--n-eval` windows). So
-   despite the name, choosing it is model selection **on training data**, on
-   the emptiest part of it (the first windows of a recording day carry about
-   1/6.9 of the full-day mean density). It also lands each arm at a different
-   epoch **and a different point of the §3.4 iteration curriculum** — measured
-   on these runs, `aug0`'s best fell at epoch 16-40 with the solver still at
-   5-10 of its eventual 20 iterations, while `mse5`'s fell at 78-143 already at
-   20. Those checkpoints differ in solver depth as well as in loss, which is
-   not a controlled comparison.
-   `varnet_last.pt` sidesteps the epoch mismatch (always epoch 149, always 20
-   iterations) but is one sample of a noisy quantity, with no
-   claim to be the best the run produced.
-   The headline table uses `best`, because that is what actually produced the
-   published numbers; `methods/varnet/checks/select_checkpoint.py` scores every
-   checkpoint of a run on the **validation** split with the iteration count
-   fixed at 20, the way Senseiver and DINCAE already select — but it needs
-   periodic checkpoints (`train.py --ckpt-every`, added 2026-09-09) that the
-   runs behind today's headline numbers predate, so it has not been applied to
-   them yet. `compare5.py --ckpt-name` picks which checkpoint to score.
+2. **Do not score a 4DVarNet run at `varnet_best.pt`.** Despite the name it is
+   selected on the **training** split (`train.py`'s `--split` defaults to
+   `train`), on the first `--n-eval` windows — the emptiest part of a recording
+   day. It also lands runs at different points of the §3.4 iteration
+   curriculum: on the earlier hidden=32 runs, `aug0`'s best fell at epoch 16-40
+   with the solver at 5-10 of its 20 iterations while `mse5`'s fell at 78-143 at
+   20, so the two differed in solver depth as well as in loss. Reported numbers
+   use the checkpoint `methods/varnet/checks/select_checkpoint.py` chose on the
+   **validation** split among the snapshots at 20 iterations
+   (`train.py --ckpt-every`), recorded per run in `select_valid.json`.
+   `compare5` and `eval_uncertainty` both resolve it through
+   `methods/varnet/checks/model_io.py:reported_ckpt`, so the accuracy table and
+   the uncertainty table score the same file. A run without `select_valid.json`
+   falls back to `varnet_best.pt` and prints a `[ckpt] ... falling back` line —
+   if you see that line, the number is not the reported one.
 
 The EnKF's overconfidence is diagnosed separately in
 `methods/varnet/check_outputs/eval/enkf_spread_growth.json` (via
@@ -360,17 +388,20 @@ and is **not** part of any reported comparison.
 
 | Codename | Method | Means |
 |---|---|---|
-| `mse5` | 4DVarNet | plain MSE loss (Eq.14), 5 random seeds, no uncertainty output |
-| `aug0` | 4DVarNet | sigma **inside** the prior operator `G(x)`, NLL — ours |
-| `vsb0` | 4DVarNet | sigma from a **separate read-out head**, NLL — ours |
+| `mse5_h96` | 4DVarNet | plain MSE loss (Eq.14), 5 random seeds, no uncertainty output |
+| `aug0_h96` | 4DVarNet | sigma **inside** the prior operator `G(x)`, NLL — ours |
+| `vsb0_h96` | 4DVarNet | sigma from a **separate read-out head**, NLL — ours |
 | `dincae_full` | DINCAE | baseline: information-form supervision (only defined cells in the loss) |
 | `dincae_ff` | DINCAE | `--full-field-loss` ablation: every cell in the loss, obstacle target = 0 |
 | `senseiver_A` | Senseiver | the one trained model |
 | `enkf_k1_full` | EnKF | exported ensemble fields, `obs_every_k=1`, full 7-day test split |
 
-`s0`..`s4` are random seeds (weight init + data ordering); the headline table
-reports mean±std across all five. `obs_every_k=4` was studied earlier and
-dropped entirely on 2026-09-08.
+`s0`..`s4` are random seeds (weight init + data ordering). The accuracy table
+reports one of them (the validation-best MSE seed); the uncertainty table reports
+each arm's 5-seed ensemble. `h96` is the prior width (hidden=96, kt=5, the
+`crowdcore/config.yaml` default since 2026-09-09); the same names without it are
+the earlier hidden=32 runs and are not reported. `obs_every_k=4` was studied
+earlier and dropped entirely on 2026-09-08.
 
 ## Sanity checks before committing to a long run
 
@@ -405,20 +436,24 @@ its `--time` budget then submits its own successor (up to `MAX_GEN=12`), so a
 seed** — loop over seeds yourself.
 
 ```bash
-# 4DVarNet -- plain MSE (the headline "4DVarNet" row), 5 seeds
+# 4DVarNet -- plain MSE (the accuracy table's 4DVarNet row), 5 seeds
 for s in 0 1 2 3 4; do
-  sbatch --job-name=varnet_mse5_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
+  sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
 done
 
 # 4DVarNet -- uncertainty design 1: sigma inside G(x) (aug0), 5 seeds
 for s in 0 1 2 3 4; do
-  sbatch --job-name=varnet_aug0_s$s methods/varnet/sbatch/submit_aug_chain.sbatch $s 0
+  sbatch --job-name=varnet_aug0_h96_s$s methods/varnet/sbatch/submit_aug_chain.sbatch $s 0
 done
 
-# 4DVarNet -- uncertainty design 2: read-out head only (vsb0). No dedicated chain
-# script; run train.py with enough --time, or copy submit_aug_chain.sbatch and
-# swap --augmented-var for --var-h-only
-python3 -m methods.varnet.train --loss nll --var-h-only --outdir runs/varnet_vsb0_s0
+# 4DVarNet -- uncertainty design 2: sigma from a read-out head on [h, x_hat] (vsb0), 5 seeds
+for s in 0 1 2 3 4; do
+  sbatch --job-name=varnet_vsb0_h96_s$s methods/varnet/sbatch/submit_vs_chain.sbatch $s 0.0
+done
+
+# then choose every run's reported epoch on the validation split (writes select_valid.json).
+# ~11 min per run on one GPU; RUNS= splits the 15 across parallel jobs, see the script header
+sbatch methods/varnet/sbatch/submit_select.sbatch
 
 # DINCAE -- baseline and the obstacle-region ablation (~16-27 GPU-hours each)
 sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_full
@@ -455,32 +490,37 @@ check what a past run did without re-running it.
 ## Reproducing the headline comparison
 
 ```bash
-sbatch sbatch/submit_compare5.sbatch      # ~2h, needs the checkpoints above
+# needs every run's select_valid.json (see Training above)
+sbatch sbatch/submit_compare5.sbatch      # ~15-30 min on one GPU
 python3 -m compare.plot_compare5          # regenerates compare/results/compare5.png
 ```
 
-The defaults reproduce exactly the published row set — all four methods, both
-uncertainty designs, five seeds each, and DINCAE's single epoch-70 checkpoint.
-A rerun writes `compare/results/compare5.json`; the published artefact is
-`compare5_final.json`, kept as a separate file so a rerun cannot silently
-overwrite the numbers this README quotes.
+The defaults reproduce exactly the published JSON: all four methods; each
+4DVarNet arm's five seeds at their validation-selected checkpoints, plus its
+5-member ensemble (`ens5`, which the uncertainty table uses); DINCAE's single
+epoch-70 checkpoint; and `single_model`, the MSE seed the accuracy table
+reports. A rerun writes `compare/results/compare5.json`; the published artefact
+is `compare5_final.json`, kept as a separate file so a rerun cannot silently
+overwrite the numbers this README quotes. Its `protocol.checkpoints` lists the
+file and epoch every 4DVarNet member was scored at.
 
-**Expected output**, pooled **RMSE**. A rerun should land within ~0.01 of these
-(4DVarNet rows carry the reproducibility floor described above). Note the figure
-`compare5.png` plots per-channel **MSE**, so its totals are these numbers
-squared — 0.329 there appears as 0.108. The 2026-09-07 deck quotes **seed 0**
-for the 4DVarNet rows (0.359 / 0.191) where this table reports the **5-seed
-mean** (0.352 / 0.186); both are stated as such, but they are not the same
-quantity:
+**Expected output**, pooled **RMSE**, one model per method (the rule is in
+[The four methods](#the-four-methods-plus-two-uncertainty-designs-of-our-own)).
+A rerun should land within ~0.01 of these (4DVarNet rows carry the
+reproducibility floor described above). The figure `compare5.png` plots
+per-channel **MSE**, so its totals are these numbers squared — 0.329 there
+appears as 0.108.
 
 | Method | `defined` convention | `allcells` convention |
 |---|---|---|
-| Senseiver | 0.343 | 0.168 |
-| 4DVarNet MSE (mean of 5 seeds) | 0.352 | 0.186 |
-| 4DVarNet `vsb0` (mean of 5 seeds) | 0.388 | 0.212 |
-| 4DVarNet `aug0` (mean of 5 seeds) | 0.401 | 0.229 |
-| EnKF | 0.368 | 0.215 |
 | DINCAE | 0.329 | **0.757** |
+| 4DVarNet MSE (one model: seed 3, validation-best) | 0.335 | 0.177 |
+| Senseiver | 0.343 | 0.168 |
+| EnKF | 0.368 | 0.215 |
+
+The uncertainty designs `vsb0` and `aug0` are not in this table. What they cost
+in accuracy is in the [uncertainty table](#uncertainty-how-it-is-scored), next to
+the MSE ensemble they are measured against.
 
 Off by 2x or more means something is broken — check the convention first.
 

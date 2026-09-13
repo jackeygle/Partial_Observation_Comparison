@@ -2,7 +2,8 @@
 bench_enkf_split.py  —  split the EnKF's per-frame cost into forecast and analysis
 =================================================================================
 
-Answers the one question the stacked bars in results_speed.png make: WHY does the EnKF get
+Answers one question about the EnKF's cost (the figure that first raised it, results_speed.png,
+was deleted on 2026-09-13 with the b0 run it timed): WHY does the EnKF get
 ~2.5x cheaper when observations drop from every frame to every 4th? The filter does two
 different things per frame and only one of them depends on observation density:
 

@@ -5,7 +5,7 @@ Every claim this project makes about "matching the paper" is checked here agains
 trained model of record, so the numbers in docstrings and slides are reproducible rather
 than remembered. Run it whenever the architecture changes.
 
-    python3 checks/check_paper_conformance.py [--ckpt runs/varnet_b0_k1/varnet_best.pt]
+    python3 checks/check_paper_conformance.py [--ckpt runs/varnet_mse5_h96_s3/ckpt_00080.pt]
 
 What each test corresponds to in the paper:
 
@@ -38,7 +38,7 @@ import torch
 import torch.nn as nn
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-from methods.varnet.checks.model_io import load_solver  # noqa: E402
+from methods.varnet.checks.model_io import load_solver, baseline_ckpt  # noqa: E402
 from methods.varnet.prior_model import GENN, ZeroCentreConv3d  # noqa: E402
 
 OK, FAIL, WARN = "  [ok]  ", "  [FAIL]", "  [note]"
@@ -59,11 +59,13 @@ def leak(phi, eps, seed=0, C=4, T=9, H=36, W=12):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ckpt", default="runs/varnet_b0_k1/varnet_best.pt")
+    ap.add_argument("--ckpt", default=None,
+                    help="relative to methods/varnet/; default: the reported 4DVarNet model")
     args = ap.parse_args()
 
-    S, A, ck = load_solver(os.path.join(ROOT, args.ckpt), "cpu")
-    print(f"model: {args.ckpt}  epoch {ck.get('epoch')}  "
+    ck_path = os.path.join(ROOT, args.ckpt) if args.ckpt else baseline_ckpt()
+    S, A, ck = load_solver(ck_path, "cpu")
+    print(f"model: {ck_path}  epoch {ck.get('epoch')}  "
           f"hidden {A['hidden']}  kt {A.get('kt')}\n")
 
     # ---- Sec. 3.2: psi is ONE layer, and its centre tap is zero -------------------

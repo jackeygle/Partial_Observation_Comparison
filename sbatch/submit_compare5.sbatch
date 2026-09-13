@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=compare5
-#SBATCH --partition=gpu-h200-141g-short,gpu-a100-80g,gpu-v100-32g
+#SBATCH --partition=gpu-h200-141g-short,gpu-a100-80g,gpu-v100-32g,gpu-v100-16g
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=128G
