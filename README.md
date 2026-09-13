@@ -276,7 +276,7 @@ files. No GPU, no Slurm, no environment setup.
 | Raw numbers, all four scoring conventions | `compare/results/compare5_final.json` |
 | A reconstructed field as a picture, all 4 methods side by side | `compare/results/reconstruction_atc-20130811_dincae-senseiver-varnet-enkf.png` |
 | DINCAE's obstacle-region result | `methods/dincae/check_outputs/eval/obstacle_region.json` |
-| Everything else (architecture diagrams, uncertainty calibration, speed) | `methods/*/check_outputs/**/*.png` — `unc_*` uncertainty, `mt_*` uncertainty meeting figures, `arch_*`/`fw_*` architecture, `speed_*` latency |
+| Everything else | `methods/varnet/check_outputs/eval/unc_spread_decay.png` (why the EnKF's ensemble cannot hold a spread), `methods/varnet/check_outputs/eval/de_*.png` (the variational cost and solver drawn as diagrams), `methods/varnet/check_outputs/navigation/` (walkable mask and obstacles on the real map) |
 
 # Which file backs which published number
 
