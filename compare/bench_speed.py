@@ -274,7 +274,7 @@ def bench_dincae(run_dir, ckpt_glob, day, n_frames, device="cpu", batch=256):
         t_unix = f["time"][:T]
     obs = om.generate_observations(
         X, sensing_range=oc_sr, num_agents=config.get("observation", "num_agents"),
-        add_noise=True, seed=0, valid_mask=stats.valid,
+        add_noise=True, seed=om.day_seed(day), valid_mask=stats.valid,
         obs_std=np.asarray(config.get("observation", "obs_std")),
         obs_every_k=config.get("observation", "obs_every_k"))
     scaled, invvar = observed_pair(obs["Y"][:, :NCH], obs["Omega_c"][:, :NCH],
@@ -310,7 +310,7 @@ def bench_senseiver(ckpt, day, n_frames, device="cpu", batch=256):
     model = Senseiver(**ck["hparams"]).to(dev)
     model.load_state_dict(ck["model"] if "model" in ck else ck["state_dict"])
     model.eval()
-    _X, Y, Om = sds.load_day(day, stride=1, seed=0, frames=n_frames,
+    _X, Y, Om = sds.load_day(day, stride=1, seed=om.day_seed(day), frames=n_frames,
                              obs_every_k=config.get("observation", "obs_every_k"))
     pe = model.pos_enc.detach().cpu().numpy()
     mean = model.in_mean.detach().cpu().numpy()

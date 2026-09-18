@@ -91,9 +91,8 @@ Reproducibility floor
 4DVarNet's numbers have a ~4e-4 relative jitter: `GradSolver` also runs an
 autograd backward pass **at inference time**, and conv backward's atomicAdd
 reduction order differs every run. Senseiver (no_grad), EnKF (numpy reading npz),
-and DINCAE (reading json) are all bit-reproducible. See
-`refactor_baseline/README.md`. **4DVarNet's 4th decimal place is noise -- do not
-report a difference at that scale.**
+and DINCAE (reading json) are all bit-reproducible. **4DVarNet's 4th decimal
+place is noise -- do not report a difference at that scale.**
 
 Usage (GPU node, from the repo root)
 --------------------------
@@ -218,6 +217,19 @@ def run_senseiver(model, Y, Om, dev, batch):
     with torch.no_grad():
         for i in range(0, Y.shape[0], batch):
             sl = slice(i, i + batch)
+            k = getattr(model, "time_window", 1)
+            if k > 1:
+                # Senseiver's temporal extension: frame j also sees the previous k-1
+                # frames of the same day (Y, Om are one whole day at full frame rate).
+                # Models without a time window never reach this branch.
+                win = [(Y[max(0, j - k + 1):j + 1], Om[max(0, j - k + 1):j + 1])
+                       for j in range(sl.start, min(sl.stop, Y.shape[0]))]
+                tok, pad, dt, _, cell_idx = sensors.build_batch_temporal(
+                    win, pe, mu, sd, return_cell_idx=True)
+                outs.append(model.reconstruct(
+                    tok.to(dev), pad.to(dev), dt.to(dev), cell_idx.to(dev)
+                ).cpu().numpy())
+                continue
             tok, pad, _ = sensors.build_batch(Y[sl], Om[sl], pe, mu, sd)
             outs.append(model.reconstruct(tok.to(dev), pad.to(dev)).cpu().numpy())
     return np.concatenate(outs, 0)
@@ -416,7 +428,7 @@ def main():
 
     for d in days:
         stem = os.path.basename(d).split("_")[0]
-        X, Y, Om = ds.load_day(d, stride=1, seed=0)
+        X, Y, Om = ds.load_day(d, stride=1, seed=ds.om.day_seed(d))
         n = X.shape[0]
         Xf = X.reshape(n, C, H, W)
         Yf = Y.reshape(n, C, H, W)
@@ -512,7 +524,7 @@ def main():
                            " (dincae_crowd/state.py:channel_valid)",
         "walkable_cells": int(walk.sum()), "grid_cells": int(walk.size),
         "frame_range": f"[{FRAME_LO}, T-{FRAME_HI_PAD})  (aligned with DINCAE's FRESH_OFFSETS)",
-        "obs_every_k": 1, "seed": 0, "clip": "EnKF's physical bounds",
+        "obs_every_k": 1, "seed": 0, "trajectory_mode": ds.om.TRAJECTORY_MODE, "clip": "EnKF's physical bounds",
         "ckpt": args.ckpt_name or "per run: select_valid.json (validation split, 20 iterations)",
         # One entry per member. Without this the JSON cannot say which epoch a number came
         # from, and with per-run selection the five members are not all the same epoch.

@@ -72,7 +72,8 @@ def main():
 
     day = [d for d in om.split_files("test") if args.day in d][0]
     X, _ = om.load_state(day); X = np.asarray(X)[:args.frames]
-    out = om.generate_observations(X, add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+    out = om.generate_observations(X, add_noise=True, seed=om.day_seed(day),
+                                   valid_mask=nav.build_valid_mask_from_config(X))
     Omega = out["Omega"]
     z = np.load(os.path.join(ENKFDIR, f"est_{args.day}.npz")); Est, Spread = z["Est"], z["Spread"]
 

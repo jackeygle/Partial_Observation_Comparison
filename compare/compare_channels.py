@@ -62,7 +62,7 @@ for npz in sorted(glob.glob(os.path.join(ENKFDIR,"obs_*.npz"))):
     stem=os.path.basename(npz)[4:-4]; z=np.load(npz)
     day=[d for d in om.split_files("test") if stem in d][0]
     Xf,_=om.load_state(day); Xf=np.asarray(Xf)[:z["X_true"].shape[0]]
-    out=om.generate_observations(Xf, add_noise=True, valid_mask=nav.build_valid_mask_from_config(Xf))
+    out=om.generate_observations(Xf, add_noise=True, seed=om.day_seed(day), valid_mask=nav.build_valid_mask_from_config(Xf))
     vr,x0=recon(Xf,out); x0=clip_np(x0)
     er=np.load(os.path.join(ENKFDIR,f"est_{stem}.npz"))["Est"]
     n=min(vr.shape[0],er.shape[0]); Xf=Xf[:n]; vr=vr[:n]; x0=x0[:n]; er=er[:n]

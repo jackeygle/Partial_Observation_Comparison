@@ -1,0 +1,22 @@
+[seq] day=atc-20130811 methods=['dincae', 'senseiver', 'varnet', 'enkf'] frames [8400, 13400) = 5000 frames
+[seq] running DINCAE ...
+[seq] running Senseiver ...
+[seq] running 4DVarNet ...
+[seq] loading EnKF export ...
+[seq] rendering 5000 frames (7 panels each) -> /scratch/work/zhangx29/Thesis_Project/compare/results/seq_ppt_atc-20130811
+  rendered 0/5000
+  rendered 200/5000
+  rendered 400/5000
+  rendered 600/5000
+  rendered 800/5000
+  rendered 1000/5000
+  rendered 1200/5000
+  rendered 1400/5000
+  rendered 1600/5000
+  rendered 1800/5000
+  rendered 2000/5000
+  rendered 2200/5000
+  rendered 2400/5000
+  rendered 2600/5000
+  rendered 2800/5000
+[2026-09-13T16:20:40.871] error: *** JOB 20236979 ON dgx3 CANCELLED AT 2026-09-13T16:20:40 DUE to SIGNAL Terminated ***

@@ -80,11 +80,12 @@ def panel(ax, state, vmax, title):
     return im
 
 
-def pick_busy_frame(X, dT):
+def pick_busy_frame(X, dT, day_file):
     """Busiest OBSERVED frame within the first dT frames -- matches
     plot_reconstruction_enkf.py's heuristic exactly, so the two scripts agree
     on which frame to show when both are pointed at the same day."""
-    out = om.generate_observations(X[:dT], add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+    out = om.generate_observations(X[:dT], add_noise=True, seed=om.day_seed(day_file),
+                                   valid_mask=nav.build_valid_mask_from_config(X))
     tdens = X[:dT, 0].reshape(dT, -1).sum(1)
     observed = out["Omega"].reshape(dT, -1).sum(1) > 0
     cand = np.where(observed)[0]
@@ -96,7 +97,8 @@ def recon_varnet(ckpt, day_file, t, dev):
     solver, a, _ = load_solver(ckpt, dev)
     dT = a["dT"]
     X, _ = om.load_state(day_file); X = np.asarray(X)
-    out = om.generate_observations(X[:dT], add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+    out = om.generate_observations(X[:dT], add_noise=True, seed=om.day_seed(day_file),
+                                   valid_mask=nav.build_valid_mask_from_config(X))
     win = lambda arr: om.to_windows(arr[:dT], dT)
     x0 = om.fill_missing_state(out["Y"], out["Omega_c"], method=config.get("observation", "init_method"))
     with torch.enable_grad():
@@ -130,7 +132,7 @@ def recon_senseiver(ckpt, day_file, t, dev):
     model, ck = senseiver_load_model(ckpt, dev)
     k = ck["args"].get("obs_every_k") or sds.obs_config()["obs_every_k"]
     C, H, W = sds.state_shape()
-    X, Y, Om = sds.load_day(day_file, stride=1, seed=0, frames=t + 1, obs_every_k=k)
+    X, Y, Om = sds.load_day(day_file, stride=1, seed=om.day_seed(day_file), frames=t + 1, obs_every_k=k)
     pe = model.pos_enc.detach().cpu().numpy()
     mean = model.in_mean.detach().cpu().numpy()
     std = model.in_std.detach().cpu().numpy()
@@ -171,9 +173,10 @@ def main():
     dT = 200                                          # the paper's window; only used to pick a busy frame + drive varnet
     if args.frame >= 0:
         t = args.frame
-        obs_out = om.generate_observations(X[:dT], add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+        obs_out = om.generate_observations(X[:dT], add_noise=True, seed=om.day_seed(day_file),
+                                           valid_mask=nav.build_valid_mask_from_config(X))
     else:
-        t, obs_out = pick_busy_frame(X, dT)
+        t, obs_out = pick_busy_frame(X, dT, day_file)
     true_s = X[t]
     obs_s = obs_out["Y"][t].copy(); obs_s[:, ~obs_out["Omega"][t]] = np.nan
 

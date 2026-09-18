@@ -59,6 +59,15 @@ observation:                                 # Component 1: multi-robot partial 
   add_noise: true                            # add Gaussian noise to observations (standard practice in the
                                              #   paper; false = clean variant, matching 4dvarnet-core's design
                                              #   of treating no_noise as the official experiment config)
+  trajectory_mode: per_day                   # robot-route seed per day, for training, validation AND testing.
+                                             #   per_day: seed = base + the day's DATE (observation_model.day_seed),
+                                             #            so every day in every split has its own routes, no two
+                                             #            days share a seed, and all scripts agree on a day.
+                                             #   fixed  : every day reuses the base seed -> identical routes and
+                                             #            masks at equal frame indices on all days. Every run and
+                                             #            published number before 2026-09-17 used this (seed 0);
+                                             #            checkpoints without a saved trajectory_mode are
+                                             #            rebuilt as fixed when their training data is rebuilt.
   # Per-channel observation-noise std [density, vx, vy, var]. Source: calibrated by
   #   the original project's inspect_data.py — robust std (1.4826*MAD) over active
   #   cells * 0.25 (assumption: "sensors are usually more accurate than the field's

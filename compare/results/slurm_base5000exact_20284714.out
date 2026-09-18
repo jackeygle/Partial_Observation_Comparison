@@ -1,0 +1,29 @@
+[seq] day=atc-20130811 methods=['senseiver'] frames [8533, 13533) = 5000 frames
+[seq] running Senseiver ...
+[seq] rendering 5000 frames (3 panels each) -> compare/results/seq_baseline_k16_s123_5000_exactobs
+  rendered 0/5000
+  rendered 200/5000
+  rendered 400/5000
+  rendered 600/5000
+  rendered 800/5000
+  rendered 1000/5000
+  rendered 1200/5000
+  rendered 1400/5000
+  rendered 1600/5000
+  rendered 1800/5000
+  rendered 2000/5000
+  rendered 2200/5000
+  rendered 2400/5000
+  rendered 2600/5000
+  rendered 2800/5000
+  rendered 3000/5000
+  rendered 3200/5000
+  rendered 3400/5000
+  rendered 3600/5000
+  rendered 3800/5000
+  rendered 4000/5000
+  rendered 4200/5000
+  rendered 4400/5000
+  rendered 4600/5000
+  rendered 4800/5000
+[done] 5000 PNGs (3 panels) -> compare/results/seq_baseline_k16_s123_5000_exactobs

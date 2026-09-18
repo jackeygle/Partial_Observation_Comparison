@@ -52,7 +52,9 @@ diagnostics and figures see `checks/check_observation_model.py`:
 
 from __future__ import annotations
 
+import datetime
 import os
+import re
 
 import h5py
 import numpy as np
@@ -73,6 +75,26 @@ GRID_CACHE = os.path.join(DATA_ROOT, config.get("data", "grid_cache"))  # pre-gr
 CHANNEL_NAMES = tuple(config.get("grid", "channels"))
 NUM_AGENTS = config.get("observation", "num_agents")     # number of robots (sensors)
 SENSING_RANGE = config.get("observation", "sensing_range")  # sensing radius (cells, Euclidean distance)
+TRAJECTORY_MODE = config.get("observation", "trajectory_mode", default="fixed")
+
+
+def day_seed(day, base_seed=0, trajectory_mode=None):
+    """Robot-route seed for one day (see config observation.trajectory_mode).
+
+    `day` is a grid-cache path or stem containing atc-YYYYMMDD. per_day keys the seed on the
+    DATE, not on a position in a split, so every script that loads a day gets the same routes
+    and no two days share a seed across train/valid/test. Recorded days are a week apart, so
+    one day's noise stream (seed + 1) never equals another day's route seed.
+    """
+    mode = trajectory_mode or TRAJECTORY_MODE
+    if mode == "fixed":
+        return int(base_seed)
+    if mode != "per_day":
+        raise ValueError(f"unknown trajectory_mode {mode!r}; expected 'per_day' or 'fixed'")
+    m = re.search(r"atc-(\d{8})", os.path.basename(str(day)))
+    if m is None:
+        raise ValueError(f"cannot read an atc-YYYYMMDD date from {day!r}")
+    return int(base_seed) + datetime.datetime.strptime(m.group(1), "%Y%m%d").toordinal()
 # Per-channel sensor noise std. Provenance (data calibration, 0.25 x robust std): see config.yaml comments.
 OBS_STD = np.array(config.get("observation", "obs_std"), dtype=np.float32)
 

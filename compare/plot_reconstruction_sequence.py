@@ -24,9 +24,10 @@ which is what keeps this from being much slower than it already is).
 results/` too) -- 5000 PNGs is 100-500MB depending on panel count, cheap to
 regenerate, not something to commit.
 
-The "partial obs" panel is illustrative (one shared simulated observation,
-not each method's own exact training-time observation) -- see
-`compare/plot_reconstruction.py`'s docstring for the same caveat.
+The "partial obs" panel is illustrative when several methods are shown (one
+shared simulated observation, not every method's own input).  For a
+Senseiver-only run it is the exact noisy observation and mask fed to Senseiver,
+including the robot trajectory advanced from frame zero.
 
 Usage (GPU node):
     python3 -m compare.plot_reconstruction_sequence --day atc-20130811 --n 5000
@@ -84,13 +85,14 @@ def panel(ax, state, vmax, title):
 # Per-method batched reconstruction over [start, start+N)
 # --------------------------------------------------------------------------- #
 
-def block_varnet(ckpt, X, start, N, dev):
+def block_varnet(ckpt, X, start, N, dev, day_file):
     """X is the FULL day array; reconstructs [start, start+N) in dT windows."""
     solver, a, _ = load_solver(ckpt, dev)
     dT = a["dT"]
     assert N % dT == 0, f"--n must be a multiple of 4DVarNet's dT={dT} (got {N})"
     Xb = X[start:start + N]
-    out = om.generate_observations(Xb, add_noise=True, valid_mask=nav.build_valid_mask_from_config(Xb))
+    out = om.generate_observations(Xb, add_noise=True, seed=om.day_seed(day_file),
+                                   valid_mask=nav.build_valid_mask_from_config(Xb))
     x0 = om.fill_missing_state(out["Y"], out["Omega_c"], method=config.get("observation", "init_method"))
     win = lambda arr: om.to_windows(arr, dT)
     yb, mb, x0b = torch.from_numpy(win(out["Y"])).float(), \
@@ -128,7 +130,7 @@ def block_dincae(run_dir, ckpt, day_file, start, N, dev):
 def block_senseiver(ckpt, day_file, start, N, batch, dev):
     model, ck = senseiver_load_model(ckpt, dev)
     k = ck["args"].get("obs_every_k") or sds.obs_config()["obs_every_k"]
-    X, Y, Om = sds.load_day(day_file, stride=1, seed=0, frames=start + N, obs_every_k=k)
+    X, Y, Om = sds.load_day(day_file, stride=1, seed=om.day_seed(day_file), frames=start + N, obs_every_k=k)
     pe = model.pos_enc.detach().cpu().numpy()
     mean = model.in_mean.detach().cpu().numpy()
     std = model.in_std.detach().cpu().numpy()
@@ -136,10 +138,32 @@ def block_senseiver(ckpt, day_file, start, N, batch, dev):
     with torch.no_grad():
         for i in range(start, start + N, batch):
             sl = slice(i, min(i + batch, start + N))
+            if getattr(model, "time_window", 1) > 1:
+                time_window = model.time_window
+                windows = [
+                    (
+                        Y[max(0, j - time_window + 1):j + 1],
+                        Om[max(0, j - time_window + 1):j + 1],
+                    )
+                    for j in range(sl.start, sl.stop)
+                ]
+                tok, pad, dt, _, cell_idx = ssensors.build_batch_temporal(
+                    windows, pe, mean, std, return_cell_idx=True
+                )
+                xr = senseiver_clip_bounds(
+                    model.reconstruct(tok.to(dev), pad.to(dev), dt.to(dev),
+                                      cell_idx.to(dev))
+                )
+                out.append(xr.cpu().numpy())
+                continue
             tok, pad, _ = ssensors.build_batch(Y[sl], Om[sl], pe, mean, std)
             xr = senseiver_clip_bounds(model.reconstruct(tok.to(dev), pad.to(dev)))
             out.append(xr.cpu().numpy())
-    return np.concatenate(out, 0)
+    recon = np.concatenate(out, 0)
+    c, h, w = sds.state_shape()
+    exact_obs = Y[start:start + N].reshape(N, c, h, w)
+    exact_omega = Om[start:start + N].reshape(N, h, w)
+    return recon, exact_obs, exact_omega
 
 
 def block_enkf(enkf_dir, day, start, N):
@@ -188,7 +212,8 @@ def main():
     print(f"[seq] day={args.day} methods={methods} frames [{start}, {start+N}) = {N} frames", flush=True)
 
     X = Xall[start:start + N]
-    out = om.generate_observations(X, add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+    out = om.generate_observations(X, add_noise=True, seed=om.day_seed(day_file),
+                                   valid_mask=nav.build_valid_mask_from_config(X))
     Omega, obs = out["Omega"], out["Y"].copy()
     vmax = max(0.3, float(np.percentile(X[:, 0], 99)))
 
@@ -198,10 +223,17 @@ def main():
         recon["DINCAE"] = block_dincae(args.dincae_run_dir, args.dincae_ckpt, day_file, start, N, dev)
     if "senseiver" in methods:
         print("[seq] running Senseiver ...", flush=True)
-        recon["Senseiver"] = block_senseiver(args.senseiver_ckpt, day_file, start, N, args.batch, dev)
+        senseiver_rec, senseiver_obs, senseiver_omega = block_senseiver(
+            args.senseiver_ckpt, day_file, start, N, args.batch, dev)
+        recon["Senseiver"] = senseiver_rec
+        if methods == ["senseiver"]:
+            # For a Senseiver-only diagnostic, show the exact observations fed
+            # to the model.  Re-initialising the robot path at `start` produces
+            # a different mask from advancing it from frame zero.
+            obs, Omega = senseiver_obs, senseiver_omega
     if "varnet" in methods:
         print("[seq] running 4DVarNet ...", flush=True)
-        recon["4DVarNet"] = block_varnet((args.varnet_ckpt or baseline_ckpt()), Xall, start, N, dev)
+        recon["4DVarNet"] = block_varnet((args.varnet_ckpt or baseline_ckpt()), Xall, start, N, dev, day_file)
     if "enkf" in methods:
         print("[seq] loading EnKF export ...", flush=True)
         est, spread = block_enkf(args.enkf_dir, args.day, start, N)
