@@ -28,10 +28,13 @@
 **/cache/
 
 # Per-frame sequence exports (hundreds-thousands of PNGs, cheap to regenerate,
-# unused in the paper). Broadened from **/check_outputs/eval/seq_ppt_*/ once
-# compare/plot_reconstruction_sequence.py started writing its own under
-# compare/results/ too -- same naming convention, different parent directory.
-**/seq_ppt_*/
+# unused in the paper). Broadened twice, each time because the prefix got narrower
+# than the naming actually in use: first from **/check_outputs/eval/seq_ppt_*/ once
+# compare/plot_reconstruction_sequence.py started writing under compare/results/
+# too, then from **/seq_ppt_*/ once the exports were named after the checkpoint
+# (seq_baseline_k16_s123_5000/) instead of after their purpose. Matching on seq_
+# alone follows the one thing every such directory has kept.
+**/seq_*/
 
 # ============================================================
 # Python
