@@ -129,7 +129,10 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
                         predict_var=_HAS_VAR(sd),
                         var_eps=a.get("var_eps", 1e-6),
                         var_sees_state=_VAR_SEES_STATE(sd, a),
-                        augmented_var=_AUGMENTED(sd, a)).to(device)
+                        augmented_var=_AUGMENTED(sd, a),
+                        # not visible in the weights: forgetting it would silently evaluate
+                        # an obs-NLL model with the plain observation term
+                        obs_nll=a.get("obs_nll", False)).to(device)
     solver.load_state_dict(sd, strict=strict)
     solver.eval()
     return solver, a, ck

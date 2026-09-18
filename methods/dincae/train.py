@@ -96,8 +96,10 @@ def main():
     if a.days:
         train_files, dev_files = train_files[: a.days], dev_files[:1]
     oc = obs_config()
+    a.trajectory_mode = oc["trajectory_mode"]           # saved in every checkpoint's args
     print(f"observation config (from 4dvarnet_enkf/config.yaml): num_agents={oc['num_agents']} "
-          f"range={oc['sensing_range']} every_k={oc['obs_every_k']} seed={oc['seed']}")
+          f"range={oc['sensing_range']} every_k={oc['obs_every_k']} seed={oc['seed']} "
+          f"trajectory_mode={oc['trajectory_mode']}")
     print(f"train {len(train_files)} days, dev {len(dev_files)} days, "
           f"per-cell statistics from {stats.n_train_days} days, walkable={stats.valid.sum()}")
 
@@ -112,6 +114,11 @@ def main():
     ckpt_last = os.path.join(a.out, "last.pt")
     if a.resume and os.path.exists(ckpt_last):
         st = torch.load(ckpt_last, map_location=dev)
+        prev = st.get("args", {}).get("trajectory_mode", "fixed")
+        if prev != a.trajectory_mode:
+            raise SystemExit(f"ABORT: {ckpt_last} was trained with trajectory_mode={prev!r}, "
+                             f"config now gives {a.trajectory_mode!r}; resuming would switch the "
+                             f"robot routes mid-training. Use a new --out.")
         model.load_state_dict(st["model"]); opt.load_state_dict(st["opt"])
         start_epoch = st["epoch"] + 1
         print(f"resume from epoch {start_epoch}")

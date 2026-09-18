@@ -71,8 +71,9 @@ class VarCost(nn.Module):
     different scales, can be weighted individually as in the reference.
     """
 
-    def __init__(self, n_channels=4):
+    def __init__(self, n_channels=4, obs_nll=False):
         super().__init__()
+        self.obs_nll = bool(obs_nll)
         self.alpha_obs = nn.Parameter(torch.tensor(1.0))          # scalar obs weight (= alphaObs)
         self.alpha_reg = nn.Parameter(torch.tensor(1.0))          # scalar prior weight (= alphaReg)
         self.w_obs = nn.Parameter(torch.ones(n_channels))         # per-channel obs weight (= WObs)
@@ -86,7 +87,7 @@ class VarCost(nn.Module):
         n_per_channel = v.numel() / v.shape[1]
         return (per_channel_sq * w ** 2).sum() / n_per_channel
 
-    def forward(self, dx, dy, s_logvar=None):
+    def forward(self, dx, dy, s_logvar=None, mask=None):
         """s_logvar = log sigma^2, an AUGMENTED STATE channel set, or None for the plain cost.
 
         When given, the prior term becomes a Gaussian log-likelihood of the prior residual
@@ -108,10 +109,23 @@ class VarCost(nn.Module):
         (density) versus 0.013/0.001/0.028 for distance-to-observation
         (check_outputs/eval/sigma_drivers.json, TRUE_ERROR block) -- so it is a real signal, and
         those figures are also the CEILING of what this route can reach.
+
+        obs_nll=True puts the SAME s into the observation term, on observed cells only:
+        mean[ ((x - y)^2 e^{-s} + s) * Omega ]. The +s is masked too, otherwise unobserved cells
+        would pay the log penalty twice. With Omega = 0 everywhere this equals the prior-only cost.
         """
-        obs = self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
         if s_logvar is None:
+            obs = self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
             return obs + self.alpha_reg ** 2 * self._weighted_l2(dx, self.w_reg)
+        if self.obs_nll:
+            # clamp at sigma^2 = 1e-6: x can match y almost exactly on observed cells, and
+            # e^{-s} there would otherwise grow without bound inside the unrolled solve
+            s_obs = s_logvar.clamp(min=-13.8)
+            obs_pt = (dy ** 2 * torch.exp(-s_obs) + s_obs) * mask
+            obs = self.alpha_obs ** 2 * (obs_pt.sum(dim=(0, 2, 3, 4)) * self.w_obs ** 2).sum() \
+                / (obs_pt.numel() / obs_pt.shape[1])
+        else:
+            obs = self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
         # per-channel, weighted, normalised the same way _weighted_l2 does
         nll = dx ** 2 * torch.exp(-s_logvar) + s_logvar          # (B, C, T, H, W)
         per_channel = nll.sum(dim=(0, 2, 3, 4))
@@ -231,11 +245,14 @@ class GradSolver(nn.Module):
 
     def __init__(self, phi, n_channels=4, dT=7, n_iter=15, hidden_ch=64, dropout=0.0,
                  predict_var=False, var_eps=1e-6, var_sees_state=True,
-                 augmented_var=False):
+                 augmented_var=False, obs_nll=False):
         super().__init__()
+        if obs_nll and not augmented_var:
+            raise ValueError("obs_nll needs augmented_var: the observation NLL uses the iterated "
+                             "log sigma^2, which only the augmented solver has")
         self.phi = phi
         self.obs_op = ObsOperator()
-        self.var_cost = VarCost(n_channels)
+        self.var_cost = VarCost(n_channels, obs_nll=obs_nll)
         # augmented_var doubles the state the optimiser sees: [x, log sigma^2], so the LSTM's
         # channel axis goes from C*dT to 2*C*dT and there is no separate variance read-out.
         self.augmented_var = bool(augmented_var)
@@ -267,7 +284,7 @@ class GradSolver(nn.Module):
         if s_logvar is None:
             J = self.var_cost(dx, dy)
             return J, torch.autograd.grad(J, x, create_graph=self.training)[0], None
-        J = self.var_cost(dx, dy, s_logvar)
+        J = self.var_cost(dx, dy, s_logvar, mask)
         gx, gs = torch.autograd.grad(J, (x, s_logvar), create_graph=self.training)
         return J, gx, gs
 

@@ -1,0 +1,39 @@
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 202 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,096,342 (GENN prior 54,220 = 2.59%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=0  data=0
+[schedule] ep0→5it@lr0.001
+[schedule] epoch 0: n_iter -> 5, lr -> 0.001
+[epoch   0] loss=0.0595  blind_MSE=0.0644  density=0.0136 vx=0.2123 vy=0.0264 var=0.0055
+           ↑ new best (0.0644) -> varnet_best.pt
+[epoch   1] loss=0.0578  blind_MSE=0.0630  density=0.0129 vx=0.2091 vy=0.0253 var=0.0047
+           ↑ new best (0.0630) -> varnet_best.pt
+[epoch   2] loss=0.0559  blind_MSE=0.0628  density=0.0122 vx=0.2106 vy=0.0245 var=0.0040
+           ↑ new best (0.0628) -> varnet_best.pt
+[epoch   3] loss=0.0564  blind_MSE=0.0626  density=0.0122 vx=0.2097 vy=0.0244 var=0.0039
+           ↑ new best (0.0626) -> varnet_best.pt
+[epoch   4] loss=0.0514  blind_MSE=0.0623  density=0.0122 vx=0.2086 vy=0.0244 var=0.0039
+           ↑ new best (0.0623) -> varnet_best.pt
+[done] checkpoints + metrics in scratch/smoke_ckptevery2
+--- snapshots written:
+scratch/smoke_ckptevery2/ckpt_00000.pt
+scratch/smoke_ckptevery2/ckpt_00002.pt
+scratch/smoke_ckptevery2/ckpt_00004.pt
+[smoke] PASS — got exactly: ckpt_00000.pt ckpt_00002.pt ckpt_00004.pt 
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 202 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,096,342 (GENN prior 54,220 = 2.59%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=0  data=0
+[schedule] ep0→5it@lr0.001
+[schedule] epoch 0: n_iter -> 5, lr -> 0.001
+[epoch   0] loss=0.0595  blind_MSE=0.0644  density=0.0136 vx=0.2123 vy=0.0264 var=0.0055
+           ↑ new best (0.0644) -> varnet_best.pt
+[epoch   1] loss=0.0578  blind_MSE=0.0630  density=0.0129 vx=0.2091 vy=0.0253 var=0.0047
+           ↑ new best (0.0630) -> varnet_best.pt
+[epoch   2] loss=0.0559  blind_MSE=0.0628  density=0.0122 vx=0.2106 vy=0.0245 var=0.0040
+           ↑ new best (0.0628) -> varnet_best.pt
+[epoch   3] loss=0.0564  blind_MSE=0.0626  density=0.0122 vx=0.2097 vy=0.0244 var=0.0039
+           ↑ new best (0.0626) -> varnet_best.pt
+[done] checkpoints + metrics in scratch/smoke_ckptevery2/lastonly
+[smoke] PASS — forced last-epoch save works: ckpt_00000.pt ckpt_00003.pt 
+[smoke] ckpt-every fully covered

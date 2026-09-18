@@ -83,7 +83,8 @@ def main():
     X = Xall[start:start + N]
     print(f"[seq] day={args.day} frames [{start}, {start+N}) = {N} frames, {N//dT} windows", flush=True)
 
-    out = om.generate_observations(X, add_noise=True, valid_mask=nav.build_valid_mask_from_config(X))
+    out = om.generate_observations(X, add_noise=True, seed=om.day_seed(day),
+                                   valid_mask=nav.build_valid_mask_from_config(X))
     Omega = out["Omega"]
     x0 = om.fill_missing_state(out["Y"], out["Omega_c"], method=config.get("observation", "init_method"))
 

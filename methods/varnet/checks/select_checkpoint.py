@@ -87,7 +87,9 @@ def score_day(solvers, fp, args_by_ckpt, walk, dev, batch):
     X, Y, M, X0 = build_windows([fp], a0["dT"], a0["sensing_range"], a0["num_agents"],
                                 data_seed, 1,
                                 add_noise=False if a0.get("no_noise") else None,
-                                obs_every_k=a0.get("obs_every_k"))
+                                obs_every_k=a0.get("obs_every_k"),
+                                # runs saved before the per_day default were trained on fixed routes
+                                trajectory_mode=a0.get("trajectory_mode", "fixed"))
     blind = (M < 0.5).numpy()                      # (N,C,dT,H,W); the mask is 1.0/0.0 float
     # walk is (H,W): broadcast over windows, channels and frames
     sel = blind & walk[None, None, None]

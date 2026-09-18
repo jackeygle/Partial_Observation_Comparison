@@ -120,7 +120,7 @@ def main():
         z = np.load(npz)
         day = [d for d in om.split_files("test") if stem in d][0]
         X = np.asarray(om.load_state(day)[0])[:z["X_true"].shape[0]]
-        out = om.generate_observations(X, add_noise=True,
+        out = om.generate_observations(X, add_noise=True, seed=om.day_seed(day),
                                        valid_mask=nav.build_valid_mask_from_config(X))
         x0 = om.fill_missing_state(out["Y"], out["Omega_c"],
                                    method=config.get("observation", "init_method"))

@@ -125,7 +125,8 @@ def main():
         X = X[:(len(X) // dT) * dT]
         valid = nav.build_valid_mask_from_config(X)
         # identical call to checks/eval_test_days.py so the two are directly comparable
-        o = om.generate_observations(X, add_noise=True, valid_mask=valid, obs_every_k=k)
+        o = om.generate_observations(X, add_noise=True, seed=om.day_seed(f), valid_mask=valid,
+                                     obs_every_k=k)
         x0 = om.fill_missing_state(o["Y"], o["Omega_c"],
                                    method=config.get("observation", "init_method"))
         w = lambda a: om.to_windows(a, dT)                 # keep on CPU; batches move to dev

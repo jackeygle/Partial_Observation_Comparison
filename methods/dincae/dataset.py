@@ -53,7 +53,8 @@ def obs_config():
         obs_std=np.asarray(cfg4d.get("observation", "obs_std"), dtype=np.float32),
         add_noise=cfg4d.get("observation", "add_noise"),
         obs_every_k=cfg4d.get("observation", "obs_every_k", default=1),
-        seed=0,                       # matches 4dvarnet_enkf's build_windows (fixed seed)
+        seed=0,                       # base seed, as in 4DVarNet's build_windows
+        trajectory_mode=om.TRAJECTORY_MODE,
     )
 
 
@@ -71,8 +72,9 @@ def encode_day(fp, stats: StateStats, stride=4, max_frames=0, full_field=False):
 
     obs = om.generate_observations(
         X, sensing_range=oc["sensing_range"], num_agents=oc["num_agents"],
-        add_noise=oc["add_noise"], seed=oc["seed"], valid_mask=stats.valid,
-        obs_std=oc["obs_std"], obs_every_k=oc["obs_every_k"])
+        add_noise=oc["add_noise"],
+        seed=om.day_seed(fp, oc["seed"], oc["trajectory_mode"]),
+        valid_mask=stats.valid, obs_std=oc["obs_std"], obs_every_k=oc["obs_every_k"])
     Y, M = obs["Y"][:, :NCH], obs["Omega_c"][:, :NCH]
 
     scaled, invvar = observed_pair(Y, M, stats.mean, stats.std)
@@ -96,13 +98,15 @@ def encode_day(fp, stats: StateStats, stride=4, max_frames=0, full_field=False):
     return out, tgt
 
 
-def cache_key(stats: StateStats, stride, full_field=False):
+def cache_key(stats: StateStats, stride, full_field=False, fp=None):
     """Cache key -- encodes everything that would change the encoded result, so
-    changing any of them rebuilds automatically."""
+    changing any of them rebuilds automatically. The seed is the one this day was
+    actually generated with, so fixed-mode caches (sd0) stay valid."""
     oc = obs_config()
+    sd = om.day_seed(fp, oc["seed"], oc["trajectory_mode"])
     return (f"v{CACHE_VER}_s{stride}_nd{stats.n_train_days}_c{NCH}"
             f"_na{oc['num_agents']}_sr{oc['sensing_range']}"
-            f"_k{oc['obs_every_k']}_sd{oc['seed']}"
+            f"_k{oc['obs_every_k']}_sd{sd}"
             # full-field targets are a DIFFERENT encoding of the same days, so they need
             # their own key -- otherwise they would silently reuse (or overwrite) the 13 GB
             # of information-form cache already on disk.
@@ -110,8 +114,8 @@ def cache_key(stats: StateStats, stride, full_field=False):
 
 
 def encode_day_cached(fp, stats, stride, max_frames, cache_dir, full_field=False):
-    """`encode_day` with a disk cache. The observation seed is fixed => the
-    encoding is deterministic => only needs computing once.
+    """`encode_day` with a disk cache. The observation seed is deterministic per day =>
+    the encoding only needs computing once.
 
     Input is stored as float16 (both slices are O(1), no overflow risk), target
     as float32.
@@ -120,7 +124,7 @@ def encode_day_cached(fp, stats, stride, max_frames, cache_dir, full_field=False
         return encode_day(fp, stats, stride, max_frames, full_field)
     os.makedirs(cache_dir, exist_ok=True)
     stem = os.path.splitext(os.path.basename(fp))[0]
-    key = cache_key(stats, stride, full_field)
+    key = cache_key(stats, stride, full_field, fp)
     xp = os.path.join(cache_dir, f"{stem}_{key}_x.npy")
     yp = os.path.join(cache_dir, f"{stem}_{key}_y.npy")
     if not (os.path.exists(xp) and os.path.exists(yp)):

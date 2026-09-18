@@ -72,7 +72,8 @@ def harvest(files):
         X = np.asarray(om.load_state(f)[0])
         X = X[:(len(X) // DT) * DT]
         valid = nav.build_valid_mask_from_config(X)
-        o = om.generate_observations(X, add_noise=True, valid_mask=valid, obs_every_k=K)
+        o = om.generate_observations(X, add_noise=True, seed=om.day_seed(f), valid_mask=valid,
+                                     obs_every_k=K)
         x0 = om.fill_missing_state(o["Y"], o["Omega_c"],
                                    method=config.get("observation", "init_method"))
         w = lambda a: torch.from_numpy(om.to_windows(a, DT)).float()

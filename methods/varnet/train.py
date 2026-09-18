@@ -68,7 +68,8 @@ def _sched_at(stages, epoch):
 
 
 def build_windows(split_files, dT, sensing_range, num_agents, seed, max_days,
-                  add_noise=None, init_method=None, obs_every_k=None):
+                  add_noise=None, init_method=None, obs_every_k=None,
+                  trajectory_mode=None):
     """Build the training tensors by cutting each day into dT-frame windows.
 
     For every day we produce four aligned tensors, each shaped (N, C, dT, H, W):
@@ -82,6 +83,9 @@ def build_windows(split_files, dT, sensing_range, num_agents, seed, max_days,
     add_noise / init_method / obs_every_k default to config.yaml when not given (single
     source). obs_every_k is overridable per run so a k=1 and a k=4 experiment can train
     side by side without fighting over the one global config value.
+
+    trajectory_mode (default config observation.trajectory_mode): per_day seeds each day with
+    seed + its date (observation_model.day_seed), fixed reuses seed for every day.
     """
     if add_noise is None:
         add_noise = config.get("observation", "add_noise")
@@ -98,7 +102,9 @@ def build_windows(split_files, dT, sensing_range, num_agents, seed, max_days,
         X_day = X_day[:n]
         # Component 1: simulate the moving robots -> partial noisy observation Y and its mask.
         out = d.generate_observations(X_day, sensing_range, num_agents,
-                                      add_noise=add_noise, seed=seed, valid_mask=valid,
+                                      add_noise=add_noise,
+                                      seed=d.day_seed(fp, seed, trajectory_mode),
+                                      valid_mask=valid,
                                       obs_every_k=obs_every_k)
         # solver's starting point: fill the unobserved cells (e.g. carry the previous frame).
         X0 = d.fill_missing_state(out["Y"], out["Omega_c"], method=init_method)
@@ -200,11 +206,19 @@ def main():
                          "gradient from the cost; the LSTM then descends [x, log sigma^2] "
                          "together. Doubles the optimiser's channel axis (C*dT -> 2*C*dT). "
                          "Requires --loss nll")
+    ap.add_argument("--obs-nll", action="store_true",
+                    help="make the observation term of J a Gaussian NLL too, sharing the "
+                         "iterated log sigma^2 with the prior term (observed cells only). "
+                         "Requires --augmented-var")
     ap.add_argument("--var-h-only", action="store_true",
                     help="build the sigma^2 read-out on the LSTM hidden state ALONE, without "
                          "the detached x_hat. This is what runs/varnet_vrb{0,1}_s0 did, and it "
                          "made sigma^2 spatially flat (0.96-1.21x empty/occupied against a "
                          "19-30x true error spread). Kept only to reproduce those baselines")
+    ap.add_argument("--trajectory-mode", choices=["per_day", "fixed"], default=None,
+                    help="robot routes per training day: per_day = data seed + the day's date, fixed = "
+                         "the same routes every day (all runs before 2026-09-17). Default: config "
+                         "observation.trajectory_mode")
     ap.add_argument("--var-eps", type=float, default=1e-6,
                     help="minimum variance added after the softplus. 1e-6 is the value "
                          "Lakshminarayanan et al. give in Sec. 2.2.1 footnote 2; it is there "
@@ -260,6 +274,16 @@ def main():
             "  purpose, pass --allow-cpu.")
     init_seed = args.seed if args.init_seed is None else args.init_seed
     data_seed = args.seed if args.data_seed is None else args.data_seed
+    # resolved here so the saved args record the mode actually used, not None
+    args.trajectory_mode = args.trajectory_mode or d.TRAJECTORY_MODE
+    _last = os.path.join(args.outdir, "varnet_last.pt")
+    if args.resume and os.path.exists(_last):
+        _prev = torch.load(_last, map_location="cpu").get("args", {}).get("trajectory_mode", "fixed")
+        if _prev != args.trajectory_mode:
+            raise SystemExit(
+                f"ABORT: {_last} was trained with trajectory_mode={_prev!r} but this run would "
+                f"build {args.trajectory_mode!r} data. Resuming would switch the robot routes mid-"
+                f"training. Pass --trajectory-mode {_prev} to continue it, or use a new --outdir.")
     torch.manual_seed(init_seed)                            # weights only
 
     # ---- data ----
@@ -270,7 +294,9 @@ def main():
     X, Y, M, X0 = build_windows(files, args.dT, args.sensing_range, args.num_agents,
                                 data_seed, args.days,
                                 add_noise=False if args.no_noise else None,
-                                obs_every_k=args.obs_every_k)
+                                obs_every_k=args.obs_every_k,
+                                trajectory_mode=args.trajectory_mode)
+    print(f"[obs] trajectory_mode = {args.trajectory_mode}  (base data seed {data_seed})", flush=True)
     if args.max_windows and X.shape[0] > args.max_windows:  # randomly subsample training windows (speed-up)
         sub = torch.randperm(X.shape[0])[:args.max_windows]
         X, Y, M, X0 = X[sub], Y[sub], M[sub], X0[sub]
@@ -288,7 +314,8 @@ def main():
                         dropout=args.dropout,
                         predict_var=args.loss == "nll", var_eps=args.var_eps,
                         var_sees_state=not args.var_h_only,
-                        augmented_var=args.augmented_var).to(dev)
+                        augmented_var=args.augmented_var,
+                        obs_nll=args.obs_nll).to(dev)
     params = list(solver.parameters())
     opt = torch.optim.Adam(params, lr=args.lr)
     n_param = sum(p.numel() for p in solver.parameters())
@@ -303,6 +330,7 @@ def main():
         if solver.augmented_var:
             print(f"[var] AUGMENTED STATE: log sigma^2 iterated with x over {args.n_iter} "
                   f"steps; prior term of J is a Gaussian log-likelihood of the prior residual"
+                  f"{'; observation term too (shared sigma)' if args.obs_nll else ''}"
                   f"   eps={args.var_eps:g}", flush=True)
         else:
             _nv = sum(p.numel() for p in solver.grad_net.out_var.parameters())

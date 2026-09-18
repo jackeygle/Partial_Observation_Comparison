@@ -1,0 +1,30 @@
+srun: job 20291286 queued and waiting for resources
+srun: job 20291286 has been allocated resources
+=========== aug0
+18:52:13
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 403 windows of (4, 200, 36, 12)  device=cuda
+[model] params=3,990,742 (GENN prior 54,220 = 1.36%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual   eps=1e-06
+[schedule] ep0→20it@lr0.001
+[schedule] epoch 0: n_iter -> 20, lr -> 0.001
+[epoch   0] loss=-0.9867  blind_MSE=0.0766  density=0.0223 vx=0.2402 vy=0.0347 var=0.0094
+           ↑ new best (0.0766) -> varnet_best.pt
+[done] checkpoints + metrics in scratch/smoke_augobs/aug0
+[smoke] aug0 OK
+18:54:04
+=========== augobs
+18:54:04
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[data] 403 windows of (4, 200, 36, 12)  device=cuda
+[model] params=3,990,742 (GENN prior 54,220 = 1.36%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual; observation term too (shared sigma)   eps=1e-06
+[schedule] ep0→20it@lr0.001
+[schedule] epoch 0: n_iter -> 20, lr -> 0.001
+[epoch   0] loss=-0.9526  blind_MSE=0.0769  density=0.0216 vx=0.2429 vy=0.0345 var=0.0086
+           ↑ new best (0.0769) -> varnet_best.pt
+[done] checkpoints + metrics in scratch/smoke_augobs/augobs
+[smoke] augobs OK
+18:55:40

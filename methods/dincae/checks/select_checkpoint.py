@@ -38,10 +38,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def score_ckpt(path, stats, files, dev, frames, batch):
     """Blind MSE over walkable cells, pooled across days and channels."""
     models, epochs, _ = load_models(os.path.dirname(path), path, dev)
+    # score on the routes this run was trained under; runs without the key predate per_day
+    mode = torch.load(path, map_location="cpu").get("args", {}).get("trajectory_mode", "fixed")
     walk = stats.valid
     se = n = 0.0
     for fp in files:
-        Xt, rec, _, _, M = predict_day(models, stats, fp, dev, frames, batch)
+        Xt, rec, _, _, M = predict_day(models, stats, fp, dev, frames, batch,
+                                       seed=om.day_seed(fp, 0, mode))
         rec = clip_bounds(rec)
         blind = ~M                                        # (T,NCH,H,W)
         sel = blind & walk[None, None]

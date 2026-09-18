@@ -141,7 +141,7 @@ def build_inputs(scaled, invvar, t_unix, idx, H, W):
 
 
 @torch.no_grad()
-def predict_day(models, stats, fp, dev, frames=0, batch=256):
+def predict_day(models, stats, fp, dev, frames=0, batch=256, seed=None):
     """Reconstruction for one day (averaged over multiple checkpoints' outputs).
 
     Returns (Xt, rec, mu_n, sd_n, M):
@@ -168,8 +168,9 @@ def predict_day(models, stats, fp, dev, frames=0, batch=256):
         t_unix = f["time"][:T]
     obs = om.generate_observations(
         X, sensing_range=oc["sensing_range"], num_agents=oc["num_agents"],
-        add_noise=oc["add_noise"], seed=oc["seed"], valid_mask=stats.valid,
-        obs_std=oc["obs_std"], obs_every_k=oc["obs_every_k"])
+        add_noise=oc["add_noise"],
+        seed=om.day_seed(fp, oc["seed"], oc["trajectory_mode"]) if seed is None else seed,
+        valid_mask=stats.valid, obs_std=oc["obs_std"], obs_every_k=oc["obs_every_k"])
     Y, M = obs["Y"][:, :NCH], obs["Omega_c"][:, :NCH]
     scaled, invvar = observed_pair(Y, M, stats.mean, stats.std)
 
