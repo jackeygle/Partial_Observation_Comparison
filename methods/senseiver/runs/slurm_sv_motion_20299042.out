@@ -1,0 +1,55 @@
+[config] observation config = {'sensing_range': 7, 'num_agents': 3, 'add_noise': True, 'obs_every_k': 1, 'init_method': 'prev'}
+[data] loading train split ...
+  [1/32] atc-20121028: 10112 target frames of 40446, observed cells/frame 202.6, window 16, observation seed 123
+  [2/32] atc-20121104: 10071 target frames of 40281, observed cells/frame 202.6, window 16, observation seed 123
+  [3/32] atc-20121111: 9685 target frames of 38740, observed cells/frame 202.8, window 16, observation seed 123
+  [4/32] atc-20121118: 9821 target frames of 39281, observed cells/frame 202.7, window 16, observation seed 123
+  [5/32] atc-20121125: 9960 target frames of 39837, observed cells/frame 202.7, window 16, observation seed 123
+  [6/32] atc-20121202: 9599 target frames of 38394, observed cells/frame 202.7, window 16, observation seed 123
+  [7/32] atc-20121209: 9295 target frames of 37178, observed cells/frame 202.5, window 16, observation seed 123
+  [8/32] atc-20121216: 10176 target frames of 40701, observed cells/frame 202.7, window 16, observation seed 123
+  [9/32] atc-20121223: 9994 target frames of 39974, observed cells/frame 202.6, window 16, observation seed 123
+  [10/32] atc-20130106: 9612 target frames of 38445, observed cells/frame 202.8, window 16, observation seed 123
+  [11/32] atc-20130113: 9701 target frames of 38803, observed cells/frame 202.8, window 16, observation seed 123
+  [12/32] atc-20130120: 9817 target frames of 39268, observed cells/frame 202.7, window 16, observation seed 123
+  [13/32] atc-20130127: 10379 target frames of 41513, observed cells/frame 202.7, window 16, observation seed 123
+  [14/32] atc-20130203: 9646 target frames of 38581, observed cells/frame 202.8, window 16, observation seed 123
+  [15/32] atc-20130210: 9788 target frames of 39152, observed cells/frame 202.8, window 16, observation seed 123
+  [16/32] atc-20130217: 9776 target frames of 39103, observed cells/frame 202.8, window 16, observation seed 123
+  [17/32] atc-20130224: 9872 target frames of 39486, observed cells/frame 202.7, window 16, observation seed 123
+  [18/32] atc-20130303: 8798 target frames of 35190, observed cells/frame 202.5, window 16, observation seed 123
+  [19/32] atc-20130310: 9930 target frames of 39719, observed cells/frame 202.7, window 16, observation seed 123
+  [20/32] atc-20130317: 9704 target frames of 38815, observed cells/frame 202.8, window 16, observation seed 123
+  [21/32] atc-20130324: 10354 target frames of 41415, observed cells/frame 202.7, window 16, observation seed 123
+  [22/32] atc-20130331: 9920 target frames of 39679, observed cells/frame 202.7, window 16, observation seed 123
+  [23/32] atc-20130407: 9704 target frames of 38814, observed cells/frame 202.8, window 16, observation seed 123
+  [24/32] atc-20130414: 9907 target frames of 39625, observed cells/frame 202.7, window 16, observation seed 123
+  [25/32] atc-20130421: 10207 target frames of 40826, observed cells/frame 202.7, window 16, observation seed 123
+  [26/32] atc-20130428: 10002 target frames of 40006, observed cells/frame 202.6, window 16, observation seed 123
+  [27/32] atc-20130505: 9926 target frames of 39702, observed cells/frame 202.7, window 16, observation seed 123
+  [28/32] atc-20130512: 9535 target frames of 38140, observed cells/frame 202.7, window 16, observation seed 123
+  [29/32] atc-20130519: 10080 target frames of 40320, observed cells/frame 202.6, window 16, observation seed 123
+  [30/32] atc-20130526: 10247 target frames of 40986, observed cells/frame 202.7, window 16, observation seed 123
+  [31/32] atc-20130602: 10012 target frames of 40046, observed cells/frame 202.6, window 16, observation seed 123
+  [32/32] atc-20130609: 10013 target frames of 40052, observed cells/frame 202.6, window 16, observation seed 123
+[data] 315643 training frames
+  [1/3] atc-20130616: 1757 target frames of 35127, observed cells/frame 202.4, window 16, observation seed 123
+  [2/3] atc-20130623: 2031 target frames of 40620, observed cells/frame 202.7, window 16, observation seed 123
+  [3/3] atc-20130630: 2036 target frames of 40710, observed cells/frame 202.7, window 16, observation seed 123
+[data] 5824 validation frames
+[data] model_seed=123  train_obs_seed=123 train_trajectory_mode=fixed  valid_obs_seed=123 valid_trajectory_mode=fixed
+[stats] encoder input standardisation mean=[0.07504988 0.0059779  0.0007054  0.02486421] std=[0.21125616 0.53789836 0.18976499 0.12118698]
+[model] 56,676 parameters  latent=grid  readout=direct  time_window=16  temporal=advected_tokens  spatial=global  share_blocks=True  seed=123
+[resume] continuing from epoch 29 (best=0.01871)
+[ep  29] train 0.01321  valid mse 0.01076  blind 0.01867  density_occ 0.02746  (928s)
+[ep  30] train 0.01321  valid mse 0.01084  blind 0.01878  density_occ 0.02777  (924s)
+[ep  31] train 0.01318  valid mse 0.01079  blind 0.01875  density_occ 0.02735  (915s)
+[ep  32] train 0.01316  valid mse 0.01077  blind 0.01867  density_occ 0.02748  (923s)
+[ep  33] train 0.01316  valid mse 0.01071  blind 0.01859  density_occ 0.02763  (913s)
+[ep  34] train 0.01314  valid mse 0.01070  blind 0.01857  density_occ 0.02771  (922s)
+[ep  35] train 0.01312  valid mse 0.01097  blind 0.01889  density_occ 0.02735  (913s)
+[ep  36] train 0.01314  valid mse 0.01073  blind 0.01860  density_occ 0.02780  (927s)
+[ep  37] train 0.01310  valid mse 0.01071  blind 0.01860  density_occ 0.02765  (918s)
+[ep  38] train 0.01310  valid mse 0.01068  blind 0.01851  density_occ 0.02750  (929s)
+[chain] close to wall clock, queuing successor
+Submitted batch job 20301412

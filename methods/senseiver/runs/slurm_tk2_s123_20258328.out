@@ -1,0 +1,82 @@
+[config] observation config = {'sensing_range': 7, 'num_agents': 3, 'add_noise': True, 'obs_every_k': 1, 'init_method': 'prev'}
+[data] loading train split ...
+  [1/32] atc-20121028: 10112 target frames of 40446, observed cells/frame 202.6, window 2
+  [2/32] atc-20121104: 10071 target frames of 40281, observed cells/frame 202.6, window 2
+  [3/32] atc-20121111: 9685 target frames of 38740, observed cells/frame 202.8, window 2
+  [4/32] atc-20121118: 9821 target frames of 39281, observed cells/frame 202.7, window 2
+  [5/32] atc-20121125: 9960 target frames of 39837, observed cells/frame 202.7, window 2
+  [6/32] atc-20121202: 9599 target frames of 38394, observed cells/frame 202.7, window 2
+  [7/32] atc-20121209: 9295 target frames of 37178, observed cells/frame 202.5, window 2
+  [8/32] atc-20121216: 10176 target frames of 40701, observed cells/frame 202.7, window 2
+  [9/32] atc-20121223: 9994 target frames of 39974, observed cells/frame 202.6, window 2
+  [10/32] atc-20130106: 9612 target frames of 38445, observed cells/frame 202.8, window 2
+  [11/32] atc-20130113: 9701 target frames of 38803, observed cells/frame 202.8, window 2
+  [12/32] atc-20130120: 9817 target frames of 39268, observed cells/frame 202.7, window 2
+  [13/32] atc-20130127: 10379 target frames of 41513, observed cells/frame 202.7, window 2
+  [14/32] atc-20130203: 9646 target frames of 38581, observed cells/frame 202.8, window 2
+  [15/32] atc-20130210: 9788 target frames of 39152, observed cells/frame 202.8, window 2
+  [16/32] atc-20130217: 9776 target frames of 39103, observed cells/frame 202.8, window 2
+  [17/32] atc-20130224: 9872 target frames of 39486, observed cells/frame 202.7, window 2
+  [18/32] atc-20130303: 8798 target frames of 35190, observed cells/frame 202.5, window 2
+  [19/32] atc-20130310: 9930 target frames of 39719, observed cells/frame 202.7, window 2
+  [20/32] atc-20130317: 9704 target frames of 38815, observed cells/frame 202.8, window 2
+  [21/32] atc-20130324: 10354 target frames of 41415, observed cells/frame 202.7, window 2
+  [22/32] atc-20130331: 9920 target frames of 39679, observed cells/frame 202.7, window 2
+  [23/32] atc-20130407: 9704 target frames of 38814, observed cells/frame 202.8, window 2
+  [24/32] atc-20130414: 9907 target frames of 39625, observed cells/frame 202.7, window 2
+  [25/32] atc-20130421: 10207 target frames of 40826, observed cells/frame 202.7, window 2
+  [26/32] atc-20130428: 10002 target frames of 40006, observed cells/frame 202.6, window 2
+  [27/32] atc-20130505: 9926 target frames of 39702, observed cells/frame 202.7, window 2
+  [28/32] atc-20130512: 9535 target frames of 38140, observed cells/frame 202.7, window 2
+  [29/32] atc-20130519: 10080 target frames of 40320, observed cells/frame 202.6, window 2
+  [30/32] atc-20130526: 10247 target frames of 40986, observed cells/frame 202.7, window 2
+  [31/32] atc-20130602: 10012 target frames of 40046, observed cells/frame 202.6, window 2
+  [32/32] atc-20130609: 10013 target frames of 40052, observed cells/frame 202.6, window 2
+[data] 315643 training frames
+  [1/3] atc-20130616: 1757 target frames of 35127, observed cells/frame 202.4, window 2
+  [2/3] atc-20130623: 2031 target frames of 40620, observed cells/frame 202.7, window 2
+  [3/3] atc-20130630: 2036 target frames of 40710, observed cells/frame 202.7, window 2
+[data] 5824 validation frames
+[stats] encoder input standardisation mean=[0.07504988 0.0059779  0.0007054  0.02486421] std=[0.21125616 0.53789836 0.18976499 0.12118698]
+[model] 56,564 parameters  latent=grid  readout=direct  time_window=2  seed=123
+[ep   0] train 0.03335  valid mse 0.01619  blind 0.02485  density_occ 0.04518  (158s)
+[ep   1] train 0.01892  valid mse 0.01433  blind 0.02397  density_occ 0.03860  (158s)
+[ep   2] train 0.01727  valid mse 0.01375  blind 0.02337  density_occ 0.03640  (158s)
+[ep   3] train 0.01673  valid mse 0.01352  blind 0.02313  density_occ 0.03576  (158s)
+[ep   4] train 0.01635  valid mse 0.01327  blind 0.02281  density_occ 0.03529  (158s)
+[ep   5] train 0.01607  valid mse 0.01306  blind 0.02255  density_occ 0.03564  (158s)
+[ep   6] train 0.01588  valid mse 0.01329  blind 0.02278  density_occ 0.03619  (158s)
+[ep   7] train 0.01572  valid mse 0.01286  blind 0.02233  density_occ 0.03455  (158s)
+[ep   8] train 0.01562  valid mse 0.01274  blind 0.02219  density_occ 0.03392  (158s)
+[ep   9] train 0.01553  valid mse 0.01274  blind 0.02219  density_occ 0.03403  (158s)
+[ep  10] train 0.01543  valid mse 0.01265  blind 0.02209  density_occ 0.03319  (158s)
+[ep  11] train 0.01540  valid mse 0.01261  blind 0.02201  density_occ 0.03450  (158s)
+[ep  12] train 0.01529  valid mse 0.01256  blind 0.02199  density_occ 0.03505  (158s)
+[ep  13] train 0.01527  valid mse 0.01259  blind 0.02200  density_occ 0.03410  (158s)
+[ep  14] train 0.01521  valid mse 0.01255  blind 0.02197  density_occ 0.03358  (158s)
+[ep  15] train 0.01517  valid mse 0.01253  blind 0.02193  density_occ 0.03315  (158s)
+[ep  16] train 0.01515  valid mse 0.01256  blind 0.02200  density_occ 0.03307  (158s)
+[ep  17] train 0.01512  valid mse 0.01247  blind 0.02186  density_occ 0.03326  (158s)
+[ep  18] train 0.01509  valid mse 0.01250  blind 0.02192  density_occ 0.03346  (158s)
+[ep  19] train 0.01507  valid mse 0.01261  blind 0.02205  density_occ 0.03220  (158s)
+[ep  20] train 0.01504  valid mse 0.01241  blind 0.02179  density_occ 0.03288  (158s)
+[ep  21] train 0.01502  valid mse 0.01244  blind 0.02188  density_occ 0.03346  (158s)
+[ep  22] train 0.01500  valid mse 0.01242  blind 0.02183  density_occ 0.03359  (158s)
+[ep  23] train 0.01498  valid mse 0.01248  blind 0.02189  density_occ 0.03241  (158s)
+[ep  24] train 0.01497  valid mse 0.01235  blind 0.02173  density_occ 0.03266  (158s)
+[ep  25] train 0.01497  valid mse 0.01241  blind 0.02178  density_occ 0.03386  (158s)
+[ep  26] train 0.01495  valid mse 0.01248  blind 0.02191  density_occ 0.03190  (158s)
+[ep  27] train 0.01493  valid mse 0.01238  blind 0.02175  density_occ 0.03302  (158s)
+[ep  28] train 0.01493  valid mse 0.01236  blind 0.02173  density_occ 0.03260  (158s)
+[ep  29] train 0.01490  valid mse 0.01237  blind 0.02174  density_occ 0.03282  (158s)
+[ep  30] train 0.01490  valid mse 0.01233  blind 0.02170  density_occ 0.03145  (158s)
+[ep  31] train 0.01489  valid mse 0.01244  blind 0.02188  density_occ 0.03227  (158s)
+[ep  32] train 0.01489  valid mse 0.01236  blind 0.02174  density_occ 0.03318  (158s)
+[ep  33] train 0.01487  valid mse 0.01231  blind 0.02166  density_occ 0.03272  (158s)
+[ep  34] train 0.01487  valid mse 0.01232  blind 0.02169  density_occ 0.03275  (158s)
+[ep  35] train 0.01487  valid mse 0.01233  blind 0.02173  density_occ 0.03256  (158s)
+[ep  36] train 0.01485  valid mse 0.01229  blind 0.02162  density_occ 0.03255  (158s)
+[ep  37] train 0.01484  valid mse 0.01236  blind 0.02172  density_occ 0.03267  (158s)
+[ep  38] train 0.01483  valid mse 0.01234  blind 0.02172  density_occ 0.03286  (158s)
+[ep  39] train 0.01483  valid mse 0.01230  blind 0.02165  density_occ 0.03211  (158s)
+[done]

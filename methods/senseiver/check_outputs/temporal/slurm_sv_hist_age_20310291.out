@@ -1,0 +1,23 @@
+[model] k1_40: methods/senseiver/runs/grid/Gdirect_s123/best.pt, epoch=39, k=1, params=56,260
+[model] k16_40: methods/senseiver/runs/temporal/k16_s123/best.pt, epoch=37, k=16, params=56,676
+[model] k16_60: methods/senseiver/runs/capacity/base32_k16_s123/best.pt, epoch=56, k=16, params=56,676
+[day] atc-20130811: k1_40 pooled=0.1965  k16_40 pooled=0.1770  k16_60 pooled=0.1757
+[day] atc-20130818: k1_40 pooled=0.2143  k16_40 pooled=0.1933  k16_60 pooled=0.1924
+[day] atc-20130825: k1_40 pooled=0.2159  k16_40 pooled=0.1947  k16_60 pooled=0.1937
+[day] atc-20130901: k1_40 pooled=0.2188  k16_40 pooled=0.1976  k16_60 pooled=0.1966
+[day] atc-20130915: k1_40 pooled=0.2179  k16_40 pooled=0.1962  k16_60 pooled=0.1954
+[day] atc-20130922: k1_40 pooled=0.2168  k16_40 pooled=0.1951  k16_60 pooled=0.1943
+[day] atc-20130929: k1_40 pooled=0.2197  k16_40 pooled=0.1976  k16_60 pooled=0.1969
+
+[pooled blind-walkable RMSE by age]
+age bin                  k1_40        k16_40        k16_60
+age_1                  0.16636       0.13530       0.13296
+age_2_4                0.21347       0.17952       0.17819
+age_5_8                0.22906       0.20126       0.20087
+age_9_15               0.23304       0.21322       0.21271
+age_16_plus            0.22435       0.21250       0.21216
+never_seen             0.14250       0.14072       0.14019
+inside_k16             0.21759       0.19032       0.18943
+outside_k16            0.22426       0.21242       0.21208
+all_blind              0.21972       0.19757       0.19687
+[out] methods/senseiver/check_outputs/temporal/history_age_k1_k16.json

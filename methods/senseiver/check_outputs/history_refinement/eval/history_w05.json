@@ -1,0 +1,690 @@
+{
+  "protocol": {
+    "cells": "blind ∩ channel-defined ∩ walkable ('defined'), alongside blind ('allcells')",
+    "channel_defined": "density: everywhere; vx/vy: density>0; var: var>0 (dincae_crowd/state.py:channel_valid)",
+    "walkable_cells": 290,
+    "grid_cells": 432,
+    "frame_range": "[1, T-1)  (aligned with DINCAE's FRESH_OFFSETS)",
+    "obs_every_k": 1,
+    "seed": 0,
+    "trajectory_mode": "per_day",
+    "clip": "EnKF's physical bounds",
+    "ckpt": "per run: select_valid.json (validation split, 20 iterations)",
+    "checkpoints": {},
+    "pooling": "accumulate squared error and cell count per channel, divide once at the end",
+    "n_days": 7
+  },
+  "per_day": [
+    {
+      "day": "atc-20130811",
+      "frames_total": 39821,
+      "frames_scored": 39819,
+      "Senseiver": {
+        "full_mse": 0.010869741542938393,
+        "defined_blind_mse": 0.07185750589173852
+      },
+      "EnKF k1": {
+        "full_mse": 0.04732490001923054,
+        "defined_blind_mse": 0.10260268221617663
+      }
+    },
+    {
+      "day": "atc-20130818",
+      "frames_total": 38885,
+      "frames_scored": 38883,
+      "Senseiver": {
+        "full_mse": 0.01487706842891864,
+        "defined_blind_mse": 0.09422882232317528
+      },
+      "EnKF k1": {
+        "full_mse": 0.06085912652487377,
+        "defined_blind_mse": 0.1307165754832742
+      }
+    },
+    {
+      "day": "atc-20130825",
+      "frames_total": 42890,
+      "frames_scored": 42888,
+      "Senseiver": {
+        "full_mse": 0.013239967789838693,
+        "defined_blind_mse": 0.09075419205285183
+      },
+      "EnKF k1": {
+        "full_mse": 0.05633560144084376,
+        "defined_blind_mse": 0.12711355805846952
+      }
+    },
+    {
+      "day": "atc-20130901",
+      "frames_total": 39758,
+      "frames_scored": 39756,
+      "Senseiver": {
+        "full_mse": 0.014466931414222242,
+        "defined_blind_mse": 0.09501540665298312
+      },
+      "EnKF k1": {
+        "full_mse": 0.060118754840726346,
+        "defined_blind_mse": 0.1334448140774385
+      }
+    },
+    {
+      "day": "atc-20130915",
+      "frames_total": 39383,
+      "frames_scored": 39381,
+      "Senseiver": {
+        "full_mse": 0.012385714155873485,
+        "defined_blind_mse": 0.08635020278633715
+      },
+      "EnKF k1": {
+        "full_mse": 0.05522741625732281,
+        "defined_blind_mse": 0.12700814847694974
+      }
+    },
+    {
+      "day": "atc-20130922",
+      "frames_total": 38842,
+      "frames_scored": 38840,
+      "Senseiver": {
+        "full_mse": 0.011897864914478798,
+        "defined_blind_mse": 0.08678055034506096
+      },
+      "EnKF k1": {
+        "full_mse": 0.054987564258609636,
+        "defined_blind_mse": 0.1277075574538501
+      }
+    },
+    {
+      "day": "atc-20130929",
+      "frames_total": 37964,
+      "frames_scored": 37962,
+      "Senseiver": {
+        "full_mse": 0.015081699014057308,
+        "defined_blind_mse": 0.10232199490205343
+      },
+      "EnKF k1": {
+        "full_mse": 0.06470797712002939,
+        "defined_blind_mse": 0.14803536759025934
+      }
+    }
+  ],
+  "channels": [
+    "density",
+    "vx",
+    "vy",
+    "var"
+  ],
+  "results": {
+    "Senseiver": {
+      "defined": {
+        "per_channel": {
+          "density": 0.018066807409380485,
+          "vx": 0.4618006602826966,
+          "vy": 0.09577712102670086,
+          "var": 0.05113072602898091
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 7435603,
+          "vy": 7435603,
+          "var": 7175206
+        },
+        "overall": 0.08970320138395088,
+        "overall_pooled": 0.08970320138395088,
+        "overall_mean_of_days": 0.08961552499345718,
+        "rmse_pooled": 0.29950492714469806,
+        "rmse_mean_of_days": 0.29897817526052595
+      },
+      "defined_full": {
+        "per_channel": {
+          "density": 0.008422821819739,
+          "vx": 0.1822513015063658,
+          "vy": 0.03748395894848453,
+          "var": 0.020660822383797635
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 20771316,
+          "vy": 20771316,
+          "var": 20089931
+        },
+        "overall": 0.039806661628519056,
+        "overall_pooled": 0.039806661628519056,
+        "overall_mean_of_days": 0.039756117866710294,
+        "rmse_pooled": 0.19951606859729132,
+        "rmse_mean_of_days": 0.19917750574337684
+      },
+      "walkable": {
+        "per_channel": {
+          "density": 0.018066807409380485,
+          "vx": 0.10686649817067945,
+          "vy": 0.02114428263223625,
+          "var": 0.010595712903216783
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 35389369,
+          "vy": 35389369,
+          "var": 35389369
+        },
+        "overall": 0.039168325278878244,
+        "overall_pooled": 0.039168325278878244,
+        "overall_mean_of_days": 0.039228328101501654,
+        "rmse_pooled": 0.19790989181665034,
+        "rmse_mean_of_days": 0.19769512521463947
+      },
+      "walkable_full": {
+        "per_channel": {
+          "density": 0.008422821819739,
+          "vx": 0.051720518784554484,
+          "vy": 0.010152489422975492,
+          "var": 0.005272630583899216
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 80483410,
+          "vy": 80483410,
+          "var": 80483410
+        },
+        "overall": 0.018892115152792047,
+        "overall_pooled": 0.018892115152792047,
+        "overall_mean_of_days": 0.01890669953752133,
+        "rmse_pooled": 0.13744859094509498,
+        "rmse_mean_of_days": 0.1372725176101986
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.010362470673033388,
+          "vx": 0.06132544407897183,
+          "vy": 0.012903488168603379,
+          "var": 0.005958275216495372
+        },
+        "n_per_channel": {
+          "density": 63885315,
+          "vx": 63885315,
+          "vy": 63885315,
+          "var": 63885315
+        },
+        "overall": 0.02263741953427599,
+        "overall_pooled": 0.02263741953427599,
+        "overall_mean_of_days": 0.022670649197518815,
+        "rmse_pooled": 0.15045736782981414,
+        "rmse_mean_of_days": 0.15029801772223653
+      },
+      "full": {
+        "per_channel": {
+          "density": 0.005863826968954228,
+          "vx": 0.036045243839132324,
+          "vy": 0.007488098007241952,
+          "var": 0.0035944348659701295
+        },
+        "n_per_channel": {
+          "density": 119892528,
+          "vx": 119892528,
+          "vy": 119892528,
+          "var": 119892528
+        },
+        "overall": 0.01324790092032466,
+        "overall_pooled": 0.01324790092032466,
+        "overall_mean_of_days": 0.013259855322903937,
+        "rmse_pooled": 0.11509952615160786,
+        "rmse_mean_of_days": 0.11496418354736745
+      },
+      "defined_noclip": {
+        "per_channel": {
+          "density": 0.018067996634808604,
+          "vx": 0.4618006602826966,
+          "vy": 0.09577712102670086,
+          "var": 0.05114942104972317
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 7435603,
+          "vy": 7435603,
+          "var": 7175206
+        },
+        "overall": 0.08970626962050016,
+        "overall_pooled": 0.08970626962050016,
+        "overall_mean_of_days": 0.08961825086570721,
+        "rmse_pooled": 0.29951004928132235,
+        "rmse_mean_of_days": 0.2989827669634639
+      },
+      "defined_full_noclip": {
+        "per_channel": {
+          "density": 0.0084276406505701,
+          "vx": 0.1822513015063658,
+          "vy": 0.03748395894848453,
+          "var": 0.019213998801501608
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 20771316,
+          "vy": 20771316,
+          "var": 20089931
+        },
+        "overall": 0.03960486341122788,
+        "overall_pooled": 0.03960486341122788,
+        "overall_mean_of_days": 0.03955669219837651,
+        "rmse_pooled": 0.19900970682664673,
+        "rmse_mean_of_days": 0.19867821877539987
+      },
+      "walkable_noclip": {
+        "per_channel": {
+          "density": 0.018067996634808604,
+          "vx": 0.10686649817067945,
+          "vy": 0.02114428263223625,
+          "var": 0.010615253111040212
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 35389369,
+          "vy": 35389369,
+          "var": 35389369
+        },
+        "overall": 0.03917350763719113,
+        "overall_pooled": 0.03917350763719113,
+        "overall_mean_of_days": 0.03923337501716036,
+        "rmse_pooled": 0.1979229841054119,
+        "rmse_mean_of_days": 0.19770766922411015
+      },
+      "walkable_full_noclip": {
+        "per_channel": {
+          "density": 0.0084276406505701,
+          "vx": 0.051720518784554484,
+          "vy": 0.010152489422975492,
+          "var": 0.004927778701147851
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 80483410,
+          "vy": 80483410,
+          "var": 80483410
+        },
+        "overall": 0.01880710688981198,
+        "overall_pooled": 0.01880710688981198,
+        "overall_mean_of_days": 0.0188228027227046,
+        "rmse_pooled": 0.13713900571978777,
+        "rmse_mean_of_days": 0.13696749343864992
+      },
+      "allcells_noclip": {
+        "per_channel": {
+          "density": 0.010363259562271862,
+          "vx": 0.06132544407897183,
+          "vy": 0.012903488168603379,
+          "var": 0.0059691174602293185
+        },
+        "n_per_channel": {
+          "density": 63885315,
+          "vx": 63885315,
+          "vy": 63885315,
+          "var": 63885315
+        },
+        "overall": 0.022640327317519096,
+        "overall_pooled": 0.022640327317519096,
+        "overall_mean_of_days": 0.02267348383506839,
+        "rmse_pooled": 0.15046703066625292,
+        "rmse_mean_of_days": 0.1503073047590103
+      },
+      "full_noclip": {
+        "per_channel": {
+          "density": 0.005867306973667283,
+          "vx": 0.036045243839132324,
+          "vy": 0.007488098007241952,
+          "var": 0.0033591265326810026
+        },
+        "n_per_channel": {
+          "density": 119892528,
+          "vx": 119892528,
+          "vy": 119892528,
+          "var": 119892528
+        },
+        "overall": 0.013189943838180642,
+        "overall_pooled": 0.013189943838180642,
+        "overall_mean_of_days": 0.013202647990809113,
+        "rmse_pooled": 0.11484748076549456,
+        "rmse_mean_of_days": 0.11471570832650088
+      }
+    },
+    "EnKF k1": {
+      "defined": {
+        "per_channel": {
+          "density": 0.023402860139297765,
+          "vx": 0.6990797098096819,
+          "vy": 0.11621335552745353,
+          "var": 0.06489160707546236
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 7435603,
+          "vy": 7435603,
+          "var": 7175206
+        },
+        "overall": 0.12807379887569562,
+        "overall_pooled": 0.12807379887569562,
+        "overall_mean_of_days": 0.1280898147652026,
+        "rmse_pooled": 0.35787399860243496,
+        "rmse_mean_of_days": 0.35745607083041103
+      },
+      "defined_full": {
+        "per_channel": {
+          "density": 0.02950465467044699,
+          "vx": 0.6852524775031106,
+          "vy": 0.09887986123508015,
+          "var": 0.06251341545797245
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 20771316,
+          "vy": 20771316,
+          "var": 20089931
+        },
+        "overall": 0.1401530425832218,
+        "overall_pooled": 0.1401530425832218,
+        "overall_mean_of_days": 0.14019430570724029,
+        "rmse_pooled": 0.37437019457112475,
+        "rmse_mean_of_days": 0.37399892485735997
+      },
+      "walkable": {
+        "per_channel": {
+          "density": 0.023402860139297765,
+          "vx": 0.17209845208034086,
+          "vy": 0.02967667705519135,
+          "var": 0.039674649981043746
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 35389369,
+          "vy": 35389369,
+          "var": 35389369
+        },
+        "overall": 0.06621315981396843,
+        "overall_pooled": 0.06621315981396843,
+        "overall_mean_of_days": 0.06631324256895196,
+        "rmse_pooled": 0.2573191788692954,
+        "rmse_mean_of_days": 0.2572022619859401
+      },
+      "walkable_full": {
+        "per_channel": {
+          "density": 0.02950465467044699,
+          "vx": 0.2032578375468932,
+          "vy": 0.03066860999676828,
+          "var": 0.039841011955134606
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 80483410,
+          "vy": 80483410,
+          "var": 80483410
+        },
+        "overall": 0.07581802854231078,
+        "overall_pooled": 0.07581802854231078,
+        "overall_mean_of_days": 0.07590606028763411,
+        "rmse_pooled": 0.275350737319352,
+        "rmse_mean_of_days": 0.27517587971775753
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.013584094746578302,
+          "vx": 0.10468202669111047,
+          "vy": 0.02028848638767767,
+          "var": 0.03918914650025597
+        },
+        "n_per_channel": {
+          "density": 63885315,
+          "vx": 63885315,
+          "vy": 63885315,
+          "var": 63885315
+        },
+        "overall": 0.0444359385814056,
+        "overall_pooled": 0.0444359385814056,
+        "overall_mean_of_days": 0.04449083021690692,
+        "rmse_pooled": 0.21079833628709121,
+        "rmse_mean_of_days": 0.21074046219638337
+      },
+      "full": {
+        "per_channel": {
+          "density": 0.02038149976493948,
+          "vx": 0.14508509446059892,
+          "vy": 0.023672016022132755,
+          "var": 0.03893254924110033
+        },
+        "n_per_channel": {
+          "density": 119892528,
+          "vx": 119892528,
+          "vy": 119892528,
+          "var": 119892528
+        },
+        "overall": 0.057017789872192866,
+        "overall_pooled": 0.057017789872192866,
+        "overall_mean_of_days": 0.05708019149451947,
+        "rmse_pooled": 0.23878398160721095,
+        "rmse_mean_of_days": 0.23866554541363727
+      },
+      "defined_noclip": {
+        "per_channel": {
+          "density": 0.023402860139297765,
+          "vx": 0.6990797098096819,
+          "vy": 0.11621335552745353,
+          "var": 0.06489160707546236
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 7435603,
+          "vy": 7435603,
+          "var": 7175206
+        },
+        "overall": 0.12807379887569562,
+        "overall_pooled": 0.12807379887569562,
+        "overall_mean_of_days": 0.1280898147652026,
+        "rmse_pooled": 0.35787399860243496,
+        "rmse_mean_of_days": 0.35745607083041103
+      },
+      "defined_full_noclip": {
+        "per_channel": {
+          "density": 0.02950465467044699,
+          "vx": 0.6852524775031106,
+          "vy": 0.09887986123508015,
+          "var": 0.06251341545797245
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 20771316,
+          "vy": 20771316,
+          "var": 20089931
+        },
+        "overall": 0.1401530425832218,
+        "overall_pooled": 0.1401530425832218,
+        "overall_mean_of_days": 0.14019430570724029,
+        "rmse_pooled": 0.37437019457112475,
+        "rmse_mean_of_days": 0.37399892485735997
+      },
+      "walkable_noclip": {
+        "per_channel": {
+          "density": 0.023402860139297765,
+          "vx": 0.17209845208034086,
+          "vy": 0.02967667705519135,
+          "var": 0.039674649981043746
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 35389369,
+          "vy": 35389369,
+          "var": 35389369
+        },
+        "overall": 0.06621315981396843,
+        "overall_pooled": 0.06621315981396843,
+        "overall_mean_of_days": 0.06631324256895196,
+        "rmse_pooled": 0.2573191788692954,
+        "rmse_mean_of_days": 0.2572022619859401
+      },
+      "walkable_full_noclip": {
+        "per_channel": {
+          "density": 0.02950465467044699,
+          "vx": 0.2032578375468932,
+          "vy": 0.03066860999676828,
+          "var": 0.039841011955134606
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 80483410,
+          "vy": 80483410,
+          "var": 80483410
+        },
+        "overall": 0.07581802854231078,
+        "overall_pooled": 0.07581802854231078,
+        "overall_mean_of_days": 0.07590606028763411,
+        "rmse_pooled": 0.275350737319352,
+        "rmse_mean_of_days": 0.27517587971775753
+      },
+      "allcells_noclip": {
+        "per_channel": {
+          "density": 0.013584094746578302,
+          "vx": 0.10468202669111047,
+          "vy": 0.02028848638767767,
+          "var": 0.03918914650025597
+        },
+        "n_per_channel": {
+          "density": 63885315,
+          "vx": 63885315,
+          "vy": 63885315,
+          "var": 63885315
+        },
+        "overall": 0.0444359385814056,
+        "overall_pooled": 0.0444359385814056,
+        "overall_mean_of_days": 0.04449083021690692,
+        "rmse_pooled": 0.21079833628709121,
+        "rmse_mean_of_days": 0.21074046219638337
+      },
+      "full_noclip": {
+        "per_channel": {
+          "density": 0.02038149976493948,
+          "vx": 0.14508509446059892,
+          "vy": 0.023672016022132755,
+          "var": 0.03893254924110033
+        },
+        "n_per_channel": {
+          "density": 119892528,
+          "vx": 119892528,
+          "vy": 119892528,
+          "var": 119892528
+        },
+        "overall": 0.057017789872192866,
+        "overall_pooled": 0.057017789872192866,
+        "overall_mean_of_days": 0.05708019149451947,
+        "rmse_pooled": 0.23878398160721095,
+        "rmse_mean_of_days": 0.23866554541363727
+      }
+    },
+    "DINCAE": {
+      "defined": {
+        "per_channel": {
+          "density": 0.023314605628483896,
+          "vx": 0.6511099439936889,
+          "vy": 0.1152491189685173,
+          "var": 0.056429410983101294
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 7435603,
+          "vy": 7435603,
+          "var": 7175206
+        },
+        "overall": 0.12062730682772951,
+        "overall_pooled": 0.12062730682772951,
+        "rmse_pooled": 0.3473144207022356,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      },
+      "defined_full": {
+        "per_channel": {
+          "density": 0.01520284846203087,
+          "vx": 0.3320930080934689,
+          "vy": 0.055342715466367175,
+          "var": 0.031501665249621814
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 20771316,
+          "vy": 20771316,
+          "var": 20089931
+        },
+        "overall": 0.06968951485092742,
+        "overall_pooled": 0.06968951485092742,
+        "rmse_pooled": 0.2639877172349642,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      },
+      "walkable": {
+        "per_channel": {
+          "density": 0.023314605628483896,
+          "vx": 0.14473152915478774,
+          "vy": 0.02568599962058352,
+          "var": 0.011800051172467838
+        },
+        "n_per_channel": {
+          "density": 35389369,
+          "vx": 35389369,
+          "vy": 35389369,
+          "var": 35389369
+        },
+        "overall": 0.05138304639408075,
+        "overall_pooled": 0.05138304639408075,
+        "rmse_pooled": 0.22667828831646128,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      },
+      "walkable_full": {
+        "per_channel": {
+          "density": 0.01520284846203087,
+          "vx": 0.09404708917651476,
+          "vy": 0.01561330543151688,
+          "var": 0.008056113384888887
+        },
+        "n_per_channel": {
+          "density": 80483410,
+          "vx": 80483410,
+          "vy": 80483410,
+          "var": 80483410
+        },
+        "overall": 0.03322983911373785,
+        "overall_pooled": 0.03322983911373785,
+        "rmse_pooled": 0.18229053489892955,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      },
+      "allcells": {
+        "per_channel": {
+          "density": 0.013428358425431745,
+          "vx": 0.08321601675326215,
+          "vy": 0.015970195364319976,
+          "var": 0.00662431503063067
+        },
+        "n_per_channel": {
+          "density": 63885315,
+          "vx": 63885315,
+          "vy": 63885315,
+          "var": 63885315
+        },
+        "overall": 0.02980972139341113,
+        "overall_pooled": 0.02980972139341113,
+        "rmse_pooled": 0.17265491998032123,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      },
+      "full": {
+        "per_channel": {
+          "density": 0.010599143374055804,
+          "vx": 0.06584046776459664,
+          "vy": 0.011696040729285482,
+          "var": 0.005484970738230659
+        },
+        "n_per_channel": {
+          "density": 119892528,
+          "vx": 119892528,
+          "vy": 119892528,
+          "var": 119892528
+        },
+        "overall": 0.023405155651542147,
+        "overall_pooled": 0.023405155651542147,
+        "rmse_pooled": 0.15298743625390337,
+        "source": "methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json"
+      }
+    }
+  },
+  "seed_summary": {},
+  "single_model": {}
+}

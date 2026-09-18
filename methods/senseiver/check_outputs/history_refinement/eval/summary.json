@@ -1,0 +1,108 @@
+{
+  "selection": "best validation blind MSE checkpoint for each 60-epoch run",
+  "test_metric": "7-day pooled blind-walkable RMSE, matched per-day trajectories",
+  "models": {
+    "Baseline": {
+      "run_dir": "methods/senseiver/runs/capacity/base32_k16_s123",
+      "epochs": 60,
+      "best_epoch": 56,
+      "best_valid_blind_mse": 0.018497142335399987,
+      "blind_walkable_mse": 0.03875617425554585,
+      "blind_walkable_rmse": 0.19686587885041393,
+      "blind_walkable_mse_per_channel": {
+        "density": 0.01761854403931305,
+        "vx": 0.10597748472147102,
+        "vy": 0.020894614168947178,
+        "var": 0.010534054092452172
+      },
+      "blind_allcells_mse": 0.022380916175850623,
+      "blind_allcells_rmse": 0.14960252730435614,
+      "full_field_mse": 0.013015801931050595,
+      "full_field_rmse": 0.11408681751653253,
+      "protocol": {
+        "cells": "blind \u2229 channel-defined \u2229 walkable ('defined'), alongside blind ('allcells')",
+        "channel_defined": "density: everywhere; vx/vy: density>0; var: var>0 (dincae_crowd/state.py:channel_valid)",
+        "walkable_cells": 290,
+        "grid_cells": 432,
+        "frame_range": "[1, T-1)  (aligned with DINCAE's FRESH_OFFSETS)",
+        "obs_every_k": 1,
+        "seed": 0,
+        "trajectory_mode": "per_day",
+        "clip": "EnKF's physical bounds",
+        "ckpt": "per run: select_valid.json (validation split, 20 iterations)",
+        "checkpoints": {},
+        "pooling": "accumulate squared error and cell count per channel, divide once at the end",
+        "n_days": 7
+      },
+      "blind_walkable_rmse_delta_vs_baseline_pct": 0.0
+    },
+    "History loss (w=0.5)": {
+      "run_dir": "methods/senseiver/runs/history_loss/w05_k16_s123",
+      "epochs": 60,
+      "best_epoch": 54,
+      "best_valid_blind_mse": 0.01871515577659011,
+      "blind_walkable_mse": 0.039168325278878244,
+      "blind_walkable_rmse": 0.19790989181665034,
+      "blind_walkable_mse_per_channel": {
+        "density": 0.018066807409380485,
+        "vx": 0.10686649817067945,
+        "vy": 0.02114428263223625,
+        "var": 0.010595712903216783
+      },
+      "blind_allcells_mse": 0.02263741953427599,
+      "blind_allcells_rmse": 0.15045736782981414,
+      "full_field_mse": 0.01324790092032466,
+      "full_field_rmse": 0.11509952615160786,
+      "protocol": {
+        "cells": "blind \u2229 channel-defined \u2229 walkable ('defined'), alongside blind ('allcells')",
+        "channel_defined": "density: everywhere; vx/vy: density>0; var: var>0 (dincae_crowd/state.py:channel_valid)",
+        "walkable_cells": 290,
+        "grid_cells": 432,
+        "frame_range": "[1, T-1)  (aligned with DINCAE's FRESH_OFFSETS)",
+        "obs_every_k": 1,
+        "seed": 0,
+        "trajectory_mode": "per_day",
+        "clip": "EnKF's physical bounds",
+        "ckpt": "per run: select_valid.json (validation split, 20 iterations)",
+        "checkpoints": {},
+        "pooling": "accumulate squared error and cell count per channel, divide once at the end",
+        "n_days": 7
+      },
+      "blind_walkable_rmse_delta_vs_baseline_pct": 0.5303168697048166
+    },
+    "Framewise": {
+      "run_dir": "methods/senseiver/runs/framewise/k16_s123",
+      "epochs": 60,
+      "best_epoch": 58,
+      "best_valid_blind_mse": 0.018492208747193217,
+      "blind_walkable_mse": 0.038837873760990904,
+      "blind_walkable_rmse": 0.19707327003170902,
+      "blind_walkable_mse_per_channel": {
+        "density": 0.017604548178366784,
+        "vx": 0.10635531888121542,
+        "vy": 0.02092084953711664,
+        "var": 0.01047077844726477
+      },
+      "blind_allcells_mse": 0.02241426027444648,
+      "blind_allcells_rmse": 0.1497139281244283,
+      "full_field_mse": 0.012991993604732816,
+      "full_field_rmse": 0.11398242673646151,
+      "protocol": {
+        "cells": "blind \u2229 channel-defined \u2229 walkable ('defined'), alongside blind ('allcells')",
+        "channel_defined": "density: everywhere; vx/vy: density>0; var: var>0 (dincae_crowd/state.py:channel_valid)",
+        "walkable_cells": 290,
+        "grid_cells": 432,
+        "frame_range": "[1, T-1)  (aligned with DINCAE's FRESH_OFFSETS)",
+        "obs_every_k": 1,
+        "seed": 0,
+        "trajectory_mode": "per_day",
+        "clip": "EnKF's physical bounds",
+        "ckpt": "per run: select_valid.json (validation split, 20 iterations)",
+        "checkpoints": {},
+        "pooling": "accumulate squared error and cell count per channel, divide once at the end",
+        "n_days": 7
+      },
+      "blind_walkable_rmse_delta_vs_baseline_pct": 0.10534643306709945
+    }
+  }
+}
