@@ -86,6 +86,20 @@ def load_day(path, stride=4, seed=0, frames=0, obs_every_k=None, add_noise=None)
     return Xs, Ys, Om
 
 
+def day_observation_seed(base_seed, day_index, trajectory_mode):
+    """Return a reproducible observation seed for one day.
+
+    ``fixed`` preserves the original protocol: every day replays exactly the
+    same robot trajectory.  ``per_day`` keeps the experiment deterministic but
+    gives day ``i`` its own trajectory.
+    """
+    if trajectory_mode == "fixed":
+        return int(base_seed)
+    if trajectory_mode == "per_day":
+        return int(base_seed) + int(day_index)
+    raise ValueError(f"unknown trajectory_mode={trajectory_mode!r}")
+
+
 class DayBank:
     """Concatenates several days into one pool that batches can be randomly
     drawn from (the reference implementation also holds everything resident in
@@ -97,15 +111,20 @@ class DayBank:
     """
 
     def __init__(self, files, stride=4, seed=0, max_days=0, frames=0,
-                 obs_every_k=None, add_noise=None, verbose=True):
+                 obs_every_k=None, add_noise=None, verbose=True,
+                 trajectory_mode="fixed"):
         files = files[:max_days] if max_days else files
+        self.observation_seeds = []
         Xs, Ys, Os = [], [], []
         for i, f in enumerate(files):
-            x, y, o = load_day(f, stride, seed, frames, obs_every_k, add_noise)
+            day_seed = day_observation_seed(seed, i, trajectory_mode)
+            self.observation_seeds.append(day_seed)
+            x, y, o = load_day(f, stride, day_seed, frames, obs_every_k, add_noise)
             Xs.append(x); Ys.append(y); Os.append(o)
             if verbose:
                 print(f"  [{i+1}/{len(files)}] {os.path.basename(f).split('_')[0]}: "
-                      f"{x.shape[0]} frames, observed cells/frame {o.sum(1).mean():.1f}", flush=True)
+                      f"{x.shape[0]} frames, observed cells/frame {o.sum(1).mean():.1f}, "
+                      f"observation seed {day_seed}", flush=True)
         self.X = np.concatenate(Xs, 0)
         self.Y = np.concatenate(Ys, 0)
         self.Omega = np.concatenate(Os, 0)
@@ -117,6 +136,103 @@ class DayBank:
         readings that reach the encoder."""
         m = self.Omega                                        # (N, HW)
         vals = [self.Y[:, c][m] for c in range(self.Y.shape[1])]
+        mean = np.array([v.mean() for v in vals], np.float32)
+        std = np.array([max(v.std(), 1e-6) for v in vals], np.float32)
+        return mean, std
+
+    def batches(self, batch, rng, drop_last=True):
+        order = rng.permutation(self.n)
+        stop = (self.n // batch) * batch if drop_last else self.n
+        for i in range(0, stop, batch):
+            yield order[i:i + batch]
+
+
+class TemporalDayBank:
+    """`DayBank` for the temporal extension (not in the reference implementation).
+
+    A sample still targets one frame, chosen exactly as `DayBank` chooses it -- every
+    `stride`-th frame of each day, observations generated over the whole day with the
+    same seed -- so a k-frame run trains on the **same targets and the same current-frame
+    observations** as its k=1 counterpart with that seed. What changes is that each
+    day's observations are kept at full frame rate, so a sample can look back
+    `window-1` frames. Windows never cross a day boundary: near the start of a day they
+    are simply shorter.
+
+    Memory: full-rate Y is about 276 MB per day, ~8.8 GB for the 32 training days,
+    on top of the subsampled targets. The sbatch script requests 96G.
+    """
+
+    def __init__(self, files, stride=4, seed=0, max_days=0, frames=0,
+                 obs_every_k=None, add_noise=None, verbose=True, *, window,
+                 trajectory_mode="fixed"):
+        if window < 2:
+            raise ValueError(f"TemporalDayBank needs window >= 2, got {window}; use DayBank")
+        files = files[:max_days] if max_days else files
+        self.window = window
+        self.observation_seeds = []
+        self.Yd, self.Od, self.frames = [], [], []
+        Xs, day_of, frame_of = [], [], []
+        for d, f in enumerate(files):
+            day_seed = day_observation_seed(seed, d, trajectory_mode)
+            self.observation_seeds.append(day_seed)
+            X, Y, Om = load_day(f, 1, day_seed, frames, obs_every_k, add_noise)  # full frame rate
+            idx = np.arange(0, X.shape[0], stride)                            # == DayBank's targets
+            Xs.append(X[idx]); self.Yd.append(Y); self.Od.append(Om); self.frames.append(idx)
+            day_of.append(np.full(len(idx), d, dtype=np.int32))
+            frame_of.append(idx.astype(np.int64))
+            del X
+            if verbose:
+                print(f"  [{d+1}/{len(files)}] {os.path.basename(f).split('_')[0]}: "
+                      f"{len(idx)} target frames of {Y.shape[0]}, observed cells/frame "
+                      f"{Om.sum(1).mean():.1f}, window {window}, observation seed "
+                      f"{day_seed}", flush=True)
+        self.X = np.concatenate(Xs, 0)
+        self.day_of = np.concatenate(day_of)
+        self.frame_of = np.concatenate(frame_of)
+        self.n = self.X.shape[0]
+
+    def windows(self, idx):
+        """[(Y_win (K,C,HW), Omega_win (K,HW)), ...] oldest first, last = the target frame."""
+        out = []
+        for i in idx:
+            d, f = self.day_of[i], self.frame_of[i]
+            lo = max(0, f - self.window + 1)
+            out.append((self.Yd[d][lo:f + 1], self.Od[d][lo:f + 1]))
+        return out
+
+    def target_omega(self, idx):
+        """(len(idx), HW) observation mask of each target frame."""
+        return np.stack([self.Od[self.day_of[i]][self.frame_of[i]] for i in idx])
+
+    def history_reachable(self, idx):
+        """Current-blind cells observed at least once earlier in the input window.
+
+        This mask depends only on observations available to the model.  The
+        current frame is deliberately excluded: it identifies exactly the cells
+        on which historical information can add something unavailable now.
+        """
+        out = []
+        for i in idx:
+            d, f = self.day_of[i], self.frame_of[i]
+            lo = max(0, f - self.window + 1)
+            current = self.Od[d][f]
+            if lo == f:
+                prior_seen = np.zeros_like(current)
+            else:
+                prior_seen = self.Od[d][lo:f].any(axis=0)
+            out.append(prior_seen & ~current)
+        return np.stack(out)
+
+    def input_stats(self):
+        """Same statistic as `DayBank.input_stats`, over the same cells: observed cells of
+        the target frames only."""
+        C = self.Yd[0].shape[1]
+        vals = [[] for _ in range(C)]
+        for Y, O, idx in zip(self.Yd, self.Od, self.frames):
+            Ys, Os = Y[idx], O[idx]
+            for c in range(C):
+                vals[c].append(Ys[:, c][Os])
+        vals = [np.concatenate(v) for v in vals]
         mean = np.array([v.mean() for v in vals], np.float32)
         std = np.array([max(v.std(), 1e-6) for v in vals], np.float32)
         return mean, std

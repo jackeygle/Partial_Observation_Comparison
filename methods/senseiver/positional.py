@@ -20,12 +20,16 @@ Output convention (matches the reference implementation):
     Row order = the spatial dimensions flattened in C order, so `enc[flat_index]`
     directly gives any cell's encoding.
     Channel order = [sin(dim0), sin(dim1), ..., cos(dim0), cos(dim1), ...]
+
+`TemporalEncoding` at the bottom belongs to the temporal extension, not to the
+reference implementation.
 """
 from __future__ import annotations
 
 import math
 
 import torch
+import torch.nn as nn
 from einops import rearrange
 
 
@@ -60,3 +64,42 @@ def PositionalEncoder(image_shape, num_frequency_bands, max_frequencies=None):
 def encoding_channels(spatial_ndim, num_frequency_bands):
     """Number of positional-encoding channels: bands sin + bands cos per spatial dimension."""
     return 2 * spatial_ndim * num_frequency_bands
+
+
+class TemporalEncoding(nn.Module):
+    """Relative time offset of a sensor token -- temporal extension, not in the reference.
+
+    Δ = t_query - t_token in {0, ..., window-1}: 0 for the frame being reconstructed,
+    1 for the frame before it, and so on. Encoded as a learnable
+    `nn.Embedding(window, dim)`, concatenated with the scalar Δ/window.
+
+    Why this form and not the others:
+      * Not sine-cosine features of time. The Senseiver paper (sec.3) reports trying
+        sine-cosine time encodings "without success"; that route was dropped on
+        2026-09-13 and is not tested here.
+      * Relative, not absolute. An absolute index needs one row per frame of the day
+        (~40k), each seen a handful of times -- what the paper called impractical. A
+        relative offset has only `window` values, each seen millions of times, and
+        carries no clock, so the model cannot fall back on "what the corridor looks
+        like at 14:00".
+      * The embedding alone treats the offsets as unordered categories; the scalar
+        Δ/window hands the model their order for free.
+    """
+
+    def __init__(self, window: int, dim: int, scalar: bool = True):
+        super().__init__()
+        if window < 2:
+            raise ValueError(f"TemporalEncoding needs window >= 2, got {window}")
+        self.window, self.dim, self.scalar = window, dim, scalar
+        self.emb = nn.Embedding(window, dim)
+
+    @property
+    def channels(self):
+        return self.dim + (1 if self.scalar else 0)
+
+    def forward(self, dt):
+        """dt (..., N) long in [0, window) -> (..., N, channels)"""
+        e = self.emb(dt)
+        if self.scalar:
+            e = torch.cat([e, (dt.to(e.dtype) / self.window).unsqueeze(-1)], dim=-1)
+        return e

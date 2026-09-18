@@ -63,9 +63,11 @@ def load_model(path, dev):
 
 
 @torch.no_grad()
-def eval_day(model, day, dev, batch, frames, clip, obs_every_k, chans, ablate=False):
+def eval_day(model, day, dev, batch, frames, clip, obs_every_k, chans,
+             obs_seed=0, ablate=False):
     C, H, W = ds.state_shape()
-    X, Y, Om = ds.load_day(day, stride=1, seed=0, frames=frames, obs_every_k=obs_every_k)
+    X, Y, Om = ds.load_day(day, stride=1, seed=obs_seed, frames=frames,
+                           obs_every_k=obs_every_k)
     pe = model.pos_enc.detach().cpu().numpy()
     mean = model.in_mean.detach().cpu().numpy()
     std = model.in_std.detach().cpu().numpy()
@@ -74,18 +76,28 @@ def eval_day(model, day, dev, batch, frames, clip, obs_every_k, chans, ablate=Fa
     se_c = np.zeros(C); n_c = np.zeros(C)
     solve_s = 0.0
     for i in range(0, X.shape[0], batch):
-        sl = slice(i, i + batch)
-        tok, pad, _ = sensors.build_batch(Y[sl], Om[sl], pe, mean, std)
+        sl = slice(i, min(i + batch, X.shape[0]))
+        if model.time_window > 1:
+            win = [(Y[max(0, j - model.time_window + 1):j + 1],
+                    Om[max(0, j - model.time_window + 1):j + 1])
+                   for j in range(sl.start, sl.stop)]
+            tok, pad, dt, _, cell_idx = sensors.build_batch_temporal(
+                win, pe, mean, std, return_cell_idx=True)
+        else:
+            tok, pad, _ = sensors.build_batch(Y[sl], Om[sl], pe, mean, std)
+            dt, cell_idx = None, None
         if ablate:
             # Ablation: erase the sensors' "readings", keep only their
             # "positions" and pad_mask. If blind MSE barely changes, the model
             # isn't using the observations, it's just memorised an average field.
             tok[:, :, :C] = 0.0
         tok, pad = tok.to(dev), pad.to(dev)
+        dt = None if dt is None else dt.to(dev)
+        cell_idx = None if cell_idx is None else cell_idx.to(dev)
         if dev.type == "cuda":
             torch.cuda.synchronize()          # CUDA is async: without this we'd only time the kernel launch
         t0 = time.perf_counter()
-        xr = model.reconstruct(tok, pad)
+        xr = model.reconstruct(tok, pad, dt, cell_idx)
         if dev.type == "cuda":
             torch.cuda.synchronize()
         solve_s += time.perf_counter() - t0
@@ -115,12 +127,19 @@ def main():
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--frames", type=int, default=0, help="when >0, only take the first N frames per day")
     ap.add_argument("--tag", default="")
+    ap.add_argument("--obs-seed", type=int, default=0,
+                    help="base seed for evaluation robot paths/noise")
+    ap.add_argument("--trajectory-mode", choices=["fixed", "per_day"], default=None,
+                    help="fixed uses --obs-seed for every day; per_day uses --obs-seed + the day's "
+                         "date (crowdcore observation_model.day_seed). Default: config "
+                         "observation.trajectory_mode")
     ap.add_argument("--no-clip", dest="clip", action="store_false")
     ap.set_defaults(clip=True)
     ap.add_argument("--outdir", default="check_outputs/eval")
     ap.add_argument("--ablate-values", action="store_true",
                     help="ablation experiment: erases sensor readings (keeps positions), to check whether the model actually uses the observations")
     args = ap.parse_args()
+    args.trajectory_mode = args.trajectory_mode or ds.om.TRAJECTORY_MODE
     os.makedirs(args.outdir, exist_ok=True)
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -141,11 +160,13 @@ def main():
     per_day = []
     for d in days:
         stem = os.path.basename(d).split("_")[0]
+        day_seed = ds.om.day_seed(d, args.obs_seed, args.trajectory_mode)
         bl, fu, nf, sec, pc = eval_day(model, d, dev, args.batch, args.frames, args.clip, k,
-                                       chans, args.ablate_values)
+                                       chans, day_seed, args.ablate_values)
         print(f"{stem:16s} {bl:>10.4f} {bl**0.5:>11.4f} {fu:>10.4f} {nf:>8} "
               f"{sec/nf*1000:>10.3f}", flush=True)
-        per_day.append({"day": stem, "blind_mse": bl, "full_mse": fu, "n_frames": nf,
+        per_day.append({"day": stem, "observation_seed": day_seed,
+                        "blind_mse": bl, "full_mse": fu, "n_frames": nf,
                         "solve_s": sec, "per_frame_ms": sec / nf * 1000,
                         "blind_mse_per_channel": pc})
 
@@ -164,6 +185,8 @@ def main():
                          + (" [ABLATION: sensor values zeroed]" if args.ablate_values else ""),
                "ablate_values": args.ablate_values, "ckpt": args.ckpt,
                "epoch": ck.get("epoch"), "split": args.split, "obs_every_k": k,
+               "observation_seed": args.obs_seed,
+               "trajectory_mode": args.trajectory_mode,
                "clip": args.clip, "frames_per_day": args.frames,
                "n_params": model.num_params, "device": str(dev),
                "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,

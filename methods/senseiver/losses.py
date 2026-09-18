@@ -27,6 +27,23 @@ def senseiver_loss(pred, target):
     return F.mse_loss(pred, target, reduction="sum")
 
 
+def history_aware_loss(pred, target, history_mask, weight):
+    """Baseline loss plus extra weight on current-blind, history-seen cells.
+
+    ``history_mask`` is (B,H,W) and is derived only from input observation
+    masks.  A weight of zero is exactly ``senseiver_loss``.  For weight > 0,
+    every selected channel/cell contributes ``1 + weight`` instead of 1; no
+    target-dependent selection or hand-written motion rule is introduced.
+    """
+    loss = senseiver_loss(pred, target)
+    if weight <= 0:
+        return loss
+    selected = history_mask[:, None].expand_as(pred)
+    if selected.any():
+        loss = loss + weight * F.mse_loss(pred[selected], target[selected], reduction="sum")
+    return loss
+
+
 @torch.no_grad()
 def diagnostics(pred, target, obs_mask, channels):
     """MSE breakdown: per channel / observed region vs. blind region.

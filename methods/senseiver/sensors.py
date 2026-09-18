@@ -38,6 +38,10 @@ no answer):
     NaN. Here a single all-zero dummy token is inserted and marked valid; the
     model can only output a constant field for such a frame -- that is an
     informational fact, not an implementation flaw.
+
+`build_batch_temporal` (the temporal extension, not in the reference) packs a window
+of frames per sample instead of one frame, and also returns each token's relative
+time offset Δ. A one-frame window gives exactly `build_batch`'s tokens.
 """
 from __future__ import annotations
 
@@ -80,6 +84,69 @@ def build_batch(Y_flat, Omega_flat, pos_enc, in_mean, in_std):
 
     return (torch.from_numpy(tokens), torch.from_numpy(pad_mask),
             torch.from_numpy(n_sens))
+
+
+def build_batch_temporal(windows, pos_enc, in_mean, in_std, return_cell_idx=False):
+    """Like `build_batch`, but each sample is a window of frames, and every token also
+    gets its relative time offset Δ.
+
+    Input
+        windows    list of B pairs (Y_win (K_b, C, HW) float32, Omega_win (K_b, HW) bool),
+                   oldest frame first; the LAST row is the frame being reconstructed.
+                   K_b <= the model's time_window -- shorter at the start of a day,
+                   where earlier frames do not exist.
+        pos_enc, in_mean, in_std   as in `build_batch`
+
+    Output
+        tokens   (B, Nmax, C+P) float32 torch   one token per observed cell per frame
+        pad_mask (B, Nmax)      bool    torch   True = padding slot
+        dt       (B, Nmax)      int64   torch   Δ = K_b-1-j for frame j of the window
+                                                (0 = the current frame); 0 on padding
+        n_sens   (B,)           int             real token count per sample
+
+    The same cell seen in several frames becomes several tokens with the same
+    positional encoding and different Δ. An all-empty window gets the same single
+    all-zero dummy token as `build_batch`, with Δ = 0.
+    """
+    B = len(windows)
+    C = windows[0][0].shape[1]
+    P = pos_enc.shape[1]
+    packed = []
+    for Yw, Ow in windows:
+        K = Yw.shape[0]
+        vals, cells, dts = [], [], []
+        for j in range(K):
+            ii = np.flatnonzero(Ow[j])
+            if len(ii) == 0:
+                continue
+            vals.append(Yw[j][:, ii].T)                        # (n_j, C)
+            cells.append(ii)
+            dts.append(np.full(len(ii), K - 1 - j, dtype=np.int64))
+        packed.append((vals, cells, dts))
+    n_sens = np.array([sum(len(c) for c in cells) for _, cells, _ in packed], dtype=np.int64)
+    n_max = max(1, int(n_sens.max()))
+
+    tokens = np.zeros((B, n_max, C + P), dtype=np.float32)
+    pad_mask = np.ones((B, n_max), dtype=bool)
+    dt = np.zeros((B, n_max), dtype=np.int64)
+    cell_idx = np.zeros((B, n_max), dtype=np.int64)
+    for b, (vals, cells, dts) in enumerate(packed):
+        if n_sens[b] == 0:
+            pad_mask[b, 0] = False                              # empty window: one dummy token, Δ = 0
+            continue
+        v, ii, d = np.concatenate(vals), np.concatenate(cells), np.concatenate(dts)
+        n = len(ii)
+        tokens[b, :n, :C] = (v - in_mean) / in_std
+        tokens[b, :n, C:] = pos_enc[ii]
+        dt[b, :n] = d
+        cell_idx[b, :n] = ii
+        pad_mask[b, :n] = False
+
+    result = (torch.from_numpy(tokens), torch.from_numpy(pad_mask),
+              torch.from_numpy(dt), torch.from_numpy(n_sens))
+    if return_cell_idx:
+        result += (torch.from_numpy(cell_idx),)
+    return result
 
 
 def query_all(pos_enc, batch):
