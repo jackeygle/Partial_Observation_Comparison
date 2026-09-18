@@ -38,6 +38,8 @@ DAY = os.environ.get("AUDIT_DAY", "atc-20130811")
 OUT = os.path.join(paths.eval_out(paths.VARNET), "sparsification_enkf.json")
 CHAN = list(config.get("grid", "channels"))
 FRACS = np.linspace(0.0, 0.9, 19)
+# np.trapz was removed in numpy 2.0; np.trapezoid is the same function renamed.
+_trapz = getattr(np, "trapezoid", None) or np.trapz
 
 o = np.load(os.path.join(SRC, f"obs_{DAY}.npz"))
 e = np.load(os.path.join(SRC, f"est_{DAY}.npz"))
@@ -54,8 +56,8 @@ def curves(sig, err, rng):
         c = np.concatenate([[0.0], np.cumsum(err[order] ** 2)])
         tot = c[-1]
         out[nm] = [float(np.sqrt((tot - c[int(f * n)]) / max(n - int(f * n), 1))) for f in FRACS]
-    a = np.trapz(np.array(out["sigma"]) - np.array(out["oracle"]), FRACS)
-    b = np.trapz(np.array(out["random"]) - np.array(out["oracle"]), FRACS)
+    a = _trapz(np.array(out["sigma"]) - np.array(out["oracle"]), FRACS)
+    b = _trapz(np.array(out["random"]) - np.array(out["oracle"]), FRACS)
     out["ause"] = float(a / b) if b > 0 else None
     out["spearman_sigma_vs_err"] = float(
         np.corrcoef(np.argsort(np.argsort(sig)), np.argsort(np.argsort(err)))[0, 1])

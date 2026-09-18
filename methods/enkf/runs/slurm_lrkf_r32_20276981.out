@@ -1,0 +1,21 @@
+NVIDIA H200
+[data] train=1,262,486, valid=269,736, load=23s, device=cuda
+[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/train.py", line 180, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/train.py", line 130, in main
+    metrics = batch_loss(cov_net, mean_net, x, target, obs_std, static_mask,
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/train.py", line 76, in batch_loss
+    nll = gaussian_nll(target_grid, mean, factor, diagonal)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/kalman.py", line 105, in gaussian_nll
+    chol, latent = _latent_system(u, precision, residual, jitter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/kalman.py", line 54, in _latent_system
+    chol = torch.linalg.cholesky(system + jitter * eye)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch._C._LinAlgError: linalg.cholesky: (Batch element 1): The factorization could not be completed because the input is not positive-definite (the leading minor of order 32 is not positive-definite).

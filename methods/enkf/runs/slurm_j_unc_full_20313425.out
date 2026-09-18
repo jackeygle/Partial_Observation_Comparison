@@ -1,0 +1,97 @@
+[compare] 512/4,096
+[compare] 1,024/4,096
+[compare] 1,536/4,096
+[compare] 2,048/4,096
+[compare] 2,560/4,096
+[compare] 3,072/4,096
+[compare] 3,584/4,096
+[compare] 4,096/4,096
+{
+  "pairs": 4096,
+  "input_frames": {
+    "a32": 1,
+    "covonly": 1,
+    "j3": 1,
+    "j4": 5,
+    "j5": 10
+  },
+  "covariance": {
+    "a32": {
+      "lowrank_trace_fraction": 0.9553197035264357,
+      "lowrank_variance_mean": 0.20376824781364095,
+      "diagonal_variance_mean": 0.009530239657576864
+    },
+    "covonly": {
+      "lowrank_trace_fraction": 0.11898893371053072,
+      "lowrank_variance_mean": 0.0025623791560693047,
+      "diagonal_variance_mean": 0.018972221383363293
+    },
+    "j3": {
+      "lowrank_trace_fraction": 0.9562499308550915,
+      "lowrank_variance_mean": 0.2031787343022174,
+      "diagonal_variance_mean": 0.009295774449414365
+    },
+    "j4": {
+      "lowrank_trace_fraction": 0.9566220603394378,
+      "lowrank_variance_mean": 0.20334068658709756,
+      "diagonal_variance_mean": 0.009220464799006053
+    },
+    "j5": {
+      "lowrank_trace_fraction": 0.9575802399080459,
+      "lowrank_variance_mean": 0.20414793136784526,
+      "diagonal_variance_mean": 0.00904353067344444
+    }
+  },
+  "selection": {
+    "a32": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.05",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha4"
+      }
+    },
+    "covonly": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha2"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "j3": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.05",
+        "best_calibrated_walkable_blind": "alpha0.1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha4"
+      }
+    },
+    "j4": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.05",
+        "best_calibrated_walkable_blind": "alpha0.1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha4"
+      }
+    },
+    "j5": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.05",
+        "best_calibrated_walkable_blind": "alpha0.1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha4"
+      }
+    }
+  }
+}

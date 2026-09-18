@@ -1,0 +1,69 @@
+{
+  "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/covonly_pedpred5_raw_floor05_r32_s0/best.pt",
+  "mean_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/pedpred3_5to5_s0/best.pt",
+  "input_frames": 5,
+  "candidate_count": 2048,
+  "anchors": [
+    [
+      15,
+      5
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      25,
+      7
+    ]
+  ],
+  "frames": [
+    {
+      "label": "low",
+      "validation_row": 78923,
+      "target_index": 78938,
+      "activity": 5.0,
+      "covariance_trace": 29.79994398355484,
+      "lowrank_trace_fraction": 0.11941639482090108,
+      "top_lowrank_eigenvalues": [
+        1.7079572003822836,
+        0.343608761776211,
+        0.2772577988176166,
+        0.21748277141939393
+      ]
+    },
+    {
+      "label": "medium",
+      "validation_row": 46247,
+      "target_index": 46257,
+      "activity": 18.014795303344727,
+      "covariance_trace": 36.511870324611664,
+      "lowrank_trace_fraction": 0.10322244459162713,
+      "top_lowrank_eigenvalues": [
+        1.658049146093447,
+        0.2934783034962764,
+        0.2382671290039625,
+        0.17485769614263916
+      ]
+    },
+    {
+      "label": "high",
+      "validation_row": 14757,
+      "target_index": 14762,
+      "activity": 36.085655212402344,
+      "covariance_trace": 43.94966597727034,
+      "lowrank_trace_fraction": 0.11887812615157087,
+      "top_lowrank_eigenvalues": [
+        2.0171183320131485,
+        0.5576773596533857,
+        0.3853635229939412,
+        0.3018015791921288
+      ]
+    }
+  ],
+  "pairwise_relative_covariance_frobenius_difference": {
+    "low_vs_medium": 1.5807701349258423,
+    "low_vs_high": 1.597719669342041,
+    "medium_vs_high": 1.4929348230361938
+  }
+}

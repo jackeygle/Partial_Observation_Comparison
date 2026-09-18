@@ -50,6 +50,67 @@ are tracked.
 | Where does the wall time go (forecast vs analysis)? | `checks/bench_enkf_split.py`, `checks/bench_enkf_opt.py` |
 | Reconstructed velocity field as a figure | `checks/plot_velocity_enkf.py` |
 
+## Experimental differentiable low-rank UNetKF
+
+`lowrank/` is the isolated next experiment.  It keeps the best retrained PedPred3 mean
+forecast frozen and trains a separate covariance U-Net with two heads:
+
+```text
+x_t -> frozen PedPred3 -> mean_{t+1}
+[x_t, mean_{t+1}, mean_{t+1}-x_t, static_mask] -> covariance U-Net -> U, d
+B = U U^T + diag(d) -> differentiable Kalman update -> analysis_{t+1}
+```
+
+The Kalman layer uses Woodbury algebra and solves only a `rank x rank` system; it never
+constructs the full 1728-square covariance.  The initial experiment freezes
+`runs/surrogate_mean_s0/best.pt` and uses rank 16. Training samples legal robot positions
+and unions their exact radius-plus-line-of-sight footprints from the real map; final
+evaluation uses the exported moving-robot trajectories and observations.
+
+```bash
+# Algebra, gradient, and shape checks (run in the project PyTorch environment)
+python3 -m methods.enkf.checks.check_lowrank_kalman
+
+# Small smoke train, then the full rank-16 run
+python3 -m methods.enkf.lowrank.train --allow-cpu --days 1 --max-frames 128 --epochs 1 --batch 8
+sbatch methods/enkf/sbatch/submit_lowrank_smoke.sbatch
+sbatch methods/enkf/sbatch/submit_lowrank_unetkf.sbatch train --rank 16 --seed 0
+
+# Sequential validation and the existing uncertainty scorer
+sbatch methods/enkf/sbatch/submit_lowrank_unetkf.sbatch eval \
+  --checkpoint methods/enkf/runs/lowrank_r16_s0/best.pt --only atc-20130616
+python3 -m methods.enkf.checks.eval_uncertainty_enkf \
+  --dir-fmt check_outputs/lowrank_unetkf_valid \
+  --out-fmt check_outputs/eval/uncertainty_lowrank_unetkf.json --k 1
+```
+
+Formal jobs request three hours. Five minutes before the limit, the batch script
+automatically submits the same command with `--resume`; the last completed epoch is
+restored from `last.pt`, so long runs continue across allocations without manual work.
+
+## Paper-style local covariance experiment
+
+`local_unetkf/` is a separate implementation of Lu's covariance-supervision idea.  Its
+teacher is PedPred3's actual one-step forecast error rather than the collapsed legacy
+ensemble.  The first gate audits systematic mean bias, then compares raw second-moment
+and bias-centered climatological local covariance before any U-Net is trained:
+
+```text
+error_raw      = truth[t+1] - PedPred3(x_t)
+error_centered = error_raw - train_bias[channel,y,x]
+target[p,a,q,b] = error[p,a] * error[q,b]
+```
+
+The local window is `15x15` (radius 7, with a unique centre) and retains all 16 directed
+channel pairs.  Boundary padding has an explicit validity mask.  Run the exact target
+checks and the two formal H200 stages with:
+
+```bash
+python3 -m methods.enkf.checks.check_local_covariance_targets
+job=$(sbatch --parsable methods/enkf/sbatch/submit_local_unetkf.sbatch audit)
+sbatch --dependency=afterok:$job methods/enkf/sbatch/submit_local_unetkf.sbatch static
+```
+
 ## The ensemble-collapse finding
 
 The EnKF's uncertainty **is** its ensemble spread, and that spread collapses to

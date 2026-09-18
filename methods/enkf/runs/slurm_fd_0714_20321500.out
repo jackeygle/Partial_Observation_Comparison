@@ -1,0 +1,8 @@
+Tesla V100-SXM2-32GB, 32768 MiB
+[new_cov_components_f1.1_d0.75_f1.1_d0.75] mode=full history=5
+  frame 10/5000: 45.8 ms/frame
+  frame 100/5000: 11.5 ms/frame
+  frame 1000/5000: 8.2 ms/frame
+  frame 5000/5000: 7.9 ms/frame
+{"variant": "new_cov_components_f1.1_d0.75_f1.1_d0.75", "rmse": 0.45975477516227586, "crps": 0.12712567555890886, "spread_skill": 0.6230829015469002}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/covonly_pedpred5_fd_f1.1_d0.75_atc-20130714_5000.json

@@ -1,0 +1,65 @@
+{
+  "config": {
+    "checkpoint": "methods/enkf/runs/local_unetkf_raw_s0/best.pt",
+    "covariance": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_static/static_covariance.npz",
+    "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+    "pairs": 1,
+    "rank": 8,
+    "patch_batch": 432,
+    "seed": 0,
+    "days": 1,
+    "max_frames": 3,
+    "out": "methods/enkf/check_outputs/eval/_smoke_learned_raw.json",
+    "allow_cpu": true
+  },
+  "target": "raw",
+  "rank": 8,
+  "pairs": 1,
+  "seconds": 11.155,
+  "normalized_rmse": {
+    "mean": {
+      "all": 0.3861191589733868,
+      "observed": 0.41471301152996265,
+      "blind": 0.34895857297862154,
+      "walkable_blind": 0.4579245062547261
+    },
+    "dynamic_diagonal": {
+      "all": 0.2952532957628859,
+      "observed": 0.24118754834071576,
+      "blind": 0.34895857297862154,
+      "walkable_blind": 0.4579245062547261
+    },
+    "dynamic_spectral": {
+      "all": 0.28645600100324997,
+      "observed": 0.2430404753880461,
+      "blind": 0.33087718688355594,
+      "walkable_blind": 0.43343771505715306
+    }
+  },
+  "projection_diagnostics": {
+    "asymmetry": 0.5391972661018372,
+    "negative_spectral_fraction": 0.0,
+    "spectral_trace": 0.08017827570438385,
+    "diagonal_trace": 0.5479128360748291
+  },
+  "train_args": {
+    "target": "raw",
+    "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+    "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+    "out": "methods/enkf/runs/local_unetkf_raw_s0",
+    "patch_size": 15,
+    "width": 32,
+    "epochs": 20,
+    "frame_batch": 16,
+    "centres_per_frame": 4,
+    "train_pairs_per_epoch": 131072,
+    "eval_pairs": 4096,
+    "lr": 0.002,
+    "diag_penalty": 0.1,
+    "seed": 0,
+    "days": 0,
+    "max_frames": 0,
+    "resume": false,
+    "allow_cpu": false
+  }
+}

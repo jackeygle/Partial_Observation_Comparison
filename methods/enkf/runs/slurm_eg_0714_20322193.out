@@ -1,0 +1,14 @@
+Tesla V100-PCIE-32GB
+[new_cov_components_f1.1_d0.75_blindg1_emptyg0.4] mode=full history=5
+  frame 10/5000: 45.7 ms/frame
+  frame 100/5000: 9.2 ms/frame
+  frame 1000/5000: 5.7 ms/frame
+  frame 5000/5000: 5.3 ms/frame
+{"variant": "new_cov_components_f1.1_d0.75_blindg1_emptyg0.4", "rmse": 0.4597565041438729, "crps": 0.10538416426639811, "spread_skill": 0.4839377980389234}
+[new_cov_components_f1.1_d0.75_blindg1_emptyg1] mode=full history=5
+  frame 10/5000: 5.0 ms/frame
+  frame 100/5000: 5.1 ms/frame
+  frame 1000/5000: 5.1 ms/frame
+  frame 5000/5000: 5.1 ms/frame
+{"variant": "new_cov_components_f1.1_d0.75_blindg1_emptyg1", "rmse": 0.4603124036116136, "crps": 0.12716841009923724, "spread_skill": 0.6220932391829302}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/covonly_pedpred5_emptygate_atc-20130714_5000.json

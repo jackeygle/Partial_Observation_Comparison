@@ -1,0 +1,50 @@
+Tesla V100-SXM2-32GB
+[compare] 512/4,096
+[compare] 1,024/4,096
+[compare] 1,536/4,096
+[compare] 2,048/4,096
+[compare] 2,560/4,096
+[compare] 3,072/4,096
+[compare] 3,584/4,096
+[compare] 4,096/4,096
+{
+  "pairs": 4096,
+  "input_frames": {
+    "old_cov": 1,
+    "new_cov": 5
+  },
+  "covariance": {
+    "old_cov": {
+      "lowrank_trace_fraction": 0.11909778436126135,
+      "lowrank_variance_mean": 0.002571625292075983,
+      "diagonal_variance_mean": 0.019020928304684707
+    },
+    "new_cov": {
+      "lowrank_trace_fraction": 0.1143569498406831,
+      "lowrank_variance_mean": 0.002442170921459278,
+      "diagonal_variance_mean": 0.018913513406092295
+    }
+  },
+  "selection": {
+    "old_cov": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "new_cov": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.1",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    }
+  }
+}

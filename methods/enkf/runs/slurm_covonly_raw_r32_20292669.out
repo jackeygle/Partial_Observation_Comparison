@@ -1,0 +1,24 @@
+Tesla V100-SXM2-16GB
+[data] train=1,262,486, valid=269,736, load=36.6s, device=cuda
+[objective] pure Gaussian NLL; target=raw; scope=walkable; Kalman update=disabled
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/covariance_only/train.py", line 183, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/covariance_only/train.py", line 129, in main
+    metrics = batch_metrics(
+              ^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/covariance_only/train.py", line 65, in batch_metrics
+    nll = selected_nll(truth, location, factor, diagonal, spatial_mask)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/covariance_only/train.py", line 56, in selected_nll
+    return gaussian_nll(truth, location, factor, diagonal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/kalman.py", line 105, in gaussian_nll
+    chol, latent = _latent_system(u, precision, residual, jitter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lowrank/kalman.py", line 54, in _latent_system
+    chol = torch.linalg.cholesky(system + jitter * eye)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch._C._LinAlgError: linalg.cholesky: (Batch element 22): The factorization could not be completed because the input is not positive-definite (the leading minor of order 32 is not positive-definite).

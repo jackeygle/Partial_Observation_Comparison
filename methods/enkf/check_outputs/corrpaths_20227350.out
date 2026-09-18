@@ -1,0 +1,15 @@
+[load] atc-20130811 -> 2000 frames in 2.0s
+[arms] ['A_forecast_only']   scale=0.01 ensemble=100 radius=7
+      [scale=0.01] frame 200/2000  0.16 s/frame  eta 5 min
+      [scale=0.01] frame 400/2000  0.15 s/frame  eta 4 min
+      [scale=0.01] frame 600/2000  0.15 s/frame  eta 4 min
+      [scale=0.01] frame 800/2000  0.15 s/frame  eta 3 min
+      [scale=0.01] frame 1000/2000  0.14 s/frame  eta 2 min
+      [scale=0.01] frame 1200/2000  0.15 s/frame  eta 2 min
+      [scale=0.01] frame 1400/2000  0.15 s/frame  eta 2 min
+      [scale=0.01] frame 1600/2000  0.15 s/frame  eta 1 min
+      [scale=0.01] frame 1800/2000  0.15 s/frame  eta 1 min
+  A_forecast_only    rmse 0.2704  sigma 0.00232  spread/skill 0.0086   (305.7s)
+      density 0.2030  vx 0.3220  vy 0.1376  var 0.3588
+
+[out] methods/enkf/check_outputs/eval/correction_paths_A_forecast_only_FIXED.json

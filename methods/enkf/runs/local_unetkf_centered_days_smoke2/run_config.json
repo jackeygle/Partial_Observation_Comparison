@@ -1,0 +1,20 @@
+{
+  "target": "centered",
+  "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+  "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+  "out": "methods/enkf/runs/local_unetkf_centered_days_smoke2",
+  "patch_size": 15,
+  "width": 32,
+  "epochs": 10,
+  "frame_batch": 16,
+  "centres_per_frame": 4,
+  "train_pairs_per_epoch": 8192,
+  "eval_pairs": 1792,
+  "lr": 0.002,
+  "diag_penalty": 0.1,
+  "seed": 0,
+  "days": 0,
+  "max_frames": 256,
+  "resume": false,
+  "allow_cpu": false
+}

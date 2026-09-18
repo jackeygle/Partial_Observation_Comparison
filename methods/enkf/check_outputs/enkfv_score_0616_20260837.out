@@ -1,0 +1,104 @@
+########## E0
+  [k=1] est_atc-20130616.npz
+  [k=1] second pass, constant sigma = all 0.2239, blind 0.2024, defined 0.3530, defined_blind 0.3460, walkable 0.2567, walkable_blind 0.2456
+
+[k=1] 1 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2239   0.1394   1.168e+18   0.0025   0.011    2.19%
+blind                   0.2024   0.1266   1.730e+18   0.0025   0.012    2.70%
+observed                0.2461   0.1540   5.300e+17   0.0025   0.010    1.62%
+defined                 0.3530   0.2035   4.033e+18   0.0016   0.005    1.33%
+defined_blind           0.3460   0.1900   7.905e+18   0.0014   0.004    1.78%
+defined_observed        0.3576   0.2125   1.432e+18   0.0017   0.005    1.02%
+walkable                0.2567   0.1605   1.690e+18   0.0025   0.010    1.33%
+walkable_blind          0.2456   0.1521   3.036e+18   0.0025   0.010    1.54%
+channel_density         0.1328   0.0689   4.598e+18   0.0006   0.004    4.31%
+channel_vx              0.3506   0.2166   4.889e+03   0.0037   0.011    2.02%
+channel_vy              0.1499   0.0941   5.330e+03   0.0016   0.010    2.30%
+channel_var             0.1939   0.1780   7.357e+16   0.0043   0.022    0.14%
+all_constant_sigma_baseline  0.2239   0.1094  -7.744e-02   0.2239   1.000   94.78%
+blind_constant_sigma_baseline  0.2024   0.0990  -1.784e-01   0.2024   1.000   95.63%
+defined_constant_sigma_baseline  0.3530   0.1769   3.777e-01   0.3530   1.000   90.05%
+defined_blind_constant_sigma_baseline  0.3460   0.1712   3.576e-01   0.3460   1.000   90.23%
+walkable_constant_sigma_baseline  0.2567   0.1260   5.909e-02   0.2567   1.000   93.65%
+walkable_blind_constant_sigma_baseline  0.2456   0.1197   1.484e-02   0.2456   1.000   94.22%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_valid_E0_0616.json
+
+########## E1
+  [k=1] est_atc-20130616.npz
+  [k=1] second pass, constant sigma = all 0.1954, blind 0.1833, defined 0.3134, defined_blind 0.3379, walkable 0.2340, walkable_blind 0.2413
+
+[k=1] 1 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.1954   0.0658   6.671e+18   0.0628   0.321   64.51%
+blind                   0.1833   0.0556   6.587e+18   0.0535   0.292   62.50%
+observed                0.2083   0.0773   6.767e+18   0.0734   0.352   66.81%
+defined                 0.3134   0.1304   2.120e+19   0.0782   0.249   62.78%
+defined_blind           0.3379   0.1377   2.570e+19   0.0888   0.263   65.23%
+defined_observed        0.2958   0.1255   1.818e+19   0.0710   0.240   61.13%
+walkable                0.2340   0.0893   8.884e+18   0.0877   0.375   69.30%
+walkable_blind          0.2413   0.0882   9.870e+18   0.0885   0.367   69.01%
+channel_density         0.1118   0.0361   1.492e+19   0.0321   0.287   72.58%
+channel_vx              0.3264   0.1323   6.364e+01   0.1190   0.365   46.25%
+channel_vy              0.1439   0.0569   1.443e+02   0.0544   0.378   51.11%
+channel_var             0.1142   0.0377   1.176e+19   0.0459   0.402   88.12%
+all_constant_sigma_baseline  0.1954   0.0870  -2.136e-01   0.1954   1.000   93.66%
+blind_constant_sigma_baseline  0.1833   0.0793  -2.776e-01   0.1833   1.000   94.15%
+defined_constant_sigma_baseline  0.3134   0.1506   2.588e-01   0.3134   1.000   92.04%
+defined_blind_constant_sigma_baseline  0.3379   0.1636   3.340e-01   0.3379   1.000   91.58%
+walkable_constant_sigma_baseline  0.2340   0.1086  -3.353e-02   0.2340   1.000   92.92%
+walkable_blind_constant_sigma_baseline  0.2413   0.1116  -2.613e-03   0.2413   1.000   92.91%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_valid_E1_0616.json
+
+########## E2
+  [k=1] est_atc-20130616.npz
+  [k=1] second pass, constant sigma = all 0.2242, blind 0.2099, defined 0.3438, defined_blind 0.3626, walkable 0.2610, walkable_blind 0.2639
+
+[k=1] 1 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2242   0.1878   4.136e+14   0.7009   3.126   99.79%
+blind                   0.2099   0.1833   7.610e+14   0.6964   3.317   99.86%
+observed                0.2394   0.1929   1.925e+13   0.7060   2.949   99.71%
+defined                 0.3438   0.2083   1.470e+15   0.6761   1.967   99.30%
+defined_blind           0.3626   0.2185   3.579e+15   0.7071   1.950   99.40%
+defined_observed        0.3306   0.2014   5.358e+13   0.6553   1.983   99.23%
+walkable                0.2610   0.2042   6.162e+14   0.7362   2.820   99.70%
+walkable_blind          0.2639   0.2088   1.375e+15   0.7580   2.872   99.77%
+channel_density         0.1635   0.1362   1.655e+15   0.5073   3.102   99.58%
+channel_vx              0.3280   0.2738   9.203e-01   1.0221   3.116   99.77%
+channel_vy              0.1671   0.2249   7.737e-01   0.9135   5.468   99.95%
+channel_var             0.1971   0.1164  -8.601e-02   0.3607   1.830   99.86%
+all_constant_sigma_baseline  0.2242   0.1123  -7.624e-02   0.2242   1.000   93.40%
+blind_constant_sigma_baseline  0.2099   0.1042  -1.421e-01   0.2099   1.000   93.51%
+defined_constant_sigma_baseline  0.3438   0.1768   3.512e-01   0.3438   1.000   91.90%
+defined_blind_constant_sigma_baseline  0.3626   0.1877   4.044e-01   0.3626   1.000   91.74%
+walkable_constant_sigma_baseline  0.2610   0.1331   7.581e-02   0.2610   1.000   93.23%
+walkable_blind_constant_sigma_baseline  0.2639   0.1343   8.683e-02   0.2639   1.000   93.33%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_valid_E2_0616.json
+
+########## E3
+  [k=1] est_atc-20130616.npz
+  [k=1] second pass, constant sigma = all 0.2306, blind 0.2508, defined 0.3346, defined_blind 0.4055, walkable 0.2691, walkable_blind 0.3180
+
+[k=1] 1 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.2306   0.1112   3.290e+19   0.3003   1.302   93.38%
+blind                   0.2508   0.1313   7.847e+17   0.3970   1.583   95.45%
+observed                0.2052   0.0885   6.936e+19   0.1905   0.929   91.03%
+defined                 0.3346   0.1476   1.137e+20   0.2911   0.870   89.50%
+defined_blind           0.4055   0.1941   1.244e+18   0.4568   1.127   95.24%
+defined_observed        0.2769   0.1163   1.892e+20   0.1798   0.649   85.64%
+walkable                0.2691   0.1314   4.896e+19   0.3262   1.212   93.71%
+walkable_blind          0.3180   0.1741   1.401e+18   0.4884   1.536   97.26%
+channel_density         0.1824   0.0753   3.738e+17   0.1891   1.037   93.29%
+channel_vx              0.3427   0.1828   4.678e+18   0.4731   1.380   88.90%
+channel_vy              0.1600   0.1144   8.237e+17   0.3849   2.405   94.53%
+channel_var             0.1906   0.0724   1.257e+20   0.1542   0.809   96.79%
+all_constant_sigma_baseline  0.2306   0.1117  -4.823e-02   0.2306   1.000   91.60%
+blind_constant_sigma_baseline  0.2508   0.1245   3.598e-02   0.2508   1.000   90.83%
+defined_constant_sigma_baseline  0.3346   0.1680   3.240e-01   0.3346   1.000   91.06%
+defined_blind_constant_sigma_baseline  0.4055   0.2120   5.162e-01   0.4055   1.000   90.53%
+walkable_constant_sigma_baseline  0.2691   0.1341   1.064e-01   0.2691   1.000   91.06%
+walkable_blind_constant_sigma_baseline  0.3180   0.1648   2.733e-01   0.3180   1.000   90.42%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_enkf_valid_E3_0616.json
+

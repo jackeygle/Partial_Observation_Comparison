@@ -1,0 +1,42 @@
+[compare] 128/128
+{
+  "pairs": 128,
+  "input_frames": {
+    "j3": 1,
+    "j4": 5
+  },
+  "covariance": {
+    "j3": {
+      "lowrank_trace_fraction": 0.9680043231108935,
+      "lowrank_variance_mean": 0.20895851505671276,
+      "diagonal_variance_mean": 0.006906755446603706
+    },
+    "j4": {
+      "lowrank_trace_fraction": 0.9671166037195026,
+      "lowrank_variance_mean": 0.2089820051297735,
+      "diagonal_variance_mean": 0.007105697558852396
+    }
+  },
+  "selection": {
+    "j3": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha1",
+        "best_calibrated_walkable_blind": "alpha1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha1",
+        "best_calibrated_walkable_blind": "alpha2"
+      }
+    },
+    "j4": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha1",
+        "best_calibrated_walkable_blind": "alpha1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha1",
+        "best_calibrated_walkable_blind": "alpha2"
+      }
+    }
+  }
+}

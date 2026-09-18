@@ -1,0 +1,78 @@
+{
+  "config": {
+    "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+    "bias_file": "methods/enkf/runs/_smoke_local_bias/bias_maps.npz",
+    "outdir": "methods/enkf/runs/_smoke_local_static",
+    "patch_size": 15,
+    "sample_pairs": 32,
+    "batch": 8,
+    "max_rank": 16,
+    "days": 1,
+    "max_frames": 96,
+    "allow_cpu": true
+  },
+  "device": "cpu",
+  "available_pairs": 95,
+  "sampled_pairs": 32,
+  "seconds": 222.7,
+  "diagnostics": {
+    "raw": {
+      "name": "raw",
+      "directed_relative_asymmetry": 0.0,
+      "min_eigenvalue": -0.04631465362679773,
+      "max_eigenvalue": 0.7393145547315936,
+      "negative_eigenvalues": 290,
+      "negative_trace_fraction": 0.023166368246027375,
+      "positive_numerical_rank": 253,
+      "psd_projection_trace": 8.284368355778643,
+      "saved_rank": 16,
+      "saved_rank_trace_fraction": 0.6617889806467211,
+      "top_rank_trace_fraction": {
+        "8": 0.4456827225234824,
+        "16": 0.6617889806467211,
+        "32": 0.883771245170554,
+        "64": 0.9974018952056857,
+        "128": 0.9999935901132437,
+        "256": 0.9999999860095199
+      },
+      "mean_std_by_channel": {
+        "density": 0.015934806435404014,
+        "vx": 0.12629680732798187,
+        "vy": 0.04779358246419019,
+        "var": 0.026224997220265535
+      }
+    },
+    "centered": {
+      "name": "centered",
+      "directed_relative_asymmetry": 0.0,
+      "min_eigenvalue": -0.04563615491350909,
+      "max_eigenvalue": 0.7332511347222859,
+      "negative_eigenvalues": 301,
+      "negative_trace_fraction": 0.028146227784295957,
+      "positive_numerical_rank": 255,
+      "psd_projection_trace": 8.160076160523165,
+      "saved_rank": 16,
+      "saved_rank_trace_fraction": 0.6558552004052604,
+      "top_rank_trace_fraction": {
+        "8": 0.44131218468997235,
+        "16": 0.6558552004052604,
+        "32": 0.8774665311153753,
+        "64": 0.9921021401570326,
+        "128": 0.999990439001549,
+        "256": 0.9999999814590451
+      },
+      "mean_std_by_channel": {
+        "density": 0.015878775676331086,
+        "vx": 0.12539557825560066,
+        "vy": 0.04739162291821514,
+        "var": 0.025824652960653942
+      }
+    },
+    "normalization_scale": {
+      "density": 0.19491,
+      "vx": 0.84916,
+      "vy": 0.33664,
+      "var": 0.14897
+    }
+  }
+}

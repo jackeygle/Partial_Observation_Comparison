@@ -1,0 +1,19 @@
+[load] atc-20130811 -> 2000 frames in 2.5s
+[sweep] day=atc-20130811 frames=2000 warmup=500 ensemble=100 radius=7  scales=[0.01]
+        injected per step = scale x PROC_STD = scale x (0.02829307, 0.31263075, 0.12325809, 0.41680932)
+      [scale=0.01] frame 200/2000  0.26 s/frame  eta 8 min
+      [scale=0.01] frame 400/2000  0.24 s/frame  eta 6 min
+      [scale=0.01] frame 600/2000  0.25 s/frame  eta 6 min
+      [scale=0.01] frame 800/2000  0.24 s/frame  eta 5 min
+      [scale=0.01] frame 1000/2000  0.24 s/frame  eta 4 min
+      [scale=0.01] frame 1200/2000  0.24 s/frame  eta 3 min
+      [scale=0.01] frame 1400/2000  0.25 s/frame  eta 2 min
+      [scale=0.01] frame 1600/2000  0.25 s/frame  eta 2 min
+      [scale=0.01] frame 1800/2000  0.25 s/frame  eta 1 min
+  scale=0.01   rmse 0.1899  sigma 0.00256  spread/skill 0.0135  cov@90 0.020  crps 0.1219   (497.1s, 2 svd-skips)
+      density  ause  0.628  spearman +0.578  sigma_cv 0.456  rmse 0.0766
+      vx       ause  0.984  spearman -0.031  sigma_cv 0.150  rmse 0.3017
+      vy       ause  1.084  spearman -0.115  sigma_cv 0.189  rmse 0.1089
+      var      ause  1.024  spearman -0.014  sigma_cv 0.072  rmse 0.1883
+
+[out] methods/enkf/check_outputs/eval/proc_scale_0.01_null.json

@@ -1,0 +1,60 @@
+Tesla V100-SXM2-32GB
+[blind-sweep] 128/128
+{
+  "selection": {
+    "best_crps": "gamma1",
+    "best_nll": "gamma1",
+    "best_coverage90": "gamma1",
+    "best_spread_skill": "gamma1"
+  },
+  "selected_metrics": {
+    "best_crps": {
+      "rmse": 0.3776883450405702,
+      "mean_spread": 0.27896385542750024,
+      "rms_spread": 0.35478778329244554,
+      "mean_sigma_skill": 0.7386085885110771,
+      "spread_skill": 0.9393665119699027,
+      "crps": 0.11558294891665001,
+      "marginal_gaussian_nll": -0.21919415366937428,
+      "coverage50": 0.8884517766497462,
+      "coverage90": 0.9703891708967851,
+      "count": 70920
+    },
+    "best_nll": {
+      "rmse": 0.3776883450405702,
+      "mean_spread": 0.27896385542750024,
+      "rms_spread": 0.35478778329244554,
+      "mean_sigma_skill": 0.7386085885110771,
+      "spread_skill": 0.9393665119699027,
+      "crps": 0.11558294891665001,
+      "marginal_gaussian_nll": -0.21919415366937428,
+      "coverage50": 0.8884517766497462,
+      "coverage90": 0.9703891708967851,
+      "count": 70920
+    },
+    "best_coverage90": {
+      "rmse": 0.3776883450405702,
+      "mean_spread": 0.27896385542750024,
+      "rms_spread": 0.35478778329244554,
+      "mean_sigma_skill": 0.7386085885110771,
+      "spread_skill": 0.9393665119699027,
+      "crps": 0.11558294891665001,
+      "marginal_gaussian_nll": -0.21919415366937428,
+      "coverage50": 0.8884517766497462,
+      "coverage90": 0.9703891708967851,
+      "count": 70920
+    },
+    "best_spread_skill": {
+      "rmse": 0.3776883450405702,
+      "mean_spread": 0.27896385542750024,
+      "rms_spread": 0.35478778329244554,
+      "mean_sigma_skill": 0.7386085885110771,
+      "spread_skill": 0.9393665119699027,
+      "crps": 0.11558294891665001,
+      "marginal_gaussian_nll": -0.21919415366937428,
+      "coverage50": 0.8884517766497462,
+      "coverage90": 0.9703891708967851,
+      "count": 70920
+    }
+  }
+}

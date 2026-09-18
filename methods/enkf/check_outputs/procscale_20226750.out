@@ -1,0 +1,47 @@
+[load] atc-20130811 -> 2000 frames in 1.7s
+[sweep] day=atc-20130811 frames=2000 warmup=500 ensemble=100 radius=7  scales=[0.1]
+        injected per step = scale x PROC_STD = scale x (0.02829307, 0.31263075, 0.12325809, 0.41680932)
+      [scale=0.1] frame 200/2000  0.17 s/frame  eta 5 min
+      [scale=0.1] frame 400/2000  0.16 s/frame  eta 4 min
+      [scale=0.1] frame 600/2000  0.16 s/frame  eta 4 min
+      [scale=0.1] frame 800/2000  0.16 s/frame  eta 3 min
+      [scale=0.1] frame 1000/2000  0.16 s/frame  eta 3 min
+      [scale=0.1] frame 1200/2000  0.17 s/frame  eta 2 min
+      [scale=0.1] frame 1400/2000  0.17 s/frame  eta 2 min
+      [scale=0.1] frame 1600/2000  0.17 s/frame  eta 1 min
+      [scale=0.1] frame 1800/2000  0.17 s/frame  eta 1 min
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:110: RuntimeWarning: divide by zero encountered in divide
+  z = (x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:110: RuntimeWarning: invalid value encountered in divide
+  z = (x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:111: RuntimeWarning: invalid value encountered in multiply
+  return sigma * (z * (2 * norm.cdf(z) - 1) + 2 * norm.pdf(z) - 1.0 / _SQRT_PI)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: divide by zero encountered in log
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: divide by zero encountered in divide
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: invalid value encountered in divide
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: invalid value encountered in add
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:156: RuntimeWarning: divide by zero encountered in divide
+  r = np.abs(x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:156: RuntimeWarning: invalid value encountered in divide
+  r = np.abs(x - mu) / sigma
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/diag_proc_scale_sweep.py", line 230, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/diag_proc_scale_sweep.py", line 210, in main
+    s = score_arm(Est, Spread, X_true, Omega, a.warmup)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/diag_proc_scale_sweep.py", line 162, in score_arm
+    a, sp = ause_spearman(s.astype(np.float64), e.astype(np.float64))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/checks/diag_proc_scale_sweep.py", line 137, in ause_spearman
+    a = np.trapz(curves["sigma"] - curves["oracle"], FRACS)
+        ^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/numpy/__init__.py", line 792, in __getattr__
+    raise AttributeError(f"module {__name__!r} has no attribute {attr!r}")
+AttributeError: module 'numpy' has no attribute 'trapz'. Did you mean: 'trace'?

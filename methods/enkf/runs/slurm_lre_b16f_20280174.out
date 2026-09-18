@@ -1,0 +1,13 @@
+NVIDIA H200
+[atc-20130616] check_outputs/enkf_valid_k1/obs_atc-20130616.npz
+  frame 10/35127: 34.8 ms/frame
+  frame 100/35127: 5.8 ms/frame
+  frame 1000/35127: 2.9 ms/frame
+  frame 5000/35127: 2.6 ms/frame
+  frame 10000/35127: 2.6 ms/frame
+  frame 15000/35127: 2.5 ms/frame
+  frame 20000/35127: 2.5 ms/frame
+  frame 25000/35127: 2.5 ms/frame
+  frame 30000/35127: 2.5 ms/frame
+  frame 35000/35127: 2.5 ms/frame
+[done]

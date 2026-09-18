@@ -1,0 +1,130 @@
+{
+  "config": {
+    "model": [
+      "a32=methods/enkf/runs/lowrank_a_r32_s0/best.pt"
+    ],
+    "alphas": "1",
+    "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+    "pairs": 2,
+    "batch": 1,
+    "seed": 0,
+    "days": 1,
+    "max_frames": 4,
+    "out": "methods/enkf/check_outputs/eval/_smoke_lowrank_sweep.json",
+    "allow_cpu": true
+  },
+  "pairs": 2,
+  "mean_rmse": {
+    "mean": {
+      "all": 0.3206953026651069,
+      "observed": 0.32987201282413225,
+      "blind": 0.3065136088867954,
+      "walkable_blind": 0.4217833910865055
+    },
+    "mean_bias_corrected": {
+      "all": 0.2962714770695075,
+      "observed": 0.3134359584094044,
+      "blind": 0.2686715060763529,
+      "walkable_blind": 0.36427170361311345
+    }
+  },
+  "modes": {
+    "a32_bias0_alpha1": {
+      "all": {
+        "rmse": 0.12721880142121716,
+        "mean_spread": 0.07543251102362303,
+        "spread_skill": 0.592935243697734,
+        "crps": 0.03253212139289072,
+        "coverage50": 0.8483796296296297,
+        "coverage90": 0.9765625
+      },
+      "observed": {
+        "rmse": 0.08529023080412948,
+        "mean_spread": 0.06300514895780591,
+        "spread_skill": 0.738714719889765,
+        "crps": 0.027239813533750303,
+        "coverage50": 0.8157640232108317,
+        "coverage90": 0.9709864603481625
+      },
+      "blind": {
+        "rmse": 0.17163930507829503,
+        "mean_spread": 0.09394820608998453,
+        "spread_skill": 0.5473583457304787,
+        "crps": 0.040417202554780034,
+        "coverage50": 0.8969740634005764,
+        "coverage90": 0.9848703170028819
+      },
+      "walkable_blind": {
+        "rmse": 0.23128279698292195,
+        "mean_spread": 0.15738415883090565,
+        "spread_skill": 0.6804836368462241,
+        "crps": 0.06867514248649037,
+        "coverage50": 0.8837209302325582,
+        "coverage90": 0.9752906976744186
+      }
+    },
+    "a32_bias1_alpha1": {
+      "all": {
+        "rmse": 0.14807855972981887,
+        "mean_spread": 0.07543251102362303,
+        "spread_skill": 0.5094087298070407,
+        "crps": 0.03532745120631902,
+        "coverage50": 0.8521412037037037,
+        "coverage90": 0.9748263888888888
+      },
+      "observed": {
+        "rmse": 0.08679555400387784,
+        "mean_spread": 0.06300514895780591,
+        "spread_skill": 0.7259029529898614,
+        "crps": 0.02753792098309931,
+        "coverage50": 0.816247582205029,
+        "coverage90": 0.9709864603481625
+      },
+      "blind": {
+        "rmse": 0.20826129021084927,
+        "mean_spread": 0.09394820608998453,
+        "spread_skill": 0.4511073853180726,
+        "crps": 0.046933177792499385,
+        "coverage50": 0.9056195965417867,
+        "coverage90": 0.9805475504322767
+      },
+      "walkable_blind": {
+        "rmse": 0.2769499359817344,
+        "mean_spread": 0.15738415883090565,
+        "spread_skill": 0.5682765669289974,
+        "crps": 0.07883217855800637,
+        "coverage50": 0.873546511627907,
+        "coverage90": 0.9709302325581395
+      }
+    }
+  },
+  "selection": {
+    "best_all": "a32_bias0_alpha1",
+    "best_blind": "a32_bias0_alpha1",
+    "best_calibrated_within_1pct_all": "a32_bias0_alpha1",
+    "reference": "a32_bias0_alpha1"
+  },
+  "checkpoints": {
+    "a32": "methods/enkf/runs/lowrank_a_r32_s0/best.pt"
+  },
+  "train_args": {
+    "a32": {
+      "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+      "rank": 32,
+      "width": 32,
+      "epochs": 20,
+      "batch": 128,
+      "lr": 0.001,
+      "nll_weight": 0.0,
+      "num_agents": 3,
+      "sensing_radius": 7.0,
+      "days": 0,
+      "max_frames": 0,
+      "eval_pairs": 4096,
+      "out": "runs/lowrank_a_r32_s0",
+      "seed": 0,
+      "resume": false,
+      "allow_cpu": false
+    }
+  }
+}

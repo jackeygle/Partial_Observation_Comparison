@@ -1,0 +1,24 @@
+  [k=1] est_atc-20130616.npz
+  [k=1] est_atc-20130623.npz
+  [k=1] est_atc-20130630.npz
+  [k=1] est_atc-20130707.npz
+  [k=1] est_atc-20130714.npz
+  [k=1] est_atc-20130721.npz
+  [k=1] est_atc-20130728.npz
+
+[k=1] 7 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.1526   0.0369   7.113e-01   0.0629   0.412   95.77%
+blind                   0.1798   0.0455  -1.196e+00   0.0753   0.419   95.80%
+observed                0.1142   0.0271   2.872e+00   0.0487   0.426   95.73%
+defined                 0.2640   0.0860   9.305e+00   0.0933   0.353   88.10%
+defined_blind           0.3544   0.1371   4.415e+00   0.1412   0.398   85.10%
+defined_observed        0.1791   0.0517   1.260e+01   0.0610   0.340   90.12%
+walkable                0.1829   0.0511   2.593e+00   0.0836   0.457   94.31%
+walkable_blind          0.2378   0.0761   4.962e-01   0.1195   0.503   93.31%
+channel_density         0.1251   0.0272  -1.006e+00   0.0375   0.299   95.47%
+channel_vx              0.2493   0.0767  -5.624e-01   0.1208   0.484   94.08%
+channel_vy              0.1043   0.0331  -1.693e+00   0.0730   0.700   96.15%
+channel_var             0.0666   0.0106   6.106e+00   0.0202   0.303   97.36%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_lowrank_a_r32_alpha2_valid7.json
+

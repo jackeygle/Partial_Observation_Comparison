@@ -1,0 +1,5 @@
+Tesla V100-SXM2-16GB, 16384 MiB
+[data] train=2,047, valid=2,047, device=cuda
+{"epoch": 0, "seconds": 1.27, "lr": 0.002, "train": {"loss": 0.03163178182376214, "covariance_mse": 0.03162253264395076, "negative_diag_penalty": 9.249234351408134e-05}, "valid": {"loss": 0.16168150929297553, "covariance_mse": 0.16168115610344103, "negative_diag_penalty": 3.5954743111688003e-06}}
+{"epoch": 1, "seconds": 0.78, "lr": 0.002, "train": {"loss": 0.01794091277190546, "covariance_mse": 0.017940839278026033, "negative_diag_penalty": 7.35911901132702e-07}, "valid": {"loss": 0.16166676851571538, "covariance_mse": 0.16166668830555864, "negative_diag_penalty": 8.25187980169062e-07}}
+[done] best=0.16166677 -> methods/enkf/runs/local_unetkf_centered_smoke/best.pt

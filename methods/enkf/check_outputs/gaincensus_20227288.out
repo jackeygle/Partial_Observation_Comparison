@@ -1,0 +1,24 @@
+[census] atc-20130811  400 frames, 299 scored assimilations (58s)
+
+=== P_yy 的三项(对角线均值),regularization = 0.001 ===
+channel       ensemble           R         reg   ens_frac       谁最大
+density      6.633e-04   3.239e-03   1.000e-03   1.35e-01         R
+vx           1.040e-01   9.905e-02   1.000e-03   5.10e-01  ensemble
+vy           1.616e-02   7.424e-03   1.000e-03   6.57e-01  ensemble
+var          8.194e-02   4.155e-05   1.000e-03   9.87e-01  ensemble
+
+=== 自增益 K[cell, 该 cell 的观测] —— 一个格子自己的新息有多少进入状态 ===
+channel               均值         绝对值最大
+density        2.089e-03     5.150e-03
+vx             1.459e-02     2.441e-02
+vy             2.648e-02     4.352e-02
+var            4.970e-01     6.368e-01
+
+=== 每步 analysis 实际移动了多少 ===
+  ||K @ innovation||            均值 3.1706e+00
+  ||innovation||                均值 6.6576e+00   -> 增益整体把新息缩小了 2.1 倍
+  ||state||                     均值 6.5663e+00
+  相对状态量级 incr/state       均值 4.827e-01
+  ||bias_estimate||(对照)       均值 5.6496e+00   -> 偏差修正比 analysis 增量大 1.78 倍
+
+[out] methods/enkf/check_outputs/eval/gain_census_FIXED_Q1.json

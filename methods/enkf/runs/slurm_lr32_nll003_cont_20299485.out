@@ -1,0 +1,7 @@
+Tesla V100-SXM2-16GB
+[data] train=1,262,486, valid=269,736, load=387s, device=cuda
+[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
+{"epoch": 17, "lr": 0.001, "skipped": 0, "seconds": 771.8, "train": {"loss": 0.04958333373527485, "analysis_mse_norm": 0.058121277857004265, "forecast_nll": -2.8459813490788326, "blind_mse_norm": 0.0916958116134265}, "valid": {"loss": 0.03680467382946517, "analysis_mse_norm": 0.04618952010059729, "forecast_nll": -3.1282820706255734, "blind_mse_norm": 0.07480977220984641}}
+{"epoch": 18, "lr": 0.001, "skipped": 0, "seconds": 770.1, "train": {"loss": 0.049586390785975945, "analysis_mse_norm": 0.05813091307503819, "forecast_nll": -2.8481740724745093, "blind_mse_norm": 0.09173771056289232}, "valid": {"loss": 0.0371778332410031, "analysis_mse_norm": 0.04657702623080695, "forecast_nll": -3.133064335997915, "blind_mse_norm": 0.07550140247622039}}
+{"epoch": 19, "lr": 0.001, "skipped": 0, "seconds": 769.0, "train": {"loss": 0.04968213225276626, "analysis_mse_norm": 0.05824417355701485, "forecast_nll": -2.854013745983977, "blind_mse_norm": 0.0919253223837887}, "valid": {"loss": 0.03689211179880658, "analysis_mse_norm": 0.04628173461969709, "forecast_nll": -3.129874287173152, "blind_mse_norm": 0.07500074821291491}}
+[done] best validation loss=0.0368047 -> runs/lowrank_a_r32_nll003_s0/best.pt

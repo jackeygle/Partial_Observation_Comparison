@@ -1,0 +1,75 @@
+NVIDIA H200, 143771 MiB
+[covariance] 3,200/32,768 pairs
+[covariance] 6,400/32,768 pairs
+[covariance] 9,600/32,768 pairs
+[covariance] 12,800/32,768 pairs
+[covariance] 16,000/32,768 pairs
+[covariance] 19,200/32,768 pairs
+[covariance] 22,400/32,768 pairs
+[covariance] 25,600/32,768 pairs
+[covariance] 28,800/32,768 pairs
+[covariance] 32,000/32,768 pairs
+[covariance] 32,768/32,768 pairs
+[eigh] raw
+[eigh] centered
+{
+  "raw": {
+    "name": "raw",
+    "directed_relative_asymmetry": 0.0,
+    "min_eigenvalue": -0.0005791063692947089,
+    "max_eigenvalue": 0.7402144465790662,
+    "negative_eigenvalues": 35,
+    "negative_trace_fraction": 2.459948063634224e-05,
+    "positive_numerical_rank": 1416,
+    "psd_projection_trace": 30.187734938526578,
+    "saved_rank": 256,
+    "saved_rank_trace_fraction": 0.7372605654301573,
+    "top_rank_trace_fraction": {
+      "8": 0.09298817616981385,
+      "16": 0.1468293906763339,
+      "32": 0.23408477672102454,
+      "64": 0.36243580479549037,
+      "128": 0.5332604125341466,
+      "256": 0.7372605654301573
+    },
+    "mean_std_by_channel": {
+      "density": 0.060556900286254114,
+      "vx": 0.20733863469133212,
+      "vy": 0.11967097023404744,
+      "var": 0.09434737588667129
+    }
+  },
+  "centered": {
+    "name": "centered",
+    "directed_relative_asymmetry": 0.0,
+    "min_eigenvalue": -1.0424636895271485e-06,
+    "max_eigenvalue": 0.5283172358135099,
+    "negative_eigenvalues": 35,
+    "negative_trace_fraction": 1.2648262924100108e-07,
+    "positive_numerical_rank": 1418,
+    "psd_projection_trace": 29.614816961702545,
+    "saved_rank": 256,
+    "saved_rank_trace_fraction": 0.7310752224905275,
+    "top_rank_trace_fraction": {
+      "8": 0.08251527045284324,
+      "16": 0.13686360725973365,
+      "32": 0.22399040624025265,
+      "64": 0.35184476185813857,
+      "128": 0.5237849351139803,
+      "256": 0.7310752224905275
+    },
+    "mean_std_by_channel": {
+      "density": 0.060486240218040194,
+      "vx": 0.20581524129864917,
+      "vy": 0.11931673099972501,
+      "var": 0.0910924581838789
+    }
+  },
+  "normalization_scale": {
+    "density": 0.19491,
+    "vx": 0.84916,
+    "vy": 0.33664,
+    "var": 0.14897
+  }
+}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_static

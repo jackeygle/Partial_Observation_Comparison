@@ -1,0 +1,10 @@
+{
+  "day": "atc-20130616",
+  "n_frames": 1000,
+  "total_s": 6.198152780532837,
+  "per_frame_s": 0.006198152780532837,
+  "device": "cuda",
+  "covariance_scale": 1.0,
+  "factor_covariance_scale": 2.0,
+  "diagonal_covariance_scale": 1.0
+}

@@ -1,0 +1,13 @@
+[E4] atc-20130616 -> check_outputs/enkf_valid_E4
+    frame 10/35127  288 ms/frame
+    frame 100/35127  183 ms/frame
+    frame 1000/35127  181 ms/frame
+    frame 5000/35127  199 ms/frame
+    frame 10000/35127  201 ms/frame
+    frame 15000/35127  202 ms/frame
+    frame 20000/35127  202 ms/frame
+    frame 25000/35127  203 ms/frame
+    frame 30000/35127  204 ms/frame
+    frame 35000/35127  204 ms/frame
+[E4] atc-20130616: 35127 frames in 7165s (204 ms/frame), 19 SVD-skips
+[done]

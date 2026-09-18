@@ -1,0 +1,42 @@
+{
+  "config": {
+    "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/covonly_pedpred5_raw_floor05_r32_s0/best.pt",
+    "pairs": 4096,
+    "batch": 64,
+    "seed": 1,
+    "out": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/covonly_pedpred5_conditional_4096_s1.json",
+    "device": "cuda"
+  },
+  "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/covonly_pedpred5_raw_floor05_r32_s0/best.pt",
+  "mean_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/pedpred3_5to5_s0/best.pt",
+  "pairs": 4096,
+  "input_frames": 5,
+  "walkable_gaussian_nll": {
+    "diagonal": -1.2216154243797064,
+    "shuffled": -0.4935785256602685,
+    "full": -1.3202443765476346
+  },
+  "analysis_normalized_mse_walkable_blind": {
+    "mean": 0.19468874293502408,
+    "diagonal": 0.19468874293502408,
+    "shuffled": 0.19473032322236639,
+    "full": 0.14004795691965602
+  },
+  "within_location_temporal_variance_error_correlation": {
+    "density": 0.4735259995762181,
+    "vx": 0.4979195556482298,
+    "vy": 0.40008987142100866,
+    "var": 0.19355369654756494
+  },
+  "predicted_variance_temporal_cv": {
+    "density": 1.2095178450656918,
+    "vx": 0.9603020820733847,
+    "vy": 1.3008860423727617,
+    "var": 2.1463351309719347
+  },
+  "relative": {
+    "shuffle_nll_increase": 0.8266658508873661,
+    "shuffle_analysis_mse_increase_fraction": 0.39045458074108885,
+    "diagonal_analysis_mse_increase_fraction": 0.3901576803916882
+  }
+}

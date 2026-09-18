@@ -1,0 +1,23 @@
+{
+  "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+  "cov_ckpt": "runs/lowrank_a_r32_s0/best.pt",
+  "mean_train": "full",
+  "mean_lr": 1e-05,
+  "forecast_weight": 0.1,
+  "input_frames": 1,
+  "rank": 32,
+  "width": 32,
+  "epochs": 20,
+  "batch": 32,
+  "lr": 0.0001,
+  "nll_weight": 0.0,
+  "num_agents": 3,
+  "sensing_radius": 7.0,
+  "days": 0,
+  "max_frames": 0,
+  "eval_pairs": 2048,
+  "out": "runs/joint_j3_full_f01_r32_s0",
+  "seed": 0,
+  "resume": true,
+  "allow_cpu": false
+}

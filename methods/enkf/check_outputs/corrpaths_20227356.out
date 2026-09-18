@@ -1,0 +1,15 @@
+[load] atc-20130811 -> 2000 frames in 1.9s
+[arms] ['C_gain_only']   scale=1.0 ensemble=100 radius=7
+      [scale=1] frame 200/2000  0.15 s/frame  eta 5 min
+      [scale=1] frame 400/2000  0.14 s/frame  eta 4 min
+      [scale=1] frame 600/2000  0.15 s/frame  eta 3 min
+      [scale=1] frame 800/2000  0.15 s/frame  eta 3 min
+      [scale=1] frame 1000/2000  0.14 s/frame  eta 2 min
+      [scale=1] frame 1200/2000  0.15 s/frame  eta 2 min
+      [scale=1] frame 1400/2000  0.15 s/frame  eta 1 min
+      [scale=1] frame 1600/2000  0.15 s/frame  eta 1 min
+      [scale=1] frame 1800/2000  0.15 s/frame  eta 0 min
+  C_gain_only        rmse 0.3322  sigma 0.16243  spread/skill 0.4890   (296.7s)
+      density 0.1924  vx 0.4973  vy 0.1517  var 0.3661
+
+[out] methods/enkf/check_outputs/eval/correction_paths_C_gain_only_FIXED_Q1.json

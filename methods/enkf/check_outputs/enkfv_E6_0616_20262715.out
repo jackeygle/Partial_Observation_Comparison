@@ -1,0 +1,13 @@
+[E6] atc-20130616 -> check_outputs/enkf_valid_E6
+    frame 10/35127  320 ms/frame
+    frame 100/35127  220 ms/frame
+    frame 1000/35127  219 ms/frame
+    frame 5000/35127  237 ms/frame
+    frame 10000/35127  239 ms/frame
+    frame 15000/35127  241 ms/frame
+    frame 20000/35127  241 ms/frame
+    frame 25000/35127  241 ms/frame
+    frame 30000/35127  241 ms/frame
+    frame 35000/35127  238 ms/frame
+[E6] atc-20130616: 35127 frames in 8364s (238 ms/frame), 35 SVD-skips
+[done]

@@ -1,0 +1,20 @@
+Tesla V100-SXM2-32GB, 32768 MiB
+[new_cov_sweep_alpha0.5_alpha0.5] mode=full history=5
+  frame 10/5000: 57.9 ms/frame
+  frame 100/5000: 14.0 ms/frame
+  frame 1000/5000: 9.6 ms/frame
+  frame 5000/5000: 9.3 ms/frame
+{"variant": "new_cov_sweep_alpha0.5_alpha0.5", "rmse": 0.4417356708556062, "crps": 0.1137600487293602, "spread_skill": 0.517169539918733}
+[new_cov_sweep_alpha0.75_alpha0.75] mode=full history=5
+  frame 10/5000: 8.4 ms/frame
+  frame 100/5000: 9.0 ms/frame
+  frame 1000/5000: 9.1 ms/frame
+  frame 5000/5000: 9.1 ms/frame
+{"variant": "new_cov_sweep_alpha0.75_alpha0.75", "rmse": 0.40542403159099927, "crps": 0.10867614020345501, "spread_skill": 0.6532063101015041}
+[new_cov_sweep_alpha1.1_alpha1.1] mode=full history=5
+  frame 10/5000: 8.3 ms/frame
+  frame 100/5000: 9.0 ms/frame
+  frame 1000/5000: 9.1 ms/frame
+  frame 5000/5000: 9.1 ms/frame
+{"variant": "new_cov_sweep_alpha1.1_alpha1.1", "rmse": 0.4055906641825733, "crps": 0.11630018367804666, "spread_skill": 0.8080965192954931}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/covonly_pedpred5_alpha3_atc-20130630_5000.json

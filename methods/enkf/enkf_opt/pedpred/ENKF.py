@@ -18,6 +18,16 @@ with open(yaml_path, 'r') as file:
 GAIN_MODES = ("pinv", "ensemble")
 DEFAULT_GAIN_MODE = os.environ.get("ENKF_GAIN_MODE", "pinv")
 
+# Multiplier applied to the calibrated process noise before it is injected each forecast step.
+# The reference hard-codes 0.01 -- i.e. 1% of the PROC_STD that estimate_noise_from_data()
+# measured as the surrogate's OWN one-step error, which is exactly the quantity a textbook EnKF
+# injects at full strength. That one constant sets the ensemble's equilibrium spread: measured
+# on enkf_k1_full, the spread settles at 1.0-1.9x the injected level within ~5 frames and is
+# then static for the remaining ~39,800 frames of the day. Exposed here so it can be swept.
+#   ENKF_PROC_SCALE=0.01  (default) the reference value; this path stays bit-identical to lab
+#   ENKF_PROC_SCALE=1.0             inject the full calibrated process noise
+DEFAULT_PROC_SCALE = float(os.environ.get("ENKF_PROC_SCALE", "0.01"))
+
 
 def _obs_indices(C):
     """`C.nonzero()[1]` -- the state index each observation row reads -- plus a flag saying
@@ -148,7 +158,7 @@ class EnsembleKalmanFilter:
                  proc_noise_std=(0.03435, 0.1899, 0.05144, 0.003886),
                  obs_noise_std=(0.05726, 0.3165, 0.08573, 0.006477),
                  init_perturb_std=(0.2290, 1.2660, 0.3429, 0.0259),
-                 inflation=1.0, seed=0):
+                 inflation=1.0, seed=0, proc_noise_scale=None):
 
         self.grid_size = grid_size
         self.state_shape = state_shape
@@ -163,7 +173,9 @@ class EnsembleKalmanFilter:
         self.obs_noise_vec = self._expand_noise(obs_noise_std)
         self.init_std_vec = self._expand_noise(init_perturb_std)
         # Hoisted out of forecast(): same value every call, allocated every call in the original
-        self._proc_step_vec = 0.01 * self.proc_noise_vec
+        self.proc_noise_scale = (DEFAULT_PROC_SCALE if proc_noise_scale is None
+                                 else float(proc_noise_scale))
+        self._proc_step_vec = self.proc_noise_scale * self.proc_noise_vec
 
         self.X = None
 
@@ -301,7 +313,9 @@ class LocalizedEnsembleKalmanFilter:
                  proc_noise_std=(0.03435, 0.1899, 0.05144, 0.003886),
                  obs_noise_std=(0.05726, 0.3165, 0.08573, 0.006477),
                  init_perturb_std=(0.2290, 1.2660, 0.3429, 0.0259),
-                 inflation=1.02, localization_radius=7, seed=0, gain_mode=None):
+                 inflation=1.02, localization_radius=7, seed=0, gain_mode=None,
+                 proc_noise_scale=None, use_gain=True, use_bias=True,
+                 fix_localization=False):
 
         self.grid_size = grid_size
         self.state_shape = state_shape
@@ -314,13 +328,26 @@ class LocalizedEnsembleKalmanFilter:
         self.gain_mode = DEFAULT_GAIN_MODE if gain_mode is None else gain_mode
         if self.gain_mode not in GAIN_MODES:
             raise ValueError(f"gain_mode must be one of {GAIN_MODES}, got {self.gain_mode!r}")
+        # Diagnostic switches for the two correction paths this filter actually has. Both
+        # default to True, i.e. the shipped behaviour; see forecast() and update().
+        self.use_gain = bool(use_gain)
+        self.use_bias = bool(use_bias)
+        # False = the published behaviour (only density is ever assimilated). See update().
+        self.fix_localization = bool(fix_localization)
+        # Read-only gain census, off by default. When on, update() appends one dict per
+        # assimilation to self.gain_stats. Nothing is read back, so the numerics are untouched;
+        # the only cost on the shipped path is one `if` per step. See checks/diag_gain_census.py.
+        self.collect_stats = False
+        self.gain_stats = []
 
         # Noise vectors
         self.proc_noise_vec = self._expand_noise(proc_noise_std)
         self.obs_noise_vec = self._expand_noise(obs_noise_std)
         self.init_std_vec = self._expand_noise(init_perturb_std)
         # Hoisted out of forecast(): same value every call, allocated every call in the original
-        self._proc_step_vec = 0.01 * self.proc_noise_vec
+        self.proc_noise_scale = (DEFAULT_PROC_SCALE if proc_noise_scale is None
+                                 else float(proc_noise_scale))
+        self._proc_step_vec = self.proc_noise_scale * self.proc_noise_vec
 
         self.X = None
 
@@ -410,9 +437,64 @@ class LocalizedEnsembleKalmanFilter:
         ##added for bias correction
         # NOT in-place, on purpose: this is where a float32 forecast becomes float64 in the
         # reference, and the rest of the step is sensitive to that.
-        X_f = X_f - self.bias_estimate[None, :]
+        #
+        # This is the reference's SECOND correction path and it is NOT textbook EnKF: update()
+        # accumulates an EMA of (ensemble mean - observation) per state index, and it is
+        # subtracted here at FULL strength, never scaled by the Kalman gain. So it keeps
+        # correcting the forecast even when the gain is ~0. use_bias=False switches it off so
+        # its contribution can be separated from the gain's.
+        if self.use_bias:
+            X_f = X_f - self.bias_estimate[None, :]
+        else:
+            X_f = X_f - 0.0 * self.bias_estimate[None, :]   # same float32 -> float64 promotion
 
         return self._clip_bounds(X_f)
+
+    def _record_gain_stats(self, K, P_yy, Y_ano, r_diag, regularization, obs_idx, Y_f,
+                           y_obs, X_f):
+        """Append one census row per assimilation. Read-only: nothing here feeds back into the
+        filter, so enabling it cannot change a result.
+
+        What it answers. The gain is K = P_xy @ pinv(P_yy) with
+
+            P_yy = (Y_ano^T Y_ano)/(N-1)  +  diag(R)  +  regularization * I
+
+        and the shipped regularization is 1e-3 while the ensemble has collapsed. If the third
+        term dominates the first, the gain is being suppressed by a numerical guard constant
+        rather than by anything physical -- a different diagnosis from "the ensemble collapsed",
+        and a different fix. `ens_frac` is that comparison, per channel.
+
+        `self_gain` is K[state index of an observation, that observation] -- the fraction of a
+        cell's own innovation that reaches that same cell's state. For a scalar Kalman filter it
+        would be exactly P/(P+R); here it is the closest interpretable scalar.
+        """
+        N = self.ensemble_size
+        HW = self.grid_size[0] * self.grid_size[1]
+        m = len(obs_idx)
+        ens_diag = (Y_ano ** 2).sum(axis=0) / (N - 1)          # diag of the ensemble term
+        self_gain = K[obs_idx, np.arange(m)]                   # (m,)
+        chan = obs_idx // HW                                   # which of the 4 fields each row is
+        innov = y_obs - Y_f.mean(axis=0)                       # the mean innovation
+        incr = K @ innov                                       # what the analysis actually moves
+        row = {"m": int(m),
+               "reg": float(regularization),
+               "incr_norm": float(np.linalg.norm(incr)),
+               "state_norm": float(np.linalg.norm(X_f.mean(axis=0))),
+               "innov_norm": float(np.linalg.norm(innov)),
+               "bias_norm": float(np.linalg.norm(self.bias_estimate)),
+               "per_channel": {}}
+        for c in range(self.num_features):
+            sel = chan == c
+            if not sel.any():
+                continue
+            e, r = float(ens_diag[sel].mean()), float(r_diag[sel].mean())
+            row["per_channel"][c] = {
+                "ens": e, "R": r,
+                "ens_frac": e / (e + r + regularization),
+                "self_gain_mean": float(self_gain[sel].mean()),
+                "self_gain_max": float(np.abs(self_gain[sel]).max()),
+            }
+        self.gain_stats.append(row)
 
     def _localization_matrix_ref(self, obs_cells):
         """ORIGINAL implementation, kept verbatim as the correctness reference.
@@ -518,7 +600,20 @@ class LocalizedEnsembleKalmanFilter:
             # (nothing on the grid is within the radius), which is exactly why the active-column
             # shortcut in the "ensemble" gain mode pays off so well here. This is the behaviour
             # every published number was produced with, so it stays.
-            observed_cells = np.stack((obs_idx // W, obs_idx % W), axis=1)
+            #
+            # MEASURED CONSEQUENCE (checks/diag_gain_census.py): with H=36 and radius=7 this
+            # zeroes the gain for 100% of the vx / vy / var observation rows and leaves only
+            # density assimilated -- the self-gain K[own state index, own observation] is
+            # exactly 0.0 for those three fields, on every frame, because the fallback moves
+            # each observation's centre f*H rows away from its own cell. Every EnKF number in
+            # this repo, and in the upstream paper, was produced by a filter that assimilated
+            # one of its four fields. fix_localization=True restores the intended mapping by
+            # putting back the feature-block division the reference dropped:
+            #     i = f*HW + r*W + c   ->   r = (i % HW) // W,   c = i % W
+            # which is exactly the decode GeneratePartialObs.reconstruct_observation() already
+            # does correctly in the same file. Off by default; the published path is untouched.
+            rows = ((obs_idx % HW) // W) if self.fix_localization else (obs_idx // W)
+            observed_cells = np.stack((rows, obs_idx % W), axis=1)
 
         # Localization, as one (m, H*W) block; the (m, state_dim) tile is never materialised.
         Loc_w = self._localization_weights(observed_cells)
@@ -568,6 +663,10 @@ class LocalizedEnsembleKalmanFilter:
             # summation order and so the last bits. The perturbation draws are unchanged --
             # RandomState fills row-major, so one (N, m) draw would give the same numbers, but
             # the matmul that would justify it is what breaks identity, not the draw.
+            if self.collect_stats:
+                self._record_gain_stats(K, P_yy, Y_ano, r_diag, regularization, obs_idx, Y_f,
+                                        y_obs, X_f)
+
             X_a = np.empty_like(X_f)
             for i in range(N):
                 perturbed_y = y_obs + self.rng.normal(0, r_sqrt)
@@ -575,6 +674,15 @@ class LocalizedEnsembleKalmanFilter:
         else:
             X_a = self._update_ensemble_space(X_f, Y_f, X_ano, Y_ano, y_obs,
                                              Loc_w, r_diag, r_sqrt, regularization)
+
+        if not self.use_gain:
+            # Diagnostic arm (use_gain=False): drop the Kalman increment but keep everything
+            # that produced it. The perturbation draws above are still consumed, so this arm
+            # sees the identical RNG stream to the use_gain=True arm and the two differ ONLY in
+            # whether the increment is applied -- a paired comparison, not two separate runs.
+            # bias_estimate has already been accumulated above, so use_gain=False + use_bias=True
+            # isolates the non-standard bias path on its own.
+            X_a = X_f.copy()
 
         # Inflation: X_mean + inflation*(X_a - X_mean), in place, two temporaries fewer.
         X_mean = np.mean(X_a, axis=0)

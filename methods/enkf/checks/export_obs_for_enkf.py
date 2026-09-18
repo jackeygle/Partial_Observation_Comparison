@@ -62,7 +62,7 @@ def main():
         X = np.asarray(X)[args.start:] if args.frames <= 0 else \
             np.asarray(X)[args.start:args.start + args.frames]
         valid = nav.build_valid_mask_from_config(X)
-        out = om.generate_observations(X, add_noise=True, valid_mask=valid,
+        out = om.generate_observations(X, add_noise=True, seed=om.day_seed(d), valid_mask=valid,
                                        obs_every_k=args.obs_every_k)
         # observation-based initial fill (same X0 the 4DVarNet solver starts from);
         # the EnKF is initialised from this too, so NEITHER method sees ground truth at t=0.

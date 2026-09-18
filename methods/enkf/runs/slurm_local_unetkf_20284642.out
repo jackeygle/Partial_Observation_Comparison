@@ -1,0 +1,87 @@
+NVIDIA H200, 143771 MiB
+[train] 51,200/1,262,486 pairs
+[train] 102,400/1,262,486 pairs
+[train] 153,600/1,262,486 pairs
+[train] 204,800/1,262,486 pairs
+[train] 256,000/1,262,486 pairs
+[train] 307,200/1,262,486 pairs
+[train] 358,400/1,262,486 pairs
+[train] 409,600/1,262,486 pairs
+[train] 460,800/1,262,486 pairs
+[train] 512,000/1,262,486 pairs
+[train] 563,200/1,262,486 pairs
+[train] 614,400/1,262,486 pairs
+[train] 665,600/1,262,486 pairs
+[train] 716,800/1,262,486 pairs
+[train] 768,000/1,262,486 pairs
+[train] 819,200/1,262,486 pairs
+[train] 870,400/1,262,486 pairs
+[train] 921,600/1,262,486 pairs
+[train] 972,800/1,262,486 pairs
+[train] 1,024,000/1,262,486 pairs
+[train] 1,075,200/1,262,486 pairs
+[train] 1,126,400/1,262,486 pairs
+[train] 1,177,600/1,262,486 pairs
+[train] 1,228,800/1,262,486 pairs
+[train] 1,262,486/1,262,486 pairs
+[valid] 51,200/269,736 pairs
+[valid] 102,400/269,736 pairs
+[valid] 153,600/269,736 pairs
+[valid] 204,800/269,736 pairs
+[valid] 256,000/269,736 pairs
+[valid] 269,736/269,736 pairs
+{
+  "train": {
+    "density": {
+      "forecast_rmse": 0.060488585382571416,
+      "bias_rms": 0.002948918457582043,
+      "bias_ratio": 0.04875165188491439,
+      "intrinsic_centered_rmse": 0.060416660297596424
+    },
+    "vx": {
+      "forecast_rmse": 0.20716493110700074,
+      "bias_rms": 0.025018605624693983,
+      "bias_ratio": 0.12076660606119607,
+      "intrinsic_centered_rmse": 0.20564867627379563
+    },
+    "vy": {
+      "forecast_rmse": 0.11948880700819835,
+      "bias_rms": 0.009130951658570712,
+      "bias_ratio": 0.07641679490485014,
+      "intrinsic_centered_rmse": 0.11913941716346994
+    },
+    "var": {
+      "forecast_rmse": 0.09528767726685129,
+      "bias_rms": 0.024510424478657034,
+      "bias_ratio": 0.2572255425013254,
+      "intrinsic_centered_rmse": 0.09208137993529235
+    }
+  },
+  "valid": {
+    "density": {
+      "forecast_rmse": 0.05748922883014172,
+      "bias_rms": 0.003572505135152576,
+      "bias_ratio": 0.06214216485157484,
+      "intrinsic_centered_rmse": 0.05737811985891231
+    },
+    "vx": {
+      "forecast_rmse": 0.20015690915158085,
+      "bias_rms": 0.027886142152634675,
+      "bias_ratio": 0.1393214067445267,
+      "intrinsic_centered_rmse": 0.198204821729839
+    },
+    "vy": {
+      "forecast_rmse": 0.11023019917387038,
+      "bias_rms": 0.012067114874543575,
+      "bias_ratio": 0.10947195020041328,
+      "intrinsic_centered_rmse": 0.10956770303568339
+    },
+    "var": {
+      "forecast_rmse": 0.08838338074132,
+      "bias_rms": 0.02276773573679666,
+      "bias_ratio": 0.25760200103041025,
+      "intrinsic_centered_rmse": 0.08540053981494805
+    }
+  }
+}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias

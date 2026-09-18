@@ -1,0 +1,18 @@
+  [k=1] est_atc-20130616.npz
+
+[k=1] 1 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.1594   0.0397   3.665e+00   0.0384   0.241   89.74%
+blind                   0.1832   0.0482   1.943e+00   0.0418   0.228   88.24%
+observed                0.1270   0.0300   5.619e+00   0.0346   0.273   91.45%
+defined                 0.2788   0.1016   1.994e+01   0.0567   0.203   75.22%
+defined_blind           0.3665   0.1598   1.878e+01   0.0744   0.203   66.24%
+defined_observed        0.1992   0.0625   2.071e+01   0.0448   0.225   81.26%
+walkable                0.1907   0.0551   6.841e+00   0.0507   0.266   87.12%
+walkable_blind          0.2417   0.0807   5.854e+00   0.0649   0.268   82.73%
+channel_density         0.1357   0.0341   5.297e+00   0.0233   0.172   85.87%
+channel_vx              0.2600   0.0824   2.494e+00   0.0729   0.280   88.12%
+channel_vy              0.1050   0.0310  -7.637e-01   0.0458   0.437   92.87%
+channel_var             0.0675   0.0111   7.632e+00   0.0116   0.172   92.11%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/uncertainty_lowrank_a_r32_alpha05_0616.json
+

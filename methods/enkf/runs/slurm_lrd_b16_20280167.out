@@ -1,0 +1,46 @@
+NVIDIA H200
+{
+  "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/lowrank_r16_s0/best.pt",
+  "mean_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+  "rank": 16,
+  "pairs": 4096,
+  "normalized_mse": {
+    "mean": {
+      "all": 0.12448311304150887,
+      "blind": 0.09433719050445062,
+      "observed": 0.1622056453422409
+    },
+    "diagonal": {
+      "all": 0.058062397322877005,
+      "blind": 0.09433719050445062,
+      "observed": 0.01267061819214563
+    },
+    "full": {
+      "all": 0.04318416992709971,
+      "blind": 0.06833069146516171,
+      "observed": 0.011717543891538802
+    },
+    "fixed-diagonal": {
+      "all": 0.0675983086742528,
+      "blind": 0.07372177590250034,
+      "observed": 0.05993582330741473
+    }
+  },
+  "covariance": {
+    "lowrank_trace_fraction": 0.956961250323062,
+    "effective_rank_mean": 1.4615414655135097,
+    "numerical_rank_mean_threshold_1e-3": 2.9658203125,
+    "lowrank_variance_mean_by_channel": [
+      0.036094521630984755,
+      0.6648838587482439,
+      0.10219131884047303,
+      0.021020100994284183
+    ],
+    "diagonal_variance_mean_by_channel": [
+      0.001764212482818402,
+      0.025881433292929426,
+      0.007089584119308185,
+      0.002332204638704011
+    ]
+  }
+}

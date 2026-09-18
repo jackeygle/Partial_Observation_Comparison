@@ -1,0 +1,6 @@
+Tesla V100-SXM2-32GB
+[data] train=507, valid=507, load=0.3s, device=cuda, frames=5->1
+[init] covariance=/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/covonly_pedpred5_raw_floor05_r32_s0/best.pt
+[objective] pure gaussian likelihood; target=raw; scope=walkable; floor_fraction=0.05; anchor=0; marginal=0.02; marginal_likelihood=student-t; marginal_df=5; Kalman update=disabled
+{"epoch": 0, "lr": 1e-05, "skipped": 0, "seconds": 1.7, "train": {"loss": -1.723534831398808, "likelihood": -1.687898905554702, "diagonal_mean": 0.013555457635508958, "lowrank_diagonal_mean": 0.0013416378207310035, "anchor_penalty": 0.0, "marginal_penalty": -1.7817959924186242}, "valid": {"loss": -1.5003152638673782, "likelihood": -1.471384197473526, "diagonal_mean": 0.01900294190272689, "lowrank_diagonal_mean": 0.0028700623370241374, "anchor_penalty": 0.0, "marginal_penalty": -1.4465539306402206}}
+[done] best validation NLL=-1.50032 -> /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/_smoke_robustmarg_df5_w002/best.pt

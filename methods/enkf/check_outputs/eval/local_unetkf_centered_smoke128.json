@@ -1,0 +1,65 @@
+{
+  "config": {
+    "checkpoint": "methods/enkf/runs/local_unetkf_centered_s0/best.pt",
+    "covariance": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_static/static_covariance.npz",
+    "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+    "pairs": 128,
+    "rank": 64,
+    "patch_batch": 1024,
+    "seed": 0,
+    "days": 0,
+    "max_frames": 0,
+    "out": "methods/enkf/check_outputs/eval/local_unetkf_centered_smoke128.json",
+    "allow_cpu": false
+  },
+  "target": "centered",
+  "rank": 64,
+  "pairs": 128,
+  "seconds": 3.015,
+  "normalized_rmse": {
+    "mean": {
+      "all": 0.34266232581766376,
+      "observed": 0.38270561250816354,
+      "blind": 0.3074144348854077,
+      "walkable_blind": 0.3963495190766978
+    },
+    "dynamic_diagonal": {
+      "all": 0.29224806258914854,
+      "observed": 0.2718092499212929,
+      "blind": 0.3074144348854077,
+      "walkable_blind": 0.3963495190766978
+    },
+    "dynamic_spectral": {
+      "all": 0.29103949074213264,
+      "observed": 0.2691081241932351,
+      "blind": 0.3072380064460601,
+      "walkable_blind": 0.39611704006334825
+    }
+  },
+  "projection_diagnostics": {
+    "asymmetry": 0.842662877868861,
+    "negative_spectral_fraction": 0.06201171875,
+    "spectral_trace": 0.33120694872923195,
+    "diagonal_trace": 0.6972272493876517
+  },
+  "train_args": {
+    "target": "centered",
+    "mean_ckpt": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+    "bias_file": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/local_unetkf_bias/bias_maps.npz",
+    "out": "methods/enkf/runs/local_unetkf_centered_s0",
+    "patch_size": 15,
+    "width": 32,
+    "epochs": 20,
+    "frame_batch": 16,
+    "centres_per_frame": 4,
+    "train_pairs_per_epoch": 131072,
+    "eval_pairs": 4096,
+    "lr": 0.002,
+    "diag_penalty": 0.1,
+    "seed": 0,
+    "days": 0,
+    "max_frames": 0,
+    "resume": false,
+    "allow_cpu": false
+  }
+}

@@ -1,0 +1,15 @@
+[load] atc-20130811 -> 2000 frames in 2.1s
+[arms] ['B_bias_only']   scale=0.01 ensemble=100 radius=7
+      [scale=0.01] frame 200/2000  0.20 s/frame  eta 6 min
+      [scale=0.01] frame 400/2000  0.19 s/frame  eta 5 min
+      [scale=0.01] frame 600/2000  0.19 s/frame  eta 4 min
+      [scale=0.01] frame 800/2000  0.19 s/frame  eta 4 min
+      [scale=0.01] frame 1000/2000  0.18 s/frame  eta 3 min
+      [scale=0.01] frame 1200/2000  0.19 s/frame  eta 3 min
+      [scale=0.01] frame 1400/2000  0.19 s/frame  eta 2 min
+      [scale=0.01] frame 1600/2000  0.19 s/frame  eta 1 min
+      [scale=0.01] frame 1800/2000  0.19 s/frame  eta 1 min
+  B_bias_only        rmse 0.1898  sigma 0.00265  spread/skill 0.0140   (389.0s)
+      density 0.0767  vx 0.3016  vy 0.1089  var 0.1883
+
+[out] methods/enkf/check_outputs/eval/correction_paths_B_bias_only_FIXED.json

@@ -1,0 +1,45 @@
+{
+  "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/lowrank_a_r32_s0/best.pt",
+  "mean_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/surrogate_mean_s0/best.pt",
+  "rank": 32,
+  "pairs": 4096,
+  "normalized_mse": {
+    "mean": {
+      "all": 0.12448311304150887,
+      "blind": 0.09433719050445062,
+      "observed": 0.1622056453422409
+    },
+    "diagonal": {
+      "all": 0.05826425600110357,
+      "blind": 0.09433719050445062,
+      "observed": 0.013125068924910397
+    },
+    "full": {
+      "all": 0.042254959834874706,
+      "blind": 0.06675175102778125,
+      "observed": 0.011601361627596856
+    },
+    "fixed-diagonal": {
+      "all": 0.06929414232504788,
+      "blind": 0.07677823864896276,
+      "observed": 0.05992905936984503
+    }
+  },
+  "covariance": {
+    "lowrank_trace_fraction": 0.962788680952921,
+    "effective_rank_mean": 1.1690220656041292,
+    "numerical_rank_mean_threshold_1e-3": 2.641845703125,
+    "lowrank_variance_mean_by_channel": [
+      0.0368348301176111,
+      0.6673789986366332,
+      0.10450766622236284,
+      0.021065221258152453
+    ],
+    "diagonal_variance_mean_by_channel": [
+      0.001629851392619307,
+      0.02278472276414837,
+      0.006475424139316251,
+      0.0011808588397505752
+    ]
+  }
+}

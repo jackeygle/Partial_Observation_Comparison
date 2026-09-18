@@ -1,0 +1,1 @@
+{"epoch": 0, "lr": 0.001, "skipped": 0, "seconds": 1.0, "train": {"nll": -0.2797842326117497, "diagonal_mean": 0.21658019183897503, "lowrank_diagonal_mean": 5.769145602743283e-06}, "valid": {"nll": -0.21839426271617413, "diagonal_mean": 0.20551302284002304, "lowrank_diagonal_mean": 4.977073785994435e-06}}
