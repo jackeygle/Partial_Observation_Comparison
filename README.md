@@ -408,14 +408,6 @@ earlier and dropped entirely on 2026-09-08.
 
 ## Sanity checks before committing to a long run
 
-Fastest possible (seconds, no GPU, no real data — synthetic tensors through the
-4DVarNet solver, confirms imports and that both uncertainty designs produce
-finite gradients):
-
-```bash
-python3 -m methods.varnet.scratch.smoke_aug
-```
-
 With real data (needs a GPU; a few minutes each):
 
 ```bash

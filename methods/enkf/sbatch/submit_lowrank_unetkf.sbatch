@@ -31,7 +31,7 @@ shift || true
 child=""
 relayed=0
 relay() {
-  if [[ ("$mode" == "train" || "$mode" == "cov-train") && "$relayed" -eq 0 ]]; then
+  if [[ "$mode" == "train" && "$relayed" -eq 0 ]]; then
     relayed=1
     echo "[relay] time limit approaching; submitting continuation with --resume" >&2
     # sbatch records the caller's current directory as SLURM_SUBMIT_DIR.  The
@@ -49,16 +49,13 @@ trap relay USR1
 
 case "$mode" in
   train) python3 -u -m methods.enkf.lowrank.train "$@" & child=$! ;;
-  cov-train) python3 -u -m methods.enkf.covariance_only.train "$@" & child=$! ;;
   eval)  python3 -u -m methods.enkf.checks.run_lowrank_unetkf "$@" & child=$! ;;
   diagnose) python3 -u -m methods.enkf.checks.diagnose_lowrank_covariance "$@" & child=$! ;;
-  conditional) python3 -u -m methods.enkf.checks.test_conditional_covariance "$@" & child=$! ;;
   blind-sweep) python3 -u -m methods.enkf.checks.sweep_blind_inflation "$@" & child=$! ;;
   pedpred5-sequential) python3 -u -m methods.enkf.checks.eval_pedpred5_sequential "$@" & child=$! ;;
   visualize) python3 -u -m methods.enkf.checks.visualize_covariance "$@" & child=$! ;;
-  sweep) python3 -u -m methods.enkf.checks.sweep_lowrank_calibration "$@" & child=$! ;;
   compare) python3 -u -m methods.enkf.checks.compare_joint_uncertainty "$@" & child=$! ;;
   check) python3 -u -m methods.enkf.checks.check_lowrank_kalman "$@" & child=$! ;;
-  *) echo "usage: $0 {train|cov-train|eval|diagnose|conditional|blind-sweep|pedpred5-sequential|visualize|sweep|compare|check} [arguments...]" >&2; exit 2 ;;
+  *) echo "usage: $0 {train|eval|diagnose|blind-sweep|pedpred5-sequential|visualize|compare|check} [arguments...]" >&2; exit 2 ;;
 esac
 wait "$child"

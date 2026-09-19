@@ -88,29 +88,6 @@ Formal jobs request three hours. Five minutes before the limit, the batch script
 automatically submits the same command with `--resume`; the last completed epoch is
 restored from `last.pt`, so long runs continue across allocations without manual work.
 
-## Paper-style local covariance experiment
-
-`local_unetkf/` is a separate implementation of Lu's covariance-supervision idea.  Its
-teacher is PedPred3's actual one-step forecast error rather than the collapsed legacy
-ensemble.  The first gate audits systematic mean bias, then compares raw second-moment
-and bias-centered climatological local covariance before any U-Net is trained:
-
-```text
-error_raw      = truth[t+1] - PedPred3(x_t)
-error_centered = error_raw - train_bias[channel,y,x]
-target[p,a,q,b] = error[p,a] * error[q,b]
-```
-
-The local window is `15x15` (radius 7, with a unique centre) and retains all 16 directed
-channel pairs.  Boundary padding has an explicit validity mask.  Run the exact target
-checks and the two formal H200 stages with:
-
-```bash
-python3 -m methods.enkf.checks.check_local_covariance_targets
-job=$(sbatch --parsable methods/enkf/sbatch/submit_local_unetkf.sbatch audit)
-sbatch --dependency=afterok:$job methods/enkf/sbatch/submit_local_unetkf.sbatch static
-```
-
 ## The ensemble-collapse finding
 
 The EnKF's uncertainty **is** its ensemble spread, and that spread collapses to
