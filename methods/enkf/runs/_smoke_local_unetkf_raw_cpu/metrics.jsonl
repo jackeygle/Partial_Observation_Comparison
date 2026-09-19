@@ -1,1 +1,0 @@
-{"epoch": 0, "seconds": 21.27, "lr": 0.002, "train": {"loss": 0.03534678928554058, "covariance_mse": 0.03428289107978344, "negative_diag_penalty": 0.010638977866619825}, "valid": {"loss": 0.03513938933610916, "covariance_mse": 0.03430634364485741, "negative_diag_penalty": 0.008330447599291801}}

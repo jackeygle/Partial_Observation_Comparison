@@ -1,1 +1,0 @@
-{"epoch": 0, "lr": 0.001, "skipped": 0, "seconds": 0.8, "train": {"loss": 0.03499689255567158, "analysis_mse_norm": 0.03527451718554777, "forecast_nll": -0.27762479256181155, "blind_mse_norm": 0.01615211022835152}, "valid": {"loss": 0.04702452849596739, "analysis_mse_norm": 0.04729563184082508, "forecast_nll": -0.27110299468040466, "blind_mse_norm": 0.03780924715101719}}
