@@ -36,6 +36,10 @@ def parse_args():
     p.add_argument("--skip-old", action="store_true")
     p.add_argument("--skip-mean", action="store_true")
     p.add_argument("--out", required=True)
+    p.add_argument("--export-npz", default="",
+                   help="directory to write est_<day>.npz (Est/Spread) into, in the "
+                        "layout compare/plot_reconstruction_sequence.py reads; only "
+                        "valid when the arguments select a single variant")
     p.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     return p.parse_args()
 
@@ -135,6 +139,7 @@ def main():
     static_mask = torch.from_numpy(walkable).to(device)
     loaded = {name: load_models(path, device) for name, path in checkpoints.items()}
     results = {}
+    exported = None
     for (name, criterion, factor_scale, diagonal_scale, mode, blind_gamma,
          empty_gamma) in variants:
         mean_net, cov_net, train_args, mean_path = loaded[name]
@@ -166,6 +171,27 @@ def main():
         print(json.dumps({"variant": label, "rmse": key["rmse"],
                           "crps": key["crps"], "spread_skill": key["spread_skill"]}),
               flush=True)
+
+        if args.export_npz:
+            # compare/plot_reconstruction_sequence.py reads one est_<day>.npz per
+            # directory, so exporting a second variant here would silently replace
+            # the first and mislabel whatever gets plotted.
+            if exported is not None:
+                raise SystemExit(
+                    f"--export-npz takes a single variant; {exported!r} was already "
+                    f"written and {label!r} would overwrite it. Narrow --blind-gammas "
+                    f"/--blind-empty-gammas, or run one configuration per export.")
+            exported = label
+            day = Path(args.obs).stem.replace("obs_", "")
+            export_dir = Path(args.export_npz)
+            export_dir.mkdir(parents=True, exist_ok=True)
+            np.savez(export_dir / f"est_{day}.npz", Est=estimate, Spread=spread)
+            (export_dir / f"est_{day}.source.json").write_text(json.dumps({
+                "variant": label, "produced_by": "eval_pedpred5_sequential.py",
+                "obs": args.obs, "frames": total,
+                "new_checkpoint": args.new_checkpoint,
+            }, indent=2) + "\n")
+            print(f"[export] {export_dir / f'est_{day}.npz'}  variant={label}", flush=True)
 
     output = {
         "config": vars(args), "frames": total, "warmup": args.warmup,

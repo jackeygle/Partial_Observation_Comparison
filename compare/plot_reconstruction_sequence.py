@@ -51,6 +51,15 @@ from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from crowdcore import paths
 
+# Set from --trajectory-mode. None follows crowdcore's configured default; the
+# override exists because the EnKF-style exports this script reads were produced
+# before per_day routes, so matching them takes an explicit "fixed".
+TRAJECTORY_MODE = None
+
+
+def day_seed(day_file):
+    return om.day_seed(day_file, trajectory_mode=TRAJECTORY_MODE)
+
 from methods.varnet.checks.model_io import load_solver, baseline_ckpt
 from methods.dincae.checks.evaluate import load_models as dincae_load_models, \
     predict_day as dincae_predict_day, clip_bounds as dincae_clip_bounds
@@ -91,7 +100,7 @@ def block_varnet(ckpt, X, start, N, dev, day_file):
     dT = a["dT"]
     assert N % dT == 0, f"--n must be a multiple of 4DVarNet's dT={dT} (got {N})"
     Xb = X[start:start + N]
-    out = om.generate_observations(Xb, add_noise=True, seed=om.day_seed(day_file),
+    out = om.generate_observations(Xb, add_noise=True, seed=day_seed(day_file),
                                    valid_mask=nav.build_valid_mask_from_config(Xb))
     x0 = om.fill_missing_state(out["Y"], out["Omega_c"], method=config.get("observation", "init_method"))
     win = lambda arr: om.to_windows(arr, dT)
@@ -130,7 +139,7 @@ def block_dincae(run_dir, ckpt, day_file, start, N, dev):
 def block_senseiver(ckpt, day_file, start, N, batch, dev):
     model, ck = senseiver_load_model(ckpt, dev)
     k = ck["args"].get("obs_every_k") or sds.obs_config()["obs_every_k"]
-    X, Y, Om = sds.load_day(day_file, stride=1, seed=om.day_seed(day_file), frames=start + N, obs_every_k=k)
+    X, Y, Om = sds.load_day(day_file, stride=1, seed=day_seed(day_file), frames=start + N, obs_every_k=k)
     pe = model.pos_enc.detach().cpu().numpy()
     mean = model.in_mean.detach().cpu().numpy()
     std = model.in_std.detach().cpu().numpy()
@@ -186,8 +195,21 @@ def main():
                     help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
     ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
+    ap.add_argument("--enkf-label", default="EnKF",
+                    help="panel title for whatever --enkf-dir holds; set it when the "
+                         "export is not the plain EnKF filter")
+    ap.add_argument("--spread-vmax", type=float, default=0.0,
+                    help="upper end of the spread panel's colour scale; 0 takes the "
+                         "sequence's 99th percentile. Set it explicitly to the same "
+                         "value for every model being compared")
+    ap.add_argument("--trajectory-mode", default=None, choices=("fixed", "per_day"),
+                    help="robot-route seeding for the observations this script "
+                         "simulates; default follows crowdcore's config")
     ap.add_argument("--outdir", default="")
     args = ap.parse_args()
+
+    global TRAJECTORY_MODE
+    TRAJECTORY_MODE = args.trajectory_mode
 
     methods = [m.strip() for m in args.methods.split(",") if m.strip()]
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -212,7 +234,7 @@ def main():
     print(f"[seq] day={args.day} methods={methods} frames [{start}, {start+N}) = {N} frames", flush=True)
 
     X = Xall[start:start + N]
-    out = om.generate_observations(X, add_noise=True, seed=om.day_seed(day_file),
+    out = om.generate_observations(X, add_noise=True, seed=day_seed(day_file),
                                    valid_mask=nav.build_valid_mask_from_config(X))
     Omega, obs = out["Omega"], out["Y"].copy()
     vmax = max(0.3, float(np.percentile(X[:, 0], 99)))
@@ -237,7 +259,16 @@ def main():
     if "enkf" in methods:
         print("[seq] loading EnKF export ...", flush=True)
         est, spread = block_enkf(args.enkf_dir, args.day, start, N)
-        recon["EnKF"] = clip_np(est)                     # est is already (N,4,H,W)
+        recon[args.enkf_label] = clip_np(est)            # est is already (N,4,H,W)
+    # One scale for the whole sequence, never per frame: matplotlib's autoscale
+    # would rescale every frame to its own maximum, so a quiet frame and a busy
+    # one look equally red (measured 4.3x between the quietest and busiest frame)
+    # and the panel stops saying anything about the absolute spread. Pass
+    # --spread-vmax to hold it fixed across models, which a comparison needs.
+    if spread is not None:
+        spread_vmax = args.spread_vmax or float(np.percentile(np.nan_to_num(spread), 99))
+        print(f"[seq] spread colour scale: vmin=0 vmax={spread_vmax:.4f}"
+              f"{' (given)' if args.spread_vmax else ' (p99 over the sequence)'}", flush=True)
 
     outdir = args.outdir or os.path.join(paths.COMPARE, "results", f"seq_ppt_{args.day}")
     os.makedirs(outdir, exist_ok=True)
@@ -252,8 +283,9 @@ def main():
         if spread is not None:
             axes[-1].cla()
             sp = np.nan_to_num(spread[t])
-            axes[-1].imshow(sp, cmap="Reds", origin="upper", aspect="equal")
-            axes[-1].set_title("EnKF spread", fontsize=11); axes[-1].set_xticks([]); axes[-1].set_yticks([])
+            axes[-1].imshow(sp, cmap="Reds", origin="upper", aspect="equal",
+                            vmin=0, vmax=spread_vmax)
+            axes[-1].set_title(f"{args.enkf_label} spread", fontsize=11); axes[-1].set_xticks([]); axes[-1].set_yticks([])
         obs_flag = "OBS" if Omega[t].any() else "no obs this frame"
         fig.suptitle(f"{args.day}  frame {start+t}  (seq {t:05d}/{N})   [{obs_flag}]", fontsize=11)
         fig.savefig(os.path.join(outdir, f"frame_{t:05d}.png"), dpi=100, bbox_inches="tight")
