@@ -16,7 +16,7 @@ import numpy as np
 import torch
 
 from crowdcore import config, navigation
-from methods.enkf.lowrank.kalman import analysis_update, gaussian_nll
+from methods.enkf.lowrank.kalman import analysis_update
 from methods.enkf.lowrank.model import CovarianceUNet, STATE_SCALE
 from methods.enkf.surrogate.data import PairFrames
 from methods.enkf.surrogate.model import load_pedpred3, surrogate_mean
@@ -28,9 +28,8 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--mean-ckpt", default=os.path.join(HERE, "runs/surrogate_mean_s0/best.pt"))
     p.add_argument("--cov-ckpt", default="", help="initialize covariance U-Net from a checkpoint")
-    p.add_argument("--mean-train", choices=("frozen", "head", "full"), default="frozen")
+    p.add_argument("--mean-train", choices=("frozen", "full"), default="frozen")
     p.add_argument("--mean-lr", type=float, default=1e-5)
-    p.add_argument("--forecast-weight", type=float, default=0.0)
     p.add_argument("--input-frames", type=int, default=1,
                    help="causal state-history length consumed by PedPred3")
     p.add_argument("--rank", type=int, default=16)
@@ -38,7 +37,6 @@ def parse_args():
     p.add_argument("--epochs", type=int, default=20)
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-3)
-    p.add_argument("--nll-weight", type=float, default=0.01)
     p.add_argument("--num-agents", type=int, default=3)
     p.add_argument("--sensing-radius", type=float, default=7.0)
     p.add_argument("--days", type=int, default=0, help="debug: first N days per split")
@@ -81,21 +79,15 @@ def batch_loss(cov_net, mean_net, x, target, obs_std, static_mask, masks, genera
     scale = torch.as_tensor(STATE_SCALE, device=target.device, dtype=target.dtype).view(1, -1, 1, 1)
     sq = ((analysis - target_grid) / scale).square()
     analysis_loss = sq.mean()
+    # Reported as a diagnostic only: the objective is the analysis error alone.
+    # A forecast-MSE term and a forecast-NLL term were both swept and neither
+    # earned its place -- see the README's provenance table.
     forecast_loss = ((mean - target_grid) / scale).square().mean()
-    # Experiment A is the pure end-to-end analysis objective.  Do not merely
-    # multiply NLL by zero: evaluating it would still perform its Cholesky
-    # factorisation and can fail even though it contributes no gradient/loss.
-    if args.nll_weight:
-        nll = gaussian_nll(target_grid, mean, factor, diagonal)
-    else:
-        nll = analysis_loss.new_zeros(())
     blind = (~mask)[:, None].expand_as(sq)
     observed = mask[:, None].expand_as(sq)
     blind_mse = sq[blind].mean() if blind.any() else sq.new_zeros(())
     observed_mse = sq[observed].mean() if observed.any() else sq.new_zeros(())
-    total = (analysis_loss + args.nll_weight * nll
-             + args.forecast_weight * forecast_loss)
-    return total, analysis_loss, forecast_loss, nll, blind_mse, observed_mse
+    return analysis_loss, analysis_loss, forecast_loss, blind_mse, observed_mse
 
 
 def main():
@@ -120,10 +112,7 @@ def main():
     mean_net = load_pedpred3(args.mean_ckpt, device).eval()
     for parameter in mean_net.parameters():
         parameter.requires_grad_(False)
-    if args.mean_train == "head":
-        for parameter in mean_net.forecaster[9].parameters():
-            parameter.requires_grad_(True)
-    elif args.mean_train == "full":
+    if args.mean_train == "full":
         for parameter in mean_net.parameters():
             parameter.requires_grad_(True)
     cov_net = CovarianceUNet(rank=args.rank, width=args.width).to(device)
@@ -143,7 +132,7 @@ def main():
     print(f"[mask] {len(masks)} legal centers, random-union coverage proxy; static walkable "
           f"cells={int(static_mask.sum())}", flush=True)
     print(f"[joint] mean_train={args.mean_train}; cov_lr={args.lr:g}; "
-          f"mean_lr={args.mean_lr:g}; forecast_weight={args.forecast_weight:g}; "
+          f"mean_lr={args.mean_lr:g}; "
           f"input_frames={args.input_frames}; cov_init={args.cov_ckpt or 'random'}", flush=True)
     start, best = 0, float("inf")
     last_path, best_path = os.path.join(out, "last.pt"), os.path.join(out, "best.pt")
@@ -202,9 +191,9 @@ def main():
             "mean_lr": (optimizer.param_groups[1]["lr"] if len(optimizer.param_groups) > 1 else 0.0),
             "skipped": skipped,
             "seconds": round(time.time() - tic, 1),
-            "train": dict(zip(("loss", "analysis_mse_norm", "forecast_mse_norm", "forecast_nll",
+            "train": dict(zip(("loss", "analysis_mse_norm", "forecast_mse_norm",
                                 "blind_mse_norm", "observed_mse_norm"), train_metrics)),
-            "valid": dict(zip(("loss", "analysis_mse_norm", "forecast_mse_norm", "forecast_nll",
+            "valid": dict(zip(("loss", "analysis_mse_norm", "forecast_mse_norm",
                                 "blind_mse_norm", "observed_mse_norm"), val_metrics)),
         }
         print(json.dumps(record), flush=True)

@@ -36,7 +36,7 @@ import torch
 
 from methods.senseiver import dataset as ds
 from methods.senseiver import sensors
-from methods.senseiver.losses import diagnostics, history_aware_loss, senseiver_loss
+from methods.senseiver.losses import diagnostics, senseiver_loss
 from methods.senseiver.network import Senseiver
 
 
@@ -118,11 +118,10 @@ def main():
     ap.add_argument("--dec-num-cross-attention-heads", type=int, default=1)
     ap.add_argument("--dropout", type=float, default=0.0)
     # Variant G (grid latent) -- an extension, not part of the reference implementation
-    ap.add_argument("--latent-mode", choices=["abstract", "grid", "hierarchical"],
+    ap.add_argument("--latent-mode", choices=["abstract", "grid"],
                     default="abstract",
                     help="abstract = the reference's 64 learnable latents (variant A); "
-                         "grid = one latent token per grid cell (variant G); "
-                         "hierarchical = 9x3 -> 18x6 -> 36x12 grid latents (H3)")
+                         "grid = one latent token per grid cell (variant G)")
     ap.add_argument("--readout", choices=["decoder", "direct"], default="decoder",
                     help="decoder = the reference's query decoder; direct = each cell's "
                          "token -> Linear -> its 4 values (needs --latent-mode grid)")
@@ -133,30 +132,10 @@ def main():
     ap.add_argument("--time-dim", type=int, default=8, help="size of the Δ embedding")
     ap.add_argument("--no-time-scalar", dest="time_scalar", action="store_false",
                     help="drop the Δ/k scalar that gives the embedding its order")
-    ap.add_argument("--temporal-mixer", choices=["token_set", "advected_tokens", "ssm", "framewise"],
-                    default="token_set",
-                    help="token_set = baseline flattened temporal tokens; "
-                         "advected_tokens = move historical token coordinates by Δt*v; "
-                         "ssm = per-cell state-space scan over the time window; "
-                         "framewise = shared per-frame spatial encoding then learned "
-                         "residual temporal fusion")
-    ap.add_argument("--spatial-attention", choices=["global", "geodesic"],
-                    default="global",
-                    help="global = baseline attention; geodesic = add a fixed-strength "
-                         "obstacle-aware shortest-path bias")
-    ap.add_argument("--ssm-hidden-ch", type=int, default=41,
-                    help="41 exactly parameter-matches the k=16 token-set baseline")
-    ap.add_argument("--geodesic-scale", type=float, default=1.0,
-                    help="fixed multiplier on max-normalised shortest-path distance")
-    ap.add_argument("--advection-tau", type=float, default=3.0,
-                    help="seconds; velocity displacement is dt*exp(-dt/tau)*v")
     # Training
     ap.add_argument("--epochs", type=int, default=100)
     ap.add_argument("--batch", type=int, default=64)
     ap.add_argument("--lr", type=float, default=1e-3)
-    ap.add_argument("--history-loss-weight", type=float, default=0.0,
-                    help="extra per-element weight for cells blind now but seen earlier "
-                         "in the temporal window (0 keeps the baseline objective)")
     ap.add_argument("--seed", type=int, default=123)
     ap.add_argument("--steps", type=int, default=0, help="when >0, only run this many steps per epoch (debug)")
     ap.add_argument("--amp", action="store_true")
@@ -165,10 +144,6 @@ def main():
     ap.add_argument("--allow-cpu", action="store_true")
     args = ap.parse_args()
 
-    if args.history_loss_weight < 0:
-        ap.error("--history-loss-weight must be non-negative")
-    if args.history_loss_weight > 0 and args.time_window == 1:
-        ap.error("--history-loss-weight needs --time-window > 1")
 
     if not torch.cuda.is_available() and not args.allow_cpu:
         raise SystemExit("No GPU. This project's rule is that torch only runs "
@@ -221,14 +196,10 @@ def main():
         dec_num_cross_attention_heads=args.dec_num_cross_attention_heads,
         dropout=args.dropout, latent_mode=args.latent_mode, readout=args.readout,
         time_window=args.time_window, time_dim=args.time_dim, time_scalar=args.time_scalar,
-        temporal_mixer=args.temporal_mixer, spatial_attention=args.spatial_attention,
-        ssm_hidden_ch=args.ssm_hidden_ch, geodesic_scale=args.geodesic_scale,
-        advection_tau=args.advection_tau,
         share_encoder_blocks=args.share_encoder_blocks,
         in_mean=mean, in_std=std).to(dev)
     print(f"[model] {model.num_params:,} parameters  latent={args.latent_mode}  "
           f"readout={args.readout}  time_window={args.time_window}  "
-          f"temporal={args.temporal_mixer}  spatial={args.spatial_attention}  "
           f"share_blocks={args.share_encoder_blocks}  seed={args.seed}", flush=True)
 
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -271,13 +242,7 @@ def main():
                 dt, cell_idx = None, None
             with torch.amp.autocast("cuda", enabled=args.amp and dev.type == "cuda"):
                 pred = model.reconstruct(tok, pad, dt, cell_idx)
-                if args.history_loss_weight > 0:
-                    hist = torch.from_numpy(train_bank.history_reachable(idx)).reshape(
-                        len(idx), H, W).to(dev)
-                    loss = history_aware_loss(
-                        pred, x, hist, args.history_loss_weight)
-                else:
-                    loss = senseiver_loss(pred, x)
+                loss = senseiver_loss(pred, x)
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()
             scaler.step(opt); scaler.update()

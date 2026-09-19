@@ -108,7 +108,7 @@ def main():
     # worse calibrated than learning the variance ("the empirical variance ... consistently
     # underestimates the true uncertainty"). Allowing it here is what makes that comparison
     # reproducible on our data instead of quoted from theirs.
-    has_var = all(s_.grad_net.out_var is not None or s_.augmented_var for s_ in solvers)
+    has_var = all(s_.augmented_var for s_ in solvers)
     if not has_var:
         print("[mode] no learnt sigma^2 in these runs -> uncertainty is the member spread "
               "alone (their Table 2 'Ensemble-M (MSE)')", flush=True)

@@ -204,25 +204,6 @@ class TemporalDayBank:
         """(len(idx), HW) observation mask of each target frame."""
         return np.stack([self.Od[self.day_of[i]][self.frame_of[i]] for i in idx])
 
-    def history_reachable(self, idx):
-        """Current-blind cells observed at least once earlier in the input window.
-
-        This mask depends only on observations available to the model.  The
-        current frame is deliberately excluded: it identifies exactly the cells
-        on which historical information can add something unavailable now.
-        """
-        out = []
-        for i in idx:
-            d, f = self.day_of[i], self.frame_of[i]
-            lo = max(0, f - self.window + 1)
-            current = self.Od[d][f]
-            if lo == f:
-                prior_seen = np.zeros_like(current)
-            else:
-                prior_seen = self.Od[d][lo:f].any(axis=0)
-            out.append(prior_seen & ~current)
-        return np.stack(out)
-
     def input_stats(self):
         """Same statistic as `DayBank.input_stats`, over the same cells: observed cells of
         the target frames only."""

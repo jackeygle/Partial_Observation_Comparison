@@ -57,8 +57,8 @@ solvers, A = [], None
 for s in MEMBERS:
     p = os.path.join(ROOT, FMT.format(s), "varnet_best.pt")
     sol, A, _ = load_solver(p, DEV)
-    if sol.grad_net.out_var is None:
-        raise SystemExit(f"{p} has no variance read-out")
+    if not sol.augmented_var:
+        raise SystemExit(f"{p} carries no learnt variance")
     solvers.append(sol)
 DT = A["dT"]
 K = A.get("obs_every_k") or config.get("observation", "obs_every_k")

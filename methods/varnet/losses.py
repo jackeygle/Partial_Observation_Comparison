@@ -92,7 +92,7 @@ def compute_loss(kind, x_rec, X, y, mask, phi, var=None, nll_beta=1.0):
         return unsupervised_loss(x_rec, y, mask, phi)
     if kind == "nll":
         if var is None:
-            raise ValueError("--loss nll needs the solver built with predict_var=True; "
+            raise ValueError("--loss nll needs a solver built with augmented_var=True; "
                              "got var=None")
         return nll_loss(x_rec, X, var, beta=nll_beta)
     raise ValueError(f"unknown loss kind: {kind!r}")

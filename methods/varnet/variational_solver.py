@@ -167,35 +167,11 @@ class GradUpdateLSTM(nn.Module):
     1×1 conv projects the LSTM hidden state back to C·T channels. The initial small
     output scale (k≈0.1) keeps the first solver steps gentle, as in 4dvarnet.
 
-    With predict_var=True a SECOND read-out is added on the same hidden state, giving the
-    predictive variance. This is Lakshminarayanan et al. Sec. 2.2.1 as written -- "a network
-    that outputs two values in the final layer, corresponding to the predicted mean and
-    variance" -- rather than a separate module bolted on after the solve, which is what this
-    file used to do.
-
-    The variance read-out sees h AND the current state x_hat (var_sees_state, default on).
-    An earlier version of this class read h alone, on the argument that h has seen all n_iter
-    gradients of J and carries spatial context while x_hat is only one cell. That argument was
-    right about h and wrong to exclude x_hat: measured, sigma^2 came out spatially FLAT, varying
-    0.96-1.21x between empty and occupied blind cells where the true error varies 19-30x
-    (measured by checks/diag_beta_gradient_share.py, archived at tag archive-2026-09-09). A 24-bin 1-D lookup on |x_hat|, fitted on one day and
-    applied unchanged to another, beat it on every channel -- NLL -2.31 vs +9.32 on density,
-    -0.90 vs +38.14 on vx (measured by checks/diag_sigma_headroom.py, archived at tag archive-2026-09-09). The information was available and
-    the read-out could not reach it, because x_hat is a 20-step accumulator (x = x - upd) and
-    is not a function of h. Feeding both keeps h's context and adds what it was missing.
-
-    x_hat enters DETACHED. In Lakshminarayanan et al. Sec. 2.2.1 mu and sigma^2 are siblings off
-    one shared representation; neither is an input to the other, and detaching keeps that -- the
-    variance term cannot lower its own loss by moving the very x_hat it conditions on.
-
-    It does NOT isolate the mean, and an earlier version of this docstring wrongly claimed it
-    did. Measured by backpropagating the variance branch alone with out_var.weight off zero:
-    grad_net.out.weight 7.2e1, lstm.gates.weight 5.7e3, phi 2.1e1 -- the variance term reshapes
-    the trunk, the mean read-out and the prior. It has to: h_last depends on the earlier x
-    values, and those are accumulated through out(), so only the final x_hat -> out_var edge is
-    cut. That is also what Sec. 2.2.1 implies, where the NLL's gradient reaches the shared
-    representation through both outputs. (An init-time test reads zero everywhere here, because
-    out_var.weight starts at zero and kills d(sigma^2)/d(h); do not test at initialisation.)
+    Variance is not read out here. An earlier design added a second read-out on the
+    same hidden state (Lakshminarayanan et al. Sec. 2.2.1); it was measured against
+    the augmented-state design, lost, and its checkpoints and code were dropped --
+    see the root README's uncertainty table. The surviving design (augmented_var,
+    below) iterates log sigma^2 as part of the state instead.
 
     sigma^2 is NOT added to the iterated state. It has no term in J -- the observation term has
     no sigma^2 component and Phi maps state channels to state channels -- so an augmented state
@@ -204,27 +180,12 @@ class GradUpdateLSTM(nn.Module):
     Here it is a read-out taken once, after the last iteration.
     """
 
-    def __init__(self, n_state_ch, hidden_ch=64, dropout=0.0, predict_var=False,
-                 var_sees_state=True):
+    def __init__(self, n_state_ch, hidden_ch=64, dropout=0.0):
         super().__init__()
         self.lstm = ConvLSTM2d(n_state_ch, hidden_ch)
         self.out = nn.Conv2d(hidden_ch, n_state_ch, 1, bias=False)
         nn.init.constant_(self.out.weight, 0.1)            # small initial updates for stability
         self.dropout = nn.Dropout(dropout)
-        self.out_var = None
-        if predict_var:
-            # bias -3 so softplus(-3) = 0.049, i.e. sigma ~ 0.22 at initialisation, which is
-            # about the model's own RMSE. Starting a little over-dispersed is the safe side:
-            # the NLL's 1/(2 sigma^2) term is benign when sigma^2 is too big and explosive when
-            # it is too small.
-            # hidden_ch + n_state_ch = 864 with the standard settings, which is exactly the
-            # input width of the LSTM's own gates conv -- the same concat this architecture
-            # already uses everywhere, not a new pattern.
-            var_in = hidden_ch + (n_state_ch if var_sees_state else 0)
-            self.out_var = nn.Conv2d(var_in, n_state_ch, 1, bias=True)
-            nn.init.zeros_(self.out_var.weight)
-            nn.init.constant_(self.out_var.bias, -3.0)
-        self.var_sees_state = bool(predict_var and var_sees_state)
 
     def forward(self, grad_2d, state):
         h, state = self.lstm(self.dropout(grad_2d), state)
@@ -244,7 +205,7 @@ class GradSolver(nn.Module):
     """
 
     def __init__(self, phi, n_channels=4, dT=7, n_iter=15, hidden_ch=64, dropout=0.0,
-                 predict_var=False, var_eps=1e-6, var_sees_state=True,
+                 var_eps=1e-6,
                  augmented_var=False, obs_nll=False):
         super().__init__()
         if obs_nll and not augmented_var:
@@ -258,8 +219,7 @@ class GradSolver(nn.Module):
         self.augmented_var = bool(augmented_var)
         n_in = n_channels * dT * (2 if self.augmented_var else 1)
         self.grad_net = GradUpdateLSTM(n_in, hidden_ch, dropout,
-                                       predict_var=predict_var and not self.augmented_var,
-                                       var_sees_state=var_sees_state)
+)
         self.n_iter = n_iter
         self.C, self.T = n_channels, dT
         # the minimum variance from Lakshminarayanan et al. Sec. 2.2.1, footnote 2: "pass the
@@ -334,18 +294,10 @@ class GradSolver(nn.Module):
             upd_2d, state, h_last = self.grad_net(grad_2d, state)
             upd = upd_2d.reshape(B, C, T, H, W) / self.n_iter   # reference: grad *= 1/n_grad
             x = x - upd
-        if not return_var:
-            return x
-        if self.grad_net.out_var is None:
-            raise ValueError("this solver was built with predict_var=False; there is no "
-                             "variance read-out to return")
-        hv = h_last
-        if self.grad_net.var_sees_state:
-            # x_hat detached: mu and sigma^2 are siblings off a shared representation in
-            # Lakshminarayanan et al. Sec. 2.2.1, never one feeding the other.
-            hv = torch.cat([h_last, x.reshape(B, C * T, H, W).detach()], dim=1)
-        var = F.softplus(self.grad_net.out_var(hv)).reshape(B, C, T, H, W)
-        return x, var + self.var_eps
+        if return_var:
+            raise ValueError("only augmented_var solvers carry a variance; this one was "
+                             "built without it")
+        return x
 
     def forward(self, x0, y, mask, return_var=False):
         return self.solve(x0, y, mask, return_var=return_var)

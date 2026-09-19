@@ -195,26 +195,16 @@ def main():
                     help="affects only weight initialisation (varied between ensemble members); defaults to --seed")
     ap.add_argument("--data-seed", type=int, default=None,
                     help="affects only the robot routes and observation noise (kept the same across ensemble members); defaults to --seed")
-    ap.add_argument("--var-hidden", type=int, default=32,
-                    help="width of the variance head for --loss nll")
-    ap.add_argument("--var-layers", type=int, default=2,
-                    help="number of layers in the variance head for --loss nll (pointwise 1x1x1)")
     ap.add_argument("--augmented-var", action="store_true",
-                    help="iterate log sigma^2 as part of the state instead of reading it off "
-                         "the last hidden layer. The prior term of J becomes a Gaussian "
-                         "log-likelihood of the prior residual, which is what gives sigma^2 a "
-                         "gradient from the cost; the LSTM then descends [x, log sigma^2] "
-                         "together. Doubles the optimiser's channel axis (C*dT -> 2*C*dT). "
-                         "Requires --loss nll")
+                    help="iterate log sigma^2 as part of the state. The prior term of J "
+                         "becomes a Gaussian log-likelihood of the prior residual, which is "
+                         "what gives sigma^2 a gradient from the cost; the LSTM then descends "
+                         "[x, log sigma^2] together. Doubles the optimiser's channel axis "
+                         "(C*dT -> 2*C*dT). Required by --loss nll")
     ap.add_argument("--obs-nll", action="store_true",
                     help="make the observation term of J a Gaussian NLL too, sharing the "
                          "iterated log sigma^2 with the prior term (observed cells only). "
                          "Requires --augmented-var")
-    ap.add_argument("--var-h-only", action="store_true",
-                    help="build the sigma^2 read-out on the LSTM hidden state ALONE, without "
-                         "the detached x_hat. This is what runs/varnet_vrb{0,1}_s0 did, and it "
-                         "made sigma^2 spatially flat (0.96-1.21x empty/occupied against a "
-                         "19-30x true error spread). Kept only to reproduce those baselines")
     ap.add_argument("--trajectory-mode", choices=["per_day", "fixed"], default=None,
                     help="robot routes per training day: per_day = data seed + the day's date, fixed = "
                          "the same routes every day (all runs before 2026-09-17). Default: config "
@@ -258,6 +248,9 @@ def main():
                          "(--hidden 128) once had a loss spike within 15 epochs (blind MSE "
                          "0.0516 -> 0.0992); clipping is the standard stabiliser")
     args = ap.parse_args()
+    if args.loss == "nll" and not args.augmented_var:
+        ap.error("--loss nll needs --augmented-var: the read-out design that used to provide "
+                 "sigma^2 without it lost the comparison and its code is gone")
     os.makedirs(args.outdir, exist_ok=True)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if dev.type != "cuda" and not args.allow_cpu:
@@ -312,8 +305,7 @@ def main():
     solver = GradSolver(phi, n_channels=C, dT=T, n_iter=args.n_iter,
                         hidden_ch=args.lstm_hidden,
                         dropout=args.dropout,
-                        predict_var=args.loss == "nll", var_eps=args.var_eps,
-                        var_sees_state=not args.var_h_only,
+                        var_eps=args.var_eps,
                         augmented_var=args.augmented_var,
                         obs_nll=args.obs_nll).to(dev)
     params = list(solver.parameters())
@@ -325,18 +317,10 @@ def main():
           f"loss={args.loss}  n_iter={args.n_iter}  amp={args.amp}", flush=True)
     print(f"[seed] init={init_seed}  data={data_seed}", flush=True)
     if args.loss == "nll":
-        # augmented_var has NO read-out: log sigma^2 is a state channel the solver iterates,
-        # so out_var is deliberately None there and this banner must not assume it exists.
-        if solver.augmented_var:
-            print(f"[var] AUGMENTED STATE: log sigma^2 iterated with x over {args.n_iter} "
-                  f"steps; prior term of J is a Gaussian log-likelihood of the prior residual"
-                  f"{'; observation term too (shared sigma)' if args.obs_nll else ''}"
-                  f"   eps={args.var_eps:g}", flush=True)
-        else:
-            _nv = sum(p.numel() for p in solver.grad_net.out_var.parameters())
-            print(f"[var read-out] {_nv:,} params on the last hidden state   "
-                  f"sigma^2 = softplus(out_var(h)) + {args.var_eps:g}   beta={args.nll_beta}",
-                  flush=True)
+        print(f"[var] AUGMENTED STATE: log sigma^2 iterated with x over {args.n_iter} "
+              f"steps; prior term of J is a Gaussian log-likelihood of the prior residual"
+              f"{'; observation term too (shared sigma)' if args.obs_nll else ''}"
+              f"   eps={args.var_eps:g}", flush=True)
     if sched:
         print("[schedule] " + "  ".join(f"ep{e}→{n}it@lr{l:g}" for e, n, l in sched), flush=True)
 
