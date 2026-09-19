@@ -1,0 +1,18 @@
+[seq] day=atc-20130811 methods=['dincae', 'senseiver', 'varnet', 'enkf'] frames [11800, 13800) = 2000 frames
+[seq] running DINCAE ...
+[seq] running Senseiver ...
+[seq] running 4DVarNet ...
+[seq] loading EnKF export ...
+[seq] spread colour scale: vmin=0 vmax=0.3690 (p99 over the sequence)
+[seq] rendering 2000 frames (7 panels each) -> compare/results/seq_4methods_j4nofcst_a2_2000
+  rendered 0/2000
+  rendered 200/2000
+  rendered 400/2000
+  rendered 600/2000
+  rendered 800/2000
+  rendered 1000/2000
+  rendered 1200/2000
+  rendered 1400/2000
+  rendered 1600/2000
+  rendered 1800/2000
+[done] 2000 PNGs (7 panels) -> compare/results/seq_4methods_j4nofcst_a2_2000

@@ -253,6 +253,7 @@ periodic `ckpt_<epoch>.pt` snapshots. This table is the authoritative mapping; e
 | DINCAE | `methods/dincae/runs/dincae_ff/ckpt_00060.pt` — **one file** | `methods/dincae/check_outputs/eval_ff_00060/dincae_metrics_test.json`, plus `methods/dincae/check_outputs/eval/uncertainty_dincae.json` | chosen on the validation split (`methods/dincae/check_outputs/eval/select_dincae_ff_valid.json`); recorded in `compare5_final.json` as `source: .../eval_ff_00060/...` |
 | Senseiver | `methods/senseiver/runs/senseiver_A/best.pt` | folded into `compare5_final.json` (`"Senseiver"`) | only trained model; `best.pt`, not `last.pt` |
 | EnKF | no weights — exported fields in `methods/enkf/check_outputs/enkf_k1_full/est_*.npz` | `compare5_final.json` (`"EnKF k1"`), `methods/enkf/check_outputs/eval/uncertainty_enkf_k1.json` | it is a filter, not a trained model |
+| Learned-cov KF (the EnKF's σ̂ replaced) | `methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt` over the frozen mean `methods/enkf/runs/surrogate_mean_s0/best.pt`, at **α = 2** | `methods/enkf/check_outputs/eval/uncertainty_j4nofcst_a2_test7.json` | chosen in `check_outputs/eval/controlled_grid_calibration_4096.json`, a seven-model grid in which every pair differs by one factor; α comes from a full-day sequential sweep, **not** from that grid — see the warning below |
 
 Two traps, both of which silently produce a *different number* rather than an
 error:
@@ -283,7 +284,43 @@ The EnKF's overconfidence is diagnosed separately in
 `methods.enkf.checks.diag_enkf_spread_growth`) — verdict `"contractive"`: the
 deterministic PedPred3 forecast model damps ensemble spread by ~65% per step
 regardless of injected noise. Not a bug to fix; a property of the forward model
-to report as-is.
+to report as-is. The learned-covariance row above is the answer to it: the same
+filter with its ensemble spread replaced by a learned `B = U Uᵀ + diag(d)` goes
+from spread/skill 0.010 and 1.6% coverage of a nominal 90% interval to 0.500 and
+92.9%, and from 26.0% *worse* than the constant-σ null to 28.3% better.
+
+**A third trap, specific to that row: α is convention-dependent.** The
+seven-model grid scores 4096 held-out one-step pairs and picks α = 0.5; a
+full-day sequential run picks α = 2, and at α = 2 every column improves at once
+(CRPS −4.8%, spread/skill 0.249 → 0.500, coverage 83.3% → 92.9%). Sequential
+error accumulates and one-step scoring cannot see it, so **a calibration constant
+has to be fitted under the convention it will be reported in.** Reusing the
+grid's α in a sequential table is not a small approximation; it is the difference
+between a badly overconfident σ̂ and a calibrated one.
+
+## Checkpoint fingerprints
+
+`*.pt` is gitignored (the weights are ~30 of the raw 31 GB), so a checkout
+reproduces the code and the result JSON but not the weights. These MD5s are the
+link between the two: they identify which file produced each published number.
+Regenerate with `md5sum <path>`.
+
+| Published as | File | MD5 |
+|---|---|---|
+| 4DVarNet MSE s0–s4 | `varnet_mse5_h96_s{0..4}/ckpt_000{80,90,80,80,80}.pt` | `d2a03364…` `4d0a4643…` `8007503d…` `4c2245c2…` `b86e8625…` |
+| 4DVarNet `aug0` s0–s4 | `varnet_aug0_h96_s{0..4}/ckpt_00{149,100,100,149,130}.pt` | `7402b99b…` `11a53aa0…` `bd126f33…` `8acaad80…` `c85d10f6…` |
+| 4DVarNet `vsb0` s0–s4 | `varnet_vsb0_h96_s{0..4}/ckpt_00{080,090,149,140,140}.pt` | `8c29259f…` `3d6abcbb…` `817fd888…` `3558260d…` `110afbb8…` |
+| DINCAE | `dincae/runs/dincae_ff/ckpt_00060.pt` | `15445c96a88515bf31417a1d59757fd8` |
+| Senseiver | `senseiver/runs/senseiver_A/best.pt` | `ad0f002ef20efb34432ba800d6ddf118` |
+| Senseiver k=16 (extension, not the main table) | `senseiver/runs/capacity/base32_k16_s123/best.pt` | `68f2f02f59957e193ffc398f3dd2a9cf` |
+| EnKF surrogate (tracked in git, 14 MB) | `enkf/enkf_lab/apt-ibex_train_model_28D.pth` | `17562f3e2d969611fe2a2b0d40c51d42` |
+| PedPred3 mean, 5→5 | `enkf/runs/pedpred3_5to5_s0/best.pt` | `077c26f0dce49fc530f064223a293d90` |
+| Mean net under the learned covariance | `enkf/runs/surrogate_mean_s0/best.pt` | `a37ad0cd283446561cf1096a03d03dab` |
+| **Learned-cov KF** | `enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt` | `9e7cb511ed2f3bce36ab8565e1c401a1` |
+
+4DVarNet paths are relative to `methods/varnet/runs/`, the rest to `methods/`.
+The per-seed epochs come from each run's `select_valid.json`; the truncated
+hashes are the first 8 characters, enough to tell the five seeds apart.
 
 ---
 

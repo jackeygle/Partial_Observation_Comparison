@@ -1,0 +1,50 @@
+Tesla V100-PCIE-32GB
+[new_cov_sweep_alpha0.5_f0.5_d0.5_blindg1_emptyg1] mode=full history=5
+  frame 10/39758: 49.3 ms/frame
+  frame 100/39758: 10.8 ms/frame
+  frame 1000/39758: 7.0 ms/frame
+  frame 5000/39758: 6.7 ms/frame
+  frame 10000/39758: 6.6 ms/frame
+  frame 15000/39758: 6.6 ms/frame
+  frame 20000/39758: 6.6 ms/frame
+  frame 25000/39758: 6.6 ms/frame
+  frame 30000/39758: 6.6 ms/frame
+  frame 35000/39758: 6.6 ms/frame
+{"variant": "new_cov_sweep_alpha0.5_f0.5_d0.5_blindg1_emptyg1", "rmse": 0.8529392991984265, "crps": 0.2749255997067988, "spread_skill": 0.35415584856078314}
+[new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1] mode=full history=5
+  frame 10/39758: 6.3 ms/frame
+  frame 100/39758: 6.6 ms/frame
+  frame 1000/39758: 6.6 ms/frame
+  frame 5000/39758: 6.6 ms/frame
+  frame 10000/39758: 6.6 ms/frame
+  frame 15000/39758: 6.6 ms/frame
+  frame 20000/39758: 6.6 ms/frame
+  frame 25000/39758: 6.6 ms/frame
+  frame 30000/39758: 6.6 ms/frame
+  frame 35000/39758: 6.6 ms/frame
+{"variant": "new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1", "rmse": 0.834559100616715, "crps": 0.25632030950205653, "spread_skill": 0.709369882463128}
+[new_cov_sweep_alpha8_f8_d8_blindg1_emptyg1] mode=full history=5
+  frame 10/39758: 6.1 ms/frame
+  frame 100/39758: 6.5 ms/frame
+  frame 1000/39758: 6.7 ms/frame
+  frame 5000/39758: 6.6 ms/frame
+  frame 10000/39758: 6.6 ms/frame
+  frame 15000/39758: 6.6 ms/frame
+  frame 20000/39758: 6.6 ms/frame
+  frame 25000/39758: 6.6 ms/frame
+  frame 30000/39758: 6.6 ms/frame
+  frame 35000/39758: 6.6 ms/frame
+{"variant": "new_cov_sweep_alpha8_f8_d8_blindg1_emptyg1", "rmse": 0.8317298912334338, "crps": 0.30797294195367725, "spread_skill": 1.480826708323568}
+[new_cov_sweep_alpha32_f32_d32_blindg1_emptyg1] mode=full history=5
+  frame 10/39758: 6.3 ms/frame
+  frame 100/39758: 6.6 ms/frame
+  frame 1000/39758: 6.6 ms/frame
+  frame 5000/39758: 6.6 ms/frame
+  frame 10000/39758: 6.6 ms/frame
+  frame 15000/39758: 6.6 ms/frame
+  frame 20000/39758: 6.6 ms/frame
+  frame 25000/39758: 6.6 ms/frame
+  frame 30000/39758: 6.6 ms/frame
+  frame 35000/39758: 6.6 ms/frame
+{"variant": "new_cov_sweep_alpha32_f32_d32_blindg1_emptyg1", "rmse": 0.8306550022536291, "crps": 0.47808943608104304, "spread_skill": 3.000120020725767}
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/j4nofcst_alphasweep_atc-20130901.json

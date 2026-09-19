@@ -1,0 +1,20 @@
+[atc-20130811] 252,685 blind walkable cell-frames
+[atc-20130818] 247,036 blind walkable cell-frames
+[atc-20130825] 271,944 blind walkable cell-frames
+[atc-20130901] 252,249 blind walkable cell-frames
+[atc-20130915] 250,136 blind walkable cell-frames
+[atc-20130922] 246,702 blind walkable cell-frames
+[atc-20130929] 240,865 blind walkable cell-frames
+
+n = 1,761,617 blind walkable cell-frames
+overall corr(sigma, |err|) = 0.7842
+
+       density stratum          n    corr  mean|err|  mean sigma
+[  0.00000,  0.00128]  1,409,293  0.8797    0.06449     0.05817
+[  0.00128,  3.23383]    352,324  0.4655    0.25521     0.18794
+
+CRPS  model                = 0.076657
+CRPS  constant-sigma null  = 0.113690   model -32.6%
+CRPS  density-stratum null = 0.107708   model -28.8%
+
+[done] check_outputs/eval/sigma_vs_error_j4nofcst_a2.json

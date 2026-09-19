@@ -1,0 +1,2 @@
+Tesla V100-PCIE-32GB
+require frames >= 2 and 0 <= warmup < frames

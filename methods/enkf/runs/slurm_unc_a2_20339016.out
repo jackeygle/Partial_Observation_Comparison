@@ -1,0 +1,31 @@
+  [k=1] est_atc-20130811.npz
+  [k=1] est_atc-20130818.npz
+  [k=1] est_atc-20130825.npz
+  [k=1] est_atc-20130901.npz
+  [k=1] est_atc-20130915.npz
+  [k=1] est_atc-20130922.npz
+  [k=1] est_atc-20130929.npz
+  [k=1] second pass, constant sigma = all 0.1578, blind 0.1871, defined 0.2690, defined_blind 0.3655, walkable 0.1888, walkable_blind 0.2470
+
+[k=1] 7 days
+split                     RMSE     CRPS         NLL    sigma   sp/sk   90%cov
+all                     0.1578   0.0391   5.570e-01   0.0666   0.422   95.60%
+blind                   0.1871   0.0479  -1.448e+00   0.0773   0.413   95.57%
+observed                0.1161   0.0292   2.830e+00   0.0544   0.469   95.64%
+defined                 0.2690   0.0883   8.282e+00   0.0959   0.357   87.85%
+defined_blind           0.3655   0.1430   2.958e+00   0.1433   0.392   84.12%
+defined_observed        0.1764   0.0515   1.187e+01   0.0640   0.363   90.36%
+walkable                0.1888   0.0542   2.367e+00   0.0892   0.473   94.02%
+walkable_blind          0.2470   0.0801   2.137e-02   0.1235   0.500   92.85%
+channel_density         0.1319   0.0292  -1.566e+00   0.0394   0.299   95.18%
+channel_vx              0.2572   0.0816  -7.993e-01   0.1284   0.499   93.75%
+channel_vy              0.1064   0.0347  -1.725e+00   0.0758   0.713   95.97%
+channel_var             0.0694   0.0111   6.319e+00   0.0227   0.327   97.49%
+all_constant_sigma_baseline  0.1578   0.0639  -4.273e-01   0.1578   1.000   95.28%
+blind_constant_sigma_baseline  0.1871   0.0784  -2.574e-01   0.1871   1.000   94.41%
+defined_constant_sigma_baseline  0.2690   0.1239   1.057e-01   0.2690   1.000   92.41%
+defined_blind_constant_sigma_baseline  0.3655   0.1812   4.124e-01   0.3655   1.000   90.13%
+walkable_constant_sigma_baseline  0.1888   0.0802  -2.479e-01   0.1888   1.000   94.42%
+walkable_blind_constant_sigma_baseline  0.2470   0.1117   2.063e-02   0.2470   1.000   92.65%
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/recon_j4nofcst_a2/../eval/uncertainty_j4nofcst_a2_test7.json
+

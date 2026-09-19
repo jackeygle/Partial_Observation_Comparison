@@ -1,0 +1,15 @@
+Tesla V100-SXM2-32GB
+[new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1] mode=full history=5
+  frame 10/38885: 56.4 ms/frame
+  frame 100/38885: 14.1 ms/frame
+  frame 1000/38885: 10.1 ms/frame
+  frame 5000/38885: 9.7 ms/frame
+  frame 10000/38885: 9.6 ms/frame
+  frame 15000/38885: 9.6 ms/frame
+  frame 20000/38885: 9.6 ms/frame
+  frame 25000/38885: 9.6 ms/frame
+  frame 30000/38885: 9.6 ms/frame
+  frame 35000/38885: 9.6 ms/frame
+{"variant": "new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1", "rmse": 0.8441988099925528, "crps": 0.2680930168790932, "spread_skill": 0.7158569914113935}
+[export] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/recon_j4nofcst_a2/est_atc-20130818.npz  variant=new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/j4nofcst_a2_export_atc-20130818.json

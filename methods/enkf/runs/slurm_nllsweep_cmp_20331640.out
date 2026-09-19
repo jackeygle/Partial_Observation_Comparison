@@ -1,0 +1,66 @@
+Tesla V100-SXM2-16GB
+[compare] 512/4,096
+[compare] 1,024/4,096
+[compare] 1,536/4,096
+[compare] 2,048/4,096
+[compare] 2,560/4,096
+[compare] 3,072/4,096
+[compare] 3,584/4,096
+[compare] 4,096/4,096
+{
+  "pairs": 4096,
+  "input_frames": {
+    "a32": 1,
+    "nll001": 1,
+    "nll003": 1
+  },
+  "covariance": {
+    "a32": {
+      "lowrank_trace_fraction": 0.955342548672942,
+      "lowrank_variance_mean": 0.20378619832709163,
+      "diagonal_variance_mean": 0.009525978137956716
+    },
+    "nll001": {
+      "lowrank_trace_fraction": 0.9562945058900006,
+      "lowrank_variance_mean": 0.2105860801126074,
+      "diagonal_variance_mean": 0.009624408199902476
+    },
+    "nll003": {
+      "lowrank_trace_fraction": 0.9538680073710735,
+      "lowrank_variance_mean": 0.21030981156258222,
+      "diagonal_variance_mean": 0.01017122977374553
+    }
+  },
+  "selection": {
+    "a32": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha2"
+      }
+    },
+    "nll001": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "nll003": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    }
+  }
+}

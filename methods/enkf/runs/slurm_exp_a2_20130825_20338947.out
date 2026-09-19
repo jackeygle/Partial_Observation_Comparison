@@ -1,0 +1,16 @@
+Tesla V100-PCIE-32GB
+[new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1] mode=full history=5
+  frame 10/42890: 46.1 ms/frame
+  frame 100/42890: 9.2 ms/frame
+  frame 1000/42890: 5.7 ms/frame
+  frame 5000/42890: 5.3 ms/frame
+  frame 10000/42890: 5.2 ms/frame
+  frame 15000/42890: 5.2 ms/frame
+  frame 20000/42890: 5.2 ms/frame
+  frame 25000/42890: 5.2 ms/frame
+  frame 30000/42890: 5.2 ms/frame
+  frame 35000/42890: 5.2 ms/frame
+  frame 40000/42890: 5.2 ms/frame
+{"variant": "new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1", "rmse": 0.8176133927947271, "crps": 0.24289747793930047, "spread_skill": 0.7131469963698245}
+[export] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/recon_j4nofcst_a2/est_atc-20130825.npz  variant=new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1
+[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/j4nofcst_a2_export_atc-20130825.json

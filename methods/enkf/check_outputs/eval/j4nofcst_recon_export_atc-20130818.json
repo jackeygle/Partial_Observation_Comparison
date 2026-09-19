@@ -1,0 +1,194 @@
+{
+  "config": {
+    "calibration": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/controlled_grid_calibration_4096.json",
+    "new_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt",
+    "old_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_s0/best.pt",
+    "obs": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/enkf_k1_full/obs_atc-20130818.npz",
+    "frames": 99999,
+    "warmup": 100,
+    "new_alphas": "0.5",
+    "new_component_scales": "",
+    "blind_gammas": "1",
+    "blind_empty_gammas": "1",
+    "skip_old": true,
+    "skip_mean": true,
+    "out": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/j4nofcst_recon_export_atc-20130818.json",
+    "export_npz": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/recon_j4nofcst_best",
+    "device": "cuda"
+  },
+  "frames": 38885,
+  "warmup": 100,
+  "calibration_selection": {
+    "a32": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha2"
+      }
+    },
+    "nll0": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "nll001": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "nll003": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.25"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "j4": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.25",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    },
+    "j4frozen": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.5"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha2"
+      }
+    },
+    "j4nofcst": {
+      "prior": {
+        "best_crps_walkable_blind": "alpha0.02",
+        "best_calibrated_walkable_blind": "alpha0.1"
+      },
+      "posterior": {
+        "best_crps_walkable_blind": "alpha0.5",
+        "best_calibrated_walkable_blind": "alpha1"
+      }
+    }
+  },
+  "results": {
+    "new_cov_sweep_alpha0.5_f0.5_d0.5_blindg1_emptyg1": {
+      "model": "new_cov",
+      "criterion": "sweep_alpha0.5",
+      "alpha": 0.5,
+      "factor_covariance_scale": 0.5,
+      "diagonal_covariance_scale": 0.5,
+      "mode": "full",
+      "blind_diagonal_std_scale": 1.0,
+      "blind_empty_diagonal_std_scale": 1.0,
+      "input_frames": 5,
+      "mean_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt::mean_model",
+      "seconds": 339.4924738407135,
+      "metrics": {
+        "all": {
+          "rmse": 0.5028972884899636,
+          "mean_spread": 0.11398603425303877,
+          "rms_spread": 0.19172496697473193,
+          "mean_sigma_skill": 0.22665867735199294,
+          "spread_skill": 0.3812408047584019,
+          "crps": 0.12393774737076577,
+          "marginal_gaussian_nll": 3.1667270674413435,
+          "coverage50": 0.7515113589159612,
+          "coverage90": 0.8903107229312592,
+          "count": 67020480
+        },
+        "walkable": {
+          "rmse": 0.6030021183055243,
+          "mean_spread": 0.1514243736857071,
+          "rms_spread": 0.22762676828501383,
+          "mean_sigma_skill": 0.251117482159465,
+          "spread_skill": 0.3774891685698552,
+          "crps": 0.17145122912432262,
+          "marginal_gaussian_nll": 5.418647766274733,
+          "coverage50": 0.6868661675994541,
+          "coverage90": 0.8595276791151929,
+          "count": 44990600
+        },
+        "observed": {
+          "rmse": 0.24188519948274023,
+          "mean_spread": 0.09248838242454951,
+          "rms_spread": 0.12422935284828346,
+          "mean_sigma_skill": 0.38236478553599573,
+          "spread_skill": 0.5135880703488345,
+          "crps": 0.06950114439179832,
+          "marginal_gaussian_nll": 3.5575835979256767,
+          "coverage50": 0.7441877331255022,
+          "coverage90": 0.9074992390987363,
+          "count": 31410120
+        },
+        "blind": {
+          "rmse": 0.6514397691925239,
+          "mean_spread": 0.13294803923279935,
+          "rms_spread": 0.23573003335329054,
+          "mean_sigma_skill": 0.20408339422935726,
+          "spread_skill": 0.3618600590588504,
+          "crps": 0.1719535560276208,
+          "marginal_gaussian_nll": 2.8219720431928788,
+          "coverage50": 0.7579711634479405,
+          "coverage90": 0.875149591298712,
+          "count": 35610360
+        },
+        "walkable_blind": {
+          "rmse": 0.8611216266269749,
+          "mean_spread": 0.2102673446313821,
+          "rms_spread": 0.30817194267191067,
+          "mean_sigma_skill": 0.24417845067368957,
+          "spread_skill": 0.3578727245290823,
+          "crps": 0.28809012387140165,
+          "marginal_gaussian_nll": 6.285247712679148,
+          "coverage50": 0.6527183989458013,
+          "coverage90": 0.8121206577865763,
+          "count": 19712412
+        },
+        "defined": {
+          "rmse": 0.84891233346853,
+          "mean_spread": 0.19251869615040246,
+          "rms_spread": 0.2740396885285328,
+          "mean_sigma_skill": 0.22678277669002592,
+          "spread_skill": 0.3228127071836113,
+          "crps": 0.30042215017645263,
+          "marginal_gaussian_nll": 12.896701297945082,
+          "coverage50": 0.4607389486107002,
+          "coverage90": 0.745184765335448,
+          "count": 21644428
+        },
+        "defined_blind": {
+          "rmse": 1.2684959515761878,
+          "mean_spread": 0.2837975246083348,
+          "rms_spread": 0.3873391077422153,
+          "mean_sigma_skill": 0.223727576154814,
+          "spread_skill": 0.30535305001243523,
+          "crps": 0.5536107736879459,
+          "marginal_gaussian_nll": 15.773565412542318,
+          "coverage50": 0.3932634561338669,
+          "coverage90": 0.6408406251134013,
+          "count": 8652894
+        }
+      }
+    }
+  }
+}
