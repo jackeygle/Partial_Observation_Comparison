@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 from contextlib import nullcontext
 
@@ -201,6 +202,10 @@ def main():
                          "what gives sigma^2 a gradient from the cost; the LSTM then descends "
                          "[x, log sigma^2] together. Doubles the optimiser's channel axis "
                          "(C*dT -> 2*C*dT). Required by --loss nll")
+    ap.add_argument("--var-head", action="store_true",
+                    help="give log sigma^2 its own update head, taking [h, x_detached], "
+                         "instead of the second half of the shared output layer. Requires "
+                         "--augmented-var")
     ap.add_argument("--obs-nll", action="store_true",
                     help="make the observation term of J a Gaussian NLL too, sharing the "
                          "iterated log sigma^2 with the prior term (observed cells only). "
@@ -248,6 +253,8 @@ def main():
                          "(--hidden 128) once had a loss spike within 15 epochs (blind MSE "
                          "0.0516 -> 0.0992); clipping is the standard stabiliser")
     args = ap.parse_args()
+    if args.var_head and not args.augmented_var:
+        ap.error("--var-head updates the iterated log sigma^2, so it needs --augmented-var")
     if args.loss == "nll" and not args.augmented_var:
         ap.error("--loss nll needs --augmented-var: the read-out design that used to provide "
                  "sigma^2 without it lost the comparison and its code is gone")
@@ -307,7 +314,8 @@ def main():
                         dropout=args.dropout,
                         var_eps=args.var_eps,
                         augmented_var=args.augmented_var,
-                        obs_nll=args.obs_nll).to(dev)
+                        obs_nll=args.obs_nll,
+                        var_head=args.var_head).to(dev)
     params = list(solver.parameters())
     opt = torch.optim.Adam(params, lr=args.lr)
     n_param = sum(p.numel() for p in solver.parameters())
@@ -320,6 +328,7 @@ def main():
         print(f"[var] AUGMENTED STATE: log sigma^2 iterated with x over {args.n_iter} "
               f"steps; prior term of J is a Gaussian log-likelihood of the prior residual"
               f"{'; observation term too (shared sigma)' if args.obs_nll else ''}"
+              f"{'; sigma^2 update from its own head on [h, x]' if args.var_head else ''}"
               f"   eps={args.var_eps:g}", flush=True)
     if sched:
         print("[schedule] " + "  ".join(f"ep{e}→{n}it@lr{l:g}" for e, n, l in sched), flush=True)
@@ -363,6 +372,7 @@ def main():
             best_mse = min(past)
             print(f"[best] previous best blind MSE = {best_mse:.4f}", flush=True)
     amp_dtype = torch.bfloat16 if args.amp else None       # bf16 mixed precision, or None = full fp32
+    nan_streak = 0
     for epoch in range(start_epoch, args.epochs):
         # Paper §3.4: "We typically increase incrementally the number of iterations of the
         # gradient-based NN Solver (typically from 5 iterations to 20 ones)". Back-propagating
@@ -416,6 +426,15 @@ def main():
                "rec_unobs_mse": rec_unobs, "r_score": r_score, "per_channel": per_ch}
         print(f"[epoch {epoch:3d}] loss={train_loss:.4f}  blind_MSE={rec_unobs:.4f}  "
               + " ".join(f"{k}={v:.4f}" for k, v in per_ch.items()), flush=True)
+        # Stop on a run of NaN epochs instead of letting the SLURM chain keep resubmitting.
+        # runs/varnet_aughead_obs_h96_s0 went NaN at epoch 61 and burnt ~38 more epochs of a
+        # three-hour allocation before anyone looked; nothing recovers from this, because the
+        # weights themselves are NaN by then.
+        nan_streak = nan_streak + 1 if math.isnan(train_loss) else 0
+        if nan_streak >= 3:
+            raise SystemExit(f"ABORT: train_loss has been NaN for {nan_streak} epochs "
+                             f"(first at {epoch - nan_streak + 1}). The weights are NaN; "
+                             f"resuming cannot recover. Fix the cause, do not --resume.")
         with open(metrics_path, "a") as f:                  # append this epoch's metrics (one JSON per line)
             f.write(json.dumps(rec) + "\n")
         # overwrite the single rolling checkpoint. `args` is saved too so eval/plotting scripts

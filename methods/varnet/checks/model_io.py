@@ -26,6 +26,16 @@ from methods.varnet.prior_model import GENN
 from methods.varnet.variational_solver import GradSolver
 
 
+def _VAR_HEAD(sd):
+    """Does log sigma^2 get its update from a head of its own?
+
+    Read off the weights, never off args: a run with var_head has grad_net.out_var and its
+    grad_net.out is half as wide (C*dT instead of 2*C*dT). Building the wrong one is a shape
+    error on load_state_dict, which would cost us the checkpoint.
+    """
+    return any("grad_net.out_var" in k for k in sd)
+
+
 def _AUGMENTED(sd, a):
     """Was this trained with log sigma^2 as part of the iterated state?
 
@@ -107,6 +117,7 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
                         dropout=a.get("dropout", 0.0),
                         var_eps=a.get("var_eps", 1e-6),
                         augmented_var=_AUGMENTED(sd, a),
+                        var_head=_VAR_HEAD(sd),
                         # not visible in the weights: forgetting it would silently evaluate
                         # an obs-NLL model with the plain observation term
                         obs_nll=a.get("obs_nll", False)).to(device)

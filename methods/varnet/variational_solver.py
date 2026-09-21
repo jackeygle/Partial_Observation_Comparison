@@ -71,9 +71,16 @@ class VarCost(nn.Module):
     different scales, can be weighted individually as in the reference.
     """
 
-    def __init__(self, n_channels=4, obs_nll=False):
+    def __init__(self, n_channels=4, obs_nll=False, bound_s=False):
         super().__init__()
         self.obs_nll = bool(obs_nll)
+        # bound_s bounds log sigma^2 inside the cost as well as in the state. OFF by default,
+        # because it is not a free stabilisation: measured on one real window, the published
+        # runs/varnet_aug0_h96_s0 drives s down to -14.59 over its 20 iterations, past the
+        # -13.8 floor, so switching this on for it would change the numbers it was published
+        # with. It exists for the var_head design, whose larger sigma updates otherwise let
+        # the prior term's e^{-s} run away -- that is what reached NaN at epoch 61.
+        self.bound_s = bool(bound_s)
         self.alpha_obs = nn.Parameter(torch.tensor(1.0))          # scalar obs weight (= alphaObs)
         self.alpha_reg = nn.Parameter(torch.tensor(1.0))          # scalar prior weight (= alphaReg)
         self.w_obs = nn.Parameter(torch.ones(n_channels))         # per-channel obs weight (= WObs)
@@ -120,14 +127,19 @@ class VarCost(nn.Module):
         if self.obs_nll:
             # clamp at sigma^2 = 1e-6: x can match y almost exactly on observed cells, and
             # e^{-s} there would otherwise grow without bound inside the unrolled solve
-            s_obs = s_logvar.clamp(min=-13.8)
+            s_obs = (s_logvar.clamp(-13.8, 6.0) if self.bound_s
+                     else s_logvar.clamp(min=-13.8))
             obs_pt = (dy ** 2 * torch.exp(-s_obs) + s_obs) * mask
             obs = self.alpha_obs ** 2 * (obs_pt.sum(dim=(0, 2, 3, 4)) * self.w_obs ** 2).sum() \
                 / (obs_pt.numel() / obs_pt.shape[1])
         else:
             obs = self.alpha_obs ** 2 * self._weighted_l2(dy, self.w_obs)
-        # per-channel, weighted, normalised the same way _weighted_l2 does
-        nll = dx ** 2 * torch.exp(-s_logvar) + s_logvar          # (B, C, T, H, W)
+        # The observation term above has always had a floor here; the prior term did not, and
+        # e^{-s} is unbounded as s falls. Under bound_s the two match, which is what keeps the
+        # var_head design from the runaway that reached NaN at epoch 61, ten epochs after the
+        # schedule raised n_iter from 10 to 15. Without it the expression is unchanged.
+        s_prior = s_logvar.clamp(-13.8, 6.0) if self.bound_s else s_logvar
+        nll = dx ** 2 * torch.exp(-s_prior) + s_prior             # (B, C, T, H, W)
         per_channel = nll.sum(dim=(0, 2, 3, 4))
         n_per_channel = nll.numel() / nll.shape[1]
         prior = (per_channel * self.w_reg ** 2).sum() / n_per_channel
@@ -180,12 +192,26 @@ class GradUpdateLSTM(nn.Module):
     Here it is a read-out taken once, after the last iteration.
     """
 
-    def __init__(self, n_state_ch, hidden_ch=64, dropout=0.0):
+    def __init__(self, n_in_ch, n_out_ch=None, hidden_ch=64, dropout=0.0, var_head=False):
         super().__init__()
-        self.lstm = ConvLSTM2d(n_state_ch, hidden_ch)
-        self.out = nn.Conv2d(hidden_ch, n_state_ch, 1, bias=False)
+        n_out_ch = n_in_ch if n_out_ch is None else n_out_ch
+        self.lstm = ConvLSTM2d(n_in_ch, hidden_ch)
+        self.out = nn.Conv2d(hidden_ch, n_out_ch, 1, bias=False)
         nn.init.constant_(self.out.weight, 0.1)            # small initial updates for stability
         self.dropout = nn.Dropout(dropout)
+        self.out_var = None
+        if var_head:
+            # ZERO init, unlike self.out's 0.1. This head's input is [h, x], and x is the
+            # un-normalised field: measured on one real window, 0.1 there gives |upd_s| 1.64
+            # at the first iteration and 11.3 by the fifth, driving J from -1.2e1 to +2.0e6 in
+            # five steps -- s moves, e^{-s} makes the next gradient more extreme, and the two
+            # feed each other. Zero keeps the first step a no-op (sigma stays at its s_lv
+            # initialisation, 0.22) while the weight still receives gradient, so the head
+            # learns from a standstill instead of diverging from one. The read-out design this
+            # descends from initialised to zeros for the same reason; no bias, because an
+            # update head with a bias would add a fixed drift every iteration.
+            self.out_var = nn.Conv2d(hidden_ch + n_out_ch, n_out_ch, 1, bias=False)
+            nn.init.zeros_(self.out_var.weight)
 
     def forward(self, grad_2d, state):
         h, state = self.lstm(self.dropout(grad_2d), state)
@@ -206,20 +232,28 @@ class GradSolver(nn.Module):
 
     def __init__(self, phi, n_channels=4, dT=7, n_iter=15, hidden_ch=64, dropout=0.0,
                  var_eps=1e-6,
-                 augmented_var=False, obs_nll=False):
+                 augmented_var=False, obs_nll=False, var_head=False):
         super().__init__()
         if obs_nll and not augmented_var:
             raise ValueError("obs_nll needs augmented_var: the observation NLL uses the iterated "
                              "log sigma^2, which only the augmented solver has")
+        if var_head and not augmented_var:
+            raise ValueError("var_head updates the iterated log sigma^2, so it needs "
+                             "augmented_var")
         self.phi = phi
         self.obs_op = ObsOperator()
-        self.var_cost = VarCost(n_channels, obs_nll=obs_nll)
+        self.var_cost = VarCost(n_channels, obs_nll=obs_nll, bound_s=bool(var_head))
         # augmented_var doubles the state the optimiser sees: [x, log sigma^2], so the LSTM's
-        # channel axis goes from C*dT to 2*C*dT and there is no separate variance read-out.
+        # channel axis goes from C*dT to 2*C*dT. Its gradient input is always both halves.
+        # What the two designs differ in is where log sigma^2's UPDATE comes from: without
+        # var_head, the second half of self.out's output channels; with it, a head of its own
+        # that also sees the current x.
         self.augmented_var = bool(augmented_var)
+        self.var_head = bool(var_head)
         n_in = n_channels * dT * (2 if self.augmented_var else 1)
-        self.grad_net = GradUpdateLSTM(n_in, hidden_ch, dropout,
-)
+        n_out = n_channels * dT if self.var_head else n_in
+        self.grad_net = GradUpdateLSTM(n_in, n_out, hidden_ch, dropout,
+                                       var_head=self.var_head)
         self.n_iter = n_iter
         self.C, self.T = n_channels, dT
         # the minimum variance from Lakshminarayanan et al. Sec. 2.2.1, footnote 2: "pass the
@@ -276,9 +310,20 @@ class GradSolver(nn.Module):
                     normg = torch.sqrt((g ** 2).mean() + 1e-12)
                 upd_2d, state, h_last = self.grad_net(
                     (g / normg).reshape(B, 2 * C * T, H, W), state)
-                upd = upd_2d.reshape(B, 2 * C, T, H, W) / self.n_iter
-                x = x - upd[:, :C]
-                s_lv = s_lv - upd[:, C:]
+                if self.var_head:
+                    # x enters the variance head DETACHED: mu and sigma^2 are siblings off a
+                    # shared representation, never one feeding the other.
+                    upd_s_2d = self.grad_net.out_var(
+                        torch.cat([h_last, x.reshape(B, C * T, H, W).detach()], dim=1))
+                    x = x - upd_2d.reshape(B, C, T, H, W) / self.n_iter
+                    # Bound the state itself, not just the value returned at the end: the
+                    # feedback that diverges is s -> e^{-s} -> gradient -> s, and it runs once
+                    # per iteration.
+                    s_lv = (s_lv - upd_s_2d.reshape(B, C, T, H, W) / self.n_iter).clamp(-13.8, 6.0)
+                else:
+                    upd = upd_2d.reshape(B, 2 * C, T, H, W) / self.n_iter
+                    x = x - upd[:, :C]
+                    s_lv = s_lv - upd[:, C:]
             if not return_var:
                 return x
             # clamp only so exp() stays finite; -13.8 is sigma^2 = 1e-6, the paper's own floor
