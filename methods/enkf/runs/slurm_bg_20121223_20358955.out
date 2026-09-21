@@ -1,0 +1,16 @@
+Tesla V100-SXM2-16GB
+[bg] /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt alpha=2 history=5 mean=/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt::mean_model
+[bg] 1 train day(s); robots=3 r=7 k=1 traj=per_day init=prev
+  frame 10/39974: 53.5 ms/frame
+  frame 100/39974: 13.2 ms/frame
+  frame 1000/39974: 9.4 ms/frame
+  frame 5000/39974: 8.8 ms/frame
+  frame 10000/39974: 8.8 ms/frame
+  frame 15000/39974: 8.8 ms/frame
+  frame 20000/39974: 8.9 ms/frame
+  frame 25000/39974: 8.8 ms/frame
+  frame 30000/39974: 8.8 ms/frame
+  frame 35000/39974: 8.8 ms/frame
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+[2026-09-20T17:41:57.732] error: *** STEP 20358955.0 ON dgx26 CANCELLED AT 2026-09-20T17:41:57 DUE to SIGNAL Terminated ***
+[2026-09-20T17:41:57.732] error: *** JOB 20358955 ON dgx26 CANCELLED AT 2026-09-20T17:41:57 DUE to SIGNAL Terminated ***

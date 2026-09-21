@@ -50,43 +50,28 @@ are tracked.
 | Where does the wall time go (forecast vs analysis)? | `checks/bench_enkf_split.py`, `checks/bench_enkf_opt.py` |
 | Reconstructed velocity field as a figure | `checks/plot_velocity_enkf.py` |
 
-## Experimental differentiable low-rank UNetKF
+## The learned-covariance filter that answers it: `lcskf/`
 
-`lowrank/` is the isolated next experiment.  It keeps the best retrained PedPred3 mean
-forecast frozen and trains a separate covariance U-Net with two heads:
+The ensemble-collapse finding below is not fixable by tuning, so
+[`lcskf/`](lcskf/README.md) replaces the ensemble outright: a U-Net predicts the
+background covariance as `B = U Uᵀ + diag(d)` for a neural forecast, and a
+differentiable Kalman analysis turns the pair into a posterior mean and an exact
+posterior diagonal. On the 7-day test split's walkable blind cells it goes from
+the EnKF's **26.0% worse than a constant-σ null** to **28.3% better**.
 
-```text
-x_t -> frozen PedPred3 -> mean_{t+1}
-[x_t, mean_{t+1}, mean_{t+1}-x_t, static_mask] -> covariance U-Net -> U, d
-B = U U^T + diag(d) -> differentiable Kalman update -> analysis_{t+1}
-```
-
-The Kalman layer uses Woodbury algebra and solves only a `rank x rank` system; it never
-constructs the full 1728-square covariance.  The initial experiment freezes
-`runs/surrogate_mean_s0/best.pt` and uses rank 16. Training samples legal robot positions
-and unions their exact radius-plus-line-of-sight footprints from the real map; final
-evaluation uses the exported moving-robot trajectories and observations.
+It shares this directory's vendored PedPred3, its exported observations
+(`check_outputs/enkf_k1_full/obs_*.npz`) and its uncertainty scorer
+(`checks/eval_uncertainty_enkf.py`), which is why it lives here rather than as a
+fifth top-level method. Its own README covers the three training stages, the
+convention-dependent α, and the seven-model single-factor ablation table.
 
 ```bash
-# Algebra, gradient, and shape checks (run in the project PyTorch environment)
-python3 -m methods.enkf.checks.check_lowrank_kalman
-
-# Small smoke train, then the full rank-16 run
-python3 -m methods.enkf.lowrank.train --allow-cpu --days 1 --max-frames 128 --epochs 1 --batch 8
-sbatch methods/enkf/sbatch/submit_lowrank_smoke.sbatch
-sbatch methods/enkf/sbatch/submit_lowrank_unetkf.sbatch train --rank 16 --seed 0
-
-# Sequential validation and the existing uncertainty scorer
-sbatch methods/enkf/sbatch/submit_lowrank_unetkf.sbatch eval \
-  --checkpoint methods/enkf/runs/lowrank_r16_s0/best.pt --only atc-20130616
-python3 -m methods.enkf.checks.eval_uncertainty_enkf \
-  --dir-fmt check_outputs/lowrank_unetkf_valid \
-  --out-fmt check_outputs/eval/uncertainty_lowrank_unetkf.json --k 1
+# algebra, gradient and shape checks
+python3 -m methods.enkf.lcskf.checks.check_kalman
+# smoke train on CPU, then the real thing
+python3 -m methods.enkf.lcskf.train --allow-cpu --days 1 --max-frames 128 --epochs 1 --batch 8
+sbatch methods/enkf/lcskf/sbatch/submit_lcskf.sbatch train --rank 32 --seed 0
 ```
-
-Formal jobs request three hours. Five minutes before the limit, the batch script
-automatically submits the same command with `--resume`; the last completed epoch is
-restored from `last.pt`, so long runs continue across allocations without manual work.
 
 ## The ensemble-collapse finding
 

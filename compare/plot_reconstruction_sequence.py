@@ -78,16 +78,23 @@ def clip_np(x):                             # (n,4,H,W)
     return x
 
 
-def panel(ax, state, vmax, title):
+def panel(ax, state, vmax, title, speed_scale):
+    """Density as the colour, velocity as arrows whose LENGTH is the speed.
+
+    The arrows used to be unit vectors, which showed heading but said nothing
+    about how fast anyone was moving; a still crowd and a rushing one drew the
+    same picture.  ``speed_scale`` is fixed for the whole sequence so a long
+    arrow means the same speed in every frame and in every panel.
+    """
     dens, vx, vy = state[0], state[1], state[2]
-    heading = np.arctan2(vy, vx)
     x, y = np.meshgrid(np.arange(dens.shape[1]), np.arange(dens.shape[0]))
-    u, v = np.cos(heading), np.sin(heading)
     m = np.isnan(dens)
-    u = np.where(m, np.nan, u); v = np.where(m, np.nan, v)
-    ax.imshow(dens, cmap="Blues", origin="upper", aspect="equal", vmin=0, vmax=vmax)
-    ax.quiver(x, y, u, v, color="black", scale=30, headwidth=3, headlength=4)
+    u = np.where(m, np.nan, vx); v = np.where(m, np.nan, vy)
+    im = ax.imshow(dens, cmap="Blues", origin="upper", aspect="equal", vmin=0, vmax=vmax)
+    ax.quiver(x, y, u, v, color="black", scale=speed_scale, scale_units="width",
+              headwidth=3, headlength=4)
     ax.set_title(title, fontsize=11); ax.set_xticks([]); ax.set_yticks([])
+    return im
 
 
 # --------------------------------------------------------------------------- #
@@ -194,7 +201,8 @@ def main():
     ap.add_argument("--dincae-ckpt", default="ckpt_00060.pt",
                     help="the checkpoint every reported DINCAE number uses (evaluate.PUBLISHED_CKPT)")
     ap.add_argument("--senseiver-ckpt", default=os.path.join(paths.method(paths.SENSEIVER), "runs", "senseiver_A", "best.pt"))
-    ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"))
+    ap.add_argument("--enkf-dir", default=paths.enkf_export("enkf_k1_full"),
+                    help="comma-separated export directories; one panel per directory")
     ap.add_argument("--enkf-label", default="EnKF",
                     help="panel title for whatever --enkf-dir holds; set it when the "
                          "export is not the plain EnKF filter")
@@ -239,7 +247,7 @@ def main():
     Omega, obs = out["Omega"], out["Y"].copy()
     vmax = max(0.3, float(np.percentile(X[:, 0], 99)))
 
-    recon, spread = {}, None
+    recon, spread, spreads = {}, None, {}
     if "dincae" in methods:
         print("[seq] running DINCAE ...", flush=True)
         recon["DINCAE"] = block_dincae(args.dincae_run_dir, args.dincae_ckpt, day_file, start, N, dev)
@@ -258,36 +266,59 @@ def main():
         recon["4DVarNet"] = block_varnet((args.varnet_ckpt or baseline_ckpt()), Xall, start, N, dev, day_file)
     if "enkf" in methods:
         print("[seq] loading EnKF export ...", flush=True)
-        est, spread = block_enkf(args.enkf_dir, args.day, start, N)
-        recon[args.enkf_label] = clip_np(est)            # est is already (N,4,H,W)
+        dirs = [d.strip() for d in args.enkf_dir.split(",") if d.strip()]
+        labels = [l.strip() for l in args.enkf_label.split(",") if l.strip()]
+        if len(labels) != len(dirs):
+            raise SystemExit(f"--enkf-label needs {len(dirs)} comma-separated names")
+        for d, lab in zip(dirs, labels):
+            est, spread = block_enkf(d, args.day, start, N)
+            recon[lab] = clip_np(est)                    # est is already (N,4,H,W)
+            spreads[lab] = spread
+        spread = spreads[labels[0]]
     # One scale for the whole sequence, never per frame: matplotlib's autoscale
     # would rescale every frame to its own maximum, so a quiet frame and a busy
     # one look equally red (measured 4.3x between the quietest and busiest frame)
     # and the panel stops saying anything about the absolute spread. Pass
     # --spread-vmax to hold it fixed across models, which a comparison needs.
     if spread is not None:
-        spread_vmax = args.spread_vmax or float(np.percentile(np.nan_to_num(spread), 99))
+        # One number across every frame AND every model: two panels that share a
+        # colour map but not its limits look alike while differing several-fold.
+        pooled = np.concatenate([np.nan_to_num(s).ravel() for s in spreads.values()])
+        spread_vmax = args.spread_vmax or float(np.percentile(pooled, 99))
         print(f"[seq] spread colour scale: vmin=0 vmax={spread_vmax:.4f}"
-              f"{' (given)' if args.spread_vmax else ' (p99 over the sequence)'}", flush=True)
+              f"{' (given)' if args.spread_vmax else ' (p99 over all models and frames)'}"
+              f"; density scale vmax={vmax:.4f}", flush=True)
+    speed_scale = max(1e-6, 7.0 * float(np.percentile(np.abs(X[:, 1:3]), 99)))
 
     outdir = args.outdir or os.path.join(paths.COMPARE, "results", f"seq_ppt_{args.day}")
     os.makedirs(outdir, exist_ok=True)
-    ncol = 2 + len(recon) + (1 if spread is not None else 0)
-    fig, axes = plt.subplots(1, ncol, figsize=(3.1 * ncol, 4.4))
+    n_spread = len(spreads) if spread is not None else 0
+    ncol = 2 + len(recon) + n_spread
+    fig, axes = plt.subplots(1, ncol, figsize=(3.1 * ncol + 1.1, 4.7))
+    fig.subplots_adjust(right=0.88, bottom=0.14)
     print(f"[seq] rendering {N} frames ({ncol} panels each) -> {outdir}", flush=True)
     for t in range(N):
         obs_t = obs[t].copy(); obs_t[:, ~Omega[t]] = np.nan
         cells = [("partial obs", obs_t), ("true state", X[t])] + [(name, arr[t]) for name, arr in recon.items()]
+        im_d = None
         for ax, (ti, s) in zip(axes, cells):
-            ax.cla(); panel(ax, s, vmax, ti)
-        if spread is not None:
-            axes[-1].cla()
-            sp = np.nan_to_num(spread[t])
-            axes[-1].imshow(sp, cmap="Reds", origin="upper", aspect="equal",
-                            vmin=0, vmax=spread_vmax)
-            axes[-1].set_title(f"{args.enkf_label} spread", fontsize=11); axes[-1].set_xticks([]); axes[-1].set_yticks([])
-        obs_flag = "OBS" if Omega[t].any() else "no obs this frame"
-        fig.suptitle(f"{args.day}  frame {start+t}  (seq {t:05d}/{N})   [{obs_flag}]", fontsize=11)
+            ax.cla(); im_d = panel(ax, s, vmax, ti, speed_scale)
+        im_s = None
+        for ax, lab in zip(axes[len(cells):], labels):
+            ax.cla()
+            im_s = ax.imshow(np.nan_to_num(spreads[lab][t]), cmap="Reds", origin="upper",
+                             aspect="equal", vmin=0, vmax=spread_vmax)
+            ax.set_title(f"{lab}\ndensity sigma", fontsize=10)
+            ax.set_xticks([]); ax.set_yticks([])
+        if t == 0:
+            cb1 = fig.colorbar(im_d, ax=axes[:len(cells)].tolist(), fraction=0.020, pad=0.012)
+            cb1.set_label("density", fontsize=9); cb1.ax.tick_params(labelsize=8)
+            if im_s is not None:
+                cb2 = fig.colorbar(im_s, ax=axes[len(cells):].tolist(), fraction=0.045, pad=0.012)
+                cb2.set_label("density sigma-hat", fontsize=9); cb2.ax.tick_params(labelsize=8)
+        seen = int(Omega[t].sum())
+        fig.suptitle(f"{args.day}   frame {start+t}   (seq {t:05d}/{N})   "
+                     f"observed {seen}/{Omega[t].size} cells", fontsize=11)
         fig.savefig(os.path.join(outdir, f"frame_{t:05d}.png"), dpi=100, bbox_inches="tight")
         if t % 200 == 0:
             print(f"  rendered {t}/{N}", flush=True)

@@ -171,6 +171,41 @@ DECKS = {
             ),
         ],
     },
+    "lcskf_framework": {
+        "title": "Learned-covariance sequential Kalman filter",
+        "subtitle": "two networks, one differentiable Kalman layer",
+        "slides": [
+            dict(
+                title="The idea",
+                bullets=[
+                    "A filter needs two things: a forecast, and a sense of how far to trust it.",
+                    "",
+                    "We learn both. One network predicts where the crowd will be. A second predicts",
+                    "how uncertain that prediction is, cell by cell.",
+                    "",
+                    "A differentiable Kalman layer fuses the two with whatever the robots happened",
+                    "to see, and returns a full-field estimate together with a per-cell uncertainty.",
+                    "",
+                    "Because the layer is differentiable, the whole thing trains end to end - which",
+                    "matters, because nobody can label a covariance directly.",
+                ],
+            ),
+            dict(
+                title="The framework",
+                image="lcskf_flow.png",
+                bullets=[
+                    "The robots see only part of the corridor.",
+                    "The forecast covers all of it; the learned",
+                    "uncertainty decides, cell by cell, whether to",
+                    "move towards what was measured or to stay",
+                    "with what was predicted.",
+                    "",
+                    "It runs sequentially: each estimate becomes",
+                    "part of the next step's history.",
+                ],
+            ),
+        ],
+    },
 }
 
 

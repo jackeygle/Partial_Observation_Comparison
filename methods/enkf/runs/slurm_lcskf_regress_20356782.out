@@ -1,0 +1,22 @@
+NVIDIA H200
+/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/bin/python3 -u -m methods.enkf.lcskf.checks.eval_sequential --calibration /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/controlled_grid_calibration_4096.json --new-checkpoint /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt --old-checkpoint /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt --frames 99999 --warmup 100 --new-alphas 2 --blind-gammas 1 --blind-empty-gammas 1 --skip-old --skip-mean --out /tmp/_lcskf_regress.json --device cuda
+usage: eval_sequential.py [-h] --calibration CALIBRATION --new-checkpoint
+                          NEW_CHECKPOINT --old-checkpoint OLD_CHECKPOINT --obs
+                          OBS [--frames FRAMES] [--warmup WARMUP]
+                          [--new-alphas NEW_ALPHAS]
+                          [--new-component-scales NEW_COMPONENT_SCALES]
+                          [--blind-gammas BLIND_GAMMAS]
+                          [--blind-empty-gammas BLIND_EMPTY_GAMMAS]
+                          [--skip-old] [--skip-mean] --out OUT
+                          [--export-npz EXPORT_NPZ] [--device DEVICE]
+eval_sequential.py: error: the following arguments are required: --obs
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lcskf/checks/_tmp_refactor_regression.py", line 16, in <module>
+    subprocess.run(cmd, check=True)
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/bin/python3', '-u', '-m', 'methods.enkf.lcskf.checks.eval_sequential', '--calibration', '/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/controlled_grid_calibration_4096.json', '--new-checkpoint', '/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt', '--old-checkpoint', '/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt', '--frames', '99999', '--warmup', '100', '--new-alphas', '2', '--blind-gammas', '1', '--blind-empty-gammas', '1', '--skip-old', '--skip-mean', '--out', '/tmp/_lcskf_regress.json', '--device', 'cuda']' returned non-zero exit status 2.
+srun: error: gpu50: task 0: Exited with exit code 1
+srun: Terminating StepId=20356782.0

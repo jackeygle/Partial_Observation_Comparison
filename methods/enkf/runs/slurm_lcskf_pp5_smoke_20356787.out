@@ -1,0 +1,14 @@
+NVIDIA H200
+[data] train=395, valid=395, load=0s, device=cuda
+[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
+[joint] mean_train=full; cov_lr=0.0001; mean_lr=1e-05; input_frames=5; cov_init=methods/enkf/runs/lowrank_a_r32_s0/best.pt
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lcskf/train.py", line 217, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/lcskf/train.py", line 171, in main
+    sums += torch.stack([m.detach().double() for m in metrics]) * len(x)
+RuntimeError: The size of tensor a (6) must match the size of tensor b (5) at non-singleton dimension 0
+srun: error: gpu50: task 0: Exited with exit code 1
+srun: Terminating StepId=20356787.0

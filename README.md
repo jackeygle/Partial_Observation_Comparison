@@ -316,6 +316,7 @@ Regenerate with `md5sum <path>`.
 | EnKF surrogate (tracked in git, 14 MB) | `enkf/enkf_lab/apt-ibex_train_model_28D.pth` | `17562f3e2d969611fe2a2b0d40c51d42` |
 | PedPred3 mean, 5→5 | `enkf/runs/pedpred3_5to5_s0/best.pt` | `077c26f0dce49fc530f064223a293d90` |
 | Mean net under the learned covariance | `enkf/runs/surrogate_mean_s0/best.pt` | `a37ad0cd283446561cf1096a03d03dab` |
+| Covariance U-Net it warm-starts from | `enkf/runs/lowrank_a_r32_s0/best.pt` | `ec24fa37ca5aa497dbb1938bf994b82a` |
 | **Learned-cov KF** | `enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt` | `9e7cb511ed2f3bce36ab8565e1c401a1` |
 
 4DVarNet paths are relative to `methods/varnet/runs/`, the rest to `methods/`.
@@ -372,6 +373,8 @@ methods/                  one subdirectory per method, none import each other
   dincae/                   DINCAE convolutional autoencoder inpainting
   senseiver/                Senseiver sparse-sensor reconstruction
   enkf/                     localised EnKF (read-only vendor copy + editable copy)
+    lcskf/                    the learned-covariance sequential KF built on it:
+                              dynamics/ + covariance.py + kalman.py + train.py + filter.py
   each has:
     train.py                (not enkf/, which is not learned)
     checks/                 evaluation and diagnostic scripts
@@ -478,6 +481,52 @@ done
 `--radius`/`--only`: it parses vendor config args first and prints that parser's
 help before reaching its own `argparse.ArgumentParser()` further down
 (`checks/run_enkf_baseline.py:120-131`). The flags above are real.
+
+The **Learned-cov KF** row *is* trained, in three stages, and its α is fitted
+afterwards. Full detail in `methods/enkf/lcskf/README.md`; the short version:
+
+```bash
+# (1) the mean forecast, (2) the covariance with that mean frozen,
+# (3) both together -- (3) is the published checkpoint
+sbatch methods/enkf/lcskf/sbatch/submit_dynamics.sbatch --seed 0
+sbatch methods/enkf/lcskf/sbatch/submit_lcskf.sbatch train --rank 32 --width 32 \
+  --batch 128 --lr 1e-3 --epochs 20 --seed 0 --out runs/lowrank_a_r32_s0
+sbatch methods/enkf/lcskf/sbatch/submit_lcskf.sbatch train \
+  --cov-ckpt runs/lowrank_a_r32_s0/best.pt \
+  --mean-ckpt runs/surrogate_mean_s0/best.pt \
+  --mean-train full --mean-lr 1e-5 --input-frames 5 --rank 32 --width 32 \
+  --batch 32 --lr 1e-4 --epochs 20 --eval-pairs 2048 --seed 0 \
+  --out runs/joint_j4_5f_r32_nofcst_s0
+```
+
+**Fit α under the convention you report in** -- see the third trap above. The
+sequential sweep and the export at the chosen α run through
+`methods/enkf/lcskf/sbatch/submit_sequential.sbatch`.
+
+A caveat for anyone re-running the export: **the sequential filter is not
+reproducible to better than about 0.2% on its reported metrics**, and its output
+arrays are never bit-identical. Two runs of the same code on the same card in the
+same process already differ, because `project_state`'s `density < EMPTY_DENSITY`
+test is a discontinuous switch that float-level non-determinism can flip, and the
+filter is autoregressive, so a flipped cell propagates. Measured on
+`atc-20130811` at alpha = 2, worst relative difference across every scored
+subset and metric:
+
+| | worst relative difference |
+|---|---|
+| the same code, same GPU, two runs | 1.73e-2 |
+| this code vs the published export | 1.37e-2 |
+
+The gap to the published number is *smaller* than the code's own run-to-run
+spread, so a re-run that lands within ~2% of the table has reproduced it. Do not
+read a 0.1% move as a real change. (Most metrics are far tighter than the worst
+case: `walkable_blind` RMSE moves by 3e-4 between runs; the 1.7e-2 outlier is the
+`blind` subset's Gaussian NLL.)
+
+Also note that the published export's recorded command cannot be replayed
+verbatim: it names `--old-checkpoint runs/joint_j4_5f_r32_s0/best.pt`, a losing
+ablation whose weights were deleted in 9825c81, and `eval_sequential.py` loads
+every checkpoint before `--skip-old` takes effect. Pass the new checkpoint twice.
 
 Checkpoints land in each method's `runs/<name>/` (gitignored). Slurm logs land
 alongside as `runs/slurm_<job>_<id>.out` and **are** tracked, so you can always

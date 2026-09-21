@@ -1,0 +1,5 @@
+[data] train=799, valid=799, load=3s, device=cuda
+[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
+[joint] mean_train=full; cov_lr=0.0001; mean_lr=1e-05; input_frames=1; cov_init=runs/lowrank_a_r32_s0/best.pt; history=observed/zeros; cov_obs_mask=True
+{"epoch": 0, "lr": 0.0001, "mean_lr": 1e-05, "skipped": 0, "seconds": 1.1, "train": {"loss": 0.032112666472177184, "analysis_mse_norm": 0.032112666472177184, "forecast_mse_norm": 0.23189249185283434, "blind_mse_norm": 0.046798384691284355, "observed_mse_norm": 0.015155280837660962}, "valid": {"loss": 0.09588352823629975, "analysis_mse_norm": 0.09588352823629975, "forecast_mse_norm": 0.3951838221400976, "blind_mse_norm": 0.15560912992805243, "observed_mse_norm": 0.024510487564839423}}
+[done] best validation loss=0.0958835 -> runs/_smoke_zero/best.pt

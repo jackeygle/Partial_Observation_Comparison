@@ -1,0 +1,6 @@
+NVIDIA H200
+[data] train=395, valid=395, load=0s, device=cuda
+[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
+[joint] mean_train=full; cov_lr=0.0001; mean_lr=1e-05; input_frames=5; cov_init=methods/enkf/runs/lowrank_a_r32_s0/best.pt
+{"epoch": 0, "lr": 0.0001, "mean_lr": 1e-05, "skipped": 0, "seconds": 0.7, "train": {"loss": 0.0064163393046282515, "analysis_mse_norm": 0.0064163393046282515, "forecast_mse_norm": 0.01695922334926038, "blind_mse_norm": 0.008323475803378262, "observed_mse_norm": 0.003903481106073419}, "valid": {"loss": 0.024952204199507833, "analysis_mse_norm": 0.024952204199507833, "forecast_mse_norm": 0.10358835104852915, "blind_mse_norm": 0.03824143158271909, "observed_mse_norm": 0.008409586444031447}}
+[done] best validation loss=0.0249522 -> methods/enkf/runs/_smoke_pp5mean_s0/best.pt

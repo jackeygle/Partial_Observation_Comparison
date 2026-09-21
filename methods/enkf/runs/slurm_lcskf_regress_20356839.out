@@ -1,0 +1,34 @@
+NVIDIA H200
+run A ...
+run B ...
+
+subset          metric                   |A-B| (this code vs itself)    |A-P| (vs published)
+all             rmse                                        1.30e-03                1.76e-04
+all             crps                                        1.13e-03                2.64e-04
+all             marginal_gaussian_nll                       7.49e-04                2.05e-03
+all             spread_skill                                5.51e-04                2.98e-04
+all             coverage90                                  4.53e-05                3.54e-05
+walkable        rmse                                        1.15e-03                2.86e-04
+walkable        crps                                        9.50e-04                1.04e-04
+walkable        marginal_gaussian_nll                       2.24e-04                1.38e-03
+walkable        spread_skill                                4.89e-04                3.20e-04
+walkable        coverage90                                  3.67e-05                2.56e-05
+walkable_blind  rmse                                        1.34e-03                3.26e-04
+walkable_blind  crps                                        1.41e-03                9.56e-05
+walkable_blind  marginal_gaussian_nll                       7.17e-03                6.67e-03
+walkable_blind  spread_skill                                5.49e-04                3.67e-04
+walkable_blind  coverage90                                  6.85e-05                4.79e-05
+blind           rmse                                        1.51e-03                2.02e-04
+blind           crps                                        1.66e-03                3.21e-04
+blind           marginal_gaussian_nll                       1.73e-02                1.37e-02
+blind           spread_skill                                6.20e-04                3.40e-04
+blind           coverage90                                  7.04e-05                5.48e-05
+observed        rmse                                        2.81e-04                1.98e-05
+observed        crps                                        1.79e-04                1.21e-04
+observed        marginal_gaussian_nll                       9.05e-04                5.93e-04
+observed        spread_skill                                1.51e-04                3.60e-05
+observed        coverage90                                  1.67e-05                1.33e-05
+
+worst |A-B| = 1.734e-02   (same code, same GPU, two runs)
+worst |A-P| = 1.366e-02   (this code vs the published V100 export)
+VERDICT: PASS -- gap to published is within this code's own run-to-run spread

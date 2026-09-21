@@ -1,0 +1,14 @@
+NVIDIA H200
+[bg] /scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt alpha=2 history=5 mean=/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt::mean_model
+[bg] 1 train day(s); robots=3 r=7 k=1 traj=per_day init=prev
+  frame 10/39837: 33.8 ms/frame
+  frame 100/39837: 6.3 ms/frame
+  frame 1000/39837: 3.6 ms/frame
+  frame 5000/39837: 3.3 ms/frame
+  frame 10000/39837: 3.3 ms/frame
+  frame 15000/39837: 3.3 ms/frame
+  frame 20000/39837: 3.3 ms/frame
+  frame 25000/39837: 3.2 ms/frame
+  frame 30000/39837: 3.2 ms/frame
+  frame 35000/39837: 3.2 ms/frame
+[done] atc-20121125: 39837 frames, filter 129s, total 136s -> check_outputs/backgrounds_j4nofcst_a2/bg_atc-20121125.npz

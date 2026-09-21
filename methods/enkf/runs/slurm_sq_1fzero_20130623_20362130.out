@@ -1,0 +1,80 @@
+Tesla V100-SXM2-16GB
+[new_cov_sweep_alpha0.125_f0.125_d0.125_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 58.3 ms/frame
+  frame 100/40620: 12.4 ms/frame
+  frame 1000/40620: 7.9 ms/frame
+  frame 5000/40620: 7.5 ms/frame
+  frame 10000/40620: 7.4 ms/frame
+  frame 15000/40620: 7.4 ms/frame
+  frame 20000/40620: 7.4 ms/frame
+  frame 25000/40620: 7.4 ms/frame
+  frame 30000/40620: 7.4 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha0.125_f0.125_d0.125_blindg1_emptyg1", "rmse": 1.0776785606528685, "crps": 0.5286514137948355, "spread_skill": 0.21802889813377446}
+[new_cov_sweep_alpha0.25_f0.25_d0.25_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 6.9 ms/frame
+  frame 100/40620: 7.3 ms/frame
+  frame 1000/40620: 7.3 ms/frame
+  frame 5000/40620: 7.3 ms/frame
+  frame 10000/40620: 7.3 ms/frame
+  frame 15000/40620: 7.3 ms/frame
+  frame 20000/40620: 7.4 ms/frame
+  frame 25000/40620: 7.4 ms/frame
+  frame 30000/40620: 7.4 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha0.25_f0.25_d0.25_blindg1_emptyg1", "rmse": 1.1070566998680893, "crps": 0.5120128618475764, "spread_skill": 0.2988992293235649}
+[new_cov_sweep_alpha0.5_f0.5_d0.5_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 7.0 ms/frame
+  frame 100/40620: 7.4 ms/frame
+  frame 1000/40620: 7.3 ms/frame
+  frame 5000/40620: 7.3 ms/frame
+  frame 10000/40620: 7.4 ms/frame
+  frame 15000/40620: 7.4 ms/frame
+  frame 20000/40620: 7.4 ms/frame
+  frame 25000/40620: 7.4 ms/frame
+  frame 30000/40620: 7.4 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha0.5_f0.5_d0.5_blindg1_emptyg1", "rmse": 1.129690563340106, "crps": 0.49071410974483126, "spread_skill": 0.41297401389646604}
+[new_cov_sweep_alpha1_f1_d1_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 6.7 ms/frame
+  frame 100/40620: 7.2 ms/frame
+  frame 1000/40620: 7.4 ms/frame
+  frame 5000/40620: 7.4 ms/frame
+  frame 10000/40620: 7.4 ms/frame
+  frame 15000/40620: 7.4 ms/frame
+  frame 20000/40620: 7.4 ms/frame
+  frame 25000/40620: 7.4 ms/frame
+  frame 30000/40620: 7.4 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha1_f1_d1_blindg1_emptyg1", "rmse": 1.1463846644176237, "crps": 0.4697225859207456, "spread_skill": 0.5741844266473446}
+[new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 6.8 ms/frame
+  frame 100/40620: 7.3 ms/frame
+  frame 1000/40620: 7.3 ms/frame
+  frame 5000/40620: 7.3 ms/frame
+  frame 10000/40620: 7.3 ms/frame
+  frame 15000/40620: 7.3 ms/frame
+  frame 20000/40620: 7.3 ms/frame
+  frame 25000/40620: 7.3 ms/frame
+  frame 30000/40620: 7.3 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1", "rmse": 1.1591249643457733, "crps": 0.45851151853771843, "spread_skill": 0.8018854339250725}
+[new_cov_sweep_alpha4_f4_d4_blindg1_emptyg1] mode=full history=1
+  frame 10/40620: 6.9 ms/frame
+  frame 100/40620: 7.3 ms/frame
+  frame 1000/40620: 7.4 ms/frame
+  frame 5000/40620: 7.4 ms/frame
+  frame 10000/40620: 7.4 ms/frame
+  frame 15000/40620: 7.4 ms/frame
+  frame 20000/40620: 7.4 ms/frame
+  frame 25000/40620: 7.4 ms/frame
+  frame 30000/40620: 7.4 ms/frame
+  frame 35000/40620: 7.4 ms/frame
+  frame 40000/40620: 7.4 ms/frame
+{"variant": "new_cov_sweep_alpha4_f4_d4_blindg1_emptyg1", "rmse": 1.171178517553689, "crps": 0.4700235442270561, "spread_skill": 1.1218592194114645}
+[done] check_outputs/eval/seq_1fzero_atc-20130623.json
