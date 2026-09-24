@@ -198,12 +198,14 @@ from before the final evaluation are **not** the reported numbers:
   log1p compresses the large errors and a constant σ there is a different null
   model. The final scores are all in physical units.
 - **The EnKF "ensemble collapse"** (spread ≈ 1% of the error, coverage 1.6% of a
-  90% interval). That was the original filter with the vendored surrogate and
-  independent Gaussian process noise, whose forecast damps member disagreement
-  by ~65% per step (`methods/enkf/checks/diag_enkf_spread_growth.py`). The final
-  EnKF replaces the forecast model (PedPred3 5→5) and samples process noise from
-  real forecast residuals; its spread is now slightly *too large* on average
-  (spread/RMSE 1.21), and too large on the velocity channels in particular.
+  90% interval) in the original filter. Its main cause is configuration: the
+  vendored forecast step injects only `0.01 ×` the process noise it was designed
+  for. At full strength the same filter reaches spread/RMSE 0.96 and 93% coverage
+  (`methods/enkf/checks/diag_proc_scale_sweep.py`, one day, 2000 frames), so the
+  earlier conclusion that no amount of noise can fix it was wrong — that
+  diagnostic only showed the forecast damps perturbations when *no* noise is
+  added. Full-strength independent noise still gives a spatially uninformative
+  σ̂; the final EnKF therefore samples the noise from real forecast residuals.
 - **The learned-covariance Kalman filter** (`methods/enkf/lcskf/`) — a research
   line that replaces the EnKF's ensemble covariance with a learned one. Kept with
   its own README; not in the final comparison.

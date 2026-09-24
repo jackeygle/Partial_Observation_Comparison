@@ -43,28 +43,45 @@ python3 -m methods.enkf.checks.verify_enkf_opt --frames 12
 # [verdict] PASS -- strict path bit-identical: True, unit checks: True
 ```
 
-## History: the original filter's ensemble collapse
+## History: the original filter's ensemble collapse, and what fixed it
 
 The original configuration — the vendored surrogate as forecast model and
 independent Gaussian process noise, run on CPU (`checks/run_enkf_baseline.py`,
 ~53 CPU-hours per day, outputs in `check_outputs/enkf_k1_full/`) — has an
 ensemble spread of only about 1% of its actual error, and a nominal 90% interval
-that contains the truth 1.6% of the time. `checks/diag_enkf_spread_growth.py`
-propagates a perturbed ensemble with no injected noise and no analysis: the spread
-decays ~65% per step, verdict `"contractive"`. That forecast model damps
-disagreement between members, so no amount of extra noise or inflation sustains a
-spread.
+that contains the truth 1.6% of the time.
 
-Two lines answered it:
+**The main cause is a constant.** The vendored `forecast()` injects
+`0.01 * proc_noise_vec`, i.e. 1% of the process noise that `PROC_STD` (the
+surrogate's own measured one-step error) calls for. The forecast damps
+perturbations (~65% per step with no noise at all, `checks/diag_enkf_spread_growth.py`,
+verdict `"contractive"`), so the spread settles at a level set by the injection.
+Changing only that multiplier (`checks/diag_proc_scale_sweep.py`, `atc-20130811`,
+2000 frames):
 
-- **The final EnKF** (above) changes the forecast model and draws the process noise
-  from real forecast residuals, so perturbations carry the spatial and
-  cross-channel structure of actual forecast errors. Its spread no longer collapses;
-  on average it is now slightly too large (spread/RMSE 1.21), mostly on the velocity
-  channels.
-- **[`lcskf/`](lcskf/README.md)**, the learned-covariance sequential Kalman filter,
-  replaces the ensemble covariance with a U-Net-predicted `B = U Uᵀ + diag(d)`. A
-  research line with its own README; **not in the final comparison**.
+| noise multiplier | spread/RMSE | 90% coverage | CRPS |
+|---|---:|---:|---:|
+| 0.01 (original) | 0.014 | 2% | 0.122 |
+| 0.1 | 0.13 | 12% | — |
+| 1 | 0.96 | 93% | 0.097 |
+
+An earlier version of this README concluded that no amount of noise could fix the
+collapse; that diagnostic only showed that the forecast damps perturbations when
+none are added. It was wrong.
+
+**Full-strength independent noise is not enough, though.** It fixes the size of
+σ̂ but not where it is large: the injected noise is spatially uniform, and on the
+velocity channels σ̂ is uncorrelated with the actual error (Spearman ≈ 0). The
+final EnKF therefore draws whole residual fields from real one-step forecast
+errors on training days (`enkf_opt/experiments/`), which carry the spatial and
+cross-channel structure of real errors: on seven full test days this lowers CRPS
+by 17.6% against full-strength Gaussian noise, on every day, and turns the vx
+spread–error correlation from −0.20 to +0.31. The noise scales were then tuned on
+validation days (`optimization_report.md`).
+
+[`lcskf/`](lcskf/README.md), the learned-covariance sequential Kalman filter, was
+a separate answer to the same problem (a U-Net-predicted covariance); it is **not
+in the final comparison**.
 
 Numbers in `check_outputs/` and in the `lcskf` README come from earlier scoring
 scripts, not the final evaluation protocol; the final numbers are in the repository
