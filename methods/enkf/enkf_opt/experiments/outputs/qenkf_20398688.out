@@ -1,8 +1,0 @@
-[residual, scale=1, rtps=0.8] 200/300, 0.113 s/frame
-[all] RMSE=0.14650 CRPS=0.07414 spread/skill=1.096 cov90=0.839
-[defined_blind] RMSE=0.23162 CRPS=0.06643 spread/skill=0.289 cov90=0.765
-[density] spearman=+0.512 AUSE=0.451 sigma_cv=0.584
-[vx] spearman=+0.199 AUSE=0.536 sigma_cv=0.526
-[vy] spearman=-0.172 AUSE=0.911 sigma_cv=0.421
-[var] spearman=+0.126 AUSE=0.979 sigma_cv=0.532
-[out] methods/enkf/enkf_opt/experiments/outputs/smoke_residual_s1_r08.json

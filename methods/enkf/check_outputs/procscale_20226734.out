@@ -1,7 +1,0 @@
-[load] atc-20130811 -> 2000 frames in 2.3s
-[sweep] day=atc-20130811 frames=2000 warmup=500 ensemble=100 radius=7  scales=[0.01]
-        injected per step = scale x PROC_STD = scale x (0.02829307, 0.31263075, 0.12325809, 0.41680932)
-      [scale=0.01] frame 200/2000  0.17 s/frame  eta 5 min
-      [scale=0.01] frame 400/2000  0.16 s/frame  eta 4 min
-      [scale=0.01] frame 600/2000  0.16 s/frame  eta 4 min
-[2026-09-12T14:53:19.512] error: *** JOB 20226734 ON csl3 CANCELLED AT 2026-09-12T14:53:19 DUE to SIGNAL Terminated ***

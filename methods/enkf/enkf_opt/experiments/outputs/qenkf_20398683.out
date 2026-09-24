@@ -1,8 +1,0 @@
-[gaussian, scale=1, rtps=0] 200/300, 0.120 s/frame
-[all] RMSE=0.17778 CRPS=0.08534 spread/skill=0.857 cov90=0.858
-[defined_blind] RMSE=0.22956 CRPS=0.07367 spread/skill=0.223 cov90=0.625
-[density] spearman=+0.757 AUSE=0.402 sigma_cv=0.272
-[vx] spearman=-0.226 AUSE=1.103 sigma_cv=0.158
-[vy] spearman=-0.121 AUSE=1.094 sigma_cv=0.160
-[var] spearman=+0.846 AUSE=0.207 sigma_cv=0.436
-[out] methods/enkf/enkf_opt/experiments/outputs/smoke_gaussian_s1_r0.json

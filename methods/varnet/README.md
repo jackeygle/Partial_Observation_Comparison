@@ -55,18 +55,18 @@ sbatch supervisor_evaluation/sbatch/full.sbatch
 
 | path | role |
 |---|---|
-| `config.yaml` | **all parameters** (data, grid, navigation/map, observation, prior, solver, training) |
-| `crowdcore/data/csv_to_h5.py` | Stage 1: raw ATC CSV → trajectory H5 |
-| `crowdcore/data/h5_to_grid.py` | Stage 2: trajectory H5 → grid_cache `(T,4,36,12)` |
-| `observation_model.py` | Component 1: multi-robot partial observation; `split_files`, `load_state`, `generate_observations` |
-| `navigation.py` | walkable map / obstacles / A*; `build_valid_mask_from_config` |
+| `../../crowdcore/config.yaml` | **all parameters** (data, grid, navigation/map, observation, prior, solver, training) |
+| `../../crowdcore/observation_model.py` | Component 1: multi-robot partial observation; `split_files`, `load_state`, `generate_observations` |
+| `../../crowdcore/navigation.py` | walkable map / obstacles / A*; `build_valid_mask_from_config` |
 | `prior_model.py` | Component 2: GENN dynamical prior Φ |
 | `variational_solver.py` | Component 3: variational cost + learned-gradient-descent solver (`GradSolver`) |
+| `losses.py` | the training losses (MSE, Eq. 14; Gaussian NLL for the aug. head) |
 | `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
-| `checks/` | verification scripts + all figure/evaluation scripts (see below) |
-| `sbatch/` | SLURM submit scripts |
-| `runs/varnet_mse5_h96_s<seed>/`, `runs/varnet_aughead_obs_h96_s0/` | the runs behind the two final models; the reported epoch is in each run's `select_valid.json` (`checks/model_io.py:reported_ckpt`) |
-| `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
+| `checks/select_checkpoint.py` | picks each run's epoch on the validation split -> `select_valid.json` |
+| `checks/model_io.py` | `load_solver`, `reported_ckpt` (resolves the selected checkpoint) |
+| `checks/eval_comprehensive.py` | helpers shared by the evaluators |
+| `sbatch/` | training (`submit_mse5_chain`, `submit_aughead_chain`) and selection (`submit_select`) jobs |
+| `runs/varnet_mse5_h96_s<seed>/`, `runs/varnet_aughead_obs_h96_s0/` | training logs (`metrics.jsonl`) and `select_valid.json` of the runs behind the two final models; checkpoints are gitignored |
 
 ---
 
@@ -169,15 +169,11 @@ srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
 
 ## Evaluate
 
-The reported evaluation is not in this directory: `supervisor_evaluation/evaluate.py`
-scores both 4DVarNet models next to the other methods, with the same test days,
-observations, cell set and clip bounds, and scores the aug. head's σ̂ in physical units
-on the same frames as DINCAE and the EnKF. Neither 4DVarNet model is initialised from
-truth: the solver starts from the observation-filled `X0`.
-
-For this method alone, `checks/eval_uncertainty.py` (single checkpoint or a seed
-ensemble) and `checks/eval_comprehensive.py` remain for diagnostics; their outputs under
-`check_outputs/eval/` predate the final protocol and are not the reported numbers.
+The reported evaluation is `supervisor_evaluation/evaluate.py`: it scores both 4DVarNet
+models next to the other methods, with the same test days, observations, cell set and
+clip bounds, and scores the aug. head's σ̂ in physical units on the same frames as DINCAE
+and the EnKF. Neither 4DVarNet model is initialised from truth: the solver starts from the
+observation-filled `X0`.
 
 ---
 
@@ -191,38 +187,18 @@ ensemble) and `checks/eval_comprehensive.py` remain for diagnostics; their outpu
 | `observation.sensing_range` | 7 | grid cells; >50 % crowd-mass coverage |
 | `observation.num_agents` | 3 | robots |
 | `observation.line_of_sight` | true | walls block sight (ray-cast on the real map) |
-| `observation.obs_std` | `[0.0569, 0.3147, 0.0862, 0.0064]` | per-channel sensor noise = **0.25 × 1.4826×MAD** on active cells (rederive with `checks/rederive_obs_std.py`); the 0.25 is an assumption, not a spec |
+| `observation.obs_std` | `[0.0569, 0.3147, 0.0862, 0.0064]` | per-channel sensor noise = **0.25 × 1.4826×MAD** on active cells (the derivation script is in the archive tag); the 0.25 is an assumption, not a spec |
 | `prior.hidden / kt,kh,kw / n_phi_layers / scale` | 32 / 3,3,3 / 2 / 2 | GENN Φ (two-scale) |
 | `solver` / `training` | — | `dT=200`, `n_iter=20`, ConvLSTM hidden 64, Adam 1e-3, batch 32 (see checkpoint) |
 
 ---
 
-## `checks/` — what each script is for
+## Experiment history
 
-**Checkpoint selection and evaluation**: `select_checkpoint.py` (epoch on the
-validation split -> `select_valid.json`), `model_io.py` (`reported_ckpt`: resolves the
-selected checkpoint, used by every evaluator), `eval_uncertainty.py`,
-`eval_comprehensive.py`, `eval_sigma_fair.py`, `plot_uncertainty.py`. The reported
-cross-method evaluation is `supervisor_evaluation/evaluate.py`;
-`compare/compare5.py` is the earlier cross-method scorer it reuses for accuracy.
-`plot_reconstruction_sequence.py` draws N consecutive frames as PNGs;
-`rederive_obs_std.py` re-derives the observation-noise std in `config.yaml`.
-
-**Module verification** (the test suite): `check_data_pipeline.py`,
-`check_map_orientation.py`, `check_navigation.py` (A* vs Dijkstra/BFS),
-`check_observation_model.py`, `check_prior_model.py`, `check_variational_solver.py`
-(shape / zero-centre / differentiability).
-
-**Map and architecture figures**: `plot_nav_mask.py` (walkable grid) and
-`plot_obstacle_map.py` (obstacle occupancy). The architecture diagrams come from
-`checks/plot_architecture.py`, drawn from the reported model
-(`checks/model_io.py:baseline_ckpt`). `plot_training_results.py` and
-`plot_results.py`, which plotted the hidden=32 capacity sweep (b0/a2/a4) and b0's
-speed, were deleted with those runs on 2026-09-13. The eight pre-2026-09-07 decks and their build
-scripts, and the whole of `slides/`, were deleted on 2026-09-08/09; the project
-no longer builds presentation decks from this repository.
-`methods/varnet/SUPERSEDED.md` keeps the findings that were only recorded in
-those decks' notes.
+The runs and diagnostics that led to these two models — the hidden=32 capacity sweep, the
+`aug0`/`vsb0` five-seed uncertainty ensembles, the loss-weighting experiments, solver and
+map diagnostics, and their figures — are not in the current tree. They are preserved in the
+git tag `archive-full-2026-09-24` (`git checkout archive-full-2026-09-24`).
 
 ---
 
@@ -231,6 +207,6 @@ those decks' notes.
 - **`torch` on GPU only** — never on the login node (see TL;DR note).
 - **`/tmp` is node-local** — a compute node cannot read the login node's `/tmp`
   (incl. the session scratchpad). Write compute-node outputs to the shared project
-  filesystem (`check_outputs/`, `runs/`, …), not `/tmp`.
+  filesystem (`runs/`, …), not `/tmp`.
 - **Two projects, two `config.py`** — the EnKF driver imports only `pedpred.*` from
   `methods/enkf/enkf_lab/`, never that copy's `config`, to avoid a module-name clash.

@@ -67,11 +67,15 @@ ensemble-space gain; it is kept separate from this `pinv` table.
 
 ## Commands
 
+The CPU `pinv` runs above used scripts that are now in the git tag
+`archive-full-2026-09-24`. With the current tree, the residual bank and the GPU filter:
+
 ```bash
 sbatch methods/enkf/enkf_opt/experiments/submit_build_residual_q.sbatch
-sbatch methods/enkf/enkf_opt/experiments/submit_eval_structured_q.sbatch \
-  --noise-kind residual --scale 1 --frames 2000 --warmup 500 --gain-mode pinv
+python3 -m methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --help
 ```
+
+The final configuration is run for every test day by `supervisor_evaluation/evaluate.py`.
 
 ## CUDA backend
 
@@ -90,10 +94,6 @@ seconds for the original CPU `pinv` jobs.  Results were nearly identical:
 | Gaussian scale 1 | 0.20422 / 0.09520 | 0.20418 / 0.09518 |
 | Residual scale 1 | 0.17137 / 0.07565 | 0.17142 / 0.07562 |
 
-```bash
-sbatch methods/enkf/enkf_opt/experiments/submit_eval_structured_q_gpu.sbatch \
-  --noise-kind residual --scale 1 --frames 100000 --warmup 500
-```
 
 ## Seven complete test days (CUDA backend)
 

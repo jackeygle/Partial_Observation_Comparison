@@ -1,5 +1,0 @@
-[model] Senseiver 65,892 params |  | walkable 290/432 | device=cuda
-[ckpt] MSE: mse5_h96_s0=ckpt_00080.pt(ep80,20it), mse5_h96_s1=ckpt_00090.pt(ep90,20it), mse5_h96_s2=ckpt_00080.pt(ep80,20it), mse5_h96_s3=ckpt_00080.pt(ep80,20it), mse5_h96_s4=ckpt_00080.pt(ep80,20it)
-[ckpt] NLL: vsb0_h96_s0=ckpt_00080.pt(ep80,20it), vsb0_h96_s1=ckpt_00090.pt(ep90,20it), vsb0_h96_s2=ckpt_00149.pt(ep149,20it), vsb0_h96_s3=ckpt_00140.pt(ep140,20it), vsb0_h96_s4=ckpt_00140.pt(ep140,20it)
-[ckpt] AUG: aug0_h96_s0=ckpt_00149.pt(ep149,20it), aug0_h96_s1=ckpt_00100.pt(ep100,20it), aug0_h96_s2=ckpt_00100.pt(ep100,20it), aug0_h96_s3=ckpt_00149.pt(ep149,20it), aug0_h96_s4=ckpt_00130.pt(ep130,20it)
-[2026-09-13T14:24:25.901] error: *** JOB 20236059 ON dgx2 CANCELLED AT 2026-09-13T14:24:25 DUE to SIGNAL Terminated ***

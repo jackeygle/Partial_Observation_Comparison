@@ -1,9 +1,0 @@
-[gaussian] 1000/2000, 0.0058 s/frame
-[all] RMSE=0.20418 CRPS=0.09518 spread/skill=0.738 cov90=0.833
-[defined_blind] RMSE=0.28401 CRPS=0.10634 spread/skill=0.235 cov90=0.540
-[density] spearman=+0.734 AUSE=0.521
-[vx] spearman=-0.193 AUSE=1.135
-[vy] spearman=-0.106 AUSE=1.059
-[var] spearman=+0.821 AUSE=0.244
-[runtime] 13.58s on Tesla V100-SXM2-32GB; failures=0
-[out] methods/enkf/enkf_opt/experiments/outputs/gpu_verify_gaussian_s1_2000.json

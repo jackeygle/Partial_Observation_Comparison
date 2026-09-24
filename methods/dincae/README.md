@@ -13,8 +13,8 @@ data pipeline and the **exact same observation configuration** with the other me
 There, DINCAE's σ̂ is scored in **physical units** on the same frames and cells as the
 other probabilistic methods: density, vx and vy map back to Gaussians with σ̂·std, and
 `var`, which is log1p-transformed here, to a shifted log-normal scored with its
-closed-form CRPS. The older `checks/eval_uncertainty_dincae.py` scores σ̂ in this
-directory's normalised space instead; its outputs are kept but superseded.
+closed-form CRPS. (An earlier evaluator scored σ̂ in this directory's normalised
+space; it is superseded and kept only in the git tag `archive-full-2026-09-24`.)
 
 Papers: Barth et al. 2020 (GMD 13, 1609) = **DINCAE 1.0**; Barth et al. 2022 (GMD 15,
 2183) = **DINCAE 2.0**. Reference implementation:
@@ -55,25 +55,17 @@ Identifiers in the code follow this table: `residual_mse()`, `resid_std`,
 | `model.py` | U-Net + SumSkip + refinement step + sigma-hat parameterisation (Eq.6-7) |
 | `losses.py` | Gaussian NLL (Eq.3), summed after independently normalising each variable |
 | `train.py` | training loop (Adam / grad clip 5 / periodic checkpoints) |
-| `checks/` | self-checks, evaluation, and scripts measuring the data itself |
-| `sbatch/` | SLURM submission scripts |
-| `artifacts/` | **artifacts**: `state_stats.npz` (read by training), `decay_tables.*` (diagnostic only) |
-| `cache/` | **artifacts**: the encoding cache (~23 GB, safe to delete and rebuild at any time) |
-| `check_outputs/` | **artifacts**: metric JSONs produced by `checks/` scripts |
-| `runs/` | **artifacts**: checkpoints, `metrics.jsonl`, SLURM logs |
+| `checks/evaluate.py` | evaluation: MSE on the reported walkable scope (plus reference cell sets), sigma-hat calibration, variance retention; `predict_day` is also what the final evaluation calls |
+| `checks/select_checkpoint.py` | picks the checkpoint on the validation split |
+| `sbatch/submit_train.sbatch` | training job (self-chaining) |
+| `artifacts/state_stats.npz` | per-cell mean field and per-channel residual std (read by training and inference) |
+| `cache/` | the encoding cache (~13 GB, gitignored, safe to delete and rebuild) |
+| `check_outputs/` | the validation-split checkpoint choice and the final checkpoint's test metrics |
+| `runs/dincae_ff/` | the final run: `metrics.jsonl` (checkpoints gitignored) |
 
-Inside `checks/`:
-
-- `check_encoding.py` — self-checks `encoding.py`'s invariants (are both pieces 0 at
-  missing cells, is the target mask correct, ...)
-- `evaluate.py` — evaluation: sigma-hat calibration, variance retention, MSE on the
-  reported walkable scope (plus reference cell sets), and optional multi-epoch output averaging (`--average-checkpoints`)
-- `measure_coverage_revisit.py` / `measure_obs_age.py` / `measure_decorrelation.py`
-  — measurements about **the data itself** (coverage, observation age, temporal
-  autocorrelation), not on the training path
-- `measure_decay_tables.py` — an early calibration for an age-dependent-sigma^2
-  variant. **Not part of the paper's method**, kept because the autocorrelation
-  table it produces is a valid measurement. Artifact in `artifacts/decay_tables.*`.
+The encoding self-checks and the scripts that measured the data itself (coverage,
+observation age, temporal decorrelation), quoted below, are in the git tag
+`archive-full-2026-09-24`.
 
 ---
 
@@ -86,18 +78,17 @@ cd methods/dincae               # python below runs from here; sbatch from the r
 # 1. Per-cell statistics (once; pure numpy/scipy, login node is fine, ~8 minutes)
 python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
 
-# 2. Encoding self-check (~2 minutes, login node is fine)
-python3 -m methods.dincae.checks.check_encoding   # expect PASS
-
-# 3. Training (GPU node)
+# 2. Training (GPU node)
 (cd ../.. && sbatch methods/dincae/sbatch/submit_train.sbatch) # 200 epochs, self-chaining + --resume
 #   -> runs/dincae_ff/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
 #   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 
-# 4. Evaluation (GPU node)
+# 3. Checkpoint choice and evaluation (GPU node)
 python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff   # pick the epoch on validation
-(cd ../.. && sbatch methods/dincae/sbatch/submit_eval.sbatch --split test)
-#   -> check_outputs/eval_ff_00060/dincae_metrics_test.json
+python3 -m methods.dincae.checks.evaluate --run-dir runs/dincae_ff \
+    --ckpt-glob "$PWD/runs/dincae_ff/ckpt_00060.pt" --split test
+#   -> check_outputs/eval/dincae_metrics_test.json
+#   The comparison with the other methods is supervisor_evaluation/evaluate.py.
 #   (the PUBLISHED configuration: runs/dincae_ff at the single epoch-60 checkpoint
 #    chosen on the validation split. Averaging checkpoints needs an explicit
 #    --average-checkpoints, see "Checkpoint policy" below.)
@@ -105,8 +96,7 @@ python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff   # 
 
 **torch only runs on GPU nodes** (`sbatch`, or
 `srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00`), never on the login
-node. `state.py` and `checks/measure_*.py` are pure numpy/scipy and can run on the
-login node.
+node. `state.py` is pure numpy/scipy and can run on the login node.
 
 ---
 
@@ -188,13 +178,13 @@ default** (neither paper has it).
 
 **Not used**: age-dependent sigma^2, multi-scale temporal aggregation, random
 per-track dropout, `truth_uncertain`. The first two were implemented at one point
-(only `checks/measure_decay_tables.py`'s measurement survives now); the last two
+(their code is in the archive tag); the last two
 exist in the paper/code but are unused -- none of these are part of the paper's
 method.
 
 ---
 
-## Two hard constraints on ATC (`checks/check_encoding.py` prints these)
+## Two hard constraints on ATC (measured by the encoding self-check)
 
 ```
 single-frame coverage of walkable cells:   55.5%
@@ -206,7 +196,7 @@ covered at least once within 3-frame window: 63.1%  -> 36.9% of cells have both
 
 The paper's data is **one snapshot per day**; "previous day / today / next day"
 gives far higher coverage there. Ours is sampled at 1 Hz with a field that
-decorrelates in about 2 seconds (`checks/measure_decorrelation.py`), so the
+decorrelates in about 2 seconds (measured on the training days), so the
 original paper's setup naturally gets little observational information here. These
 two numbers are key to explaining performance, not a bug.
 

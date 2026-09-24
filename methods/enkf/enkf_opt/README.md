@@ -1,5 +1,12 @@
 # `enkf_opt/` — the EnKF copy we are allowed to modify
 
+> **What is in the current tree.** `pedpred/` (the filter and PedPred3 code) and
+> `experiments/` (the final structured-noise GPU filter and its residual-bank builder).
+> The read-only reference copy `enkf_lab/`, the bit-identity checks
+> (`checks/verify_enkf_opt.py`, `checks/verify_enkf_gain_mode.py`) and the benchmark
+> script quoted below are in the git tag `archive-full-2026-09-24`; the numbers below are
+> as measured with them.
+
 Starts as an exact copy of `../enkf_lab/` (which is itself a pristine copy of the
 `Partial_observation` baseline). Experimental changes go HERE; `enkf_lab` stays untouched so
 every change can be diffed and, more importantly, numerically verified against it.

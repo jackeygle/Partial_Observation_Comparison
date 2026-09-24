@@ -1,4 +1,0 @@
-Tesla V100-SXM2-16GB, 16384 MiB
-{"model": "new_5to5", "weighted_nlll": 0.06294347927905619, "direct5_rmse": 0.2434278272830412, "direct5_nmse": 0.3757661172648522, "rolling_rmse": 0.4143589214217818, "rolling_nmse": 1.091097050235525}
-{"model": "old_apt_ibex", "weighted_nlll": 0.08364570315461606, "direct5_rmse": 0.27347113462271505, "direct5_nmse": 0.47424215640233675, "rolling_rmse": 0.4012368321918544, "rolling_nmse": 1.0230846759126657}
-[done] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/eval/pedpred5_comparison_leads_4096.json

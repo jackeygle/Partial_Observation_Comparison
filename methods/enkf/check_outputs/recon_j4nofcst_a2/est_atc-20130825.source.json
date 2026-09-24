@@ -1,7 +1,0 @@
-{
-  "variant": "new_cov_sweep_alpha2_f2_d2_blindg1_emptyg1",
-  "produced_by": "eval_pedpred5_sequential.py",
-  "obs": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/enkf_k1_full/obs_atc-20130825.npz",
-  "frames": 42890,
-  "new_checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/runs/joint_j4_5f_r32_nofcst_s0/best.pt"
-}

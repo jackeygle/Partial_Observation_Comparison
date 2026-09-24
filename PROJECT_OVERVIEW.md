@@ -20,7 +20,7 @@ reconstruction is.
 | [The final comparison](#the-final-comparison) | which six models are compared, and why these |
 | [Scoring conventions](#scoring-conventions) | what exactly every number measures |
 | [Where each final model comes from](#where-each-final-model-comes-from) | provenance, retraining commands |
-| [Superseded results still in the repository](#superseded-results-still-in-the-repository) | reading older files without being misled |
+| [Superseded results, and the archive tag](#superseded-results-and-the-archive-tag) | what was removed, and how to get it back |
 | [Running things](#running-things) | environment, layout, diagnostics |
 | [Data](#data) | where the data lives, what is and is not in git |
 
@@ -57,8 +57,9 @@ Three rules hold for every row:
 
 Not in the final comparison, by decision: the two 4DVarNet deep-ensemble
 uncertainty designs (`aug0`, `vsb0`), the learned-covariance Kalman filter
-(`methods/enkf/lcskf/`), and the Senseiver temporal-mixer variants. Their records
-stay in the repository; see [Superseded results](#superseded-results-still-in-the-repository).
+(LCSKF), and the Senseiver temporal-mixer variants. Their code, runs and results
+were removed from the current tree and are kept in the git tag
+`archive-full-2026-09-24`; see [Superseded results](#superseded-results-and-the-archive-tag).
 
 ---
 
@@ -180,40 +181,46 @@ Two traps that silently produce a *different number* rather than an error:
 
 ---
 
-## Superseded results still in the repository
+## Superseded results, and the archive tag
 
-The repository keeps the record of how the final comparison was reached. Files
-from before the final evaluation are **not** the reported numbers:
+On 2026-09-24 the repository was reduced to the six final models: their code,
+training and selection scripts, the final evaluation, and the records needed to
+explain them. Everything else — all other experiments, their runs, logs, figures and
+result files, the earlier cross-method scorer outputs, the original EnKF code copy and
+its diagnostics — is preserved unchanged in the git tag **`archive-full-2026-09-24`**:
 
-- **`compare/results/compare5_final.json` and `compare5.png`** — the accuracy
-  table used until 2026-09-17, when robot routes changed from one fixed seed for
-  every day to a seed per day. Different observations, so different numbers;
-  the final accuracy table is `supervisor_evaluation/outputs/full/accuracy.csv`.
-- **4DVarNet `aug0` / `vsb0` five-seed deep ensembles** and their uncertainty
-  JSONs under `methods/varnet/check_outputs/eval/`. Replaced by the single
+```bash
+git checkout archive-full-2026-09-24          # the whole earlier tree
+git checkout archive-full-2026-09-24 -- <path>   # one file or directory into the current tree
+```
+
+What those older results were, so that numbers quoted elsewhere are not mistaken for
+the final ones:
+
+- **`compare/results/compare5_final.json`** — the accuracy table used until
+  2026-09-17, when robot routes changed from one fixed seed for every day to a seed
+  per day. Different observations, so different numbers.
+- **4DVarNet `aug0` / `vsb0` five-seed deep ensembles** — replaced by the single
   `aughead_obs` model.
-- **Uncertainty scored in DINCAE's normalised space**
-  (`uncertainty_dincae.json` from `methods/dincae/checks/eval_uncertainty_dincae.py`).
-  Coverage is unaffected by that space, but CRPS skill and spread/RMSE are not:
-  log1p compresses the large errors and a constant σ there is a different null
-  model. The final scores are all in physical units.
+- **Uncertainty scored in DINCAE's normalised space** — coverage is unaffected by
+  that space, but CRPS skill and spread/RMSE are not (log1p compresses the large
+  errors, and a constant σ there is a different null model). The final scores are all
+  in physical units.
 - **The EnKF "ensemble collapse"** (spread ≈ 1% of the error, coverage 1.6% of a
-  90% interval) in the original filter. Its main cause is configuration: the
-  vendored forecast step injects only `0.01 ×` the process noise it was designed
-  for. At full strength the same filter reaches spread/RMSE 0.96 and 93% coverage
-  (`methods/enkf/checks/diag_proc_scale_sweep.py`, one day, 2000 frames), so the
-  earlier conclusion that no amount of noise can fix it was wrong — that
-  diagnostic only showed the forecast damps perturbations when *no* noise is
-  added. Full-strength independent noise still gives a spatially uninformative
-  σ̂; the final EnKF therefore samples the noise from real forecast residuals.
-- **The learned-covariance Kalman filter** (`methods/enkf/lcskf/`) — a research
-  line that replaces the EnKF's ensemble covariance with a learned one. Kept with
-  its own README; not in the final comparison.
-- **Senseiver extensions after G-direct k=16** (temporal mixers, history loss,
-  motion tokens, geodesic bias) — none beat k=16; recorded in
-  `methods/senseiver/README.md`.
-- Any per-method section that quotes MSE over all 432 cells, `obs_every_k=4`, or
-  400-frame subsets — scopes the project stopped reporting in early September.
+  90% interval) in the original filter. Its main cause is configuration: the vendored
+  forecast step injects only `0.01 ×` the process noise it was designed for. At full
+  strength the same filter reaches spread/RMSE 0.96 and 93% coverage
+  (`methods/enkf/checks/diag_proc_scale_sweep.py`, still in the tree, one day, 2000
+  frames), so an earlier conclusion that no amount of noise can fix it was wrong.
+  Full-strength independent noise still gives a spatially uninformative σ̂; the final
+  EnKF therefore samples the noise from real forecast residuals
+  (`methods/enkf/README.md`).
+- **The learned-covariance Kalman filter (LCSKF)** — a research line that replaces
+  the EnKF's ensemble covariance with a learned one; not in the final comparison.
+- **Senseiver extensions after G-direct k=16** (temporal mixers, history loss, motion
+  tokens, geodesic bias) — none beat k=16.
+- Anything quoting MSE over all 432 cells, `obs_every_k=4`, or 400-frame subsets —
+  scopes the project stopped reporting in early September.
 
 ---
 
@@ -254,28 +261,27 @@ methods/                  one directory per method; none imports another
   varnet/                   4DVarNet (MSE and aug. head)
   dincae/                   DINCAE
   senseiver/                Senseiver (A, and the G / temporal extensions)
-  enkf/                     EnKF: enkf_lab/ (read-only vendor copy), enkf_opt/
-                            (the editable copy + structured-noise GPU filter),
-                            lcskf/ (PedPred3 dynamics training; learned-covariance KF)
-  each has checks/ (evaluation, diagnostics), sbatch/, runs/ (checkpoints,
-  gitignored) and check_outputs/ (figures and result JSON, tracked)
+  enkf/                     EnKF: enkf_opt/ (filter code + the final structured-noise
+                            GPU filter and its tuning record), lcskf/dynamics/
+                            (PedPred3 forecast-model training)
+  each has train.py (not enkf/), checks/ (checkpoint selection, evaluation),
+  sbatch/ (training jobs) and runs/ (training logs; checkpoints gitignored)
 compare/                  the only code that imports more than one method:
                           cross-method scoring, shared metrics, plot style
 sbatch/_env.sh            the single environment entry point
 ```
 
-### Per-method diagnostics
+### Per-method scripts that are not training
 
 | Question | Script |
 |---|---|
-| DINCAE accuracy, σ̂ calibration, variance retention | `methods.dincae.checks.evaluate` |
-| 4DVarNet variational solver sanity (gradients, convergence) | `methods.varnet.checks.check_variational_solver` |
-| Senseiver pipeline trace (tensor shapes end to end) | `methods.senseiver.checks.trace_pipeline` |
-| Does an ensemble sustain spread, or collapse? | `methods.enkf.checks.diag_enkf_spread_growth` |
-| Is `enkf_opt/` still bit-identical to the vendored `enkf_lab/`? | `methods.enkf.checks.verify_enkf_opt` |
-| A reconstructed field as a picture | `supervisor_evaluation/evaluate.py images` (100 matched frames, all methods) |
+| DINCAE accuracy, σ̂ calibration, variance retention on its own | `methods.dincae.checks.evaluate` |
+| Which epoch of a run to report (validation split) | `methods.varnet.checks.select_checkpoint`, `methods.dincae.checks.select_checkpoint` |
+| Why did the original EnKF collapse? | `methods.enkf.checks.diag_proc_scale_sweep` |
+| A reconstructed field as a picture, all methods | `supervisor_evaluation/evaluate.py images` (100 matched frames) |
 
-All take `--help`; most default to the seven test days.
+All take `--help`. The earlier diagnostics (solver checks, pipeline traces, EnKF
+bit-identity checks and benchmarks) are in the archive tag.
 
 ---
 
@@ -297,7 +303,7 @@ resolution changes; see `crowdcore/data/DOC_data_pipeline.md`.
 
 **In git:** code, configuration, the real ATC map, the split lists (copies in
 `supervisor_evaluation/data_split/`), the nine packaged final weights (126 MB,
-`supervisor_evaluation/models/`), the vendored EnKF surrogate, DINCAE's
+`supervisor_evaluation/models/`), the original EnKF forecast model (`methods/enkf/enkf_opt/apt-ibex_train_model_28D.pth`, 14 MB), DINCAE's
 normalisation statistics, result JSON/CSV and figures.
 
 **Not in git:** the ATC data at every stage (it carries its own redistribution

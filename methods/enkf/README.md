@@ -29,33 +29,37 @@ weights with a fresh optimiser, gradient clipping at 1.0 and lr 5e-4, and was
 stopped at epoch 131 of 150 once the validation loss had been flat for ~20
 epochs (`runs/pedpred3_5to5_clip_s0/dyn150_pick.json`).
 
-## Two copies of the original code, on purpose
+## Directory layout
 
-| Directory | Role |
+| path | role |
 |---|---|
-| `enkf_lab/` | **pristine, read-only** byte-for-byte copy of the EnKF baseline from the original `Partial_observation` project, trained surrogate weights included. Files are chmod 444 deliberately. This is the reference. |
-| `enkf_opt/` | the copy we are allowed to modify. Changes to the original filter path must be **bit-identical** to `enkf_lab` on real data — `np.array_equal`, not `np.isclose`. The structured-noise GPU filter above lives in `enkf_opt/experiments/`. |
+| `enkf_opt/pedpred/` | the filter and PedPred3 code, adapted from the original `Partial_observation` EnKF baseline (see [`enkf_opt/README.md`](enkf_opt/README.md)) |
+| `enkf_opt/experiments/eval_structured_q_gpu.py` | **the final filter**: 100 members, structured residual noise, localisation, ensemble-space Kalman update, all on GPU |
+| `enkf_opt/experiments/build_residual_q_bank.py` | builds the residual noise bank from training days |
+| `enkf_opt/experiments/outputs/` | the tuning record: `optimization_report.md` and the per-stage `*_summary.json` |
+| `enkf_opt/apt-ibex_train_model_28D.pth` | the original baseline's forecast model (14 MB), used by the collapse diagnosis below |
+| `lcskf/dynamics/` | trains the final forecast model (PedPred3 5→5) |
+| `checks/export_obs_for_enkf.py` | writes the robots' observations in the filter's format (used by the final evaluation) |
+| `checks/diag_proc_scale_sweep.py` | the collapse diagnosis: the original filter with only its noise multiplier changed |
+| `check_outputs/eval/proc_scale_*.json` | its results |
+| `runs/pedpred3_5to5_clip_s0/`, `runs/pedpred3_5to5_s0/` | training logs of the forecast model (checkpoints gitignored) |
 
-Verify before trusting any change to the original path in `enkf_opt/`:
-
-```bash
-python3 -m methods.enkf.checks.verify_enkf_opt --frames 12
-# [verdict] PASS -- strict path bit-identical: True, unit checks: True
-```
+The original read-only baseline copy (`enkf_lab/`), the bit-identity checks and
+benchmarks of the engineering speed-ups, the original CPU driver, and every other
+experiment are in the git tag `archive-full-2026-09-24`.
 
 ## History: the original filter's ensemble collapse, and what fixed it
 
 The original configuration — the vendored surrogate as forecast model and
-independent Gaussian process noise, run on CPU (`checks/run_enkf_baseline.py`,
-~53 CPU-hours per day, outputs in `check_outputs/enkf_k1_full/`) — has an
+independent Gaussian process noise, run on CPU (~53 CPU-hours per day) — has an
 ensemble spread of only about 1% of its actual error, and a nominal 90% interval
 that contains the truth 1.6% of the time.
 
 **The main cause is a constant.** The vendored `forecast()` injects
 `0.01 * proc_noise_vec`, i.e. 1% of the process noise that `PROC_STD` (the
 surrogate's own measured one-step error) calls for. The forecast damps
-perturbations (~65% per step with no noise at all, `checks/diag_enkf_spread_growth.py`,
-verdict `"contractive"`), so the spread settles at a level set by the injection.
+perturbations (~65% per step with no noise at all, verdict `"contractive"`), so the
+spread settles at a level set by the injection.
 Changing only that multiplier (`checks/diag_proc_scale_sweep.py`, `atc-20130811`,
 2000 frames):
 
@@ -79,21 +83,6 @@ by 17.6% against full-strength Gaussian noise, on every day, and turns the vx
 spread–error correlation from −0.20 to +0.31. The noise scales were then tuned on
 validation days (`optimization_report.md`).
 
-[`lcskf/`](lcskf/README.md), the learned-covariance sequential Kalman filter, was
-a separate answer to the same problem (a U-Net-predicted covariance); it is **not
-in the final comparison**.
-
-Numbers in `check_outputs/` and in the `lcskf` README come from earlier scoring
-scripts, not the final evaluation protocol; the final numbers are in the repository
-README.
-
-## What the checks answer
-
-| Question | Script |
-|---|---|
-| Is `enkf_opt/` still bit-identical to `enkf_lab/`? | `checks/verify_enkf_opt.py` |
-| Same, for the gain-mode variants | `checks/verify_enkf_gain_mode.py` |
-| Does an ensemble sustain spread, or collapse? | `checks/diag_enkf_spread_growth.py` |
-| Where does the original filter's wall time go? | `checks/bench_enkf_split.py`, `checks/bench_enkf_opt.py` |
-| Score an exported estimate of the original filter | `checks/score_enkf.py`, `checks/eval_uncertainty_enkf.py` |
-| Export the robots' observations in the filter's format | `checks/export_obs_for_enkf.py` (also used by the final evaluation) |
+The learned-covariance sequential Kalman filter (LCSKF), a separate answer to the
+same problem with a U-Net-predicted covariance, is **not in the final comparison**;
+it is in the archive tag.

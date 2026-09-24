@@ -1,6 +1,0 @@
-Tesla V100-SXM2-32GB, 32768 MiB
-[PASS] dense equivalence, posterior variance, gradients, and U-Net shapes
-[data] train=511, valid=511, load=16s, device=cuda
-[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
-{"epoch": 0, "lr": 0.001, "skipped": 0, "seconds": 0.8, "train": {"loss": 0.03115764898913247, "analysis_mse_norm": 0.03413066679134294, "forecast_nll": -0.2973017850617373, "blind_mse_norm": 0.014499355419201743}, "valid": {"loss": 0.0437788013368845, "analysis_mse_norm": 0.04690255969762802, "forecast_nll": -0.3123757764697075, "blind_mse_norm": 0.03805730491876602}}
-[done] best validation loss=0.0437788 -> runs/lowrank_smoke_gpu/best.pt

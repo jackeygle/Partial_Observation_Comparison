@@ -1,5 +1,0 @@
-Tesla V100-SXM2-16GB
-[data] train=255, valid=255, load=0s, device=cuda
-[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
-{"epoch": 0, "lr": 0.001, "skipped": 0, "seconds": 0.8, "train": {"loss": 0.0344407747919653, "analysis_mse_norm": 0.0352756051456227, "forecast_nll": -0.2782767599704219, "blind_mse_norm": 0.016163842164564367}, "valid": {"loss": 0.04651312995702028, "analysis_mse_norm": 0.04733242932707071, "forecast_nll": -0.27309978753328323, "blind_mse_norm": 0.037900992669165134}}
-[done] best validation loss=0.0465131 -> runs/lowrank_a_r32_nll003_smoke/best.pt

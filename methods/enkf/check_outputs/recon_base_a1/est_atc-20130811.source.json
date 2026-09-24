@@ -1,7 +1,0 @@
-{
-  "variant": "new_cov_sweep_alpha1_f1_d1_blindg1_emptyg1",
-  "produced_by": "methods.enkf.lcskf.checks.eval_sequential",
-  "obs": "check_outputs/enkf_k1_full/obs_atc-20130811.npz",
-  "frames": 39821,
-  "new_checkpoint": "runs/joint_j4_5f_r32_nofcst_s0/best.pt"
-}

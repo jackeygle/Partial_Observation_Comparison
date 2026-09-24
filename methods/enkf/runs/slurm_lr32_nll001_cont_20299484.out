@@ -1,7 +1,0 @@
-NVIDIA H200
-[data] train=1,262,486, valid=269,736, load=23s, device=cuda
-[mask] 290 legal centers, random-union coverage proxy; static walkable cells=290
-{"epoch": 17, "lr": 0.001, "skipped": 0, "seconds": 356.4, "train": {"loss": 0.05543204729462171, "analysis_mse_norm": 0.05821899521165374, "forecast_nll": -2.786947791497379, "blind_mse_norm": 0.09165478242524311}, "valid": {"loss": 0.04341639130143449, "analysis_mse_norm": 0.04649761177279288, "forecast_nll": -3.081220367923379, "blind_mse_norm": 0.07516309354105033}}
-{"epoch": 18, "lr": 0.001, "skipped": 0, "seconds": 358.7, "train": {"loss": 0.05542417553620076, "analysis_mse_norm": 0.05821598286814828, "forecast_nll": -2.7918071898323267, "blind_mse_norm": 0.09167623266600879}, "valid": {"loss": 0.043542907824303256, "analysis_mse_norm": 0.0466262452173396, "forecast_nll": -3.0833375757792965, "blind_mse_norm": 0.07536970789078623}}
-{"epoch": 19, "lr": 0.0005, "skipped": 0, "seconds": 360.6, "train": {"loss": 0.05553909788026938, "analysis_mse_norm": 0.05833193671175876, "forecast_nll": -2.7928386954644013, "blind_mse_norm": 0.09186817721295058}, "valid": {"loss": 0.04372288336890051, "analysis_mse_norm": 0.04680508652381832, "forecast_nll": -3.0822026565438136, "blind_mse_norm": 0.07568437122972682}}
-[done] best validation loss=0.0433452 -> runs/lowrank_a_r32_nll001_s0/best.pt
