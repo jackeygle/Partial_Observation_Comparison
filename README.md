@@ -203,6 +203,66 @@ test days. The two neural networks are overconfident (spread/RMSE 0.58 and
 the velocity channels: there it is 1.6–1.8× too large and worse than a constant
 (bars below zero). Per-channel numbers: `uncertainty_by_channel.csv`.
 
+#### The math behind the two uncertainty numbers, and why they differ
+
+For each scored cell $i$ (all cells of all frames, $N$ in total), a method gives a
+value $\mu_i$ and an uncertainty $\hat\sigma_i$; the truth is $x_i$ and the error
+is $e_i = x_i - \mu_i$.
+
+**Spread / RMSE** divides two averages that are computed *separately*:
+
+$$
+\text{Spread / RMSE} \;=\; \frac{\dfrac{1}{N}\sum_{i}\hat\sigma_i}{\sqrt{\dfrac{1}{N}\sum_{i} e_i^2}}
+$$
+
+The top only looks at the $\hat\sigma_i$, the bottom only at the $e_i$. Which
+$\hat\sigma$ belongs to which error is lost when each is averaged, so this number
+can only say whether σ̂ has the right overall size.
+
+**CRPS** scores every cell's $\hat\sigma_i$ *against that same cell's* error. For a
+prediction that is a normal distribution $\mathcal{N}(\mu_i, \hat\sigma_i^2)$ it has
+a closed form (Gneiting & Raftery, 2007):
+
+$$
+\text{CRPS}_i \;=\; \hat\sigma_i\left[\, z_i\,\big(2\Phi(z_i)-1\big) + 2\,\varphi(z_i) - \frac{1}{\sqrt{\pi}} \right],
+\qquad z_i = \frac{e_i}{\hat\sigma_i}
+$$
+
+where $\Phi$ and $\varphi$ are the standard normal distribution and density
+functions. It is small only when the error is small *and* $\hat\sigma_i$ matches
+it: a large error with a tiny $\hat\sigma_i$ is punished hard (overconfident), and
+a large $\hat\sigma_i$ where the error is small is punished too (too cautious).
+When $\hat\sigma_i \to 0$ it becomes the absolute error $|e_i|$. It is a *proper*
+score: a method gets its best expected CRPS only by reporting its honest
+uncertainty, so it cannot be improved by inflating or shrinking σ̂.
+
+**CRPS skill** compares the method's average CRPS with that of a reference that
+keeps the method's own values $\mu_i$ but uses one constant $\sigma = \text{RMSE}$
+in every cell — right on average, blind to where errors are:
+
+$$
+\text{CRPS skill} \;=\; 1 - \frac{\frac{1}{N}\sum_i \text{CRPS}_i(\mu_i, \hat\sigma_i)}{\frac{1}{N}\sum_i \text{CRPS}_i(\mu_i, \text{RMSE})}
+$$
+
+**A two-cell example.** Two methods predict the same values, so they have the
+same errors (0 in cell 1, 2 in cell 2), and the same set of σ̂ values — only in
+different cells:
+
+| | cell 1: error 0 | cell 2: error 2 | Spread / RMSE | CRPS skill |
+|---|---|---|---|---|
+| Method A: σ̂ | 0.01 | 2 | 0.71 | **+0.26** |
+| Method B: σ̂ | 2 | 0.01 | 0.71 | **−0.51** |
+
+A says "I am unsure" exactly where it is wrong; B says "I am sure" exactly where
+it is wrong. Spread/RMSE cannot tell them apart, because both have the same
+average σ̂ and the same RMSE. CRPS skill rates A clearly better than the constant
+reference and B clearly worse. This is why CRPS skill is the main uncertainty
+measure and spread/RMSE only a check on overall size.
+
+(DINCAE predicts velocity variance on a log scale, so for that channel its
+prediction is a log-normal rather than a normal distribution; the CRPS then uses
+the corresponding closed form for a log-normal, in the same physical units.)
+
 ### 3. Inference time — how fast is each method?
 
 The median GPU time to reconstruct one frame, measured for every method on the
