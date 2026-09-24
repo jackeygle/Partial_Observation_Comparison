@@ -111,29 +111,28 @@ are the blind cells the headline scores are computed on. Observations carry
 per-channel Gaussian noise. Robot routes are seeded by the day's date, so every
 day has its own routes and every script sees the same observations for a day.
 
-## What is scored
+## Results, and how to read them
 
-All scores are on **unobserved walkable cells**: cells inside the corridor that
-no robot sees at that frame. Obstacle cells are never scored.
+All numbers are over the seven test days, on **unobserved walkable cells**:
+cells inside the corridor that no robot sees at that frame (about 44% of
+walkable cells). Reconstructing them is the actual task; obstacle cells are
+never scored. The four quantities being reconstructed are:
 
-- **Accuracy:** RMSE of the reconstruction, pooled over the four channels and
-  per channel; six methods.
-- **Uncertainty** (4DVarNet with augmented head, DINCAE, EnKF), all in
-  physical units on the same frames and cells:
-  - *CRPS skill* — improvement of the continuous ranked probability score over
-    a null model that predicts the same constant σ (the method's own RMSE) in
-    every cell. It is the main uncertainty metric: it rewards σ̂ for being
-    large where the error is large, which an average-scale check cannot see.
-    Below 0, the predicted uncertainty is worse than a constant.
-  - *Spread / RMSE* — mean predicted σ̂ over RMSE; 1 means the right average
-    size, below 1 too small.
-  - Pooled numbers carry 95% bootstrap intervals over the seven test days.
-- **Inference time:** median GPU time per reconstructed frame, same GPU and
-  frames for every method.
+| Channel | Meaning | Unit |
+|---|---|---|
+| Density | how many people are in the cell | ≈ people per m² |
+| $v_x$, $v_y$ | mean walking velocity in the cell, along and across the corridor | m/s |
+| Vel. var. | how much the velocities in the cell disagree (people walking in different directions) | (m/s)² |
 
-## Results (seven test days)
+### 1. Reconstruction accuracy — how close is the reconstructed field to the truth?
 
-| Method | RMSE (all) | Density | $v_x$ | $v_y$ | Vel. var. |
+**RMSE** (root-mean-square error): the typical size of the difference between
+the reconstructed value and the true value, in the channel's own unit. **Lower
+is better.** For example, a density RMSE of 0.13 means the reconstruction is off
+by about 0.13 people per m² in a typical cell. "All" pools the four channels
+into one number.
+
+| Method | All | Density | $v_x$ | $v_y$ | Vel. var. |
 |---|---|---|---|---|---|
 | Senseiver-A | 0.222 | 0.156 | 0.372 | 0.154 | 0.107 |
 | **Senseiver-G (ours)** | **0.197** | **0.133** | **0.326** | **0.145** | **0.103** |
@@ -142,17 +141,89 @@ no robot sees at that frame. Obstacle cells are never scored.
 | 4DVarNet (aug. head) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
 | EnKF | 0.283 | 0.154 | 0.419 | 0.183 | 0.295 |
 
-| Method | CRPS skill (95% CI) | Spread / RMSE |
-|---|---|---|
-| 4DVarNet (aug. head) | 0.232 (0.221–0.244) | 0.66 |
-| **DINCAE** | **0.275 (0.266–0.283)** | 0.58 |
-| EnKF | 0.075 (0.068–0.081) | 1.21 |
-
 ![Reconstruction accuracy](supervisor_evaluation/outputs/full/figures/accuracy_rmse.png)
+
+*How to read the figure:* each group of bars is one channel (the left group is
+all channels together); each colour is one method, the same colour in every
+figure. A shorter bar is a smaller error.
+
+*What it shows:* Senseiver-G has the smallest error overall and on every
+channel. Giving 4DVarNet an uncertainty output (aug. head) costs accuracy,
+mostly on $v_x$. The EnKF is competitive on density but has by far the largest
+error on velocity variance.
+
+### 2. Uncertainty — does the method know where it is likely to be wrong?
+
+Three methods output, for every cell, not only a value but also an uncertainty
+σ̂ ("I think the density here is 0.5, give or take 0.1"). Two numbers judge
+that σ̂:
+
+**CRPS skill — is σ̂ large where the error is large? Higher is better.** The
+CRPS (continuous ranked probability score) scores a prediction *together with*
+its σ̂ in each cell: it is lowest when the value is right and σ̂ matches how
+wrong the value actually is in that cell. The skill compares this against a
+simple reference that uses the same constant σ everywhere (the method's own
+average error): it knows *how large* errors are on average, but not *where*
+they are.
+
+- CRPS skill = 0.275 means 27.5% better than that constant reference.
+- 0 means σ̂ tells you nothing beyond the average error.
+- Below 0 means σ̂ is worse than simply using a constant.
+
+**Spread / RMSE — is σ̂ the right size on average? 1 is ideal.** The average
+predicted σ̂ divided by the actual error. Below 1: the method is overconfident
+(its σ̂ is too small). Above 1: it is too cautious (σ̂ too large). This number
+only checks the average size, not the location — a constant σ scores a perfect
+1 — which is why CRPS skill is the main measure.
+
+**The range in brackets (95% interval)** shows how much a number depends on
+which days happened to be the test days: the result is recomputed 10,000 times,
+each time on a random re-draw of the seven test days, and the range contains 95%
+of those results. When two methods' ranges do not overlap, the difference between
+them cannot be explained by which days were used for testing.
+
+| Method | CRPS skill (higher is better) | range over test days | Spread / RMSE (1 is ideal) |
+|---|---|---|---|
+| **DINCAE** | **0.275** | 0.266–0.283 | 0.58 |
+| 4DVarNet (aug. head) | 0.232 | 0.221–0.244 | 0.66 |
+| EnKF | 0.075 | 0.068–0.081 | 1.21 |
+
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
+
+*How to read the figure:* (a) CRPS skill, (b) spread/RMSE; left group all
+channels together, then one group per channel. The small black bars on the
+"All" group are the 95% ranges above. In (a), a bar below the zero line means
+that channel's σ̂ is worse than a constant; in (b), the dashed line at 1 is the
+ideal size.
+
+*What it shows:* DINCAE's σ̂ is the most informative, on every channel, and its
+range does not overlap 4DVarNet's, so the ranking is not down to the choice of
+test days. The two neural networks are overconfident (spread/RMSE 0.58 and
+0.66). The EnKF's σ̂ is somewhat too large on average (1.21) and badly placed on
+the velocity channels: there it is 1.6–1.8× too large and worse than a constant
+(bars below zero). Per-channel numbers: `uncertainty_by_channel.csv`.
+
+### 3. Inference time — how fast is each method?
+
+The median GPU time to reconstruct one frame, measured for every method on the
+same GPU (one Tesla V100) and the same frames.
+
 ![Inference time](supervisor_evaluation/outputs/full/figures/inference_latency.png)
 
-The CSVs behind these (`accuracy.csv`, `uncertainty.csv`,
-`uncertainty_by_channel.csv`, `inference_time_controlled.csv`), a LaTeX table
-(`accuracy_table.tex`) and generated figure captions (`figures/captions.md`)
-are in `supervisor_evaluation/outputs/full/`.
+*How to read the figure:* the vertical axis is logarithmic — each grid line is
+10× the one below — because the methods differ by a factor of about 260. Read
+the value printed on each bar rather than comparing bar heights.
+
+*What it shows:* DINCAE is the fastest (0.027 ms per frame) and the EnKF, which
+runs 100 forecast members, the slowest (7.1 ms). Every method is far faster than
+the data itself, which arrives at one frame per second.
+
+### Files
+
+The numbers above are in `supervisor_evaluation/outputs/full/`:
+`accuracy.csv`, `uncertainty.csv`, `uncertainty_by_channel.csv` and
+`inference_time_controlled.csv`, plus a LaTeX table (`accuracy_table.tex`) and
+figure captions (`figures/captions.md`). The exact definitions and code are in
+`supervisor_evaluation/evaluate.py` and `compare/score_uncertainty.py`
+(CRPS in physical units; DINCAE's velocity-variance channel uses the log-normal
+form of the CRPS because the network predicts it on a log scale).

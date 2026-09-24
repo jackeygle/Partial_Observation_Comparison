@@ -676,7 +676,7 @@ def plot_summary(output_dir: Path) -> None:
                    label=short.get(r["method"], r["method"]))
         ax.set_xticks(x, [t for _, t in cols])
         ax.tick_params(axis="x", length=0)
-        ax.set_ylabel("RMSE")
+        ax.set_ylabel("RMSE (lower is better)")
         fig.legend(loc="outside upper center", ncol=3, handlelength=1.2, columnspacing=1.5)
         save(fig, "accuracy_rmse")
         captions.append(
@@ -715,8 +715,8 @@ def plot_summary(output_dir: Path) -> None:
         fig, (ax_c, ax_d) = ps.figure(ncols=2, rows_h=2.6, constrained_layout=True)
         x = np.arange(len(groups)); w = 0.8 / len(names)
         for ax, key, ylabel, ref, letter in (
-                (ax_c, "crps_skill", "CRPS skill vs. null", 0.0, "a"),
-                (ax_d, "spread_skill", "Spread / RMSE", 1.0, "b")):
+                (ax_c, "crps_skill", "CRPS skill (higher is better)", 0.0, "a"),
+                (ax_d, "spread_skill", "Spread / RMSE (1 = right size)", 1.0, "b")):
             for i, m in enumerate(names):
                 v = np.array([float(pooled[m][key])] +
                              [float(per_ch[(m, c)][key]) for c in CHANNELS])
@@ -771,7 +771,7 @@ def plot_summary(output_dir: Path) -> None:
             ax.set_xticks(xs, [short.get(m, m).replace(" (", "\n(") for m in names],
                           fontsize=ps.FS_TICK - 0.5)
             ax.tick_params(axis="x", length=0)
-            ax.set_ylabel("GPU time per frame (ms, log)")
+            ax.set_ylabel("GPU time per frame (ms, log scale)")
             save(fig, "inference_latency")
             spread_pct = 100 * max((b - a) / a for a, b in zip(median, p95))
             gpu = timing[0].get("gpu", "")
