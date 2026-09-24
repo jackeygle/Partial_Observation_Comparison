@@ -1,0 +1,68 @@
+[warn] missing unfinished artifact: varnet_aughead_obs_s0.pt
+[verify] PASS -> supervisor_evaluation/outputs/smoke_sa/verification_report.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --arms  --no-with-ensemble --days 1 --frames 512 --out supervisor_evaluation/outputs/smoke_sa/raw/senseiver_a_accuracy.json
+[model] Senseiver 65,892 params |  | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0026  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0510      0.0510        0.0510          0.0510
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.7608     0.1251     0.0184     0.0273      0.1653
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.2539     0.0416     0.0061     0.0128      0.1130
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.0242     0.0039     0.0006     0.0078      0.0881
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.0118     0.0019     0.0003     0.0038      0.0616
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0138     0.0023     0.0004     0.0044      0.0666
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0008     0.0081     0.0013     0.0002     0.0026      0.0510
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] supervisor_evaluation/outputs/smoke_sa/raw/senseiver_a_accuracy.json
+[collect] 1 accuracy rows, 0 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/smoke_sa/figures

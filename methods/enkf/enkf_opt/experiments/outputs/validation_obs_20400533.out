@@ -1,0 +1,9 @@
+[export] 7 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130616: exported 35127 frames, observed cells/frame mean 202.6
+  atc-20130623: exported 40620 frames, observed cells/frame mean 200.3
+  atc-20130630: exported 40710 frames, observed cells/frame mean 202.6
+  atc-20130707: exported 38437 frames, observed cells/frame mean 202.1
+  atc-20130714: exported 40457 frames, observed cells/frame mean 202.1
+  atc-20130721: exported 37413 frames, observed cells/frame mean 202.8
+  atc-20130728: exported 36979 frames, observed cells/frame mean 202.9
+[done] -> methods/enkf/enkf_opt/experiments/validation_obs/obs_*.npz

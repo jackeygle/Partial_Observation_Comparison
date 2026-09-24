@@ -57,3 +57,12 @@ core.*
 
 # compare's intermediate artifacts (regression-test scratch output)
 compare/results/_*.json
+
+# ============================================================
+# supervisor_evaluation: the frozen final weights ARE tracked (126 MB, all
+# files < 100 MB); they are what evaluate.py loads and hash-checks.
+# Test runs (smoke/verify) under outputs/dev/ are not results -> not tracked.
+# ============================================================
+!supervisor_evaluation/models/*.pt
+!supervisor_evaluation/models/*.npz
+supervisor_evaluation/outputs/dev/

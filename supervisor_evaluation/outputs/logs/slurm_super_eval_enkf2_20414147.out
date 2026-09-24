@@ -1,0 +1,35 @@
+[warn] missing unfinished artifact: varnet_aughead_obs_s0.pt
+[verify] PASS -> supervisor_evaluation/outputs/smoke_enkf2/verification_report.json
+[run] methods.enkf.checks.export_obs_for_enkf --split test --frames 600 --outdir supervisor_evaluation/outputs/smoke_enkf2/raw/enkf_observations --obs-every-k 1 --only atc-20130811
+[export] 1 test days, frames [0, 600), obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 600 frames, observed cells/frame mean 201.6
+[done] -> supervisor_evaluation/outputs/smoke_enkf2/raw/enkf_observations/obs_*.npz
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir supervisor_evaluation/outputs/smoke_enkf2/raw/enkf_observations --calibration-export supervisor_evaluation/outputs/smoke_enkf2/raw/enkf_exports/atc-20130811.npz --out supervisor_evaluation/outputs/smoke_enkf2/raw/enkf/atc-20130811.json
+[all] RMSE=0.15017 CRPS=0.06875 spread/skill=1.341 cov90=0.807
+[defined_blind] RMSE=0.19629 CRPS=0.06448 spread/skill=0.776 cov90=0.940
+[density] spearman=+0.942 AUSE=0.084
+[vx] spearman=+0.650 AUSE=0.243
+[vy] spearman=+0.680 AUSE=0.278
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 6.93s on Tesla V100-SXM2-16GB; failures=0
+[out] supervisor_evaluation/outputs/smoke_enkf2/raw/enkf/atc-20130811.json
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:110: RuntimeWarning: divide by zero encountered in divide
+  z = (x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:110: RuntimeWarning: invalid value encountered in divide
+  z = (x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:111: RuntimeWarning: invalid value encountered in multiply
+  return sigma * (z * (2 * norm.cdf(z) - 1) + 2 * norm.pdf(z) - 1.0 / _SQRT_PI)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: divide by zero encountered in log
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: divide by zero encountered in divide
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: invalid value encountered in divide
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:118: RuntimeWarning: invalid value encountered in add
+  return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:156: RuntimeWarning: divide by zero encountered in divide
+  r = np.abs(x - mu) / sigma
+/scratch/work/zhangx29/Thesis_Project/compare/score_uncertainty.py:156: RuntimeWarning: invalid value encountered in divide
+  r = np.abs(x - mu) / sigma
+[collect] 1 accuracy rows, 1 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/smoke_enkf2/figures

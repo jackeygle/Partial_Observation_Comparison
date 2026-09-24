@@ -39,26 +39,20 @@ a **null model**: it knows how big its average error is and nothing about
 to check whether its CRPS beats this baseline -- because the null model's
 spread/skill is always exactly 1.00, so that "perfect calibration" score is free.
 
-Cross-space comparability (important)
---------------------------------------
-The four methods do not live in the same space:
+Everything in physical units
+----------------------------
+All methods are scored in physical units (`supervisor_evaluation/evaluate.py
+uncertainty`). 4DVarNet and EnKF predict Gaussians there directly. DINCAE predicts
+a Gaussian in its standardised space; density/vx/vy are only standardised
+(linear), so they map back to physical Gaussians with sigma * std, while `var`
+also goes through log1p, so its physical predictive is a shifted log-normal --
+scored with `Accumulator.add_lognormal1p` (closed-form CRPS, no sampling).
 
-    4DVarNet / EnKF   physical values
-    DINCAE            log1p(density), raw vx/vy, log1p(var), then per-channel standardisation
-
-So:
-
-  * **CRPS's absolute value is not comparable across methods** (different units).
-    Tables must state the space.
-  * **The ratio CRPS / CRPS_const is comparable** -- numerator and denominator are
-    in the same space, so the transform cancels. The verdict column uses this.
-  * **spread/skill is comparable** -- likewise a ratio within the same space.
-  * **coverage is comparable, and strictly so** -- a monotonic transform preserves
-    whether the truth falls inside an interval, so coverage is completely immune
-    to log1p.
-
-So the main table uses coverage + the verdict ratio; raw CRPS goes in an appendix
-with the space noted.
+An earlier version scored DINCAE in its standardised space and argued that the
+ratios cancel the transform. That holds for coverage (a monotonic transform keeps
+"inside the interval"), but not for CRPS skill or spread/skill: the log1p space
+compresses the large errors, and a constant sigma there is already
+heteroscedastic in physical units -- a different null model.
 
 Usage
 -----
@@ -118,6 +112,28 @@ def nll_gaussian(mu, sigma, x):
     return 0.5 * np.log(2 * np.pi * sigma ** 2) + (x - mu) ** 2 / (2 * sigma ** 2)
 
 
+#: exp() argument cap for the log-normal helpers: exp(700) is still finite in float64.
+_EXP_CAP = 700.0
+
+
+def crps_lognormal1p(m, s, v):
+    """Closed-form CRPS when log1p(V) ~ N(m, s^2), scored against the observed v >= 0.
+
+    V + 1 is log-normal, and CRPS is shift-invariant, so this is the log-normal
+    CRPS of Baran & Lerch (2015) evaluated at y = v + 1:
+
+        CRPS = y (2 Phi(z) - 1) - 2 exp(m + s^2/2) [Phi(z - s) + Phi(s/sqrt 2) - 1],
+        z = (ln y - m) / s
+
+    In the units of v, so it sits next to the Gaussian CRPS of the other methods.
+    """
+    m, s, v = _f64(m), _f64(s), _f64(v)
+    y = np.maximum(v, 0.0) + 1.0
+    z = (np.log(y) - m) / s
+    e = np.exp(np.minimum(m + 0.5 * s ** 2, _EXP_CAP))
+    return y * (2 * norm.cdf(z) - 1) - 2 * e * (norm.cdf(z - s) + norm.cdf(s / np.sqrt(2)) - 1)
+
+
 def const_sigma(mu, x):
     """The null model's sigma: this slice's own RMSE (a scalar).
 
@@ -144,18 +160,42 @@ class Accumulator:
         self.n = 0
         self.cov = {z: 0 for z in ZS}
 
+    def _add(self, crps, nll, err, sigma, r):
+        """Pointwise CRPS, NLL, point error, predictive SD and |standardised residual|."""
+        self.crps += crps.sum()
+        self.nll += nll.sum()
+        self.se += (err ** 2).sum()
+        self.sig += sigma.sum()
+        self.n += err.size
+        for z in ZS:
+            self.cov[z] += int((r <= norm.ppf(0.5 + z / 200)).sum())
+
     def add(self, mu, sigma, x):
+        """Gaussian predictive N(mu, sigma^2)."""
         mu, sigma, x = _f64(mu).ravel(), _f64(sigma).ravel(), _f64(x).ravel()
         if x.size == 0:
             return
-        self.crps += crps_gaussian(mu, sigma, x).sum()
-        self.nll += nll_gaussian(mu, sigma, x).sum()
-        self.se += ((x - mu) ** 2).sum()
-        self.sig += sigma.sum()
-        self.n += x.size
-        r = np.abs(x - mu) / sigma
-        for z in ZS:
-            self.cov[z] += int((r <= norm.ppf(0.5 + z / 200)).sum())
+        self._add(crps_gaussian(mu, sigma, x), nll_gaussian(mu, sigma, x),
+                  x - mu, sigma, np.abs(x - mu) / sigma)
+
+    def add_lognormal1p(self, m, s, v):
+        """Predictive log1p(V) ~ N(m, s^2), everything scored in the units of v.
+
+        Point estimate = the median expm1(m) (the same point the accuracy table
+        uses for such a channel); sigma = the log-normal predictive SD. The
+        central z% interval is expm1(m +/- q s), so coverage is decided in log1p
+        space -- identical to transforming the interval back.
+        """
+        m, s, v = _f64(m).ravel(), _f64(s).ravel(), _f64(v).ravel()
+        if v.size == 0:
+            return
+        y = np.log1p(np.maximum(v, 0.0))
+        point = np.expm1(np.minimum(m, _EXP_CAP))
+        sd = (np.sqrt(np.expm1(np.minimum(s ** 2, _EXP_CAP)))
+              * np.exp(np.minimum(m + 0.5 * s ** 2, _EXP_CAP)))
+        # density of V at v = N(y; m, s) / (1 + v)  ->  NLL gains + log1p(v)
+        self._add(crps_lognormal1p(m, s, v), nll_gaussian(m, s, y) + y,
+                  v - point, sd, np.abs(y - m) / s)
 
     def result(self):
         if not self.n:

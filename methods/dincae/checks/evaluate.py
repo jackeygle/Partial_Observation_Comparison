@@ -53,6 +53,7 @@ import argparse
 import glob
 import json
 import os
+import time
 import sys
 
 import h5py
@@ -141,7 +142,7 @@ def build_inputs(scaled, invvar, t_unix, idx, H, W):
 
 
 @torch.no_grad()
-def predict_day(models, stats, fp, dev, frames=0, batch=256, seed=None):
+def predict_day(models, stats, fp, dev, frames=0, batch=256, seed=None, timing=None):
     """Reconstruction for one day (averaged over multiple checkpoints' outputs).
 
     Returns (Xt, rec, mu_n, sd_n, M):
@@ -187,9 +188,16 @@ def predict_day(models, stats, fp, dev, frames=0, batch=256, seed=None):
         xb = torch.from_numpy(build_inputs(scaled, invvar, t_unix, idx, H, W)).to(dev)
         m_sum = torch.zeros(len(idx), NCH, H, W, device=dev)
         s2_sum = torch.zeros_like(m_sum)
+        if dev.type == "cuda":
+            torch.cuda.synchronize()
+        infer_start = time.perf_counter()
         for m in models:                             # output averaging (1.0 Fig.3)
             mo, s2 = m(xb)[-1]                       # take the last level (post-refinement output)
             m_sum += mo; s2_sum += s2
+        if dev.type == "cuda":
+            torch.cuda.synchronize()
+        if timing is not None:
+            timing.append((time.perf_counter() - infer_start, len(idx)))
         k = len(models)
         mu_n[b:b + len(idx)] = (m_sum / k).cpu().numpy()
         s2_n[b:b + len(idx)] = (s2_sum / k).cpu().numpy()
@@ -335,9 +343,12 @@ def main():
                             for _ in range(NCH)]
     acc["calib"] = [{"sd": [], "se": []} for _ in range(NCH)]
     per_day = []
+    inference_timing = []
 
     for fp in files:
-        Xt, rec, mu_n, sd_n, M = predict_day(models, stats, fp, dev, args.frames, args.batch)
+        timing_start = len(inference_timing)
+        Xt, rec, mu_n, sd_n, M = predict_day(models, stats, fp, dev, args.frames, args.batch,
+                                              timing=inference_timing)
         # this day's ours_blind MSE (recorded per day, to see stability)
         cv = channel_valid(Xt); walk = stats.valid[None]
         day_mse = {}
@@ -345,8 +356,11 @@ def main():
             sel = cv[c] & walk & (~M[:, c])
             day_mse[CHANNELS[c]] = (float(((clip_bounds(rec)[:, c] - Xt[:, c]) ** 2)[sel].mean())
                                     if sel.any() else None)
+        day_timing = inference_timing[timing_start:]
         per_day.append({"day": os.path.splitext(os.path.basename(fp))[0],
                         "frames": int(Xt.shape[0]), "ours_blind_mse": day_mse})
+        per_day[-1]["inference_ms_per_frame"] = float(
+            1000 * sum(t for t, _ in day_timing) / max(sum(n for _, n in day_timing), 1))
         print(f"  {per_day[-1]['day']}  " +
               "  ".join(f"{k} {v:.5f}" for k, v in day_mse.items() if v is not None),
               flush=True)
@@ -357,6 +371,13 @@ def main():
     result = {"run_dir": args.run_dir, "split": args.split,
               "checkpoints": [os.path.basename(p) for p in paths], "epochs": epochs,
               "n_days": len(files), "per_day": per_day, "channels": list(CHANNELS)}
+    result["inference"] = {
+        "seconds": float(sum(t for t, _ in inference_timing)),
+        "frames": int(sum(n for _, n in inference_timing)),
+        "ms_per_frame": float(1000 * sum(t for t, _ in inference_timing) /
+                              max(sum(n for _, n in inference_timing), 1)),
+        "scope": "model forward only; checkpoint/data loading and scoring excluded",
+    }
 
     for tag in TAGS:
         result[tag + "_mse"] = {CHANNELS[c]: (acc[tag][c]["se"] / acc[tag][c]["n"]

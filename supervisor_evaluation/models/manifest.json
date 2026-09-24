@@ -1,0 +1,45 @@
+{
+  "created": "2026-09-23T21:42:48+0300",
+  "files": {
+    "senseiver_A.pt": {
+      "bytes": 1029398,
+      "sha256": "f909bb3a61949cd018cace4c1bf3d6dd4423f230851f1b0328b683f8f1ba8874",
+      "source": "methods/senseiver/runs/senseiver_A/best.pt"
+    },
+    "senseiver_G_k16.pt": {
+      "bytes": 904834,
+      "sha256": "b20c145d7077ff771312d4b676f6998e3d75674682e8631242df4f14911b7491",
+      "source": "methods/senseiver/runs/capacity/base32_k16_s123/best.pt"
+    },
+    "dincae_epoch60.pt": {
+      "bytes": 1288437,
+      "sha256": "42abc4b26334ce70663283e23a7e1905a94f2a4de2fc63baa19a43ce276e94b4",
+      "source": "methods/dincae/runs/dincae_ff/ckpt_00060.pt"
+    },
+    "varnet_mse_s3_epoch80.pt": {
+      "bytes": 25184373,
+      "sha256": "2ae4fa42654f0696346783bf33d2ab53e2e53ce48850e61c6bafe9a8ab9777df",
+      "source": "methods/varnet/runs/varnet_mse5_h96_s3/ckpt_00080.pt"
+    },
+    "varnet_aughead_obs_s0.pt": {
+      "bytes": 55598389,
+      "sha256": "272abccc188e2e47ff79d922101ba91c1c945cac9610624f5e792d7d8b04cb57",
+      "source": "methods/varnet/runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt"
+    },
+    "pedpred3_5to5_epoch38.pt": {
+      "bytes": 3575885,
+      "sha256": "4f3f261b28b6bff6e03b7b33e47b7df291cb650864357014bfbd0535eccb1491",
+      "source": "methods/enkf/runs/pedpred3_5to5_clip_s0/dyn150_best.pt"
+    },
+    "enkf_residual_q_bank.npz": {
+      "bytes": 38879874,
+      "sha256": "240772c0a9c7b6c30b583e8c36baed7262fdb8fb0914b8b1fbc664cd997d0e7f",
+      "source": "methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz"
+    },
+    "dincae_state_stats.npz": {
+      "bytes": 17043,
+      "sha256": "8dc594bf92e2aab3ef7ea4c75811dc29b889d462d7e04f327df10ae1b863ec71",
+      "source": "methods/dincae/artifacts/state_stats.npz"
+    }
+  }
+}

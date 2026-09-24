@@ -1,0 +1,12 @@
+[residual] 1000/5000, 0.0078 s/frame
+[residual] 2000/5000, 0.0075 s/frame
+[residual] 3000/5000, 0.0075 s/frame
+[residual] 4000/5000, 0.0074 s/frame
+[all] RMSE=0.21737 CRPS=0.09587 spread/skill=0.803 cov90=0.820
+[defined_blind] RMSE=0.36975 CRPS=0.13681 spread/skill=0.555 cov90=0.847
+[density] spearman=+0.804 AUSE=0.210
+[vx] spearman=+0.414 AUSE=0.408
+[vy] spearman=+0.077 AUSE=0.626
+[var] spearman=+0.627 AUSE=0.489
+[runtime] 45.43s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/conditional_residual_smoke/density4.json

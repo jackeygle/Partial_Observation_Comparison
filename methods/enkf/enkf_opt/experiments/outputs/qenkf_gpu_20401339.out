@@ -1,0 +1,50 @@
+[residual] 1000/42890, 0.0050 s/frame
+[residual] 2000/42890, 0.0048 s/frame
+[residual] 3000/42890, 0.0047 s/frame
+[residual] 4000/42890, 0.0047 s/frame
+[residual] 5000/42890, 0.0047 s/frame
+[residual] 6000/42890, 0.0046 s/frame
+[residual] 7000/42890, 0.0047 s/frame
+[residual] 8000/42890, 0.0046 s/frame
+[residual] 9000/42890, 0.0046 s/frame
+[residual] 10000/42890, 0.0046 s/frame
+[residual] 11000/42890, 0.0046 s/frame
+[residual] 12000/42890, 0.0046 s/frame
+[residual] 13000/42890, 0.0046 s/frame
+[residual] 14000/42890, 0.0046 s/frame
+[residual] 15000/42890, 0.0046 s/frame
+[residual] 16000/42890, 0.0046 s/frame
+[residual] 17000/42890, 0.0046 s/frame
+[residual] 18000/42890, 0.0046 s/frame
+[residual] 19000/42890, 0.0046 s/frame
+[residual] 20000/42890, 0.0046 s/frame
+[residual] 21000/42890, 0.0046 s/frame
+[residual] 22000/42890, 0.0046 s/frame
+[residual] 23000/42890, 0.0046 s/frame
+[residual] 24000/42890, 0.0046 s/frame
+[residual] 25000/42890, 0.0046 s/frame
+[residual] 26000/42890, 0.0046 s/frame
+[residual] 27000/42890, 0.0046 s/frame
+[residual] 28000/42890, 0.0046 s/frame
+[residual] 29000/42890, 0.0046 s/frame
+[residual] 30000/42890, 0.0046 s/frame
+[residual] 31000/42890, 0.0046 s/frame
+[residual] 32000/42890, 0.0046 s/frame
+[residual] 33000/42890, 0.0046 s/frame
+[residual] 34000/42890, 0.0046 s/frame
+[residual] 35000/42890, 0.0046 s/frame
+[residual] 36000/42890, 0.0046 s/frame
+[residual] 37000/42890, 0.0046 s/frame
+[residual] 38000/42890, 0.0046 s/frame
+[residual] 39000/42890, 0.0046 s/frame
+[residual] 40000/42890, 0.0046 s/frame
+[residual] 41000/42890, 0.0046 s/frame
+[residual] 42000/42890, 0.0046 s/frame
+[all] RMSE=0.22727 CRPS=0.10008 spread/skill=0.774 cov90=0.842
+[defined_blind] RMSE=0.37269 CRPS=0.15429 spread/skill=0.542 cov90=0.798
+[density] spearman=+0.865 AUSE=0.192
+[vx] spearman=+0.448 AUSE=0.390
+[vy] spearman=+0.092 AUSE=0.632
+[var] spearman=+0.686 AUSE=0.377
+[runtime] 274.21s on Tesla V100-PCIE-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/selected_test/atc-20130825_r15_rho80.json

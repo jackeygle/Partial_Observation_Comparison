@@ -1,0 +1,96 @@
+[residual] 1000/5000, 0.0094 s/frame
+[residual] 2000/5000, 0.0090 s/frame
+[residual] 3000/5000, 0.0089 s/frame
+[residual] 4000/5000, 0.0089 s/frame
+[all] RMSE=0.16378 CRPS=0.08265 spread/skill=1.284 cov90=0.901
+[defined_blind] RMSE=0.27886 CRPS=0.08115 spread/skill=0.517 cov90=0.943
+[density] spearman=+0.872 AUSE=0.163
+[vx] spearman=+0.278 AUSE=0.456
+[vy] spearman=-0.084 AUSE=0.716
+[var] spearman=+0.618 AUSE=0.471
+[runtime] 52.28s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha25_all.json
+[residual] 1000/5000, 0.0091 s/frame
+[residual] 2000/5000, 0.0089 s/frame
+[residual] 3000/5000, 0.0088 s/frame
+[residual] 4000/5000, 0.0087 s/frame
+[all] RMSE=0.16623 CRPS=0.08498 spread/skill=1.317 cov90=0.903
+[defined_blind] RMSE=0.28121 CRPS=0.08176 spread/skill=0.543 cov90=0.946
+[density] spearman=+0.879 AUSE=0.161
+[vx] spearman=+0.274 AUSE=0.471
+[vy] spearman=-0.077 AUSE=0.720
+[var] spearman=+0.630 AUSE=0.451
+[runtime] 51.84s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_all.json
+[residual] 1000/5000, 0.0094 s/frame
+[residual] 2000/5000, 0.0091 s/frame
+[residual] 3000/5000, 0.0090 s/frame
+[residual] 4000/5000, 0.0090 s/frame
+[all] RMSE=0.16366 CRPS=0.08262 spread/skill=1.285 cov90=0.901
+[defined_blind] RMSE=0.27895 CRPS=0.08117 spread/skill=0.518 cov90=0.942
+[density] spearman=+0.872 AUSE=0.163
+[vx] spearman=+0.278 AUSE=0.456
+[vy] spearman=-0.084 AUSE=0.716
+[var] spearman=+0.614 AUSE=0.475
+[runtime] 53.2s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha25_novar.json
+[residual] 1000/5000, 0.0089 s/frame
+[residual] 2000/5000, 0.0086 s/frame
+[residual] 3000/5000, 0.0085 s/frame
+[residual] 4000/5000, 0.0085 s/frame
+[all] RMSE=0.16589 CRPS=0.08485 spread/skill=1.321 cov90=0.902
+[defined_blind] RMSE=0.28140 CRPS=0.08175 spread/skill=0.545 cov90=0.946
+[density] spearman=+0.879 AUSE=0.162
+[vx] spearman=+0.275 AUSE=0.471
+[vy] spearman=-0.077 AUSE=0.720
+[var] spearman=+0.624 AUSE=0.458
+[runtime] 50.23s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_novar.json
+[residual] 1000/5000, 0.0087 s/frame
+[residual] 2000/5000, 0.0084 s/frame
+[residual] 3000/5000, 0.0084 s/frame
+[residual] 4000/5000, 0.0083 s/frame
+[all] RMSE=0.16492 CRPS=0.08312 spread/skill=1.287 cov90=0.904
+[defined_blind] RMSE=0.27997 CRPS=0.08130 spread/skill=0.519 cov90=0.945
+[density] spearman=+0.872 AUSE=0.163
+[vx] spearman=+0.281 AUSE=0.456
+[vy] spearman=-0.078 AUSE=0.717
+[var] spearman=+0.625 AUSE=0.460
+[runtime] 49.48s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_age11.json
+[residual] 1000/5000, 0.0087 s/frame
+[residual] 2000/5000, 0.0084 s/frame
+[residual] 3000/5000, 0.0083 s/frame
+[residual] 4000/5000, 0.0083 s/frame
+[all] RMSE=0.16165 CRPS=0.08065 spread/skill=1.253 cov90=0.901
+[defined_blind] RMSE=0.27665 CRPS=0.08088 spread/skill=0.492 cov90=0.937
+[density] spearman=+0.865 AUSE=0.166
+[vx] spearman=+0.278 AUSE=0.444
+[vy] spearman=-0.090 AUSE=0.713
+[var] spearman=+0.608 AUSE=0.490
+[runtime] 49.45s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_age51.json
+[residual] 1000/5000, 0.0090 s/frame
+[residual] 2000/5000, 0.0087 s/frame
+[residual] 3000/5000, 0.0087 s/frame
+[residual] 4000/5000, 0.0086 s/frame
+[all] RMSE=0.16461 CRPS=0.08311 spread/skill=1.285 cov90=0.901
+[defined_blind] RMSE=0.27986 CRPS=0.08126 spread/skill=0.518 cov90=0.943
+[density] spearman=+0.872 AUSE=0.163
+[vx] spearman=+0.281 AUSE=0.457
+[vy] spearman=-0.079 AUSE=0.718
+[var] spearman=+0.616 AUSE=0.470
+[runtime] 51.07s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_age11_nv.json
+[residual] 1000/5000, 0.0092 s/frame
+[residual] 2000/5000, 0.0090 s/frame
+[residual] 3000/5000, 0.0089 s/frame
+[residual] 4000/5000, 0.0088 s/frame
+[all] RMSE=0.16163 CRPS=0.08066 spread/skill=1.253 cov90=0.900
+[defined_blind] RMSE=0.27664 CRPS=0.08088 spread/skill=0.492 cov90=0.936
+[density] spearman=+0.865 AUSE=0.166
+[vx] spearman=+0.278 AUSE=0.444
+[vy] spearman=-0.090 AUSE=0.713
+[var] spearman=+0.605 AUSE=0.492
+[runtime] 52.07s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/forecast_mlp_online_ablation/alpha50_age51_nv.json

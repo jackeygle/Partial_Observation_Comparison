@@ -77,6 +77,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--members", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--run-fmt", default="runs/varnet_aug0_s{}")
+    ap.add_argument("--checkpoint", default="",
+                    help="direct checkpoint path for a single-model evaluation; when set, "
+                         "--members must contain exactly one value and --run-fmt is ignored")
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--frames", type=int, default=0, help="0 = whole day")
     # Windows are solved in batches like checks/eval_test_days.py. A whole day at dT=200 is
@@ -91,13 +94,15 @@ def main():
     dev = torch.device(args.device)
 
     # ---- members -------------------------------------------------------------
+    if args.checkpoint and len(args.members) != 1:
+        ap.error("--checkpoint is a single-model mode and requires exactly one --members value")
     solvers, A = [], None
     for s in args.members:
         # The same checkpoint compare5's accuracy table scores for this run -- see
         # model_io.reported_ckpt. This used to be a hardcoded varnet_best.pt, which is
         # selected on the training split and would have put the two tables on different
         # checkpoints of the same run.
-        p = reported_ckpt(os.path.join(ROOT, args.run_fmt.format(s)))
+        p = args.checkpoint or reported_ckpt(os.path.join(ROOT, args.run_fmt.format(s)))
         sol, A, ck = load_solver(p, dev)
         print(f"  member {s}: {os.path.relpath(p, ROOT)}  epoch={ck.get('epoch')}  "
               f"n_iter={ck.get('n_iter_eff')}", flush=True)
@@ -113,7 +118,8 @@ def main():
         print("[mode] no learnt sigma^2 in these runs -> uncertainty is the member spread "
               "alone (their Table 2 'Ensemble-M (MSE)')", flush=True)
     dT, k = A["dT"], A.get("obs_every_k") or config.get("observation", "obs_every_k")
-    print(f"[members] {len(solvers)} x {args.run_fmt}  dT={dT}  obs_every_k={k}  dev={dev}",
+    source_desc = args.checkpoint if args.checkpoint else args.run_fmt
+    print(f"[members] {len(solvers)} x {source_desc}  dT={dT}  obs_every_k={k}  dev={dev}",
           flush=True)
 
     files = om.split_files("test")[:args.days]

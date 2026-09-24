@@ -1,0 +1,46 @@
+[gaussian] 1000/38885, 0.0062 s/frame
+[gaussian] 2000/38885, 0.0060 s/frame
+[gaussian] 3000/38885, 0.0059 s/frame
+[gaussian] 4000/38885, 0.0058 s/frame
+[gaussian] 5000/38885, 0.0058 s/frame
+[gaussian] 6000/38885, 0.0058 s/frame
+[gaussian] 7000/38885, 0.0058 s/frame
+[gaussian] 8000/38885, 0.0058 s/frame
+[gaussian] 9000/38885, 0.0058 s/frame
+[gaussian] 10000/38885, 0.0058 s/frame
+[gaussian] 11000/38885, 0.0058 s/frame
+[gaussian] 12000/38885, 0.0058 s/frame
+[gaussian] 13000/38885, 0.0058 s/frame
+[gaussian] 14000/38885, 0.0058 s/frame
+[gaussian] 15000/38885, 0.0058 s/frame
+[gaussian] 16000/38885, 0.0058 s/frame
+[gaussian] 17000/38885, 0.0058 s/frame
+[gaussian] 18000/38885, 0.0058 s/frame
+[gaussian] 19000/38885, 0.0058 s/frame
+[gaussian] 20000/38885, 0.0058 s/frame
+[gaussian] 21000/38885, 0.0058 s/frame
+[gaussian] 22000/38885, 0.0058 s/frame
+[gaussian] 23000/38885, 0.0058 s/frame
+[gaussian] 24000/38885, 0.0058 s/frame
+[gaussian] 25000/38885, 0.0058 s/frame
+[gaussian] 26000/38885, 0.0058 s/frame
+[gaussian] 27000/38885, 0.0058 s/frame
+[gaussian] 28000/38885, 0.0058 s/frame
+[gaussian] 29000/38885, 0.0058 s/frame
+[gaussian] 30000/38885, 0.0058 s/frame
+[gaussian] 31000/38885, 0.0058 s/frame
+[gaussian] 32000/38885, 0.0058 s/frame
+[gaussian] 33000/38885, 0.0058 s/frame
+[gaussian] 34000/38885, 0.0058 s/frame
+[gaussian] 35000/38885, 0.0058 s/frame
+[gaussian] 36000/38885, 0.0058 s/frame
+[gaussian] 37000/38885, 0.0058 s/frame
+[gaussian] 38000/38885, 0.0058 s/frame
+[all] RMSE=0.25513 CRPS=0.12268 spread/skill=0.591 cov90=0.767
+[defined_blind] RMSE=0.37731 CRPS=0.18419 spread/skill=0.315 cov90=0.502
+[density] spearman=+0.726 AUSE=0.441
+[vx] spearman=-0.159 AUSE=1.098
+[vy] spearman=-0.096 AUSE=1.058
+[var] spearman=+0.779 AUSE=0.317
+[runtime] 298.68s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/fullseq7_gpu/atc-20130818_gaussian_s1.json

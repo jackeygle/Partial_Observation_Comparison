@@ -1,0 +1,48 @@
+[residual] 1000/40457, 0.0068 s/frame
+[residual] 2000/40457, 0.0066 s/frame
+[residual] 3000/40457, 0.0065 s/frame
+[residual] 4000/40457, 0.0064 s/frame
+[residual] 5000/40457, 0.0064 s/frame
+[residual] 6000/40457, 0.0064 s/frame
+[residual] 7000/40457, 0.0064 s/frame
+[residual] 8000/40457, 0.0064 s/frame
+[residual] 9000/40457, 0.0064 s/frame
+[residual] 10000/40457, 0.0064 s/frame
+[residual] 11000/40457, 0.0064 s/frame
+[residual] 12000/40457, 0.0064 s/frame
+[residual] 13000/40457, 0.0064 s/frame
+[residual] 14000/40457, 0.0064 s/frame
+[residual] 15000/40457, 0.0064 s/frame
+[residual] 16000/40457, 0.0064 s/frame
+[residual] 17000/40457, 0.0064 s/frame
+[residual] 18000/40457, 0.0064 s/frame
+[residual] 19000/40457, 0.0064 s/frame
+[residual] 20000/40457, 0.0064 s/frame
+[residual] 21000/40457, 0.0064 s/frame
+[residual] 22000/40457, 0.0064 s/frame
+[residual] 23000/40457, 0.0064 s/frame
+[residual] 24000/40457, 0.0063 s/frame
+[residual] 25000/40457, 0.0063 s/frame
+[residual] 26000/40457, 0.0063 s/frame
+[residual] 27000/40457, 0.0063 s/frame
+[residual] 28000/40457, 0.0063 s/frame
+[residual] 29000/40457, 0.0063 s/frame
+[residual] 30000/40457, 0.0063 s/frame
+[residual] 31000/40457, 0.0063 s/frame
+[residual] 32000/40457, 0.0063 s/frame
+[residual] 33000/40457, 0.0063 s/frame
+[residual] 34000/40457, 0.0063 s/frame
+[residual] 35000/40457, 0.0063 s/frame
+[residual] 36000/40457, 0.0063 s/frame
+[residual] 37000/40457, 0.0063 s/frame
+[residual] 38000/40457, 0.0063 s/frame
+[residual] 39000/40457, 0.0063 s/frame
+[residual] 40000/40457, 0.0063 s/frame
+[all] RMSE=0.21416 CRPS=0.09620 spread/skill=0.882 cov90=0.855
+[defined_blind] RMSE=0.36743 CRPS=0.14770 spread/skill=0.642 cov90=0.877
+[density] spearman=+0.828 AUSE=0.178
+[vx] spearman=+0.426 AUSE=0.382
+[vy] spearman=+0.109 AUSE=0.594
+[var] spearman=+0.588 AUSE=0.484
+[runtime] 342.81s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/cross_localization_validation/atc-20130714_weak50.json

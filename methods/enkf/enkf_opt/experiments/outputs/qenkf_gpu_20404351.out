@@ -1,0 +1,48 @@
+[residual] 1000/40457, 0.0050 s/frame
+[residual] 2000/40457, 0.0048 s/frame
+[residual] 3000/40457, 0.0048 s/frame
+[residual] 4000/40457, 0.0047 s/frame
+[residual] 5000/40457, 0.0047 s/frame
+[residual] 6000/40457, 0.0047 s/frame
+[residual] 7000/40457, 0.0046 s/frame
+[residual] 8000/40457, 0.0046 s/frame
+[residual] 9000/40457, 0.0046 s/frame
+[residual] 10000/40457, 0.0046 s/frame
+[residual] 11000/40457, 0.0046 s/frame
+[residual] 12000/40457, 0.0046 s/frame
+[residual] 13000/40457, 0.0046 s/frame
+[residual] 14000/40457, 0.0046 s/frame
+[residual] 15000/40457, 0.0046 s/frame
+[residual] 16000/40457, 0.0046 s/frame
+[residual] 17000/40457, 0.0046 s/frame
+[residual] 18000/40457, 0.0046 s/frame
+[residual] 19000/40457, 0.0046 s/frame
+[residual] 20000/40457, 0.0046 s/frame
+[residual] 21000/40457, 0.0046 s/frame
+[residual] 22000/40457, 0.0046 s/frame
+[residual] 23000/40457, 0.0046 s/frame
+[residual] 24000/40457, 0.0046 s/frame
+[residual] 25000/40457, 0.0046 s/frame
+[residual] 26000/40457, 0.0046 s/frame
+[residual] 27000/40457, 0.0045 s/frame
+[residual] 28000/40457, 0.0045 s/frame
+[residual] 29000/40457, 0.0045 s/frame
+[residual] 30000/40457, 0.0045 s/frame
+[residual] 31000/40457, 0.0045 s/frame
+[residual] 32000/40457, 0.0045 s/frame
+[residual] 33000/40457, 0.0045 s/frame
+[residual] 34000/40457, 0.0045 s/frame
+[residual] 35000/40457, 0.0045 s/frame
+[residual] 36000/40457, 0.0045 s/frame
+[residual] 37000/40457, 0.0045 s/frame
+[residual] 38000/40457, 0.0045 s/frame
+[residual] 39000/40457, 0.0045 s/frame
+[residual] 40000/40457, 0.0045 s/frame
+[all] RMSE=0.22705 CRPS=0.09952 spread/skill=0.741 cov90=0.820
+[defined_blind] RMSE=0.37370 CRPS=0.15620 spread/skill=0.526 cov90=0.759
+[density] spearman=+0.835 AUSE=0.221
+[vx] spearman=+0.452 AUSE=0.389
+[vy] spearman=+0.112 AUSE=0.608
+[var] spearman=+0.709 AUSE=0.357
+[runtime] 257.46s on Tesla V100-PCIE-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/channel_sweep/atc-20130714_base.json

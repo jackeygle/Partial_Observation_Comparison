@@ -83,8 +83,12 @@ class GridData(torch.Tensor):
 			assert 1 == sum(x is not None for x in (density, logdensity))
 			assert 1 == sum(x is not None for x in (vel_mean,))
 			assert 1 == sum(x is not None for x in (vel_var, vel_logvar))
-			*sB,_,H,W = (density if density is not None else logdensity).shape
-			tensor = torch.full((*sB,4,H,W), nan)
+			ref = density if density is not None else logdensity
+			*sB,_,H,W = ref.shape
+			# Preserve the producing network's device and dtype.  The old allocation always
+			# created a CPU float tensor, silently pulling a CUDA PedPred output back to host
+			# (and making an end-to-end GPU EnKF impossible).
+			tensor = torch.full((*sB,4,H,W), nan, device=ref.device, dtype=ref.dtype)
 		
 		else: assert 0 == sum(x is not None for x in (density,logdensity,vel_mean,vel_var,vel_logvar))
 		

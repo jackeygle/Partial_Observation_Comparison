@@ -1,0 +1,708 @@
+[verify] PASS -> supervisor_evaluation/outputs/full/verification_report.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --arms  --no-with-ensemble --days 0 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/senseiver_a_accuracy.json
+[model] Senseiver 65,892 params |  | walkable 290/432 | device=cuda
+  atc-20130811: 39821 frames, scored [1,39820)  Senseiver full=0.0140  EnKF k1 full=0.0473
+  atc-20130818: 38885 frames, scored [1,38884)  Senseiver full=0.0194  EnKF k1 full=0.0609
+  atc-20130825: 42890 frames, scored [1,42889)  Senseiver full=0.0172  EnKF k1 full=0.0563
+  atc-20130901: 39758 frames, scored [1,39757)  Senseiver full=0.0186  EnKF k1 full=0.0601
+  atc-20130915: 39383 frames, scored [1,39382)  Senseiver full=0.0163  EnKF k1 full=0.0552
+  atc-20130922: 38842 frames, scored [1,38841)  Senseiver full=0.0154  EnKF k1 full=0.0550
+  atc-20130929: 37964 frames, scored [1,37963)  Senseiver full=0.0195  EnKF k1 full=0.0647
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.1311      0.1310        0.1309          0.1307
+EnKF k1                     0.2388      0.2387        0.2388          0.2387
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0243     0.6347     0.1107     0.0538     0.1182      0.3438
+EnKF k1                      0.0234     0.6991     0.1162     0.0649     0.1281      0.3579
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.1206      0.3473
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0121     0.2532     0.0447     0.0231     0.0537      0.2317
+EnKF k1                      0.0295     0.6853     0.0989     0.0625     0.1402      0.3744
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0697      0.2640
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0243     0.1385     0.0238     0.0114     0.0495      0.2225
+EnKF k1                      0.0234     0.1721     0.0297     0.0397     0.0662      0.2573
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0121     0.0684     0.0118     0.0060     0.0246      0.1568
+EnKF k1                      0.0295     0.2033     0.0307     0.0398     0.0758      0.2754
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0140     0.0791     0.0144     0.0064     0.0285      0.1688
+EnKF k1                      0.0136     0.1047     0.0203     0.0392     0.0444      0.2108
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0085     0.0475     0.0087     0.0041     0.0172      0.1311
+EnKF k1                      0.0204     0.1451     0.0237     0.0389     0.0570      0.2388
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/senseiver_a_accuracy.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_G_k16.pt --arms  --no-with-ensemble --days 0 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/senseiver_g_accuracy.json
+[model] Senseiver 56,676 params |  | walkable 290/432 | device=cuda
+  atc-20130811: 39821 frames, scored [1,39820)  Senseiver full=0.0106  EnKF k1 full=0.0473
+  atc-20130818: 38885 frames, scored [1,38884)  Senseiver full=0.0146  EnKF k1 full=0.0609
+  atc-20130825: 42890 frames, scored [1,42889)  Senseiver full=0.0130  EnKF k1 full=0.0563
+  atc-20130901: 39758 frames, scored [1,39757)  Senseiver full=0.0142  EnKF k1 full=0.0601
+  atc-20130915: 39383 frames, scored [1,39382)  Senseiver full=0.0122  EnKF k1 full=0.0552
+  atc-20130922: 38842 frames, scored [1,38841)  Senseiver full=0.0117  EnKF k1 full=0.0550
+  atc-20130929: 37964 frames, scored [1,37963)  Senseiver full=0.0149  EnKF k1 full=0.0647
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.1141      0.1140        0.1138          0.1137
+EnKF k1                     0.2388      0.2387        0.2388          0.2387
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0176     0.4538     0.0941     0.0504     0.0881      0.2968
+EnKF k1                      0.0234     0.6991     0.1162     0.0649     0.1281      0.3579
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.1206      0.3473
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0082     0.1781     0.0366     0.0203     0.0389      0.1972
+EnKF k1                      0.0295     0.6853     0.0989     0.0625     0.1402      0.3744
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0697      0.2640
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0176     0.1060     0.0209     0.0105     0.0388      0.1969
+EnKF k1                      0.0234     0.1721     0.0297     0.0397     0.0662      0.2573
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0082     0.0510     0.0099     0.0052     0.0186      0.1363
+EnKF k1                      0.0295     0.2033     0.0307     0.0398     0.0758      0.2754
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0101     0.0608     0.0127     0.0059     0.0224      0.1496
+EnKF k1                      0.0136     0.1047     0.0203     0.0392     0.0444      0.2108
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0057     0.0355     0.0073     0.0035     0.0130      0.1141
+EnKF k1                      0.0204     0.1451     0.0237     0.0389     0.0570      0.2388
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/senseiver_g_accuracy.json
+[run] methods.dincae.checks.evaluate --run-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models --ckpt-glob /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/dincae_epoch60.pt --split test --days 0 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/dincae_accuracy
+single checkpoint:  epochs [60]
+test split: 7 days
+  atc-20130811_corridor_1.0s  density 0.02046  vx 0.51441  vy 0.09208  var 0.04419
+  atc-20130818_corridor_1.0s  density 0.03025  vx 0.58375  vy 0.10699  var 0.05458
+  atc-20130825_corridor_1.0s  density 0.02520  vx 0.66709  vy 0.11826  var 0.05971
+  atc-20130901_corridor_1.0s  density 0.02685  vx 0.63854  vy 0.11512  var 0.06189
+  atc-20130915_corridor_1.0s  density 0.02058  vx 0.69936  vy 0.12676  var 0.05395
+  atc-20130922_corridor_1.0s  density 0.01869  vx 0.74118  vy 0.12833  var 0.05295
+  atc-20130929_corridor_1.0s  density 0.02197  vx 0.75834  vy 0.12222  var 0.06135
+
+=== MSE (both conventions) ===
+convention         density         vx         vy        var   4-channel merged
+ours_blind         0.02345    0.65305    0.11502    0.05580   0.12085
+ours_all           0.01529    0.33376    0.05545    0.03148   0.06999
+ours_blind_noclip   0.02353    0.65306    0.11502    0.05647   0.12099
+ours_all_noclip    0.01544    0.33389    0.05545  1205.34273   170.45644
+walkable_blind     0.02345    0.14532    0.02568    0.01169   0.05153
+walkable_all       0.01529    0.09446    0.01565    0.00805   0.03336
+v4dvar_blind       0.01351    0.08361    0.01598    0.00657   0.02992
+v4dvar_all         0.01065    0.06612    0.01172    0.00548   0.02349
+
+=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===
+  density  truth 0.2039  rec 0.1804  ratio 0.885
+  vx       truth 0.8981  rec 0.7083  ratio 0.789
+  vy       truth 0.3317  rec 0.2357  ratio 0.711
+  var      truth 0.2326  rec 0.1837  ratio 0.790
+
+=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===
+  density  mean predicted SD 0.4997  actual RMS 0.7869  global adjustment factor 1.575  (n=4,000,000)
+      pred 0.0478 -> actual 0.0764  (n=1,094,512)
+      pred 0.1914 -> actual 0.2378  (n=323,021)
+      pred 0.3227 -> actual 0.3402  (n=274,812)
+      pred 0.4463 -> actual 0.4596  (n=230,061)
+      pred 0.5738 -> actual 0.5814  (n=213,780)
+      pred 0.7023 -> actual 0.7368  (n=228,345)
+      pred 0.8239 -> actual 0.8744  (n=222,823)
+      pred 0.9517 -> actual 1.0559  (n=202,080)
+      pred 1.0782 -> actual 1.2237  (n=193,826)
+      pred 1.2078 -> actual 1.3886  (n=216,740)
+  vx       mean predicted SD 0.5862  actual RMS 0.9519  global adjustment factor 1.624  (n=4,000,000)
+      pred 0.3598 -> actual 0.8302  (n=142,290)
+      pred 0.4042 -> actual 0.8447  (n=188,159)
+      pred 0.4499 -> actual 0.8595  (n=238,660)
+      pred 0.4960 -> actual 0.9044  (n=296,019)
+      pred 0.5413 -> actual 0.9143  (n=317,404)
+      pred 0.5863 -> actual 0.9410  (n=366,550)
+      pred 0.6325 -> actual 0.9839  (n=387,814)
+      pred 0.6778 -> actual 1.0046  (n=443,372)
+      pred 0.7236 -> actual 1.0285  (n=413,658)
+      pred 0.7681 -> actual 1.0526  (n=406,074)
+  vy       mean predicted SD 0.5825  actual RMS 1.0077  global adjustment factor 1.730  (n=4,000,000)
+      pred 0.4088 -> actual 1.0021  (n=164,382)
+      pred 0.4439 -> actual 0.9670  (n=197,325)
+      pred 0.4788 -> actual 0.9539  (n=249,630)
+      pred 0.5134 -> actual 0.9574  (n=305,749)
+      pred 0.5481 -> actual 0.9427  (n=321,031)
+      pred 0.5834 -> actual 0.9759  (n=356,118)
+      pred 0.6175 -> actual 0.9948  (n=359,369)
+      pred 0.6531 -> actual 0.9623  (n=368,831)
+      pred 0.6879 -> actual 0.9628  (n=448,462)
+      pred 0.7218 -> actual 0.9989  (n=429,103)
+  var      mean predicted SD 0.5831  actual RMS 1.0246  global adjustment factor 1.757  (n=4,000,000)
+      pred 0.2324 -> actual 0.6321  (n=339,147)
+      pred 0.3113 -> actual 0.7223  (n=339,532)
+      pred 0.3886 -> actual 0.8000  (n=334,295)
+      pred 0.4682 -> actual 0.8608  (n=309,248)
+      pred 0.5475 -> actual 0.9349  (n=304,846)
+      pred 0.6266 -> actual 1.0130  (n=331,986)
+      pred 0.7052 -> actual 1.0908  (n=310,269)
+      pred 0.7832 -> actual 1.1667  (n=320,699)
+      pred 0.8623 -> actual 1.2348  (n=317,307)
+      pred 0.9399 -> actual 1.3234  (n=292,671)
+
+wrote /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/dincae_accuracy/dincae_metrics_test.json
+[run] methods.dincae.checks.eval_uncertainty_dincae --run-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models --ckpt-glob /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/dincae_epoch60.pt --split test --days 0 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/uncertainty_dincae.json
+[members] 1 checkpoints: epochs [60]  dev=cuda
+  atc-20130811_corridor_1.0s.h5  39819 frames
+  atc-20130818_corridor_1.0s.h5  38883 frames
+  atc-20130825_corridor_1.0s.h5  42888 frames
+  atc-20130901_corridor_1.0s.h5  39756 frames
+  atc-20130915_corridor_1.0s.h5  39381 frames
+  atc-20130922_corridor_1.0s.h5  38840 frames
+  atc-20130929_corridor_1.0s.h5  37962 frames
+
+[pass 2] constant-sigma baseline, sigma = all 0.3825, blind 0.4312, defined 0.6728, defined_blind 0.8727, walkable 0.4559, walkable_blind 0.5649
+
+split                                 RMSE     CRPS   sigma   sp/sk   cov90
+all                                 0.3825   0.1117  0.2020   0.528   95.5%
+blind                               0.4312   0.1224  0.2289   0.531   96.2%
+observed                            0.3180   0.0996  0.1712   0.538   94.7%
+defined                             0.6728   0.2681  0.3996   0.594   88.5%
+defined_blind                       0.8727   0.3734  0.5320   0.610   86.4%
+defined_observed                    0.4930   0.1967  0.3097   0.628   89.9%
+walkable                            0.4559   0.1503  0.2698   0.592   94.1%
+walkable_blind                      0.5649   0.1954  0.3628   0.642   94.3%
+channel_density                     0.5323   0.1486  0.2700   0.507   96.4%
+channel_vx                          0.3029   0.1048  0.1808   0.597   94.1%
+channel_vy                          0.3216   0.1195  0.2194   0.682   94.7%
+channel_var                         0.3268   0.0741  0.1376   0.421   96.8%
+defined_channel_density             0.7870   0.2726  0.4997   0.635   95.3%
+defined_channel_vx                  0.9517   0.5903  0.5862   0.616   63.3%
+defined_channel_vy                  1.0075   0.5904  0.5824   0.578   67.6%
+defined_channel_var                 1.0250   0.4204  0.5831   0.569   86.3%
+all_constant_sigma_baseline         0.3825   0.1631  0.3825   1.000   94.0%
+blind_constant_sigma_baseline       0.4312   0.1821  0.4312   1.000   93.9%
+defined_constant_sigma_baseline     0.6728   0.3241  0.6728   1.000   92.1%
+defined_blind_constant_sigma_baseline  0.8727   0.4328  0.8727   1.000   92.3%
+walkable_constant_sigma_baseline    0.4559   0.2023  0.4559   1.000   93.2%
+walkable_blind_constant_sigma_baseline  0.5649   0.2545  0.5649   1.000   92.5%
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/uncertainty_dincae.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --varnet-checkpoints MSE=/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_mse_s3_epoch80.pt --arms  --no-with-ensemble --days 0 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/varnet_mse_accuracy.json
+[model] Senseiver 65,892 params | 4DVarNet MSE dT=200 n_iter=20 | walkable 290/432 | device=cuda
+  atc-20130811: 39821 frames, scored [1,39820)  Senseiver full=0.0140  4DVarNet MSE full=0.0240  EnKF k1 full=0.0473
+  atc-20130818: 38885 frames, scored [1,38884)  Senseiver full=0.0194  4DVarNet MSE full=0.0296  EnKF k1 full=0.0609
+  atc-20130825: 42890 frames, scored [1,42889)  Senseiver full=0.0172  4DVarNet MSE full=0.0275  EnKF k1 full=0.0563
+  atc-20130901: 39758 frames, scored [1,39757)  Senseiver full=0.0186  4DVarNet MSE full=0.0291  EnKF k1 full=0.0601
+  atc-20130915: 39383 frames, scored [1,39382)  Senseiver full=0.0163  4DVarNet MSE full=0.0267  EnKF k1 full=0.0552
+  atc-20130922: 38842 frames, scored [1,38841)  Senseiver full=0.0154  4DVarNet MSE full=0.0262  EnKF k1 full=0.0550
+  atc-20130929: 37964 frames, scored [1,37963)  Senseiver full=0.0195  4DVarNet MSE full=0.0304  EnKF k1 full=0.0647
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.1311      0.1310        0.1309          0.1307
+4DVarNet MSE                0.1662      0.1662        0.1675          0.1674
+EnKF k1                     0.2388      0.2387        0.2388          0.2387
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0243     0.6347     0.1107     0.0538     0.1182      0.3438
+4DVarNet MSE                 0.0310     0.5233     0.1260     0.0766     0.1128      0.3359
+EnKF k1                      0.0234     0.6991     0.1162     0.0649     0.1281      0.3579
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.1206      0.3473
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0121     0.2532     0.0447     0.0231     0.0537      0.2317
+4DVarNet MSE                 0.0154     0.2488     0.0525     0.0294     0.0570      0.2387
+EnKF k1                      0.0295     0.6853     0.0989     0.0625     0.1402      0.3744
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0697      0.2640
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0243     0.1385     0.0238     0.0114     0.0495      0.2225
+4DVarNet MSE                 0.0310     0.1303     0.0318     0.0197     0.0532      0.2306
+EnKF k1                      0.0234     0.1721     0.0297     0.0397     0.0662      0.2573
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0121     0.0684     0.0118     0.0060     0.0246      0.1568
+4DVarNet MSE                 0.0154     0.1036     0.0193     0.0092     0.0369      0.1921
+EnKF k1                      0.0295     0.2033     0.0307     0.0398     0.0758      0.2754
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0140     0.0791     0.0144     0.0064     0.0285      0.1688
+4DVarNet MSE                 0.0178     0.0766     0.0201     0.0111     0.0314      0.1772
+EnKF k1                      0.0136     0.1047     0.0203     0.0392     0.0444      0.2108
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0085     0.0475     0.0087     0.0041     0.0172      0.1311
+4DVarNet MSE                 0.0108     0.0783     0.0151     0.0063     0.0276      0.1662
+EnKF k1                      0.0204     0.1451     0.0237     0.0389     0.0570      0.2388
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/varnet_mse_accuracy.json
+[run] methods.varnet.checks.eval_uncertainty --members 0 --checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt --days 7 --frames 0 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/uncertainty_varnet_aughead.json
+  member 0: ../../supervisor_evaluation/models/varnet_aughead_obs_s0.pt  epoch=90  n_iter=20
+[members] 1 x /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  199 windows
+  atc-20130818_corridor_1.0s.h5  194 windows
+  atc-20130825_corridor_1.0s.h5  214 windows
+  atc-20130901_corridor_1.0s.h5  198 windows
+  atc-20130915_corridor_1.0s.h5  196 windows
+  atc-20130922_corridor_1.0s.h5  194 windows
+  atc-20130929_corridor_1.0s.h5  189 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.2072   0.0742   -1.143  0.1510   0.73   92.8%
+all_aleatoric_only              0.2072   0.0742   -1.143  0.1510   0.73   92.8%
+all_epistemic_only              0.2072   0.096121470710839.865  0.0000   0.00    0.0%
+all_constant_sigma_baseline     0.2072   0.0953   -0.155  0.2072   1.00   92.5%
+blind                           0.2300   0.0727   -1.209  0.1390   0.60   93.5%
+observed                        0.1776   0.0760   -1.068  0.1647   0.93   91.9%
+defined                         0.2841   0.1056   -0.240  0.1981   0.70   91.1%
+defined_constant_sigma_baseline  0.2841   0.1319    0.160  0.2841   1.00   92.2%
+defined_blind                   0.4054   0.1572    0.730  0.2143   0.53   85.2%
+defined_blind_constant_sigma_baseline  0.4054   0.1989    0.516  0.4054   1.00   90.3%
+defined_observed                0.1549   0.0706   -0.899  0.1871   1.21   95.1%
+defined_observed_constant_sigma_baseline  0.1549   0.0751   -0.446  0.1549   1.00   92.2%
+walkable                        0.2380   0.0901   -0.789  0.1863   0.78   93.1%
+walkable_constant_sigma_baseline  0.2380   0.1114   -0.017  0.2380   1.00   92.1%
+walkable_blind                  0.2961   0.1055   -0.492  0.1947   0.66   92.2%
+walkable_blind_constant_sigma_baseline  0.2961   0.1375    0.202  0.2961   1.00   92.3%
+blind_constant_sigma_baseline   0.2300   0.1016   -0.051  0.2300   1.00   93.6%
+channel_density                 0.1165   0.0432   -1.362  0.0876   0.75   92.1%
+channel_vx                      0.3681   0.1813    0.195  0.3571   0.97   91.2%
+channel_vy                      0.1265   0.0558   -0.989  0.1120   0.89   92.2%
+channel_var                     0.0816   0.0167   -2.416  0.0473   0.58   95.6%
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/uncertainty_varnet_aughead.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%
+[run] methods.enkf.checks.export_obs_for_enkf --split test --frames 0 --outdir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --obs-every-k 1
+[export] 7 test days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 39821 frames, observed cells/frame mean 200.6
+  atc-20130818: exported 38885 frames, observed cells/frame mean 202.8
+  atc-20130825: exported 42890 frames, observed cells/frame mean 200.4
+  atc-20130901: exported 39758 frames, observed cells/frame mean 202.2
+  atc-20130915: exported 39383 frames, observed cells/frame mean 202.2
+  atc-20130922: exported 38842 frames, observed cells/frame mean 202.3
+  atc-20130929: exported 37964 frames, observed cells/frame mean 202.3
+[done] -> /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations/obs_*.npz
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130811.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130811.json
+[residual] 1000/39821, 0.0058 s/frame
+[residual] 2000/39821, 0.0056 s/frame
+[residual] 3000/39821, 0.0055 s/frame
+[residual] 4000/39821, 0.0054 s/frame
+[residual] 5000/39821, 0.0054 s/frame
+[residual] 6000/39821, 0.0054 s/frame
+[residual] 7000/39821, 0.0054 s/frame
+[residual] 8000/39821, 0.0053 s/frame
+[residual] 9000/39821, 0.0053 s/frame
+[residual] 10000/39821, 0.0053 s/frame
+[residual] 11000/39821, 0.0053 s/frame
+[residual] 12000/39821, 0.0053 s/frame
+[residual] 13000/39821, 0.0053 s/frame
+[residual] 14000/39821, 0.0053 s/frame
+[residual] 15000/39821, 0.0053 s/frame
+[residual] 16000/39821, 0.0053 s/frame
+[residual] 17000/39821, 0.0053 s/frame
+[residual] 18000/39821, 0.0053 s/frame
+[residual] 19000/39821, 0.0053 s/frame
+[residual] 20000/39821, 0.0053 s/frame
+[residual] 21000/39821, 0.0053 s/frame
+[residual] 22000/39821, 0.0053 s/frame
+[residual] 23000/39821, 0.0053 s/frame
+[residual] 24000/39821, 0.0053 s/frame
+[residual] 25000/39821, 0.0053 s/frame
+[residual] 26000/39821, 0.0053 s/frame
+[residual] 27000/39821, 0.0053 s/frame
+[residual] 28000/39821, 0.0053 s/frame
+[residual] 29000/39821, 0.0053 s/frame
+[residual] 30000/39821, 0.0053 s/frame
+[residual] 31000/39821, 0.0053 s/frame
+[residual] 32000/39821, 0.0053 s/frame
+[residual] 33000/39821, 0.0053 s/frame
+[residual] 34000/39821, 0.0053 s/frame
+[residual] 35000/39821, 0.0053 s/frame
+[residual] 36000/39821, 0.0053 s/frame
+[residual] 37000/39821, 0.0053 s/frame
+[residual] 38000/39821, 0.0053 s/frame
+[residual] 39000/39821, 0.0053 s/frame
+[all] RMSE=0.18590 CRPS=0.07937 spread/skill=1.113 cov90=0.796
+[defined_blind] RMSE=0.33226 CRPS=0.13912 spread/skill=0.903 cov90=0.938
+[density] spearman=+0.912 AUSE=0.163
+[vx] spearman=+0.669 AUSE=0.276
+[vy] spearman=+0.663 AUSE=0.396
+[var] spearman=+0.937 AUSE=0.108
+[runtime] 281.62s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130811.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130818 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130818.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130818.json
+[residual] 1000/38885, 0.0057 s/frame
+[residual] 2000/38885, 0.0055 s/frame
+[residual] 3000/38885, 0.0054 s/frame
+[residual] 4000/38885, 0.0054 s/frame
+[residual] 5000/38885, 0.0053 s/frame
+[residual] 6000/38885, 0.0053 s/frame
+[residual] 7000/38885, 0.0053 s/frame
+[residual] 8000/38885, 0.0053 s/frame
+[residual] 9000/38885, 0.0053 s/frame
+[residual] 10000/38885, 0.0053 s/frame
+[residual] 11000/38885, 0.0053 s/frame
+[residual] 12000/38885, 0.0053 s/frame
+[residual] 13000/38885, 0.0053 s/frame
+[residual] 14000/38885, 0.0053 s/frame
+[residual] 15000/38885, 0.0053 s/frame
+[residual] 16000/38885, 0.0053 s/frame
+[residual] 17000/38885, 0.0053 s/frame
+[residual] 18000/38885, 0.0053 s/frame
+[residual] 19000/38885, 0.0053 s/frame
+[residual] 20000/38885, 0.0053 s/frame
+[residual] 21000/38885, 0.0053 s/frame
+[residual] 22000/38885, 0.0053 s/frame
+[residual] 23000/38885, 0.0053 s/frame
+[residual] 24000/38885, 0.0053 s/frame
+[residual] 25000/38885, 0.0053 s/frame
+[residual] 26000/38885, 0.0053 s/frame
+[residual] 27000/38885, 0.0053 s/frame
+[residual] 28000/38885, 0.0053 s/frame
+[residual] 29000/38885, 0.0053 s/frame
+[residual] 30000/38885, 0.0053 s/frame
+[residual] 31000/38885, 0.0053 s/frame
+[residual] 32000/38885, 0.0053 s/frame
+[residual] 33000/38885, 0.0053 s/frame
+[residual] 34000/38885, 0.0053 s/frame
+[residual] 35000/38885, 0.0053 s/frame
+[residual] 36000/38885, 0.0053 s/frame
+[residual] 37000/38885, 0.0053 s/frame
+[residual] 38000/38885, 0.0053 s/frame
+[all] RMSE=0.20271 CRPS=0.08413 spread/skill=1.030 cov90=0.795
+[defined_blind] RMSE=0.36441 CRPS=0.15871 spread/skill=0.919 cov90=0.937
+[density] spearman=+0.910 AUSE=0.142
+[vx] spearman=+0.688 AUSE=0.273
+[vy] spearman=+0.665 AUSE=0.404
+[var] spearman=+0.928 AUSE=0.120
+[runtime] 275.79s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130818.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130825 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130825.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130825.json
+[residual] 1000/42890, 0.0057 s/frame
+[residual] 2000/42890, 0.0055 s/frame
+[residual] 3000/42890, 0.0055 s/frame
+[residual] 4000/42890, 0.0054 s/frame
+[residual] 5000/42890, 0.0054 s/frame
+[residual] 6000/42890, 0.0054 s/frame
+[residual] 7000/42890, 0.0054 s/frame
+[residual] 8000/42890, 0.0053 s/frame
+[residual] 9000/42890, 0.0053 s/frame
+[residual] 10000/42890, 0.0053 s/frame
+[residual] 11000/42890, 0.0053 s/frame
+[residual] 12000/42890, 0.0053 s/frame
+[residual] 13000/42890, 0.0053 s/frame
+[residual] 14000/42890, 0.0053 s/frame
+[residual] 15000/42890, 0.0053 s/frame
+[residual] 16000/42890, 0.0053 s/frame
+[residual] 17000/42890, 0.0053 s/frame
+[residual] 18000/42890, 0.0053 s/frame
+[residual] 19000/42890, 0.0053 s/frame
+[residual] 20000/42890, 0.0053 s/frame
+[residual] 21000/42890, 0.0053 s/frame
+[residual] 22000/42890, 0.0053 s/frame
+[residual] 23000/42890, 0.0053 s/frame
+[residual] 24000/42890, 0.0053 s/frame
+[residual] 25000/42890, 0.0053 s/frame
+[residual] 26000/42890, 0.0053 s/frame
+[residual] 27000/42890, 0.0053 s/frame
+[residual] 28000/42890, 0.0053 s/frame
+[residual] 29000/42890, 0.0053 s/frame
+[residual] 30000/42890, 0.0053 s/frame
+[residual] 31000/42890, 0.0053 s/frame
+[residual] 32000/42890, 0.0053 s/frame
+[residual] 33000/42890, 0.0053 s/frame
+[residual] 34000/42890, 0.0053 s/frame
+[residual] 35000/42890, 0.0053 s/frame
+[residual] 36000/42890, 0.0053 s/frame
+[residual] 37000/42890, 0.0053 s/frame
+[residual] 38000/42890, 0.0053 s/frame
+[residual] 39000/42890, 0.0053 s/frame
+[residual] 40000/42890, 0.0053 s/frame
+[residual] 41000/42890, 0.0053 s/frame
+[residual] 42000/42890, 0.0053 s/frame
+[all] RMSE=0.19785 CRPS=0.08144 spread/skill=1.049 cov90=0.797
+[defined_blind] RMSE=0.36063 CRPS=0.14917 spread/skill=0.863 cov90=0.938
+[density] spearman=+0.921 AUSE=0.123
+[vx] spearman=+0.684 AUSE=0.257
+[vy] spearman=+0.668 AUSE=0.379
+[var] spearman=+0.937 AUSE=0.202
+[runtime] 303.46s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130825.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130901 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130901.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130901.json
+[residual] 1000/39758, 0.0057 s/frame
+[residual] 2000/39758, 0.0055 s/frame
+[residual] 3000/39758, 0.0054 s/frame
+[residual] 4000/39758, 0.0054 s/frame
+[residual] 5000/39758, 0.0053 s/frame
+[residual] 6000/39758, 0.0053 s/frame
+[residual] 7000/39758, 0.0053 s/frame
+[residual] 8000/39758, 0.0053 s/frame
+[residual] 9000/39758, 0.0053 s/frame
+[residual] 10000/39758, 0.0053 s/frame
+[residual] 11000/39758, 0.0053 s/frame
+[residual] 12000/39758, 0.0053 s/frame
+[residual] 13000/39758, 0.0053 s/frame
+[residual] 14000/39758, 0.0053 s/frame
+[residual] 15000/39758, 0.0053 s/frame
+[residual] 16000/39758, 0.0053 s/frame
+[residual] 17000/39758, 0.0053 s/frame
+[residual] 18000/39758, 0.0053 s/frame
+[residual] 19000/39758, 0.0053 s/frame
+[residual] 20000/39758, 0.0053 s/frame
+[residual] 21000/39758, 0.0053 s/frame
+[residual] 22000/39758, 0.0053 s/frame
+[residual] 23000/39758, 0.0053 s/frame
+[residual] 24000/39758, 0.0053 s/frame
+[residual] 25000/39758, 0.0053 s/frame
+[residual] 26000/39758, 0.0053 s/frame
+[residual] 27000/39758, 0.0053 s/frame
+[residual] 28000/39758, 0.0053 s/frame
+[residual] 29000/39758, 0.0053 s/frame
+[residual] 30000/39758, 0.0053 s/frame
+[residual] 31000/39758, 0.0053 s/frame
+[residual] 32000/39758, 0.0052 s/frame
+[residual] 33000/39758, 0.0052 s/frame
+[residual] 34000/39758, 0.0052 s/frame
+[residual] 35000/39758, 0.0052 s/frame
+[residual] 36000/39758, 0.0052 s/frame
+[residual] 37000/39758, 0.0052 s/frame
+[residual] 38000/39758, 0.0052 s/frame
+[residual] 39000/39758, 0.0052 s/frame
+[all] RMSE=0.20200 CRPS=0.08290 spread/skill=1.031 cov90=0.797
+[defined_blind] RMSE=0.36766 CRPS=0.15550 spread/skill=0.885 cov90=0.938
+[density] spearman=+0.917 AUSE=0.132
+[vx] spearman=+0.685 AUSE=0.262
+[vy] spearman=+0.665 AUSE=0.381
+[var] spearman=+0.931 AUSE=0.200
+[runtime] 280.0s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130901.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130915 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130915.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130915.json
+[residual] 1000/39383, 0.0057 s/frame
+[residual] 2000/39383, 0.0055 s/frame
+[residual] 3000/39383, 0.0054 s/frame
+[residual] 4000/39383, 0.0054 s/frame
+[residual] 5000/39383, 0.0054 s/frame
+[residual] 6000/39383, 0.0053 s/frame
+[residual] 7000/39383, 0.0053 s/frame
+[residual] 8000/39383, 0.0053 s/frame
+[residual] 9000/39383, 0.0053 s/frame
+[residual] 10000/39383, 0.0053 s/frame
+[residual] 11000/39383, 0.0053 s/frame
+[residual] 12000/39383, 0.0053 s/frame
+[residual] 13000/39383, 0.0053 s/frame
+[residual] 14000/39383, 0.0053 s/frame
+[residual] 15000/39383, 0.0053 s/frame
+[residual] 16000/39383, 0.0053 s/frame
+[residual] 17000/39383, 0.0053 s/frame
+[residual] 18000/39383, 0.0053 s/frame
+[residual] 19000/39383, 0.0053 s/frame
+[residual] 20000/39383, 0.0053 s/frame
+[residual] 21000/39383, 0.0053 s/frame
+[residual] 22000/39383, 0.0053 s/frame
+[residual] 23000/39383, 0.0053 s/frame
+[residual] 24000/39383, 0.0053 s/frame
+[residual] 25000/39383, 0.0053 s/frame
+[residual] 26000/39383, 0.0053 s/frame
+[residual] 27000/39383, 0.0053 s/frame
+[residual] 28000/39383, 0.0053 s/frame
+[residual] 29000/39383, 0.0053 s/frame
+[residual] 30000/39383, 0.0053 s/frame
+[residual] 31000/39383, 0.0053 s/frame
+[residual] 32000/39383, 0.0053 s/frame
+[residual] 33000/39383, 0.0053 s/frame
+[residual] 34000/39383, 0.0053 s/frame
+[residual] 35000/39383, 0.0053 s/frame
+[residual] 36000/39383, 0.0053 s/frame
+[residual] 37000/39383, 0.0053 s/frame
+[residual] 38000/39383, 0.0053 s/frame
+[residual] 39000/39383, 0.0053 s/frame
+[all] RMSE=0.19662 CRPS=0.08054 spread/skill=1.046 cov90=0.793
+[defined_blind] RMSE=0.36000 CRPS=0.14458 spread/skill=0.821 cov90=0.935
+[density] spearman=+0.923 AUSE=0.126
+[vx] spearman=+0.679 AUSE=0.260
+[vy] spearman=+0.671 AUSE=0.375
+[var] spearman=+0.938 AUSE=0.134
+[runtime] 277.36s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130915.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130922 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130922.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130922.json
+[residual] 1000/38842, 0.0057 s/frame
+[residual] 2000/38842, 0.0055 s/frame
+[residual] 3000/38842, 0.0054 s/frame
+[residual] 4000/38842, 0.0054 s/frame
+[residual] 5000/38842, 0.0054 s/frame
+[residual] 6000/38842, 0.0053 s/frame
+[residual] 7000/38842, 0.0053 s/frame
+[residual] 8000/38842, 0.0053 s/frame
+[residual] 9000/38842, 0.0053 s/frame
+[residual] 10000/38842, 0.0053 s/frame
+[residual] 11000/38842, 0.0053 s/frame
+[residual] 12000/38842, 0.0053 s/frame
+[residual] 13000/38842, 0.0053 s/frame
+[residual] 14000/38842, 0.0053 s/frame
+[residual] 15000/38842, 0.0053 s/frame
+[residual] 16000/38842, 0.0053 s/frame
+[residual] 17000/38842, 0.0053 s/frame
+[residual] 18000/38842, 0.0053 s/frame
+[residual] 19000/38842, 0.0053 s/frame
+[residual] 20000/38842, 0.0053 s/frame
+[residual] 21000/38842, 0.0053 s/frame
+[residual] 22000/38842, 0.0053 s/frame
+[residual] 23000/38842, 0.0053 s/frame
+[residual] 24000/38842, 0.0053 s/frame
+[residual] 25000/38842, 0.0053 s/frame
+[residual] 26000/38842, 0.0053 s/frame
+[residual] 27000/38842, 0.0053 s/frame
+[residual] 28000/38842, 0.0053 s/frame
+[residual] 29000/38842, 0.0053 s/frame
+[residual] 30000/38842, 0.0053 s/frame
+[residual] 31000/38842, 0.0053 s/frame
+[residual] 32000/38842, 0.0053 s/frame
+[residual] 33000/38842, 0.0053 s/frame
+[residual] 34000/38842, 0.0053 s/frame
+[residual] 35000/38842, 0.0053 s/frame
+[residual] 36000/38842, 0.0053 s/frame
+[residual] 37000/38842, 0.0053 s/frame
+[residual] 38000/38842, 0.0053 s/frame
+[all] RMSE=0.19509 CRPS=0.07989 spread/skill=1.052 cov90=0.794
+[defined_blind] RMSE=0.36067 CRPS=0.14396 spread/skill=0.815 cov90=0.936
+[density] spearman=+0.926 AUSE=0.122
+[vx] spearman=+0.681 AUSE=0.254
+[vy] spearman=+0.669 AUSE=0.366
+[var] spearman=+0.939 AUSE=0.123
+[runtime] 272.92s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130922.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130929 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_exports/atc-20130929.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130929.json
+[residual] 1000/37964, 0.0057 s/frame
+[residual] 2000/37964, 0.0055 s/frame
+[residual] 3000/37964, 0.0054 s/frame
+[residual] 4000/37964, 0.0053 s/frame
+[residual] 5000/37964, 0.0053 s/frame
+[residual] 6000/37964, 0.0053 s/frame
+[residual] 7000/37964, 0.0053 s/frame
+[residual] 8000/37964, 0.0053 s/frame
+[residual] 9000/37964, 0.0053 s/frame
+[residual] 10000/37964, 0.0053 s/frame
+[residual] 11000/37964, 0.0053 s/frame
+[residual] 12000/37964, 0.0053 s/frame
+[residual] 13000/37964, 0.0053 s/frame
+[residual] 14000/37964, 0.0053 s/frame
+[residual] 15000/37964, 0.0053 s/frame
+[residual] 16000/37964, 0.0053 s/frame
+[residual] 17000/37964, 0.0053 s/frame
+[residual] 18000/37964, 0.0053 s/frame
+[residual] 19000/37964, 0.0053 s/frame
+[residual] 20000/37964, 0.0053 s/frame
+[residual] 21000/37964, 0.0053 s/frame
+[residual] 22000/37964, 0.0053 s/frame
+[residual] 23000/37964, 0.0053 s/frame
+[residual] 24000/37964, 0.0053 s/frame
+[residual] 25000/37964, 0.0053 s/frame
+[residual] 26000/37964, 0.0053 s/frame
+[residual] 27000/37964, 0.0053 s/frame
+[residual] 28000/37964, 0.0053 s/frame
+[residual] 29000/37964, 0.0052 s/frame
+[residual] 30000/37964, 0.0052 s/frame
+[residual] 31000/37964, 0.0052 s/frame
+[residual] 32000/37964, 0.0052 s/frame
+[residual] 33000/37964, 0.0052 s/frame
+[residual] 34000/37964, 0.0052 s/frame
+[residual] 35000/37964, 0.0052 s/frame
+[residual] 36000/37964, 0.0052 s/frame
+[residual] 37000/37964, 0.0052 s/frame
+[all] RMSE=0.20861 CRPS=0.08319 spread/skill=0.989 cov90=0.793
+[defined_blind] RMSE=0.38545 CRPS=0.15913 spread/skill=0.835 cov90=0.935
+[density] spearman=+0.919 AUSE=0.131
+[vx] spearman=+0.699 AUSE=0.248
+[vy] spearman=+0.672 AUSE=0.353
+[var] spearman=+0.937 AUSE=0.142
+[runtime] 267.09s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf/atc-20130929.json
+[collect] 5 accuracy rows, 3 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/full/figures

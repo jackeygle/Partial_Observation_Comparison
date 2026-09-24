@@ -1,0 +1,8 @@
+##### 对照: 从 epoch_29(好权重) 出发, 不裁剪
+[init] weights from runs/pedpred3_5to5_s0/epoch_29.pt, optimiser fresh
+{"epoch": 0, "train_loss": 0.013235351705343896, "valid_loss": 0.028451521164450867, "lr": 0.001, "skipped": 0, "train_s": 2.4, "valid_rmse": {"densit
+{"epoch": 1, "train_loss": 0.011786450354481413, "valid_loss": 0.02945145161461866, "lr": 0.001, "skipped": 0, "train_s": 1.9, "valid_rmse": {"density
+##### 压力测试: 从 epoch_31(已崩权重) 出发, 裁剪 1.0 + lr 2e-4
+[init] weights from runs/pedpred3_5to5_s0/epoch_31.pt, optimiser fresh
+{"epoch": 0, "train_loss": 0.039147036704425243, "valid_loss": NaN, "lr": 0.0002, "skipped": 27, "train_s": 2.1, "valid_rmse": {"density": 0.108283356
+{"epoch": 1, "train_loss": 0.017937466847052434, "valid_loss": NaN, "lr": 0.0002, "skipped": 3, "train_s": 1.9, "valid_rmse": {"density": 0.0633286437

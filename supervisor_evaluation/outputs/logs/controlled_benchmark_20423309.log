@@ -1,0 +1,41 @@
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_-1.json
+[all] RMSE=0.15002 CRPS=0.06873 spread/skill=1.342 cov90=0.807
+[defined_blind] RMSE=0.19658 CRPS=0.06452 spread/skill=0.775 cov90=0.940
+[density] spearman=+0.942 AUSE=0.084
+[vx] spearman=+0.652 AUSE=0.243
+[vy] spearman=+0.680 AUSE=0.277
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 5.93s on Tesla V100-SXM2-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_-1.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_0.json
+[all] RMSE=0.15029 CRPS=0.06875 spread/skill=1.340 cov90=0.807
+[defined_blind] RMSE=0.19645 CRPS=0.06444 spread/skill=0.775 cov90=0.940
+[density] spearman=+0.942 AUSE=0.084
+[vx] spearman=+0.652 AUSE=0.243
+[vy] spearman=+0.680 AUSE=0.279
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 5.93s on Tesla V100-SXM2-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_0.json
+[benchmark] round 1/3: Senseiver-A=0.137 ms/frame, Senseiver-G Temporal (ours)=0.844 ms/frame, DINCAE=0.027 ms/frame, 4DVarNet MSE=0.332 ms/frame, 4DVarNet aughead_obs (single)=0.376 ms/frame, Localized EnKF (100 members)=7.203 ms/frame
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_1.json
+[all] RMSE=0.15023 CRPS=0.06874 spread/skill=1.340 cov90=0.807
+[defined_blind] RMSE=0.19660 CRPS=0.06451 spread/skill=0.775 cov90=0.940
+[density] spearman=+0.943 AUSE=0.083
+[vx] spearman=+0.651 AUSE=0.243
+[vy] spearman=+0.682 AUSE=0.276
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 5.79s on Tesla V100-SXM2-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_1.json
+[benchmark] round 2/3: Senseiver-A=0.137 ms/frame, Senseiver-G Temporal (ours)=0.843 ms/frame, DINCAE=0.027 ms/frame, 4DVarNet MSE=0.331 ms/frame, 4DVarNet aughead_obs (single)=0.377 ms/frame, Localized EnKF (100 members)=6.968 ms/frame
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/enkf_observations --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_2.json
+[all] RMSE=0.15027 CRPS=0.06876 spread/skill=1.340 cov90=0.807
+[defined_blind] RMSE=0.19692 CRPS=0.06455 spread/skill=0.774 cov90=0.940
+[density] spearman=+0.942 AUSE=0.084
+[vx] spearman=+0.651 AUSE=0.243
+[vy] spearman=+0.681 AUSE=0.277
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 5.88s on Tesla V100-SXM2-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/raw/latency_enkf/round_2.json
+[benchmark] round 3/3: Senseiver-A=0.137 ms/frame, Senseiver-G Temporal (ours)=0.844 ms/frame, DINCAE=0.027 ms/frame, 4DVarNet MSE=0.332 ms/frame, 4DVarNet aughead_obs (single)=0.377 ms/frame, Localized EnKF (100 members)=7.121 ms/frame
+[benchmark] controlled timing written to /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/inference_time_controlled.csv
+[plot] figures written under supervisor_evaluation/outputs/full/figures

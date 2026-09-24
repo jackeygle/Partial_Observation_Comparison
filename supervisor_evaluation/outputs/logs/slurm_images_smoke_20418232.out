@@ -1,0 +1,9 @@
+[verify] PASS -> supervisor_evaluation/outputs/full/verification_report.json
+[images] atc-20130811: 1 common-frame samples complete
+[images] atc-20130818: 1 common-frame samples complete
+[images] atc-20130825: 1 common-frame samples complete
+[images] atc-20130901: 1 common-frame samples complete
+[images] atc-20130915: 1 common-frame samples complete
+[images] atc-20130922: 1 common-frame samples complete
+[images] atc-20130929: 1 common-frame samples complete
+[images] wrote 7 comparison boards to supervisor_evaluation/outputs/full/images

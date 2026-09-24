@@ -200,3 +200,46 @@ changing it would change results, which this copy is not allowed to do silently.
 what makes the active-column shortcut in `gain_mode="ensemble"` so effective (~70% of rows
 dropped). If the baseline is ever re-run, this is the first thing to revisit — pass real
 `observed_cells` and the filter gets three more channels of information.
+
+## Structured-Q GPU experiments
+
+`experiments/eval_structured_q_gpu.py` is the CUDA evaluation path for the
+100-member EnKF.  It keeps the ensemble, residual-Q sampling, localization and
+ensemble-space Kalman solve on GPU.  The principal uncertainty controls are:
+
+- `--scale`: common residual-Q scale;
+- `--temporal-rho`: variance-normalized AR(1) persistence;
+- `--channel-scales density vx vy variance`: global per-channel Q scale;
+- `--blind-channel-scales density vx vy variance`: an extra multiplier only on
+  currently unobserved cells inside the fixed walkable map.
+- `--density-report-gain`, `--density-report-threshold` and
+  `--density-report-radius`: optional posterior density-sigma calibration.  This
+  is report-only and never feeds back into the EnKF state or Kalman gain.
+
+The blind scaling is causal.  It uses the current observation footprint and the
+static training/map-derived walkable mask; it does not use ground truth or a
+future observation mask.  Scaling is applied to a clone of the AR state, so a
+scale larger than one does not accidentally change the next step's effective
+AR coefficient.
+
+The final validation-selected blind-uncertainty configuration is `sp_b2`:
+
+    --noise-kind residual --scale 1.5 --temporal-rho 0.5 \
+    --channel-scales 2 1 1 0.75 \
+    --blind-channel-scales 1 1.25 1.4 0.9333333 \
+    --density-report-gain 1.5 --density-report-threshold 0.4 \
+    --density-report-radius 0
+
+The last line is the validation-selected uncertainty-product calibration.  Omit
+it when the raw ensemble covariance, rather than calibrated reported sigma, is
+required for a subsequent assimilation step.  Output JSON files preserve both
+`scores` and `raw_scores_before_report_calibration` so the two cannot be
+silently confused.
+
+Complete validation/test results and the alternative all-domain `den2`
+configuration are recorded in
+`experiments/outputs/optimization_report.md`.  Machine-readable summaries are
+`channel_sweep_summary.json`, `channel_test_summary.json`,
+`blind_spatial_validation_summary.json`, `blind_spatial_test_summary.json`,
+`density_calibration_validation_summary.json`, and
+`density_calibration_test_summary.json`.

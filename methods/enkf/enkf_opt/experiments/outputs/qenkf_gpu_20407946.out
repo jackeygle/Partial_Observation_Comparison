@@ -1,0 +1,43 @@
+[residual] 1000/35127, 0.0056 s/frame
+[residual] 2000/35127, 0.0054 s/frame
+[residual] 3000/35127, 0.0053 s/frame
+[residual] 4000/35127, 0.0052 s/frame
+[residual] 5000/35127, 0.0052 s/frame
+[residual] 6000/35127, 0.0052 s/frame
+[residual] 7000/35127, 0.0052 s/frame
+[residual] 8000/35127, 0.0052 s/frame
+[residual] 9000/35127, 0.0052 s/frame
+[residual] 10000/35127, 0.0052 s/frame
+[residual] 11000/35127, 0.0052 s/frame
+[residual] 12000/35127, 0.0052 s/frame
+[residual] 13000/35127, 0.0052 s/frame
+[residual] 14000/35127, 0.0052 s/frame
+[residual] 15000/35127, 0.0052 s/frame
+[residual] 16000/35127, 0.0052 s/frame
+[residual] 17000/35127, 0.0051 s/frame
+[residual] 18000/35127, 0.0051 s/frame
+[residual] 19000/35127, 0.0051 s/frame
+[residual] 20000/35127, 0.0051 s/frame
+[residual] 21000/35127, 0.0051 s/frame
+[residual] 22000/35127, 0.0051 s/frame
+[residual] 23000/35127, 0.0051 s/frame
+[residual] 24000/35127, 0.0051 s/frame
+[residual] 25000/35127, 0.0051 s/frame
+[residual] 26000/35127, 0.0051 s/frame
+[residual] 27000/35127, 0.0051 s/frame
+[residual] 28000/35127, 0.0051 s/frame
+[residual] 29000/35127, 0.0051 s/frame
+[residual] 30000/35127, 0.0051 s/frame
+[residual] 31000/35127, 0.0051 s/frame
+[residual] 32000/35127, 0.0051 s/frame
+[residual] 33000/35127, 0.0051 s/frame
+[residual] 34000/35127, 0.0051 s/frame
+[residual] 35000/35127, 0.0051 s/frame
+[all] RMSE=0.21280 CRPS=0.09639 spread/skill=0.809 cov90=0.810
+[defined_blind] RMSE=0.34939 CRPS=0.13795 spread/skill=0.582 cov90=0.812
+[density] spearman=+0.821 AUSE=0.205
+[vx] spearman=+0.408 AUSE=0.428
+[vy] spearman=+0.084 AUSE=0.652
+[var] spearman=+0.616 AUSE=0.482
+[runtime] 244.5s on Tesla V100-PCIE-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/log_density_validation/atc-20130616_log1.json

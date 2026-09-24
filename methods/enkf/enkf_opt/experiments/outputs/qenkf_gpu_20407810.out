@@ -1,0 +1,12 @@
+[residual] 1000/5000, 0.0060 s/frame
+[residual] 2000/5000, 0.0058 s/frame
+[residual] 3000/5000, 0.0058 s/frame
+[residual] 4000/5000, 0.0057 s/frame
+[all] RMSE=0.21484 CRPS=0.09473 spread/skill=0.809 cov90=0.826
+[defined_blind] RMSE=0.36794 CRPS=0.13634 spread/skill=0.548 cov90=0.848
+[density] spearman=+0.796 AUSE=0.231
+[vx] spearman=+0.403 AUSE=0.413
+[vy] spearman=+0.063 AUSE=0.647
+[var] spearman=+0.603 AUSE=0.520
+[runtime] 36.27s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/log_density_smoke/physical_none.json

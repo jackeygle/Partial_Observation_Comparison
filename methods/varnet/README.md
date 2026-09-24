@@ -1,6 +1,6 @@
 # Crowd-field reconstruction on ATC — 4DVarNet reproduction
 
-> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
 
 Reproducing the **4DVarNet** learned variational data-assimilation framework
 (Fablet et al. 2020, [arXiv:2007.12941](https://arxiv.org/abs/2007.12941)) on the

@@ -1,0 +1,9 @@
+[residual] 1000/2000, 0.0077 s/frame
+[all] RMSE=0.21247 CRPS=0.09301 spread/skill=0.827 cov90=0.834
+[defined_blind] RMSE=0.37108 CRPS=0.13609 spread/skill=0.584 cov90=0.872
+[density] spearman=+0.809 AUSE=0.229
+[vx] spearman=+0.390 AUSE=0.417
+[vy] spearman=+0.061 AUSE=0.634
+[var] spearman=+0.594 AUSE=0.607
+[runtime] 18.45s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/density_state_smoke/s2.json

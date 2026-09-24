@@ -1,6 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=lr_unetkf
-#SBATCH --partition=gpu-h200-141g-short
+# Several partitions so Slurm starts on whichever has a slot; it must be in the header because
+# the relay resubmits this file. V100-32g is included although with --history observed the
+# split is held on the device twice (truth + filled-in observation, ~20 GB before activations),
+# which may not fit there -- if a run dies with an out-of-memory error on a V100, drop it.
+#SBATCH --partition=gpu-h200-141g-short,gpu-h100-80g-short,gpu-a100-80g,gpu-v100-32g
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=64G

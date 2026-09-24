@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/enkf_opt/experiments/eval_structured_q_gpu.py", line 658, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/enkf_opt/experiments/eval_structured_q_gpu.py", line 549, in main
+    xf, calibration_scale = online_calibrator(
+                            ^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/enkf/enkf_opt/experiments/eval_structured_q_gpu.py", line 227, in __call__
+    & (age.reshape(H, W) >= self.min_age))
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NotImplementedError: "compare_cuda" not implemented for 'UInt16'

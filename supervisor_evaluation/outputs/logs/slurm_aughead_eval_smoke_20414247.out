@@ -1,0 +1,30 @@
+  member 0: runs/varnet_aughead_obs_h96_s0/varnet_best.pt  epoch=87  n_iter=20
+[members] 1 x /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_aughead_obs_h96_s0/varnet_best.pt  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  2 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1682   0.0632   -1.289  0.1274   0.76   93.7%
+all_aleatoric_only              0.1682   0.0632   -1.289  0.1274   0.76   93.7%
+all_epistemic_only              0.1682   0.084314151957746.265  0.0000   0.00    0.0%
+all_constant_sigma_baseline     0.1682   0.0797   -0.363  0.1682   1.00   92.0%
+blind                           0.1387   0.0479   -1.514  0.1094   0.79   96.0%
+observed                        0.1964   0.0806   -1.034  0.1478   0.75   91.0%
+defined                         0.1548   0.0548   -0.769  0.1085   0.70   93.6%
+defined_constant_sigma_baseline  0.1548   0.0661   -0.447  0.1548   1.00   95.9%
+defined_blind                   0.1907   0.0562   -0.385  0.0942   0.49   93.7%
+defined_blind_constant_sigma_baseline  0.1907   0.0779   -0.238  0.1907   1.00   95.7%
+defined_observed                0.1213   0.0538   -1.057  0.1192   0.98   93.5%
+defined_observed_constant_sigma_baseline  0.1213   0.0577   -0.690  0.1213   1.00   94.8%
+walkable                        0.1858   0.0725   -1.047  0.1470   0.79   93.9%
+walkable_constant_sigma_baseline  0.1858   0.0892   -0.264  0.1858   1.00   91.7%
+walkable_blind                  0.1659   0.0597   -1.110  0.1350   0.81   96.2%
+walkable_blind_constant_sigma_baseline  0.1659   0.0745   -0.378  0.1659   1.00   93.5%
+blind_constant_sigma_baseline   0.1387   0.0615   -0.556  0.1387   1.00   93.6%
+channel_density                 0.0661   0.0335   -1.473  0.0782   1.18   94.6%
+channel_vx                      0.3143   0.1634    0.128  0.3040   0.97   89.8%
+channel_vy                      0.0952   0.0468   -1.117  0.0990   1.04   93.3%
+channel_var                     0.0316   0.0092   -2.693  0.0284   0.90   97.0%
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/aughead_adapter_smoke.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%

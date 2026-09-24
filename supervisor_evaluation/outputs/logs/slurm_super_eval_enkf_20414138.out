@@ -1,0 +1,4 @@
+[warn] missing unfinished artifact: varnet_aughead_obs_s0.pt
+[verify] PASS -> supervisor_evaluation/outputs/smoke_enkf/verification_report.json
+[run] methods.enkf.checks.export_obs_for_enkf --split test --frames 600 --outdir supervisor_evaluation/outputs/smoke_enkf/raw/enkf_observations --obs-every-k 1
+[2026-09-23T21:20:47.460] error: *** JOB 20414138 ON dgx3 CANCELLED AT 2026-09-23T21:20:47 DUE to SIGNAL Terminated ***

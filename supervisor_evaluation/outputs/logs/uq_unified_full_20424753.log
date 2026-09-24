@@ -1,0 +1,14 @@
+[verify] PASS -> supervisor_evaluation/outputs/full/verification_report.json
+[uncertainty] atc-20130811: frames [500, 39800), 5048181 cells/channel
+[uncertainty] atc-20130818: frames [500, 38800), 4844975 cells/channel
+[uncertainty] atc-20130825: frames [500, 42800), 5449209 cells/channel
+[uncertainty] atc-20130901: frames [500, 39600), 4966114 cells/channel
+[uncertainty] atc-20130915: frames [500, 39200), 4930763 cells/channel
+[uncertainty] atc-20130922: frames [500, 38800), 4867436 cells/channel
+[uncertainty] atc-20130929: frames [500, 37800), 4746982 cells/channel
+[uncertainty] 4DVarNet aughead_obs (single)    rmse 0.2973  crps 0.1062  skill 0.2320  sp/sk 0.659  cov90 0.921
+[uncertainty] DINCAE                           rmse 0.2283  crps 0.0743  skill 0.2747  sp/sk 0.584  cov90 0.943
+[uncertainty] Localized EnKF (100 members)     rmse 0.2828  crps 0.1326  skill 0.0746  sp/sk 1.208  cov90 0.937
+[uncertainty] wrote supervisor_evaluation/outputs/full/raw/uncertainty_unified.json
+[collect] 6 accuracy rows, 3 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/full/figures

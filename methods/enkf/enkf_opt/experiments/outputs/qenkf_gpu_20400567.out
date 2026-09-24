@@ -1,0 +1,43 @@
+[gaussian] 1000/35127, 0.0065 s/frame
+[gaussian] 2000/35127, 0.0063 s/frame
+[gaussian] 3000/35127, 0.0062 s/frame
+[gaussian] 4000/35127, 0.0062 s/frame
+[gaussian] 5000/35127, 0.0061 s/frame
+[gaussian] 6000/35127, 0.0061 s/frame
+[gaussian] 7000/35127, 0.0061 s/frame
+[gaussian] 8000/35127, 0.0061 s/frame
+[gaussian] 9000/35127, 0.0061 s/frame
+[gaussian] 10000/35127, 0.0061 s/frame
+[gaussian] 11000/35127, 0.0061 s/frame
+[gaussian] 12000/35127, 0.0061 s/frame
+[gaussian] 13000/35127, 0.0061 s/frame
+[gaussian] 14000/35127, 0.0061 s/frame
+[gaussian] 15000/35127, 0.0061 s/frame
+[gaussian] 16000/35127, 0.0061 s/frame
+[gaussian] 17000/35127, 0.0061 s/frame
+[gaussian] 18000/35127, 0.0061 s/frame
+[gaussian] 19000/35127, 0.0061 s/frame
+[gaussian] 20000/35127, 0.0061 s/frame
+[gaussian] 21000/35127, 0.0061 s/frame
+[gaussian] 22000/35127, 0.0061 s/frame
+[gaussian] 23000/35127, 0.0061 s/frame
+[gaussian] 24000/35127, 0.0061 s/frame
+[gaussian] 25000/35127, 0.0061 s/frame
+[gaussian] 26000/35127, 0.0061 s/frame
+[gaussian] 27000/35127, 0.0061 s/frame
+[gaussian] 28000/35127, 0.0061 s/frame
+[gaussian] 29000/35127, 0.0061 s/frame
+[gaussian] 30000/35127, 0.0061 s/frame
+[gaussian] 31000/35127, 0.0061 s/frame
+[gaussian] 32000/35127, 0.0061 s/frame
+[gaussian] 33000/35127, 0.0061 s/frame
+[gaussian] 34000/35127, 0.0061 s/frame
+[gaussian] 35000/35127, 0.0061 s/frame
+[all] RMSE=0.23449 CRPS=0.11123 spread/skill=0.642 cov90=0.790
+[defined_blind] RMSE=0.34899 CRPS=0.15906 spread/skill=0.288 cov90=0.503
+[density] spearman=+0.712 AUSE=0.468
+[vx] spearman=-0.172 AUSE=1.114
+[vy] spearman=-0.113 AUSE=1.072
+[var] spearman=+0.794 AUSE=0.321
+[runtime] 291.17s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/validation_sweep/atc-20130616_g1.json

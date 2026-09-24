@@ -1,0 +1,105 @@
+[verify] PASS -> supervisor_evaluation/outputs/smoke_aughead/verification_report.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --varnet-checkpoints aughead_obs=/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt --arms  --no-with-ensemble --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_aughead/raw/varnet_aughead_accuracy.json
+[model] Senseiver 65,892 params | 4DVarNet aughead_obs dT=200 n_iter=20 | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0026  4DVarNet aughead_obs full=0.0257  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0510      0.0510        0.0510          0.0510
+4DVarNet aughead_obs        0.1602      0.1602        0.1615          0.1615
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.7608     0.1251     0.0184     0.0273      0.1653
+4DVarNet aughead_obs         0.0033     0.9736     0.1624     0.0250     0.0349      0.1867
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.2539     0.0416     0.0061     0.0128      0.1130
+4DVarNet aughead_obs         0.0031     0.3974     0.0569     0.0075     0.0212      0.1455
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.0242     0.0039     0.0006     0.0078      0.0881
+4DVarNet aughead_obs         0.0033     0.0833     0.0095     0.0019     0.0245      0.1565
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.0118     0.0019     0.0003     0.0038      0.0616
+4DVarNet aughead_obs         0.0031     0.1110     0.0105     0.0009     0.0314      0.1772
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0138     0.0023     0.0004     0.0044      0.0666
+4DVarNet aughead_obs         0.0020     0.0591     0.0062     0.0011     0.0171      0.1309
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0008     0.0081     0.0013     0.0002     0.0026      0.0510
+4DVarNet aughead_obs         0.0024     0.0913     0.0083     0.0006     0.0257      0.1602
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_aughead/raw/varnet_aughead_accuracy.json
+[run] methods.varnet.checks.eval_uncertainty --members 0 --checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_aughead/raw/uncertainty_varnet_aughead.json
+  member 0: ../../supervisor_evaluation/models/varnet_aughead_obs_s0.pt  epoch=90  n_iter=20
+[members] 1 x /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  2 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1615   0.0605   -1.299  0.1234   0.76   93.5%
+all_aleatoric_only              0.1615   0.0605   -1.299  0.1234   0.76   93.5%
+all_epistemic_only              0.1615   0.080313038958641.602  0.0000   0.00    0.0%
+all_constant_sigma_baseline     0.1615   0.0763   -0.404  0.1615   1.00   92.1%
+blind                           0.1318   0.0452   -1.483  0.1053   0.80   96.2%
+observed                        0.1896   0.0778   -1.090  0.1439   0.76   90.6%
+defined                         0.1510   0.0524   -0.569  0.1029   0.68   93.1%
+defined_constant_sigma_baseline  0.1510   0.0639   -0.472  0.1510   1.00   95.9%
+defined_blind                   0.1888   0.0536    0.142  0.0882   0.47   93.6%
+defined_blind_constant_sigma_baseline  0.1888   0.0764   -0.248  0.1888   1.00   95.7%
+defined_observed                0.1149   0.0515   -1.100  0.1139   0.99   92.8%
+defined_observed_constant_sigma_baseline  0.1149   0.0552   -0.745  0.1149   1.00   94.6%
+walkable                        0.1786   0.0693   -1.034  0.1436   0.80   93.8%
+walkable_constant_sigma_baseline  0.1786   0.0853   -0.304  0.1786   1.00   91.8%
+walkable_blind                  0.1576   0.0561   -1.011  0.1303   0.83   96.2%
+walkable_blind_constant_sigma_baseline  0.1576   0.0697   -0.429  0.1576   1.00   93.8%
+blind_constant_sigma_baseline   0.1318   0.0578   -0.608  0.1318   1.00   93.9%
+channel_density                 0.0626   0.0316   -1.532  0.0729   1.16   94.1%
+channel_vx                      0.3020   0.1567    0.078  0.2980   0.99   90.4%
+channel_vy                      0.0911   0.0455   -1.130  0.0973   1.07   93.0%
+channel_var                     0.0295   0.0082   -2.611  0.0254   0.86   96.7%
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_aughead/raw/uncertainty_varnet_aughead.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%
+[collect] 1 accuracy rows, 1 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/smoke_aughead/figures

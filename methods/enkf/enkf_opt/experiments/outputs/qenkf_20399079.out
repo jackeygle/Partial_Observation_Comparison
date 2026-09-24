@@ -1,0 +1,16 @@
+[residual, scale=1, rtps=0] 200/2000, 0.411 s/frame
+[residual, scale=1, rtps=0] 400/2000, 0.385 s/frame
+[residual, scale=1, rtps=0] 600/2000, 0.384 s/frame
+[residual, scale=1, rtps=0] 800/2000, 0.380 s/frame
+[residual, scale=1, rtps=0] 1000/2000, 0.367 s/frame
+[residual, scale=1, rtps=0] 1200/2000, 0.380 s/frame
+[residual, scale=1, rtps=0] 1400/2000, 0.383 s/frame
+[residual, scale=1, rtps=0] 1600/2000, 0.384 s/frame
+[residual, scale=1, rtps=0] 1800/2000, 0.382 s/frame
+[all] RMSE=0.16228 CRPS=0.07181 spread/skill=0.711 cov90=0.768
+[defined_blind] RMSE=0.26146 CRPS=0.08314 spread/skill=0.275 cov90=0.673
+[density] spearman=+0.734 AUSE=0.303 sigma_cv=0.746
+[vx] spearman=+0.280 AUSE=0.478 sigma_cv=0.574
+[vy] spearman=-0.121 AUSE=0.811 sigma_cv=0.499
+[var] spearman=+0.685 AUSE=0.450 sigma_cv=0.848
+[out] methods/enkf/enkf_opt/experiments/outputs/full7/atc-20130901_residual_s1.json

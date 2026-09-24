@@ -1,0 +1,350 @@
+{
+  "ok": true,
+  "repo_root": "/scratch/work/zhangx29/Thesis_Project",
+  "data_root": "/scratch/work/zhangx29/data",
+  "python": "3.12.13",
+  "platform": "Linux-5.14.0-687.49.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "packages": {
+    "numpy": true,
+    "scipy": true,
+    "h5py": true,
+    "torch": true,
+    "matplotlib": true
+  },
+  "models": {
+    "dincae_epoch60.pt": {
+      "exists": true,
+      "bytes": 1288437,
+      "sha256": "42abc4b26334ce70663283e23a7e1905a94f2a4de2fc63baa19a43ce276e94b4",
+      "hash_ok": true
+    },
+    "dincae_state_stats.npz": {
+      "exists": true,
+      "bytes": 17043,
+      "sha256": "8dc594bf92e2aab3ef7ea4c75811dc29b889d462d7e04f327df10ae1b863ec71",
+      "hash_ok": true
+    },
+    "enkf_residual_q_bank.npz": {
+      "exists": true,
+      "bytes": 38879874,
+      "sha256": "240772c0a9c7b6c30b583e8c36baed7262fdb8fb0914b8b1fbc664cd997d0e7f",
+      "hash_ok": true,
+      "input_frames": 5,
+      "dynamics_hash_ok": true
+    },
+    "pedpred3_5to5_epoch38.pt": {
+      "exists": true,
+      "bytes": 3575885,
+      "sha256": "4f3f261b28b6bff6e03b7b33e47b7df291cb650864357014bfbd0535eccb1491",
+      "hash_ok": true
+    },
+    "senseiver_A.pt": {
+      "exists": true,
+      "bytes": 1029398,
+      "sha256": "f909bb3a61949cd018cace4c1bf3d6dd4423f230851f1b0328b683f8f1ba8874",
+      "hash_ok": true
+    },
+    "senseiver_G_k16.pt": {
+      "exists": true,
+      "bytes": 904834,
+      "sha256": "b20c145d7077ff771312d4b676f6998e3d75674682e8631242df4f14911b7491",
+      "hash_ok": true
+    },
+    "varnet_aughead_obs_s0.pt": {
+      "exists": true,
+      "bytes": 55598389,
+      "sha256": "272abccc188e2e47ff79d922101ba91c1c945cac9610624f5e792d7d8b04cb57",
+      "hash_ok": true
+    },
+    "varnet_mse_s3_epoch80.pt": {
+      "exists": true,
+      "bytes": 25184373,
+      "sha256": "2ae4fa42654f0696346783bf33d2ab53e2e53ce48850e61c6bafe9a8ab9777df",
+      "hash_ok": true
+    }
+  },
+  "data": {
+    "grid_cache": "/scratch/work/zhangx29/data/grid_cache",
+    "n_h5": 46,
+    "shapes": {
+      "atc-20121028_corridor_1.0s.h5": [
+        40446,
+        4,
+        36,
+        12
+      ],
+      "atc-20121104_corridor_1.0s.h5": [
+        40281,
+        4,
+        36,
+        12
+      ],
+      "atc-20121111_corridor_1.0s.h5": [
+        38740,
+        4,
+        36,
+        12
+      ],
+      "atc-20121118_corridor_1.0s.h5": [
+        39281,
+        4,
+        36,
+        12
+      ],
+      "atc-20121125_corridor_1.0s.h5": [
+        39837,
+        4,
+        36,
+        12
+      ],
+      "atc-20121202_corridor_1.0s.h5": [
+        38394,
+        4,
+        36,
+        12
+      ],
+      "atc-20121209_corridor_1.0s.h5": [
+        37178,
+        4,
+        36,
+        12
+      ],
+      "atc-20121216_corridor_1.0s.h5": [
+        40701,
+        4,
+        36,
+        12
+      ],
+      "atc-20121223_corridor_1.0s.h5": [
+        39974,
+        4,
+        36,
+        12
+      ],
+      "atc-20130106_corridor_1.0s.h5": [
+        38445,
+        4,
+        36,
+        12
+      ],
+      "atc-20130113_corridor_1.0s.h5": [
+        38803,
+        4,
+        36,
+        12
+      ],
+      "atc-20130120_corridor_1.0s.h5": [
+        39268,
+        4,
+        36,
+        12
+      ],
+      "atc-20130127_corridor_1.0s.h5": [
+        41513,
+        4,
+        36,
+        12
+      ],
+      "atc-20130203_corridor_1.0s.h5": [
+        38581,
+        4,
+        36,
+        12
+      ],
+      "atc-20130210_corridor_1.0s.h5": [
+        39152,
+        4,
+        36,
+        12
+      ],
+      "atc-20130217_corridor_1.0s.h5": [
+        39103,
+        4,
+        36,
+        12
+      ],
+      "atc-20130224_corridor_1.0s.h5": [
+        39486,
+        4,
+        36,
+        12
+      ],
+      "atc-20130303_corridor_1.0s.h5": [
+        35190,
+        4,
+        36,
+        12
+      ],
+      "atc-20130310_corridor_1.0s.h5": [
+        39719,
+        4,
+        36,
+        12
+      ],
+      "atc-20130317_corridor_1.0s.h5": [
+        38815,
+        4,
+        36,
+        12
+      ],
+      "atc-20130324_corridor_1.0s.h5": [
+        41415,
+        4,
+        36,
+        12
+      ],
+      "atc-20130331_corridor_1.0s.h5": [
+        39679,
+        4,
+        36,
+        12
+      ],
+      "atc-20130407_corridor_1.0s.h5": [
+        38814,
+        4,
+        36,
+        12
+      ],
+      "atc-20130414_corridor_1.0s.h5": [
+        39625,
+        4,
+        36,
+        12
+      ],
+      "atc-20130421_corridor_1.0s.h5": [
+        40826,
+        4,
+        36,
+        12
+      ],
+      "atc-20130428_corridor_1.0s.h5": [
+        40006,
+        4,
+        36,
+        12
+      ],
+      "atc-20130505_corridor_1.0s.h5": [
+        39702,
+        4,
+        36,
+        12
+      ],
+      "atc-20130512_corridor_1.0s.h5": [
+        38140,
+        4,
+        36,
+        12
+      ],
+      "atc-20130519_corridor_1.0s.h5": [
+        40320,
+        4,
+        36,
+        12
+      ],
+      "atc-20130526_corridor_1.0s.h5": [
+        40986,
+        4,
+        36,
+        12
+      ],
+      "atc-20130602_corridor_1.0s.h5": [
+        40046,
+        4,
+        36,
+        12
+      ],
+      "atc-20130609_corridor_1.0s.h5": [
+        40052,
+        4,
+        36,
+        12
+      ],
+      "atc-20130616_corridor_1.0s.h5": [
+        35127,
+        4,
+        36,
+        12
+      ],
+      "atc-20130623_corridor_1.0s.h5": [
+        40620,
+        4,
+        36,
+        12
+      ],
+      "atc-20130630_corridor_1.0s.h5": [
+        40710,
+        4,
+        36,
+        12
+      ],
+      "atc-20130707_corridor_1.0s.h5": [
+        38437,
+        4,
+        36,
+        12
+      ],
+      "atc-20130714_corridor_1.0s.h5": [
+        40457,
+        4,
+        36,
+        12
+      ],
+      "atc-20130721_corridor_1.0s.h5": [
+        37413,
+        4,
+        36,
+        12
+      ],
+      "atc-20130728_corridor_1.0s.h5": [
+        36979,
+        4,
+        36,
+        12
+      ],
+      "atc-20130811_corridor_1.0s.h5": [
+        39821,
+        4,
+        36,
+        12
+      ],
+      "atc-20130818_corridor_1.0s.h5": [
+        38885,
+        4,
+        36,
+        12
+      ],
+      "atc-20130825_corridor_1.0s.h5": [
+        42890,
+        4,
+        36,
+        12
+      ],
+      "atc-20130901_corridor_1.0s.h5": [
+        39758,
+        4,
+        36,
+        12
+      ],
+      "atc-20130915_corridor_1.0s.h5": [
+        39383,
+        4,
+        36,
+        12
+      ],
+      "atc-20130922_corridor_1.0s.h5": [
+        38842,
+        4,
+        36,
+        12
+      ],
+      "atc-20130929_corridor_1.0s.h5": [
+        37964,
+        4,
+        36,
+        12
+      ]
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

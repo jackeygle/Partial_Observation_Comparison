@@ -1,0 +1,8 @@
+[all] RMSE=0.15623 CRPS=0.07553 spread/skill=1.041 cov90=0.841
+[defined_blind] RMSE=0.23483 CRPS=0.06447 spread/skill=0.358 cov90=0.796
+[density] spearman=+0.628 AUSE=0.378
+[vx] spearman=+0.234 AUSE=0.526
+[vy] spearman=-0.128 AUSE=0.897
+[var] spearman=+0.783 AUSE=0.333
+[runtime] 3.21s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/gpu_diag_smoke.json

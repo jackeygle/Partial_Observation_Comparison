@@ -1,0 +1,100 @@
+[warn] missing unfinished artifact: varnet_aughead_obs_s0.pt
+[verify] PASS -> supervisor_evaluation/outputs/smoke_dincae/verification_report.json
+[run] methods.dincae.checks.evaluate --run-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models --ckpt-glob /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/dincae_epoch60.pt --split test --days 1 --frames 512 --out supervisor_evaluation/outputs/smoke_dincae/raw/dincae_accuracy
+single checkpoint:  epochs [60]
+test split: 1 days
+  atc-20130811_corridor_1.0s  density 0.00251  vx 0.78327  vy 0.13247  var 0.01858
+
+=== MSE (both conventions) ===
+convention         density         vx         vy        var   4-channel merged
+ours_blind         0.00251    0.78327    0.13247    0.01858   0.02838
+ours_all           0.00168    0.38031    0.06021    0.00886   0.01899
+ours_blind_noclip   0.00252    0.78327    0.13247    0.01869   0.02840
+ours_all_noclip    0.00172    0.38031    0.06021    0.01066   0.01910
+walkable_blind     0.00251    0.03006    0.00501    0.00072   0.00957
+walkable_all       0.00168    0.02146    0.00339    0.00047   0.00675
+v4dvar_blind       0.00142    0.01746    0.00324    0.00040   0.00563
+v4dvar_all         0.00114    0.01487    0.00258    0.00032   0.00472
+
+=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===
+  density  truth 0.0595  rec 0.0497  ratio 0.835
+  vx       truth 0.9249  rec 0.7402  ratio 0.800
+  vy       truth 0.3443  rec 0.2609  ratio 0.758
+  var      truth 0.1361  rec 0.0967  ratio 0.711
+
+=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===
+  density  mean predicted SD 0.2428  actual RMS 0.2578  global adjustment factor 1.062  (n=65,507)
+      pred 0.0247 -> actual 0.0289  (n=29,103)
+      pred 0.1054 -> actual 0.1187  (n=6,890)
+      pred 0.1798 -> actual 0.3179  (n=3,750)
+      pred 0.2476 -> actual 0.2015  (n=2,813)
+      pred 0.3169 -> actual 0.2061  (n=3,146)
+      pred 0.3868 -> actual 0.4248  (n=2,790)
+      pred 0.4559 -> actual 0.3636  (n=2,606)
+      pred 0.5242 -> actual 0.3847  (n=3,253)
+      pred 0.5916 -> actual 0.4177  (n=2,317)
+      pred 0.6646 -> actual 0.4710  (n=2,288)
+  vx       mean predicted SD 0.3938  actual RMS 1.0422  global adjustment factor 2.647  (n=1,995)
+      pred 0.1890 -> actual 0.6769  (n=164)
+      pred 0.2382 -> actual 0.8044  (n=147)
+      pred 0.2763 -> actual 0.7421  (n=229)
+      pred 0.3195 -> actual 1.0426  (n=100)
+      pred 0.4081 -> actual 0.9213  (n=142)
+      pred 0.4537 -> actual 1.2141  (n=121)
+      pred 0.4946 -> actual 1.2990  (n=213)
+      pred 0.5387 -> actual 1.2248  (n=201)
+      pred 0.5831 -> actual 1.1992  (n=179)
+  vy       mean predicted SD 0.4081  actual RMS 1.0812  global adjustment factor 2.649  (n=1,995)
+      pred 0.2682 -> actual 1.1447  (n=164)
+      pred 0.2987 -> actual 1.0881  (n=124)
+      pred 0.3331 -> actual 1.1807  (n=164)
+      pred 0.3589 -> actual 1.0543  (n=182)
+      pred 0.3914 -> actual 1.0613  (n=160)
+      pred 0.4251 -> actual 0.9961  (n=141)
+      pred 0.4538 -> actual 0.9651  (n=170)
+      pred 0.4849 -> actual 0.9702  (n=152)
+      pred 0.5140 -> actual 0.9772  (n=165)
+      pred 0.5467 -> actual 1.3056  (n=173)
+  var      mean predicted SD 0.2408  actual RMS 0.5201  global adjustment factor 2.160  (n=1,930)
+      pred 0.1019 -> actual 0.4197  (n=266)
+      pred 0.1436 -> actual 0.4030  (n=288)
+      pred 0.1752 -> actual 0.4813  (n=174)
+      pred 0.2139 -> actual 0.3159  (n=195)
+      pred 0.2485 -> actual 0.4383  (n=131)
+      pred 0.2881 -> actual 0.3173  (n=125)
+      pred 0.3190 -> actual 0.2175  (n=135)
+
+wrote supervisor_evaluation/outputs/smoke_dincae/raw/dincae_accuracy/dincae_metrics_test.json
+[run] methods.dincae.checks.eval_uncertainty_dincae --run-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models --ckpt-glob /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/dincae_epoch60.pt --split test --days 1 --frames 512 --out supervisor_evaluation/outputs/smoke_dincae/raw/uncertainty_dincae.json
+[members] 1 checkpoints: epochs [60]  dev=cuda
+  atc-20130811_corridor_1.0s.h5  510 frames
+
+[pass 2] constant-sigma baseline, sigma = all 0.1424, blind 0.1574, defined 0.2949, defined_blind 0.3623, walkable 0.1699, walkable_blind 0.2049
+
+split                                 RMSE     CRPS   sigma   sp/sk   cov90
+all                                 0.1424   0.0432  0.1020   0.716   97.9%
+blind                               0.1574   0.0503  0.1320   0.838   98.8%
+observed                            0.1233   0.0351  0.0682   0.553   96.8%
+defined                             0.2949   0.0973  0.1723   0.584   94.0%
+defined_blind                       0.3623   0.1311  0.2515   0.694   94.4%
+defined_observed                    0.2324   0.0721  0.1133   0.487   93.8%
+walkable                            0.1699   0.0555  0.1307   0.769   97.2%
+walkable_blind                      0.2049   0.0754  0.2003   0.978   98.3%
+channel_density                     0.1749   0.0461  0.1112   0.636   98.3%
+channel_vx                          0.1436   0.0447  0.1033   0.719   97.6%
+channel_vy                          0.1507   0.0576  0.1352   0.897   97.7%
+channel_var                         0.0849   0.0242  0.0584   0.688   97.8%
+defined_channel_density             0.2578   0.0927  0.2428   0.942   98.6%
+defined_channel_vx                  1.0422   0.7226  0.3938   0.378   26.8%
+defined_channel_vy                  1.0812   0.7328  0.4081   0.378   38.9%
+defined_channel_var                 0.5201   0.2000  0.2408   0.463   78.7%
+all_constant_sigma_baseline         0.1424   0.0573  0.1424   1.000   96.1%
+blind_constant_sigma_baseline       0.1574   0.0637  0.1574   1.000   96.0%
+defined_constant_sigma_baseline     0.2949   0.1318  0.2949   1.000   93.7%
+defined_blind_constant_sigma_baseline  0.3623   0.1654  0.3623   1.000   94.4%
+walkable_constant_sigma_baseline    0.1699   0.0702  0.1699   1.000   95.4%
+walkable_blind_constant_sigma_baseline  0.2049   0.0866  0.2049   1.000   95.7%
+
+[out] supervisor_evaluation/outputs/smoke_dincae/raw/uncertainty_dincae.json
+[collect] 1 accuracy rows, 1 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/smoke_dincae/figures

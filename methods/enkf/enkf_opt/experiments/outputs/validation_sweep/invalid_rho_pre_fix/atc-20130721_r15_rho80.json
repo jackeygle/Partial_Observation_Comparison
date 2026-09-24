@@ -1,0 +1,580 @@
+{
+  "config": {
+    "noise_kind": "residual",
+    "scale": 1.5,
+    "rtps": 0.0,
+    "frames": 100000,
+    "warmup": 500,
+    "ensemble": 100,
+    "radius": 7,
+    "seed": 0,
+    "day": "atc-20130721",
+    "obs_dir": "methods/enkf/enkf_opt/experiments/validation_obs",
+    "temporal_rho": 0.8,
+    "channel_scales": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "bank": "/scratch/work/zhangx29/Thesis_Project/methods/enkf/enkf_opt/experiments/outputs/pedpred3_train_residual_q_8192.npz",
+    "out": "methods/enkf/enkf_opt/experiments/outputs/validation_sweep/atc-20130721_r15_rho80.json"
+  },
+  "backend": "torch_cuda",
+  "fix_localization": true,
+  "bias_ema": true,
+  "inflation": 1.02,
+  "proc_std": [
+    0.02829307,
+    0.31263075,
+    0.12325809,
+    0.41680932
+  ],
+  "frames_used": 37413,
+  "n_analysis_failures": 36941,
+  "seconds": 171.05,
+  "gpu": "Tesla V100-PCIE-32GB",
+  "scores": {
+    "all": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 63785664,
+      "crps_over_null": NaN
+    },
+    "all_constant_sigma_baseline": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 63785664
+    },
+    "blind": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 33856624
+    },
+    "observed": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 29929040
+    },
+    "defined": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 21099012,
+      "crps_over_null": NaN
+    },
+    "defined_constant_sigma_baseline": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 21099012
+    },
+    "occupied": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 14866136
+    },
+    "defined_blind": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 8233113,
+      "crps_over_null": NaN
+    },
+    "defined_blind_constant_sigma_baseline": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 8233113
+    },
+    "defined_observed": {
+      "rmse": NaN,
+      "crps": NaN,
+      "nll": NaN,
+      "sigma_mean": NaN,
+      "spread_skill": NaN,
+      "coverage": {
+        "10": 0.0,
+        "20": 0.0,
+        "30": 0.0,
+        "40": 0.0,
+        "50": 0.0,
+        "60": 0.0,
+        "70": 0.0,
+        "80": 0.0,
+        "90": 0.0
+      },
+      "n": 12865899
+    },
+    "per_channel": {
+      "density": {
+        "ause": null,
+        "spearman": NaN,
+        "sigma_mean": NaN,
+        "sigma_cv_within_frame": NaN,
+        "rmse": NaN
+      },
+      "vx": {
+        "ause": null,
+        "spearman": NaN,
+        "sigma_mean": NaN,
+        "sigma_cv_within_frame": NaN,
+        "rmse": NaN
+      },
+      "vy": {
+        "ause": null,
+        "spearman": NaN,
+        "sigma_mean": NaN,
+        "sigma_cv_within_frame": NaN,
+        "rmse": NaN
+      },
+      "var": {
+        "ause": null,
+        "spearman": NaN,
+        "sigma_mean": NaN,
+        "sigma_cv_within_frame": NaN,
+        "rmse": NaN
+      }
+    }
+  },
+  "diagnostics": {
+    "per_channel": {
+      "density": {
+        "defined": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 10704770
+        },
+        "defined_blind": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 4676033
+        },
+        "defined_observed": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 6028737
+        }
+      },
+      "vx": {
+        "defined": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 3496238
+        },
+        "defined_blind": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 1197825
+        },
+        "defined_observed": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 2298413
+        }
+      },
+      "vy": {
+        "defined": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 3496238
+        },
+        "defined_blind": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 1197825
+        },
+        "defined_observed": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 2298413
+        }
+      },
+      "var": {
+        "defined": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 3401766
+        },
+        "defined_blind": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 1161430
+        },
+        "defined_observed": {
+          "rmse": NaN,
+          "crps": NaN,
+          "nll": NaN,
+          "sigma_mean": NaN,
+          "spread_skill": NaN,
+          "coverage": {
+            "10": 0.0,
+            "20": 0.0,
+            "30": 0.0,
+            "40": 0.0,
+            "50": 0.0,
+            "60": 0.0,
+            "70": 0.0,
+            "80": 0.0,
+            "90": 0.0
+          },
+          "n": 2240336
+        }
+      }
+    },
+    "observation_age": {
+      "observed": {
+        "rmse": NaN,
+        "crps": NaN,
+        "nll": NaN,
+        "sigma_mean": NaN,
+        "spread_skill": NaN,
+        "coverage": {
+          "10": 0.0,
+          "20": 0.0,
+          "30": 0.0,
+          "40": 0.0,
+          "50": 0.0,
+          "60": 0.0,
+          "70": 0.0,
+          "80": 0.0,
+          "90": 0.0
+        },
+        "n": 12865899
+      },
+      "blind_1_10": {
+        "rmse": NaN,
+        "crps": NaN,
+        "nll": NaN,
+        "sigma_mean": NaN,
+        "spread_skill": NaN,
+        "coverage": {
+          "10": 0.0,
+          "20": 0.0,
+          "30": 0.0,
+          "40": 0.0,
+          "50": 0.0,
+          "60": 0.0,
+          "70": 0.0,
+          "80": 0.0,
+          "90": 0.0
+        },
+        "n": 4753623
+      },
+      "blind_11_50": {
+        "rmse": NaN,
+        "crps": NaN,
+        "nll": NaN,
+        "sigma_mean": NaN,
+        "spread_skill": NaN,
+        "coverage": {
+          "10": 0.0,
+          "20": 0.0,
+          "30": 0.0,
+          "40": 0.0,
+          "50": 0.0,
+          "60": 0.0,
+          "70": 0.0,
+          "80": 0.0,
+          "90": 0.0
+        },
+        "n": 3153435
+      },
+      "blind_51_plus": {
+        "rmse": NaN,
+        "crps": NaN,
+        "nll": NaN,
+        "sigma_mean": NaN,
+        "spread_skill": NaN,
+        "coverage": {
+          "10": 0.0,
+          "20": 0.0,
+          "30": 0.0,
+          "40": 0.0,
+          "50": 0.0,
+          "60": 0.0,
+          "70": 0.0,
+          "80": 0.0,
+          "90": 0.0
+        },
+        "n": 326055
+      }
+    }
+  }
+}

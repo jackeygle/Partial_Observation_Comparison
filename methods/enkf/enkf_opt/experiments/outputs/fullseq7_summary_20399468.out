@@ -1,0 +1,15 @@
+arm             all RMSE       all CRPS       DB CRPS        DB cov90   failures
+gaussian_s1     0.24801+/-0.01061 0.11740+/-0.00478 0.17313+/-0.01167 0.502     0
+residual_s1     0.21897+/-0.01049 0.09673+/-0.00442 0.16172+/-0.01124 0.546     0
+residual_s15    0.22487+/-0.01003 0.09887+/-0.00384 0.15479+/-0.01072 0.703     0
+residual_s1 vs gaussian:
+  all_rmse: -11.7% (7/7 days better)
+  all_crps: -17.6% (7/7 days better)
+  defined_crps: -15.7% (7/7 days better)
+  defined_blind_crps: -6.6% (7/7 days better)
+residual_s15 vs gaussian:
+  all_rmse: -9.3% (7/7 days better)
+  all_crps: -15.8% (7/7 days better)
+  defined_crps: -19.8% (7/7 days better)
+  defined_blind_crps: -10.6% (7/7 days better)
+[out] methods/enkf/enkf_opt/experiments/outputs/fullseq7_summary.json

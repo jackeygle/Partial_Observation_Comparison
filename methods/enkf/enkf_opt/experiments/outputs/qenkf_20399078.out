@@ -1,0 +1,16 @@
+[gaussian, scale=1, rtps=0] 200/2000, 0.358 s/frame
+[gaussian, scale=1, rtps=0] 400/2000, 0.346 s/frame
+[gaussian, scale=1, rtps=0] 600/2000, 0.348 s/frame
+[gaussian, scale=1, rtps=0] 800/2000, 0.346 s/frame
+[gaussian, scale=1, rtps=0] 1000/2000, 0.332 s/frame
+[gaussian, scale=1, rtps=0] 1200/2000, 0.348 s/frame
+[gaussian, scale=1, rtps=0] 1400/2000, 0.351 s/frame
+[gaussian, scale=1, rtps=0] 1600/2000, 0.349 s/frame
+[gaussian, scale=1, rtps=0] 1800/2000, 0.351 s/frame
+[all] RMSE=0.19502 CRPS=0.09101 spread/skill=0.773 cov90=0.847
+[defined_blind] RMSE=0.26386 CRPS=0.09087 spread/skill=0.217 cov90=0.565
+[density] spearman=+0.750 AUSE=0.511 sigma_cv=0.270
+[vx] spearman=-0.207 AUSE=1.148 sigma_cv=0.153
+[vy] spearman=-0.108 AUSE=1.039 sigma_cv=0.155
+[var] spearman=+0.822 AUSE=0.235 sigma_cv=0.417
+[out] methods/enkf/enkf_opt/experiments/outputs/full7/atc-20130901_gaussian_s1.json

@@ -51,6 +51,17 @@ def parse_args():
     p.add_argument("--max-frames", type=int, default=0, help="debug: only the first N frames per day")
     p.add_argument("--eval-batch", type=int, default=2000)
     p.add_argument("--out", default="", help="default runs/surrogate_<arm>_s<seed>")
+    p.add_argument("--clip-grad", type=float, default=0.0,
+                   help="clip the gradient norm to this value; 0 keeps the original "
+                        "recipe, which has none. The read-outs are exp(ch0) and exp(ch3), "
+                        "so one large step can push the variance channel past what float32 "
+                        "survives: a run diverged at epoch 30 with the variance reaching "
+                        "7e22, after which every batch was non-finite and skipped.")
+    p.add_argument("--init-weights", default="",
+                   help="start from this checkpoint's weights with a fresh optimiser, "
+                        "unlike --resume which also restores the optimiser and epoch "
+                        "counter. For restarting after a divergence from the last good "
+                        "epoch, where the optimiser state is what has to be discarded.")
     p.add_argument("--resume", action="store_true")
     p.add_argument("--allow-cpu", action="store_true")
     return p.parse_args()
@@ -94,6 +105,9 @@ def main():
     gen = torch.Generator().manual_seed(a.seed)
     last_p, best_p = os.path.join(out, "last.pt"), os.path.join(out, "best.pt")
     start, best = 0, float("inf")
+    if a.init_weights:
+        model.load_state_dict(torch.load(a.init_weights, map_location=dev)["model"])
+        print(f"[init] weights from {a.init_weights}, optimiser fresh", flush=True)
     if a.resume and os.path.exists(last_p):
         ck = torch.load(last_p, map_location=dev)
         model.load_state_dict(ck["model"])
@@ -117,6 +131,8 @@ def main():
                 skipped += 1
                 continue
             loss.backward()
+            if a.clip_grad:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip_grad)
             opt.step()
             tot += loss.detach() * len(x)
             n += len(x)

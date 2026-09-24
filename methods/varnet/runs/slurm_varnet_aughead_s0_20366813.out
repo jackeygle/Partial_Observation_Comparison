@@ -1,0 +1,21 @@
+Submitted batch job 20386652
+[chain] submitted successor (afterany:20366813)
+NVIDIA H200
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=4,630,742 (GENN prior 54,220 = 1.17%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual; observation term too (shared sigma); sigma^2 update from its own head on [h, x]   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_aughead_obs_h96_s0/varnet_last.pt: continuing from epoch 143 (step 28171)
+[best] previous best blind MSE = 0.0493
+[schedule] epoch 143: n_iter -> 20, lr -> 0.0003
+[epoch 143] loss=-1.4920  blind_MSE=0.0600  density=0.0238 vx=0.1781 vy=0.0282 var=0.0101
+[epoch 144] loss=-1.8016  blind_MSE=0.0548  density=0.0210 vx=0.1617 vy=0.0271 var=0.0093
+[epoch 145] loss=-1.8453  blind_MSE=0.0528  density=0.0201 vx=0.1558 vy=0.0259 var=0.0093
+[epoch 146] loss=-1.8167  blind_MSE=0.0548  density=0.0204 vx=0.1619 vy=0.0274 var=0.0094
+[epoch 147] loss=-0.9790  blind_MSE=0.0604  density=0.0221 vx=0.1795 vy=0.0293 var=0.0106
+[epoch 148] loss=39.2402  blind_MSE=0.0825  density=0.0371 vx=0.2297 vy=0.0464 var=0.0169
+[epoch 149] loss=-1.6902  blind_MSE=0.0563  density=0.0211 vx=0.1667 vy=0.0279 var=0.0096
+[done] checkpoints + metrics in runs/varnet_aughead_obs_h96_s0

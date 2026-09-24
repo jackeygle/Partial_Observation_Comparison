@@ -1,0 +1,8 @@
+{
+ "epochs_run": 132,
+ "epochs_finite": 132,
+ "best_epoch": 38,
+ "best_valid_loss": 0.06270414162333253,
+ "chosen_on": "the full validation split (269,708 pairs), not a subset",
+ "stopped_early": "cancelled at epoch 131 of 150: lr had decayed to 4.9e-07 and the validation loss had been flat to five decimals for ~20 epochs; the best epoch was 94 epochs behind."
+}

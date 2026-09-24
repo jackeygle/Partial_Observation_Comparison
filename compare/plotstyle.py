@@ -50,24 +50,28 @@ import matplotlib.pyplot as plt
 # --------------------------------------------------------------------------- #
 # 1. Method -> colour
 # --------------------------------------------------------------------------- #
-#: Categorical palette. Taken from a dataviz spec's categorical slots, fixed
-#: order, no cycling. Each of the five methods gets one slot, **consistent across
-#: every figure and every sub-project**. Ablation rows (a4_k1, single-member) use
-#: a paler shade of the same colour, see `shade()`.
+#: Categorical palette: the validated reference palette of the dataviz spec, fixed
+#: order, no cycling. **Consistent across every figure and every sub-project.**
+#: The three uncertainty methods (DINCAE, 4DVarNet+aug, EnKF) hold slots 1-3, the
+#: only three that stay distinguishable in *every* pair under colour-vision
+#: deficiency; figures with more methods must also name each mark directly (axis
+#: row label or point label), never rely on colour alone. The previous hand-picked
+#: set failed that check (Senseiver-A's pale shade vs EnKF teal: protan dE 1.5).
 METHOD_COLORS = {
-    "DINCAE":    "#4269d0",   # blue
-    "4DVarNet":  "#efb118",   # gold
-    "Senseiver": "#ff725c",   # orange-red
-    "EnKF":      "#6cc5b0",   # teal
-    "4DVarNet+var": "#a463f2",  # purple -- the read-out-head design (vsb0)
-    "4DVarNet+aug": "#9c6b4f",  # brown  -- sigma inside G(x) (aug0); needs a slot of
-                                # its own or it collides with the plain-MSE gold
+    "DINCAE":       "#2a78d6",  # slot 1 blue
+    "4DVarNet+aug": "#eb6834",  # slot 2 orange -- sigma inside G(x) (aug head)
+    "EnKF":         "#1baf7a",  # slot 3 aqua
+    "4DVarNet":     "#eda100",  # slot 4 yellow -- plain MSE
+    "Senseiver-A":  "#e87ba4",  # slot 5 magenta -- the paper-faithful Senseiver
+    "Senseiver":    "#4a3aa7",  # slot 7 violet -- Senseiver-G, ours
+    "4DVarNet+var": "#e34948",  # slot 8 red -- the read-out-head design (vsb0)
 }
 
-#: Neutral colours: axes, text, gridlines. Three shades, do not add more.
+#: Neutral colours: text, axes, gridlines. Keep it to these.
 INK = "#1b1b1b"          # body text and axis labels
 INK_MUTED = "#6b6b6b"    # secondary annotations, footnotes
-RULE = "#d9d9d9"         # gridlines and dividers
+RULE = "#e3e3e3"         # gridlines and dividers
+AXIS = "#333333"         # axis lines and tick labels
 
 
 def method_color(name: str) -> str:
@@ -85,7 +89,9 @@ def method_color(name: str) -> str:
         if "NLL" in n or "nll" in n:
             return METHOD_COLORS["4DVarNet+var"]
         return METHOD_COLORS["4DVarNet"]
-    for k, v in METHOD_COLORS.items():
+    if "EnKF" in n:                               # "EnKF k1", "Localized EnKF (...)"
+        return METHOD_COLORS["EnKF"]
+    for k, v in METHOD_COLORS.items():            # "Senseiver-A" is listed before "Senseiver"
         if n.startswith(k):
             return v
     return INK_MUTED
@@ -136,26 +142,34 @@ FS_TITLE, FS_LABEL, FS_TICK = 10.0, 9.0, 8.0
 
 
 def use(dpi: int = 200):
-    """Tune rcParams. Call once per process."""
+    """Tune rcParams. Call once per process.
+
+    Look: left/bottom axes only in dark ink, light horizontal gridlines only (a
+    horizontal-bar or dot figure switches the grid to x itself), sans-serif.
+    """
     plt.rcParams.update({
         "figure.dpi": dpi,
         "savefig.dpi": dpi,
         "savefig.bbox": "tight",
+        "font.family": "DejaVu Sans",
         "font.size": FS_LABEL,
         "axes.titlesize": FS_TITLE,
         "axes.labelsize": FS_LABEL,
         "xtick.labelsize": FS_TICK,
         "ytick.labelsize": FS_TICK,
         "legend.fontsize": FS_TICK,
-        "axes.edgecolor": RULE,
+        "legend.frameon": False,
+        "axes.edgecolor": AXIS,
+        "axes.linewidth": 0.8,
         "axes.labelcolor": INK,
         "axes.titlecolor": INK,
         "text.color": INK,
-        "xtick.color": INK_MUTED,
-        "ytick.color": INK_MUTED,
+        "xtick.color": AXIS,
+        "ytick.color": AXIS,
         "axes.spines.top": False,
         "axes.spines.right": False,
         "axes.grid": True,
+        "axes.grid.axis": "y",
         "axes.axisbelow": True,           # grid below the data, or bars get sliced by it
         "grid.color": RULE,
         "grid.linewidth": 0.6,

@@ -1,6 +1,6 @@
 # methods/dincae — reproducing DINCAE on the ATC crowd field
 
-> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring scope (blind cells inside the walkable region), and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring scope (blind cells inside the walkable region), and which checkpoint backs which published number.
 
 The second technical route. The first (4DVarNet reproduction + EnKF comparison) is
 already complete, in [`../varnet/`](../varnet/); this directory

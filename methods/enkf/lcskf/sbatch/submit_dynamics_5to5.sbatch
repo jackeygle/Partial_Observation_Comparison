@@ -1,6 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=pedpred5_s0
-#SBATCH --partition=gpu-h200-141g-short
+# Any card with >=32 GB works: the whole training split (~8.7 GB) lives on the device. Listing
+# several partitions lets Slurm start on whichever has a free slot first. It has to be in
+# the header, not on the command line, because the relay below resubmits THIS file.
+#SBATCH --partition=gpu-h200-141g-short,gpu-h100-80g-short,gpu-a100-80g,gpu-v100-32g
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=64G

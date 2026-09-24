@@ -1,0 +1,34 @@
+[verify] PASS -> supervisor_evaluation/outputs/smoke_final/verification_report.json
+[run] methods.varnet.checks.eval_uncertainty --members 0 --checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_final/raw/uncertainty_varnet_aughead.json
+  member 0: ../../supervisor_evaluation/models/varnet_aughead_obs_s0.pt  epoch=90  n_iter=20
+[members] 1 x /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt  dT=200  obs_every_k=1  dev=cuda
+  atc-20130811_corridor_1.0s.h5  2 windows
+
+split                             RMSE     CRPS      NLL   sigma  sp/sk  90%cov
+all                             0.1614   0.0605   -1.293  0.1234   0.76   93.5%
+all_aleatoric_only              0.1614   0.0605   -1.293  0.1234   0.76   93.5%
+all_epistemic_only              0.1614   0.080213021502430.592  0.0000   0.00    0.0%
+all_constant_sigma_baseline     0.1614   0.0762   -0.405  0.1614   1.00   92.1%
+blind                           0.1317   0.0452   -1.472  0.1052   0.80   96.2%
+observed                        0.1895   0.0778   -1.090  0.1440   0.76   90.5%
+defined                         0.1509   0.0524   -0.535  0.1028   0.68   93.1%
+defined_constant_sigma_baseline  0.1509   0.0639   -0.472  0.1509   1.00   95.9%
+defined_blind                   0.1886   0.0536    0.223  0.0881   0.47   93.6%
+defined_blind_constant_sigma_baseline  0.1886   0.0763   -0.249  0.1886   1.00   95.7%
+defined_observed                0.1149   0.0515   -1.101  0.1138   0.99   92.7%
+defined_observed_constant_sigma_baseline  0.1149   0.0552   -0.745  0.1149   1.00   94.6%
+walkable                        0.1785   0.0693   -1.025  0.1436   0.80   93.8%
+walkable_constant_sigma_baseline  0.1785   0.0853   -0.304  0.1785   1.00   91.8%
+walkable_blind                  0.1574   0.0561   -0.990  0.1303   0.83   96.2%
+walkable_blind_constant_sigma_baseline  0.1574   0.0697   -0.430  0.1574   1.00   93.8%
+blind_constant_sigma_baseline   0.1317   0.0577   -0.609  0.1317   1.00   93.9%
+channel_density                 0.0626   0.0316   -1.533  0.0729   1.16   94.1%
+channel_vx                      0.3018   0.1566    0.077  0.2981   0.99   90.4%
+channel_vy                      0.0912   0.0455   -1.130  0.0972   1.07   92.9%
+channel_var                     0.0295   0.0081   -2.586  0.0254   0.86   96.7%
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/smoke_final/raw/uncertainty_varnet_aughead.json
+
+EnKF k=1 for reference (measured, check_outputs/enkf_k1_full):  spread/skill 0.011   90% coverage 2.24%
+[collect] 5 accuracy rows, 3 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/smoke_final/figures

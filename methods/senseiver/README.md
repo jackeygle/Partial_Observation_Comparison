@@ -1,6 +1,6 @@
 # methods/senseiver — reproducing Senseiver on the ATC crowd field
 
-> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
 
 **The third method route.** The first two (4DVarNet reproduction + Localized EnKF
 comparison) live in [`../varnet/`](../varnet/). This directory only

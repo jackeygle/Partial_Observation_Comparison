@@ -105,6 +105,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from crowdcore import paths
 import sys
 
@@ -285,6 +286,10 @@ def main():
                          "e.g. 'a4_k1'. Empty by default: the three arms below already cover "
                          "every reported 4DVarNet number, and a2/a4/b0 are exploratory "
                          "capacity ablations that are not part of any reported comparison.")
+    ap.add_argument("--varnet-checkpoints", default="",
+                    help="comma-separated label=/absolute/checkpoint.pt rows. This direct, "
+                         "single-model form is used by the supervisor package so inference "
+                         "loads only files from its frozen models directory.")
     ap.add_argument("--arms", default="MSE=mse5_h96_s{},NLL=vsb0_h96_s{},AUG=aug0_h96_s{}",
                     help="comma-separated `label=run-name-template` entries. Each "
                          "arm produces N single-seed rows, plus one cross-seed "
@@ -318,6 +323,8 @@ def main():
                          "check_outputs/eval/ holds the 16-checkpoint average instead, "
                          "which is a different configuration from every other row here.")
     ap.add_argument("--days", type=int, default=0)
+    ap.add_argument("--frames", type=int, default=0,
+                    help="debug/smoke only: truncate each day before the common frame-range cut")
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--varnet-batch", type=int, default=16)
     # Output lands in compare/'s own directory: this quantity is cross-method and
@@ -354,6 +361,13 @@ def main():
     for vn in vnames:
         sol, va, _ = load_solver(varnet_ckpt(vn, args.ckpt_name), dev)
         vsolvers[vn] = (sol, va)
+    for spec in (z.strip() for z in args.varnet_checkpoints.split(",") if z.strip()):
+        label, sep, checkpoint = spec.partition("=")
+        if not sep or not label or not checkpoint:
+            ap.error(f"bad --varnet-checkpoints entry {spec!r}; expected label=/path/file.pt")
+        sol, va, _ = load_solver(checkpoint, dev)
+        vnames.append(label)
+        vsolvers[label] = (sol, va)
 
     # Deep ensemble. The point estimate is the mean of the members'
     # reconstructions (the paper's Sec 2.4), so "ensemble" and "single-model
@@ -425,10 +439,13 @@ def main():
     # the two are not the same quantity, so both are given here.
     day_overall = {k: {c: [] for c in CONVENTIONS} for k in names}
     per_day = []
+    inference = {k: {"seconds": 0.0, "frames": 0, "per_day_ms": []} for k in names}
 
     for d in days:
         stem = os.path.basename(d).split("_")[0]
         X, Y, Om = ds.load_day(d, stride=1, seed=ds.om.day_seed(d))
+        if args.frames:
+            X, Y, Om = X[:args.frames], Y[:args.frames], Om[:args.frames]
         n = X.shape[0]
         Xf = X.reshape(n, C, H, W)
         Yf = Y.reshape(n, C, H, W)
@@ -439,7 +456,14 @@ def main():
         cut = lambda m, a, b: {k: v[a:b] for k, v in m.items()}
         dacc = {k: Acc(C) for k in names}                    # accumulated separately for this day, to compute the day average
 
+        if dev.type == "cuda": torch.cuda.synchronize()
+        tic = time.perf_counter()
         p = run_senseiver(sm, Y, Om, dev, args.batch)
+        if dev.type == "cuda": torch.cuda.synchronize()
+        senseiver_seconds = time.perf_counter() - tic
+        inference["Senseiver"]["seconds"] += senseiver_seconds
+        inference["Senseiver"]["frames"] += len(p)
+        inference["Senseiver"]["per_day_ms"].append(1000 * senseiver_seconds / len(p))
         dacc["Senseiver"].add(clip_np(p[lo:hi]), p[lo:hi], Xf[lo:hi], cut(sel_all, lo, hi))
         del p
 
@@ -447,7 +471,15 @@ def main():
         X0 = ds.om.fill_missing_state(Yf, Omc, method=ds.obs_config()["init_method"])
         for vn in vnames:
             sol, va = vsolvers[vn]
+            if dev.type == "cuda": torch.cuda.synchronize()
+            tic = time.perf_counter()
             pv, nkeep = run_varnet(sol, Yf, Omc, X0, va["dT"], dev, args.varnet_batch)
+            if dev.type == "cuda": torch.cuda.synchronize()
+            varnet_seconds = time.perf_counter() - tic
+            inference[f"4DVarNet {vn}"]["seconds"] += varnet_seconds
+            inference[f"4DVarNet {vn}"]["frames"] += nkeep
+            inference[f"4DVarNet {vn}"]["per_day_ms"].append(
+                1000 * varnet_seconds / max(nkeep, 1))
             b = min(hi, nkeep)                               # the tail dropped when dT doesn't divide evenly
             dacc[f"4DVarNet {vn}"].add(clip_np(pv[lo:b]), pv[lo:b], Xf[lo:b],
                                        cut(sel_all, lo, b))
@@ -533,6 +565,12 @@ def main():
         "pooling": "accumulate squared error and cell count per channel, divide once at the end",
         "n_days": len(days)},
         "per_day": per_day, "channels": chans, "results": {}}
+    res["inference"] = {
+        name: {**q, "ms_per_frame": 1000 * q["seconds"] / max(q["frames"], 1),
+               "scope": "method inference including tensor/window/token construction; "
+                        "checkpoint/data loading and scoring excluded"}
+        for name, q in inference.items() if q["frames"]
+    }
 
     for k, a in accs.items():
         if a.n["defined"].sum() == 0:

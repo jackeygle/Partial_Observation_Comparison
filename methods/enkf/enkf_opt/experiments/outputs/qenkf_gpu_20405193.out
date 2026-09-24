@@ -1,0 +1,9 @@
+[residual] 1000/2000, 0.0053 s/frame
+[all] RMSE=0.21172 CRPS=0.09241 spread/skill=0.824 cov90=0.835
+[defined_blind] RMSE=0.36717 CRPS=0.13140 spread/skill=0.559 cov90=0.886
+[density] spearman=+0.798 AUSE=0.239
+[vx] spearman=+0.386 AUSE=0.419
+[vy] spearman=+0.056 AUSE=0.632
+[var] spearman=+0.598 AUSE=0.598
+[runtime] 15.31s on Tesla V100-PCIE-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/density_calibration_apply_smoke.json

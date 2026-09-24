@@ -1,0 +1,16 @@
+[residual, scale=0.75, rtps=0] 200/2000, 0.286 s/frame
+[residual, scale=0.75, rtps=0] 400/2000, 0.268 s/frame
+[residual, scale=0.75, rtps=0] 600/2000, 0.273 s/frame
+[residual, scale=0.75, rtps=0] 800/2000, 0.273 s/frame
+[residual, scale=0.75, rtps=0] 1000/2000, 0.262 s/frame
+[residual, scale=0.75, rtps=0] 1200/2000, 0.275 s/frame
+[residual, scale=0.75, rtps=0] 1400/2000, 0.274 s/frame
+[residual, scale=0.75, rtps=0] 1600/2000, 0.269 s/frame
+[residual, scale=0.75, rtps=0] 1800/2000, 0.267 s/frame
+[all] RMSE=0.16958 CRPS=0.07561 spread/skill=0.535 cov90=0.674
+[defined_blind] RMSE=0.28338 CRPS=0.10602 spread/skill=0.240 cov90=0.493
+[density] spearman=+0.772 AUSE=0.307 sigma_cv=0.762
+[vx] spearman=+0.303 AUSE=0.457 sigma_cv=0.565
+[vy] spearman=-0.087 AUSE=0.764 sigma_cv=0.486
+[var] spearman=+0.601 AUSE=0.573 sigma_cv=0.882
+[out] methods/enkf/enkf_opt/experiments/outputs/formal_residual_s075_r0_pinv.json

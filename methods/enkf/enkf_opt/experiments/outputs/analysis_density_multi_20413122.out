@@ -1,0 +1,75 @@
+[residual] 1000/5000, 0.0068 s/frame
+[residual] 2000/5000, 0.0066 s/frame
+[residual] 3000/5000, 0.0065 s/frame
+[residual] 4000/5000, 0.0065 s/frame
+[all] RMSE=0.18214 CRPS=0.08556 spread/skill=1.110 cov90=0.893
+[defined_blind] RMSE=0.32705 CRPS=0.10753 spread/skill=0.524 cov90=0.920
+[density] spearman=+0.862 AUSE=0.173
+[vx] spearman=+0.330 AUSE=0.401
+[vy] spearman=-0.011 AUSE=0.619
+[var] spearman=+0.589 AUSE=0.499
+[runtime] 39.91s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130707_raw.json
+[residual] 1000/5000, 0.0084 s/frame
+[residual] 2000/5000, 0.0081 s/frame
+[residual] 3000/5000, 0.0081 s/frame
+[residual] 4000/5000, 0.0080 s/frame
+[all] RMSE=0.18234 CRPS=0.08561 spread/skill=1.104 cov90=0.888
+[defined_blind] RMSE=0.32648 CRPS=0.10721 spread/skill=0.499 cov90=0.876
+[density] spearman=+0.852 AUSE=0.186
+[vx] spearman=+0.334 AUSE=0.402
+[vy] spearman=-0.009 AUSE=0.618
+[var] spearman=+0.589 AUSE=0.499
+[runtime] 47.61s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130707_density.json
+[residual] 1000/5000, 0.0068 s/frame
+[residual] 2000/5000, 0.0066 s/frame
+[residual] 3000/5000, 0.0066 s/frame
+[residual] 4000/5000, 0.0065 s/frame
+[all] RMSE=0.17085 CRPS=0.08235 spread/skill=1.180 cov90=0.898
+[defined_blind] RMSE=0.30242 CRPS=0.09221 spread/skill=0.497 cov90=0.929
+[density] spearman=+0.864 AUSE=0.175
+[vx] spearman=+0.287 AUSE=0.423
+[vy] spearman=-0.067 AUSE=0.679
+[var] spearman=+0.604 AUSE=0.488
+[runtime] 39.91s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130714_raw.json
+[residual] 1000/5000, 0.0081 s/frame
+[residual] 2000/5000, 0.0079 s/frame
+[residual] 3000/5000, 0.0078 s/frame
+[residual] 4000/5000, 0.0078 s/frame
+[all] RMSE=0.17106 CRPS=0.08237 spread/skill=1.174 cov90=0.893
+[defined_blind] RMSE=0.30172 CRPS=0.09163 spread/skill=0.470 cov90=0.884
+[density] spearman=+0.854 AUSE=0.189
+[vx] spearman=+0.291 AUSE=0.423
+[vy] spearman=-0.066 AUSE=0.678
+[var] spearman=+0.604 AUSE=0.488
+[runtime] 46.17s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130714_density.json
+[residual] 1000/5000, 0.0065 s/frame
+[residual] 2000/5000, 0.0063 s/frame
+[residual] 3000/5000, 0.0062 s/frame
+[residual] 4000/5000, 0.0062 s/frame
+[all] RMSE=0.20073 CRPS=0.09318 spread/skill=1.018 cov90=0.880
+[defined_blind] RMSE=0.34726 CRPS=0.13035 spread/skill=0.619 cov90=0.908
+[density] spearman=+0.852 AUSE=0.181
+[vx] spearman=+0.400 AUSE=0.385
+[vy] spearman=+0.062 AUSE=0.614
+[var] spearman=+0.540 AUSE=0.534
+[runtime] 38.54s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130721_raw.json
+[residual] 1000/5000, 0.0086 s/frame
+[residual] 2000/5000, 0.0084 s/frame
+[residual] 3000/5000, 0.0083 s/frame
+[residual] 4000/5000, 0.0083 s/frame
+[all] RMSE=0.20090 CRPS=0.09328 spread/skill=1.013 cov90=0.875
+[defined_blind] RMSE=0.34687 CRPS=0.13053 spread/skill=0.596 cov90=0.861
+[density] spearman=+0.844 AUSE=0.197
+[vx] spearman=+0.403 AUSE=0.385
+[vy] spearman=+0.064 AUSE=0.613
+[var] spearman=+0.540 AUSE=0.533
+[runtime] 49.22s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/enkf_opt/experiments/outputs/analysis_density_multiday/atc-20130721_density.json
+[residual] 1000/5000, 0.0066 s/frame
+[residual] 2000/5000, 0.0064 s/frame
+[2026-09-23T19:42:40.120] error: *** JOB 20413122 ON dgx3 CANCELLED AT 2026-09-23T19:42:40 DUE to SIGNAL Terminated ***

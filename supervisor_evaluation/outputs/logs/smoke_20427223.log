@@ -1,0 +1,356 @@
+[verify] PASS -> supervisor_evaluation/outputs/dev/smoke_check_0924/verification_report.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --arms  --no-with-ensemble --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/senseiver_a_accuracy.json
+[model] Senseiver 65,892 params |  | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0026  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0510      0.0510        0.0510          0.0510
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.7608     0.1251     0.0184     0.0273      0.1653
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.2539     0.0416     0.0061     0.0128      0.1130
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.0242     0.0039     0.0006     0.0078      0.0881
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.0118     0.0019     0.0003     0.0038      0.0616
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0138     0.0023     0.0004     0.0044      0.0666
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0008     0.0081     0.0013     0.0002     0.0026      0.0510
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/senseiver_a_accuracy.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_G_k16.pt --arms  --no-with-ensemble --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/senseiver_g_accuracy.json
+[model] Senseiver 56,676 params |  | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0019  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0439      0.0439        0.0439          0.0439
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.4852     0.1098     0.0181     0.0183      0.1353
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0006     0.1627     0.0361     0.0057     0.0085      0.0924
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0178     0.0037     0.0006     0.0058      0.0764
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0006     0.0086     0.0017     0.0003     0.0028      0.0530
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0007     0.0102     0.0021     0.0003     0.0033      0.0578
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0004     0.0059     0.0012     0.0002     0.0019      0.0439
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/senseiver_g_accuracy.json
+[run] methods.dincae.checks.evaluate --run-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models --ckpt-glob /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/dincae_epoch60.pt --split test --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/dincae_accuracy
+single checkpoint:  epochs [60]
+test split: 1 days
+  atc-20130811_corridor_1.0s  density 0.00251  vx 0.78327  vy 0.13247  var 0.01858
+
+=== MSE (both conventions) ===
+convention         density         vx         vy        var   4-channel merged
+ours_blind         0.00251    0.78327    0.13247    0.01858   0.02838
+ours_all           0.00168    0.38031    0.06021    0.00886   0.01899
+ours_blind_noclip   0.00252    0.78327    0.13247    0.01869   0.02840
+ours_all_noclip    0.00172    0.38031    0.06021    0.01066   0.01910
+walkable_blind     0.00251    0.03006    0.00501    0.00072   0.00957
+walkable_all       0.00168    0.02146    0.00339    0.00047   0.00675
+v4dvar_blind       0.00142    0.01746    0.00324    0.00040   0.00563
+v4dvar_all         0.00114    0.01487    0.00258    0.00032   0.00472
+
+=== Variance retention (reconstruction SD / truth SD, 1 is best; <1 = smoothed out) ===
+  density  truth 0.0595  rec 0.0497  ratio 0.835
+  vx       truth 0.9249  rec 0.7402  ratio 0.800
+  vy       truth 0.3443  rec 0.2609  ratio 0.758
+  var      truth 0.1361  rec 0.0967  ratio 0.711
+
+=== sigma-hat calibration (blind, normalised space; ideally actual ≈ predicted) ===
+  density  mean predicted SD 0.2428  actual RMS 0.2578  global adjustment factor 1.062  (n=65,507)
+      pred 0.0247 -> actual 0.0289  (n=29,103)
+      pred 0.1054 -> actual 0.1187  (n=6,890)
+      pred 0.1798 -> actual 0.3179  (n=3,750)
+      pred 0.2476 -> actual 0.2015  (n=2,813)
+      pred 0.3169 -> actual 0.2061  (n=3,146)
+      pred 0.3868 -> actual 0.4248  (n=2,790)
+      pred 0.4559 -> actual 0.3636  (n=2,606)
+      pred 0.5242 -> actual 0.3847  (n=3,253)
+      pred 0.5916 -> actual 0.4177  (n=2,317)
+      pred 0.6646 -> actual 0.4710  (n=2,288)
+  vx       mean predicted SD 0.3938  actual RMS 1.0422  global adjustment factor 2.647  (n=1,995)
+      pred 0.1890 -> actual 0.6769  (n=164)
+      pred 0.2382 -> actual 0.8044  (n=147)
+      pred 0.2763 -> actual 0.7421  (n=229)
+      pred 0.3195 -> actual 1.0426  (n=100)
+      pred 0.4081 -> actual 0.9213  (n=142)
+      pred 0.4537 -> actual 1.2141  (n=121)
+      pred 0.4946 -> actual 1.2990  (n=213)
+      pred 0.5387 -> actual 1.2248  (n=201)
+      pred 0.5831 -> actual 1.1992  (n=179)
+  vy       mean predicted SD 0.4081  actual RMS 1.0812  global adjustment factor 2.649  (n=1,995)
+      pred 0.2682 -> actual 1.1447  (n=164)
+      pred 0.2987 -> actual 1.0881  (n=124)
+      pred 0.3331 -> actual 1.1807  (n=164)
+      pred 0.3589 -> actual 1.0543  (n=182)
+      pred 0.3914 -> actual 1.0613  (n=160)
+      pred 0.4251 -> actual 0.9961  (n=141)
+      pred 0.4538 -> actual 0.9651  (n=170)
+      pred 0.4849 -> actual 0.9702  (n=152)
+      pred 0.5140 -> actual 0.9772  (n=165)
+      pred 0.5467 -> actual 1.3056  (n=173)
+  var      mean predicted SD 0.2408  actual RMS 0.5201  global adjustment factor 2.160  (n=1,930)
+      pred 0.1019 -> actual 0.4197  (n=266)
+      pred 0.1436 -> actual 0.4030  (n=288)
+      pred 0.1752 -> actual 0.4813  (n=174)
+      pred 0.2139 -> actual 0.3159  (n=195)
+      pred 0.2485 -> actual 0.4383  (n=131)
+      pred 0.2881 -> actual 0.3173  (n=125)
+      pred 0.3190 -> actual 0.2175  (n=135)
+
+wrote /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/dincae_accuracy/dincae_metrics_test.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --varnet-checkpoints MSE=/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_mse_s3_epoch80.pt --arms  --no-with-ensemble --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/varnet_mse_accuracy.json
+[model] Senseiver 65,892 params | 4DVarNet MSE dT=200 n_iter=20 | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0026  4DVarNet MSE full=0.0135  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0510      0.0510        0.0510          0.0510
+4DVarNet MSE                0.1162      0.1162        0.1178          0.1178
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.7608     0.1251     0.0184     0.0273      0.1653
+4DVarNet MSE                 0.0031     0.6650     0.1530     0.0251     0.0260      0.1613
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.2539     0.0416     0.0061     0.0128      0.1130
+4DVarNet MSE                 0.0024     0.2634     0.0534     0.0075     0.0151      0.1227
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.0242     0.0039     0.0006     0.0078      0.0881
+4DVarNet MSE                 0.0031     0.0300     0.0076     0.0019     0.0107      0.1033
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.0118     0.0019     0.0003     0.0038      0.0616
+4DVarNet MSE                 0.0024     0.0553     0.0079     0.0009     0.0166      0.1289
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0138     0.0023     0.0004     0.0044      0.0666
+4DVarNet MSE                 0.0021     0.0192     0.0052     0.0011     0.0069      0.0830
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0008     0.0081     0.0013     0.0002     0.0026      0.0510
+4DVarNet MSE                 0.0019     0.0450     0.0065     0.0006     0.0135      0.1162
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/varnet_mse_accuracy.json
+[run] compare.compare5 --senseiver /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/senseiver_A.pt --varnet-checkpoints aughead_obs=/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/varnet_aughead_obs_s0.pt --arms  --no-with-ensemble --days 1 --frames 512 --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/varnet_aughead_accuracy.json
+[model] Senseiver 65,892 params | 4DVarNet aughead_obs dT=200 n_iter=20 | walkable 290/432 | device=cuda
+  atc-20130811: 512 frames, scored [1,511)  Senseiver full=0.0026  4DVarNet aughead_obs full=0.0257  EnKF k1 full=0.0258
+
+  [warn] the DINCAE row is pooled over 7 days, this run only covered 1 -- the two are not comparable, this table is only useful to check the code runs.
+
+
+Full-field RMSE (observed + blind, all cells) -- pooled vs day-averaged vs unclipped
+
+method                      pooled     day-avg pooled,noclip  day-avg,noclip
+----------------------------------------------------------------------------
+Senseiver                   0.0510      0.0510        0.0510          0.0510
+4DVarNet aughead_obs        0.1602      0.1602        0.1615          0.1615
+EnKF k1                     0.1606      0.1606        0.1606          0.1606
+DINCAE                      0.1530           —             —               —
+
+(1) defined ∩ walkable ∩ blind  -- comparable across all five, the main result
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.7608     0.1251     0.0184     0.0273      0.1653
+4DVarNet aughead_obs         0.0033     0.9725     0.1625     0.0250     0.0348      0.1866
+EnKF k1                      0.0029     0.7545     0.1356     0.0382     0.0286      0.1690
+DINCAE                       0.0233     0.6511     0.1152     0.0564     0.0443      0.2105
+
+(2) defined ∩ walkable ∩ full field (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.2539     0.0416     0.0061     0.0128      0.1130
+4DVarNet aughead_obs         0.0031     0.3970     0.0569     0.0075     0.0212      0.1455
+EnKF k1                      0.0042     0.7753     0.1146     0.0369     0.0398      0.1995
+DINCAE                       0.0152     0.3321     0.0553     0.0315     0.0297      0.1725
+
+(3) walkable ∩ blind  -- the main result: the physical domain, empty cells included, map obstacles excluded
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0023     0.0242     0.0039     0.0006     0.0078      0.0881
+4DVarNet aughead_obs         0.0033     0.0832     0.0095     0.0020     0.0245      0.1564
+EnKF k1                      0.0029     0.0524     0.0084     0.0393     0.0257      0.1604
+DINCAE                       0.0233     0.1447     0.0257     0.0118     0.0514      0.2267
+
+(4) walkable ∩ full field  (includes observed cells)
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0011     0.0118     0.0019     0.0003     0.0038      0.0616
+4DVarNet aughead_obs         0.0031     0.1109     0.0105     0.0009     0.0314      0.1771
+EnKF k1                      0.0042     0.0640     0.0096     0.0363     0.0285      0.1689
+DINCAE                       0.0152     0.0940     0.0156     0.0081     0.0332      0.1823
+
+(5) all cells ∩ blind  -- the removed three-way script's convention, for reference
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0013     0.0138     0.0023     0.0004     0.0044      0.0666
+4DVarNet aughead_obs         0.0021     0.0590     0.0062     0.0011     0.0171      0.1308
+EnKF k1                      0.0023     0.0382     0.0071     0.0479     0.0239      0.1545
+DINCAE                       0.0134     0.0832     0.0160     0.0066     0.0298      0.1727
+
+(4) all cells ∩ full field  -- the same quantity as eval_test_days's full_mse
+
+method                      density         vx         vy        var      total  total RMSE
+-------------------------------------------------------------------------------------------
+Senseiver                    0.0008     0.0081     0.0013     0.0002     0.0026      0.0510
+4DVarNet aughead_obs         0.0024     0.0913     0.0083     0.0006     0.0257      0.1602
+EnKF k1                      0.0033     0.0498     0.0080     0.0420     0.0258      0.1606
+DINCAE                       0.0106     0.0658     0.0117     0.0055     0.0234      0.1530
+
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/varnet_aughead_accuracy.json
+[run] methods.enkf.checks.export_obs_for_enkf --split test --frames 600 --outdir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf_observations --obs-every-k 1 --only atc-20130811
+[export] 1 test days, frames [0, 600), obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130811: exported 600 frames, observed cells/frame mean 201.6
+[done] -> /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf_observations/obs_*.npz
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 2.0 1.0 1.0 0.75 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 600 --warmup 100 --day atc-20130811 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf_exports/atc-20130811.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf/atc-20130811.json
+[all] RMSE=0.15014 CRPS=0.06872 spread/skill=1.341 cov90=0.807
+[defined_blind] RMSE=0.19656 CRPS=0.06447 spread/skill=0.775 cov90=0.941
+[density] spearman=+0.942 AUSE=0.083
+[vx] spearman=+0.651 AUSE=0.243
+[vy] spearman=+0.680 AUSE=0.278
+[var] spearman=+0.953 AUSE=0.034
+[runtime] 6.45s on Tesla V100-SXM2-16GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/smoke_check_0924/raw/enkf/atc-20130811.json
+[uncertainty] atc-20130811: frames [100, 599), 64730 cells/channel
+[uncertainty] 4DVarNet aughead_obs (single)    rmse 0.1682  crps 0.0574  skill 0.2210  sp/sk 0.733  cov90 0.953
+[uncertainty] DINCAE                           rmse 0.1134  crps 0.0329  skill 0.2479  sp/sk 0.716  cov90 0.979
+[uncertainty] Localized EnKF (100 members)     rmse 0.2323  crps 0.1169  skill 0.0251  sp/sk 1.438  cov90 0.943
+[uncertainty] wrote supervisor_evaluation/outputs/dev/smoke_check_0924/raw/uncertainty_unified.json
+[collect] 6 accuracy rows, 3 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/dev/smoke_check_0924/figures

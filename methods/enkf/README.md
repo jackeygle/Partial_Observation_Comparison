@@ -1,6 +1,6 @@
 # methods/enkf — localised ensemble Kalman filter on the ATC crowd field
 
-> Part of [Partial Observation Comparison](../../README.md) — see the root README for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
 
 The only method here that is **not learned**. It is a filter: a 100-member
 ensemble propagated by the PedPred3 neural surrogate, corrected by a localised
