@@ -5,11 +5,18 @@
 Reproducing the **4DVarNet** learned variational data-assimilation framework
 (Fablet et al. 2020, [arXiv:2007.12941](https://arxiv.org/abs/2007.12941)) on the
 **ATC pedestrian dataset**: reconstruct the full crowd field (density + velocity)
-over a time window from a few robots' partial, noisy observations, and compare
-fairly against a **Localized EnKF** baseline.
+over a time window from a few robots' partial, noisy observations.
+
+Two models from this directory are in the final six-method comparison, evaluated
+by `supervisor_evaluation/evaluate.py` (see the repository [README](../../README.md)):
+
+| Row | Run | What it is |
+|---|---|---|
+| 4DVarNet | `runs/varnet_mse5_h96_s3/ckpt_00080.pt` | plain MSE (Eq. 14); of five seeds, the one with the lowest validation error |
+| 4DVarNet (aug. head) | `runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | ours: σ inside the prior (`aug0`), a Gaussian-NLL observation term, and a dedicated variance head |
 
 This README is written so someone else can reproduce the whole thing from the raw
-data. **All parameters live in `config.yaml` (single source of truth)**; every
+data. **All parameters live in `crowdcore/config.yaml` (single source of truth)**; every
 command reads its defaults from there, and command-line flags override for one run.
 
 ---
@@ -17,37 +24,30 @@ command reads its defaults from there, and command-line flags override for one r
 ## TL;DR — reproduce end to end
 
 ```bash
-# 0. environment (Aalto Triton)
-cd path/to/this/repo && source sbatch/_env.sh   # the repo root; module load + PYTHONPATH
-cd methods/varnet               # python below runs from here; sbatch from the repo root
+# 0. environment (Aalto Triton), from the repository root
+source sbatch/_env.sh           # module load + PYTHONPATH
 
 # 1. (data is already gridded — see "Data" below if you must rebuild from CSV)
 
-# 2. train 4DVarNet to convergence (full 32-day train split, paper window dT=200), 5 seeds,
-#    then choose every run's epoch on the validation split
+# 2. train: plain MSE, 5 seeds (full 32-day train split, paper window dT=200), self-chaining
 for s in 0 1 2 3 4; do
-  (cd ../.. && sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0) # self-chains
+  sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
 done
-#   -> runs/varnet_mse5_h96_s<seed>/ckpt_<epoch>.pt + metrics.jsonl
-(cd ../.. && sbatch methods/varnet/sbatch/submit_select.sbatch) # -> runs/varnet_*_h96_s*/select_valid.json
+#    and the uncertainty model (aug. head), one seed
+sbatch --job-name=varnet_aughead_s0 methods/varnet/sbatch/submit_aughead_chain.sbatch 0 0
 
-# 3. evaluate on the 7 held-out TEST days
-(cd ../.. && sbatch methods/varnet/sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip) # 4DVarNet
-python3 -m methods.enkf.checks.export_obs_for_enkf --frames 400        # export identical obs for the EnKF
-python3 -m methods.enkf.checks.run_enkf_baseline  --frames 400         # EnKF (apt-ibex) on the SAME obs
-python3 -m methods.enkf.checks.score_enkf                              # score EnKF vs truth
+# 3. choose each run's epoch on the validation split (-> runs/<run>/select_valid.json)
+sbatch --export=ALL,RUNS="mse5_h96_s0 mse5_h96_s1 mse5_h96_s2 mse5_h96_s3 mse5_h96_s4 aughead_obs_h96_s0" \
+  methods/varnet/sbatch/submit_select.sbatch
 
-# 4. figures + comparison + slide deck
-python3 -m compare.plot_reconstruction_enkf --day atc-20130811
-python3 -m methods.enkf.checks.plot_velocity_enkf       --day atc-20130811
-python3 -m compare.compare_channels
-python3 -m compare.plot_compare5
+# 4. evaluate against the other methods on the 7 test days
+python3 supervisor_evaluation/evaluate.py prepare     # package the selected checkpoints
+sbatch supervisor_evaluation/sbatch/full.sbatch
 ```
 
 > **GPU, not the login node.** Anything that touches `torch` (training, evaluation,
-> reconstruction/velocity figures, the deck's table) must run on a GPU node —
-> `sbatch`, or `srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 bash -c '...'`.
-> The pure-map / pure-numpy figures are fine on a compute node too.
+> reconstruction figures) must run on a GPU node — `sbatch`, or
+> `srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 bash -c '...'`.
 
 ---
 
@@ -65,7 +65,7 @@ python3 -m compare.plot_compare5
 | `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/` | verification scripts + all figure/evaluation scripts (see below) |
 | `sbatch/` | SLURM submit scripts |
-| `runs/varnet_mse5_h96_s<seed>/` | the reported model: the seed recorded as `single_model.MSE` in `compare/results/compare5_final.json`, at the epoch in that run's `select_valid.json` (`checks/model_io.py:baseline_ckpt`) |
+| `runs/varnet_mse5_h96_s<seed>/`, `runs/varnet_aughead_obs_h96_s0/` | the runs behind the two final models; the reported epoch is in each run's `select_valid.json` (`checks/model_io.py:reported_ckpt`) |
 | `check_outputs/` | all generated figures & metric JSONs (organised by module; `eval/` = comparison) |
 
 ---
@@ -101,16 +101,17 @@ python3 crowdcore/data/h5_to_grid.py --traj-h5 /tmp/day.h5 --out /tmp/day_corrid
   `vx` = velocity along grid rows (down the corridor), `vy` = along columns (across).
 
 ### Splits — temporal, disjoint, no leakage
-Defined by `data/sunday_atc_{train,valid,test}.lst` (ATC Sundays):
+Defined by `sunday_atc_{train,valid,test}.lst` in the data root (copies in
+`supervisor_evaluation/data_split/`); the full description, and how to use a different
+split, is in the repository [README](../../README.md#dataset-split).
 
 | split | days | date range | used for |
 |---|---|---|---|
-| **train** | 32 | 2012-10-28 → 2013-06-09 | training 4DVarNet |
-| valid | 7 | 2013-06-16 → 2013-07-28 | validation (not in the final comparison) |
-| **test** | 7 | 2013-08-11 → 2013-09-29 | evaluation (4DVarNet **and** EnKF, identical days) |
+| **train** | 32 | 2012-10-28 → 2013-06-09 | training |
+| valid | 7 | 2013-06-16 → 2013-07-28 | choosing each run's epoch and the reported seed |
+| **test** | 7 | 2013-08-11 → 2013-09-29 | the final evaluation, identical days for every method |
 
-Train is strictly earlier than test → past-trains-future, no overlap. Both methods
-are scored on the same held-out test days they never saw in training.
+Train is strictly earlier than validation, validation strictly earlier than test.
 
 ---
 
@@ -157,41 +158,26 @@ srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
 ```
 - Loss: `--loss supervised` = `‖x_rec − X‖²` (paper Eq.14, unweighted MSE). `--no-noise`
   observes without sensor noise.
+- **Aug. head** (`sbatch/submit_aughead_chain.sbatch`): the same network and schedule,
+  with log σ² iterated inside the prior operator G(x) (`aug0`), the observation term of
+  the variational cost replaced by a Gaussian NLL sharing that σ² (`--obs-nll`), and σ²'s
+  update produced by a head of its own that sees `[h, x]` (`--var-head`). Trained with an
+  NLL loss; the reported epoch (90) is chosen on validation like the MSE runs.
 - `metrics.jsonl` logs train loss / blind-zone MSE / R-score / the X0 baseline per epoch.
 
 ---
 
-## Evaluate (fair 4DVarNet vs EnKF)
+## Evaluate
 
-Both methods use the **same test days, observations, noise, frames, metric, and clip
-bounds**, and **neither is initialised from truth** (4DVarNet: obs-based `X0`; EnKF:
-its original random ensemble — the vendored EnKF code in `methods/enkf/enkf_lab/` is left unmodified).
+The reported evaluation is not in this directory: `supervisor_evaluation/evaluate.py`
+scores both 4DVarNet models next to the other methods, with the same test days,
+observations, cell set and clip bounds, and scores the aug. head's σ̂ in physical units
+on the same frames as DINCAE and the EnKF. Neither 4DVarNet model is initialised from
+truth: the solver starts from the observation-filled `X0`.
 
-```bash
-# 4DVarNet — blind-zone & full-state MSE on the 7 test days (clip on to match the EnKF)
-(cd ../.. && sbatch methods/varnet/sbatch/submit_eval.sbatch checks/eval_test_days.py --tag _matched_clip)
-#   -> check_outputs/eval/test_metrics_matched_clip.json
-
-# EnKF — export identical observations, run, score
-python3 -m methods.enkf.checks.export_obs_for_enkf --frames 400   # -> check_outputs/enkf/obs_<day>.npz
-python3 -m methods.enkf.checks.run_enkf_baseline  --frames 400    # -> check_outputs/enkf/est_<day>.npz  (needs the apt-ibex model)
-python3 -m methods.enkf.checks.score_enkf                         # -> check_outputs/eval/enkf_metrics.json
-
-# per-channel × per-region (observed Ω / blind ¬Ω) breakdown
-python3 -m compare.compare_channels                  # -> check_outputs/eval/channel_metrics.json + compare_channels.png
-```
-The EnKF driver lives **in this project** (`methods/enkf/checks/run_enkf_baseline.py`) and imports
-`pedpred.*` from the in-repo copy `methods/enkf/enkf_lab/` via `sys.path`; it does not modify it.
-
----
-
-## Slides
-
-```bash
-```
-The deck **reads every number** from `config.yaml`, the checkpoint's saved `args`, and
-the `check_outputs/eval/*.json` files — nothing is hard-coded in the slide script, so it
-can never drift from what was actually trained/measured.
+For this method alone, `checks/eval_uncertainty.py` (single checkpoint or a seed
+ensemble) and `checks/eval_comprehensive.py` remain for diagnostics; their outputs under
+`check_outputs/eval/` predate the final protocol and are not the reported numbers.
 
 ---
 
@@ -213,23 +199,21 @@ can never drift from what was actually trained/measured.
 
 ## `checks/` — what each script is for
 
-**Evaluation / comparison pipeline** (the results):
-`eval_test_days.py`, `export_obs_for_enkf.py`, `run_enkf_baseline.py`, `score_enkf.py`,
-`compare_channels.py`, `compare/compare5.py` + `compare/plot_compare5.py`
-(the cross-method comparison; `plot_comparison.py`, `plot_speed.py`,
-`plot_frameworks.py` and `plot_meeting.py` were deleted on 2026-09-09 -- their
-figures fed decks that no longer exist),
-`plot_reconstruction_enkf.py` (density + heading arrows), `plot_velocity_enkf.py`
-(speed magnitude + heading arrows),
-`plot_reconstruction_sequence.py` (N consecutive frames as PNGs, optional EnKF panels),
-`rederive_obs_std.py`.
+**Checkpoint selection and evaluation**: `select_checkpoint.py` (epoch on the
+validation split -> `select_valid.json`), `model_io.py` (`reported_ckpt`: resolves the
+selected checkpoint, used by every evaluator), `eval_uncertainty.py`,
+`eval_comprehensive.py`, `eval_sigma_fair.py`, `plot_uncertainty.py`. The reported
+cross-method evaluation is `supervisor_evaluation/evaluate.py`;
+`compare/compare5.py` is the earlier cross-method scorer it reuses for accuracy.
+`plot_reconstruction_sequence.py` draws N consecutive frames as PNGs;
+`rederive_obs_std.py` re-derives the observation-noise std in `config.yaml`.
 
 **Module verification** (the test suite): `check_data_pipeline.py`,
 `check_map_orientation.py`, `check_navigation.py` (A* vs Dijkstra/BFS),
 `check_observation_model.py`, `check_prior_model.py`, `check_variational_solver.py`
 (shape / zero-centre / differentiability).
 
-**Map figures for the deck**: `plot_nav_mask.py` (walkable grid) and
+**Map and architecture figures**: `plot_nav_mask.py` (walkable grid) and
 `plot_obstacle_map.py` (obstacle occupancy). The architecture diagrams come from
 `checks/plot_architecture.py`, drawn from the reported model
 (`checks/model_io.py:baseline_ckpt`). `plot_training_results.py` and
@@ -250,5 +234,3 @@ those decks' notes.
   filesystem (`check_outputs/`, `runs/`, …), not `/tmp`.
 - **Two projects, two `config.py`** — the EnKF driver imports only `pedpred.*` from
   `methods/enkf/enkf_lab/`, never that copy's `config`, to avoid a module-name clash.
-- Reconstruction/velocity figures need the EnKF outputs (`check_outputs/enkf/est_<day>.npz`)
-  to exist first (run the EnKF step before them).

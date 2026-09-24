@@ -232,7 +232,12 @@ The final validation-selected blind-uncertainty configuration is `sp_b2`:
 
 The last line is the validation-selected uncertainty-product calibration.  Omit
 it when the raw ensemble covariance, rather than calibrated reported sigma, is
-required for a subsequent assimilation step.  Output JSON files preserve both
+required for a subsequent assimilation step.
+
+**The final comparison uses `sp_b2` without that last line** — the raw ensemble
+spread, not a recalibrated reported sigma — together with the 5-frame PedPred3
+forecast model, the log1p density-noise space and a cross-channel matrix. The exact
+arguments are built from `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`.  Output JSON files preserve both
 `scores` and `raw_scores_before_report_calibration` so the two cannot be
 silently confused.
 

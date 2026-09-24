@@ -1,42 +1,74 @@
 # methods/enkf — localised ensemble Kalman filter on the ATC crowd field
 
-> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
+> Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring conventions, and where each final model comes from.
 
-The only method here that is **not learned**. It is a filter: a 100-member
-ensemble propagated by the PedPred3 neural surrogate, corrected by a localised
-Kalman analysis on every frame that carries an observation. There is no
-`train.py` and no checkpoint — its "model" is the vendored baseline code plus a
-configuration.
+The one method in the final comparison that is a **filter** rather than a
+reconstruction network: a 100-member ensemble is propagated by a neural forecast
+model and corrected by a localised Kalman analysis on every frame. Its
+uncertainty is the ensemble spread.
 
-## Two copies of the same code, on purpose
+## The final EnKF (row "EnKF" in the results)
+
+| Part | What | Where |
+|---|---|---|
+| Forecast model | PedPred3, 5 frames in → 5 frames out, trained on the 32 training days; epoch 38 chosen on the full validation split | `runs/pedpred3_5to5_clip_s0/dyn150_best.pt` (trained by `lcskf/dynamics/train.py`) |
+| Process noise | **structured**: whole one-step forecast-residual fields sampled from a bank of 8192 built on training days only, scaled per channel, AR(1) in time | `enkf_opt/experiments/build_residual_q_bank.py` |
+| Filter | 100 members, localisation radius 7, inflation 1.02, cross-channel coupling; runs on GPU | `enkf_opt/experiments/eval_structured_q_gpu.py` |
+| Settings | noise scale 1.5, AR(1) ρ 0.5, per-channel and blind-cell noise scales — selected on the validation days | `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`; selection record in `enkf_opt/experiments/outputs/optimization_report.md` |
+
+`supervisor_evaluation/evaluate.py` runs this filter on the seven test days (about
+7 ms per frame on one V100, a few minutes per day), discards a 500-frame warm-up,
+and scores its analysis mean and ensemble spread next to the other methods.
+Both packaged files (`pedpred3_5to5_epoch38.pt`, `enkf_residual_q_bank.npz`) are
+in `supervisor_evaluation/models/`. Retraining commands are in the project
+overview.
+
+The forecast model's first training run diverged at epoch 30 (every iteration
+non-finite from epoch 31); the reported run restarts from that run's epoch-29
+weights with a fresh optimiser, gradient clipping at 1.0 and lr 5e-4, and was
+stopped at epoch 131 of 150 once the validation loss had been flat for ~20
+epochs (`runs/pedpred3_5to5_clip_s0/dyn150_pick.json`).
+
+## Two copies of the original code, on purpose
 
 | Directory | Role |
 |---|---|
 | `enkf_lab/` | **pristine, read-only** byte-for-byte copy of the EnKF baseline from the original `Partial_observation` project, trained surrogate weights included. Files are chmod 444 deliberately. This is the reference. |
-| `enkf_opt/` | the copy we are allowed to modify. Every change must be **bit-identical** to `enkf_lab` on real data — `np.array_equal`, not `np.isclose`. |
+| `enkf_opt/` | the copy we are allowed to modify. Changes to the original filter path must be **bit-identical** to `enkf_lab` on real data — `np.array_equal`, not `np.isclose`. The structured-noise GPU filter above lives in `enkf_opt/experiments/`. |
 
-Verify before trusting any change to `enkf_opt/`:
+Verify before trusting any change to the original path in `enkf_opt/`:
 
 ```bash
 python3 -m methods.enkf.checks.verify_enkf_opt --frames 12
 # [verdict] PASS -- strict path bit-identical: True, unit checks: True
 ```
 
-The optimised copy is ~24x faster than the reference at identical output (and
-~114x with the fast path), which is why it exists at all. Each directory has its
-own README with the details.
+## History: the original filter's ensemble collapse
 
-## Producing the EnKF's results
+The original configuration — the vendored surrogate as forecast model and
+independent Gaussian process noise, run on CPU (`checks/run_enkf_baseline.py`,
+~53 CPU-hours per day, outputs in `check_outputs/enkf_k1_full/`) — has an
+ensemble spread of only about 1% of its actual error, and a nominal 90% interval
+that contains the truth 1.6% of the time. `checks/diag_enkf_spread_growth.py`
+propagates a perturbed ensemble with no injected noise and no analysis: the spread
+decays ~65% per step, verdict `"contractive"`. That forecast model damps
+disagreement between members, so no amount of extra noise or inflation sustains a
+spread.
 
-Two stages, both CPU-only — no GPU accelerates a Kalman analysis. This is
-**slow**: one real day took ~53 CPU-hours in the run that produced
-`check_outputs/enkf_k1_full/`, so submit one job per day and let the seven run in
-parallel. Commands are in the root `README.md` under "Training".
+Two lines answered it:
 
-Outputs land in `check_outputs/enkf_k1_full/` as `obs_<day>.npz` (the simulated
-robot observations) and `est_<day>.npz` (the filter's estimate and ensemble
-spread). Those `.npz` are gitignored; the `.out` logs and timing JSON beside them
-are tracked.
+- **The final EnKF** (above) changes the forecast model and draws the process noise
+  from real forecast residuals, so perturbations carry the spatial and
+  cross-channel structure of actual forecast errors. Its spread no longer collapses;
+  on average it is now slightly too large (spread/RMSE 1.21), mostly on the velocity
+  channels.
+- **[`lcskf/`](lcskf/README.md)**, the learned-covariance sequential Kalman filter,
+  replaces the ensemble covariance with a U-Net-predicted `B = U Uᵀ + diag(d)`. A
+  research line with its own README; **not in the final comparison**.
+
+Numbers in `check_outputs/` and in the `lcskf` README come from earlier scoring
+scripts, not the final evaluation protocol; the final numbers are in the repository
+README.
 
 ## What the checks answer
 
@@ -44,48 +76,7 @@ are tracked.
 |---|---|
 | Is `enkf_opt/` still bit-identical to `enkf_lab/`? | `checks/verify_enkf_opt.py` |
 | Same, for the gain-mode variants | `checks/verify_enkf_gain_mode.py` |
-| Score the exported estimate against ground truth | `checks/score_enkf.py` |
-| Is the ensemble spread a useful uncertainty? (CRPS/NLL/coverage vs a constant-sigma null model) | `checks/eval_uncertainty_enkf.py` |
-| **Why is the ensemble so overconfident?** | `checks/diag_enkf_spread_growth.py` |
-| Where does the wall time go (forecast vs analysis)? | `checks/bench_enkf_split.py`, `checks/bench_enkf_opt.py` |
-| Reconstructed velocity field as a figure | `checks/plot_velocity_enkf.py` |
-
-## The learned-covariance filter that answers it: `lcskf/`
-
-The ensemble-collapse finding below is not fixable by tuning, so
-[`lcskf/`](lcskf/README.md) replaces the ensemble outright: a U-Net predicts the
-background covariance as `B = U Uᵀ + diag(d)` for a neural forecast, and a
-differentiable Kalman analysis turns the pair into a posterior mean and an exact
-posterior diagonal. On the 7-day test split's walkable blind cells it goes from
-the EnKF's **26.0% worse than a constant-σ null** to **28.3% better**.
-
-It shares this directory's vendored PedPred3, its exported observations
-(`check_outputs/enkf_k1_full/obs_*.npz`) and its uncertainty scorer
-(`checks/eval_uncertainty_enkf.py`), which is why it lives here rather than as a
-fifth top-level method. Its own README covers the three training stages, the
-convention-dependent α, and the seven-model single-factor ablation table.
-
-```bash
-# algebra, gradient and shape checks
-python3 -m methods.enkf.lcskf.checks.check_kalman
-# smoke train on CPU, then the real thing
-python3 -m methods.enkf.lcskf.train --allow-cpu --days 1 --max-frames 128 --epochs 1 --batch 8
-sbatch methods/enkf/lcskf/sbatch/submit_lcskf.sbatch train --rank 32 --seed 0
-```
-
-## The ensemble-collapse finding
-
-The EnKF's uncertainty **is** its ensemble spread, and that spread collapses to
-about 0.011 of the actual error. `diag_enkf_spread_growth.py` separates the two
-possible causes by propagating a perturbed ensemble through PedPred3 with no
-injected noise and no analysis step: the spread decays ~65% per step, verdict
-`"contractive"`.
-
-So it is not a tuning problem. A deterministic forecast model can sustain an
-ensemble only if its dynamics *amplify* differences (that is how operational
-weather ensembles work); this one damps them, so no amount of extra process
-noise or inflation fixes it. Corroborating oddity: the EnKF is the only method
-whose **observed** cells score worse than its **blind** cells — the gain is so
-small the filter barely assimilates what it sees.
-
-This is reported as a property of the forward model, not as a bug to fix.
+| Does an ensemble sustain spread, or collapse? | `checks/diag_enkf_spread_growth.py` |
+| Where does the original filter's wall time go? | `checks/bench_enkf_split.py`, `checks/bench_enkf_opt.py` |
+| Score an exported estimate of the original filter | `checks/score_enkf.py`, `checks/eval_uncertainty_enkf.py` |
+| Export the robots' observations in the filter's format | `checks/export_obs_for_enkf.py` (also used by the final evaluation) |

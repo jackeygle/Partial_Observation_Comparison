@@ -2,16 +2,14 @@
 
 > Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring-convention pitfall that decides the ranking, and which checkpoint backs which published number.
 
-**The third method route.** The first two (4DVarNet reproduction + Localized EnKF
-comparison) live in [`../varnet/`](../varnet/). This directory only
-reuses its **data pipeline and observation configuration** (`config.yaml` /
-`observation_model.py` / `navigation.py`), does not depend on any of its
-conclusions, and does not modify any of its lines.
+Two rows of the final six-method comparison come from this directory. It shares only
+the **data pipeline and observation configuration** with the other methods
+(`crowdcore/`), and imports none of them.
 
 Paper: Santos et al., *The Senseiver: attention-based global field reconstruction
 from sparse observations* (NeurIPS ML4PS 2022 workshop; published version Nature MI
 2023). Reference implementation:
-[`../../reference/Senseiver/`](../../reference/Senseiver/) (the official PyTorch
+[`OrchardLANL/Senseiver`](https://github.com/OrchardLANL/Senseiver) (the official PyTorch
 code).
 
 **The goal is to reproduce the paper's method**, not to improve on it first. Every
@@ -22,12 +20,14 @@ reason.
 
 ## Status: this line is closed (2026-09-18)
 
-**The baseline is the deliverable.** Two checkpoints are kept:
+**The baseline is the deliverable.** Two checkpoints are kept, and both are in the
+final comparison evaluated by `supervisor_evaluation/evaluate.py` (numbers in the
+repository [README](../../README.md#results-seven-test-days)):
 
-| checkpoint | what it is |
-|---|---|
-| `runs/senseiver_A/` | faithful reproduction of the paper (variant A); backs the published main-table row, walkable blind RMSE 0.222 |
-| `runs/capacity/base32_k16_s123/` | k=16 G-direct, 60 epochs; the control every experiment below was compared against |
+| checkpoint | row in the final comparison | what it is |
+|---|---|---|
+| `runs/senseiver_A/best.pt` | Senseiver-A | faithful reproduction of the paper (variant A); blind walkable RMSE 0.222 |
+| `runs/capacity/base32_k16_s123/best.pt` | **Senseiver-G (ours)** | grid latent with direct read-out ("G-direct") plus a 16-frame causal observation window (k=16), 60 epochs, seed 123; blind walkable RMSE 0.197, the best of the six methods. The control every experiment below was compared against |
 
 Everything after this section is an **extension that did not beat the baseline**.
 Nothing is pending — the sections are kept as the record of what was tried.
@@ -340,13 +340,12 @@ worth." Without this sentence, the table would be misread.
 
 > **Superseded scope.** This section predates 2026-09-05: it reports MSE over *all
 > 432 cells* (obstacle cells included), a scope the project no longer reports. The
-> authoritative numbers are pooled RMSE over walkable cells -- repo README,
-> "Reproducing the headline comparison", backed by
-> `compare/results/compare5_final.json`. Kept as a record; recompute in the
-> walkable scope before citing any number from it.
+> authoritative numbers are pooled RMSE over walkable cells from
+> `supervisor_evaluation/` (repository README, "Results"). Kept as a record;
+> recompute in the walkable scope before citing any number from it.
 
 > **Unit note.** This section reports **MSE**, under what the main tables now
-> call the `allcells` convention; the root `README.md`'s headline table reports
+> call the `allcells` convention; the final tables report
 > **RMSE**, so the same quantity appears as 0.0284 here and 0.168 there
 > (0.168^2 = 0.0282). Its 4DVarNet rows were produced by `eval_test_days.py`,
 > which was removed on 2026-09-09 in favour of `compare/compare5.py` as the

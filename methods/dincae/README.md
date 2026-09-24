@@ -2,15 +2,23 @@
 
 > Part of [Partial Observation Comparison](../../PROJECT_OVERVIEW.md) — see the project overview for the problem statement, the scoring scope (blind cells inside the walkable region), and which checkpoint backs which published number.
 
-The second technical route. The first (4DVarNet reproduction + EnKF comparison) is
-already complete, in [`../varnet/`](../varnet/); this directory
-**does not depend on its conclusions**, only reuses its data pipeline
-(`observation_model.py` / `navigation.py` / `data_pipeline/`) and the **exact same
-observation configuration**.
+One of the six methods in the final comparison (row "DINCAE"). It shares only the
+data pipeline and the **exact same observation configuration** with the other methods
+(`crowdcore/`), and imports none of them.
+
+**Final model:** `runs/dincae_ff/ckpt_00060.pt`, packaged as
+`supervisor_evaluation/models/dincae_epoch60.pt` together with
+`artifacts/state_stats.npz`. The reported numbers come from
+`supervisor_evaluation/evaluate.py` (see the repository [README](../../README.md)).
+There, DINCAE's σ̂ is scored in **physical units** on the same frames and cells as the
+other probabilistic methods: density, vx and vy map back to Gaussians with σ̂·std, and
+`var`, which is log1p-transformed here, to a shifted log-normal scored with its
+closed-form CRPS. The older `checks/eval_uncertainty_dincae.py` scores σ̂ in this
+directory's normalised space instead; its outputs are kept but superseded.
 
 Papers: Barth et al. 2020 (GMD 13, 1609) = **DINCAE 1.0**; Barth et al. 2022 (GMD 15,
 2183) = **DINCAE 2.0**. Reference implementation:
-[`../../reference/DINCAE.jl`](../../reference/DINCAE.jl) (Julia v2.0.6).
+[`gher-uliege/DINCAE.jl`](https://github.com/gher-uliege/DINCAE.jl) (Julia v2.0.6).
 
 **The goal is to strictly reproduce the paper's method**, not to improve on it
 first. Every place that deviates from the paper is listed below with its reason.
@@ -229,10 +237,9 @@ be reported separately).
 
 ## Gotchas
 
-- **Module-name shadowing**: `methods/varnet` also has a `losses.py`. So scripts in
-  this directory always `sys.path.insert(0, project_root)` before
-  `sys.path.append(methods/varnet)` -- getting the order backwards imports the wrong
-  file.
+- **Module-name shadowing**: `methods/varnet` also has a `losses.py`. Always run code
+  as `python3 -m methods.dincae.<module>` after `source sbatch/_env.sh`
+  (`PYTHONSAFEPATH=1`); a bare script path can import the wrong file.
 - **Changing the encoding means clearing `cache/`.** The cache key includes
   `CACHE_VER` and the observation config, so changing those invalidates it
   automatically; but changing the *contents* of `state_stats.npz` (same day count)

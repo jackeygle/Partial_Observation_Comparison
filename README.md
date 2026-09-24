@@ -105,8 +105,9 @@ and its validation are documented in
 Set in `crowdcore/config.yaml` (`observation:`), identical for every method:
 three robots follow A* routes between random walkable goals, one cell per
 second; a walkable cell is observed at a frame if it is within 7 cells of a
-robot and in line of sight (obstacles from the real ATC map block sight),
-which covers about 62% of the corridor on average. Observations carry
+robot and in line of sight (obstacles from the real ATC map block sight).
+On average about 56% of walkable cells are observed at a frame; the other 44%
+are the blind cells the headline scores are computed on. Observations carry
 per-channel Gaussian noise. Robot routes are seeded by the day's date, so every
 day has its own routes and every script sees the same observations for a day.
 

@@ -1,5 +1,11 @@
 # lcskf — the learned-covariance sequential Kalman filter
 
+> **Not in the final comparison.** A research line kept with its record; the final
+> six-method comparison uses the structured-noise EnKF (see [../README.md](../README.md)).
+> The `dynamics/` training code here is still what produced the final EnKF's PedPred3
+> forecast model. Numbers below come from this directory's own scripts, not the final
+> evaluation protocol.
+
 > Part of [methods/enkf](../README.md). The EnKF next door is a filter with no
 > learned parameters; this is the answer to its one fatal property.
 
