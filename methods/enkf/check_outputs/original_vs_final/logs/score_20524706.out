@@ -1,0 +1,12 @@
+                          RMSE   spread  spread/RMSE     CRPS
+all         original    0.2636   0.0036        0.014   0.1610
+all         final       0.2619   0.3616        1.381   0.1150
+density     original    0.1587   0.0008        0.005   0.0874
+density     final       0.1536   0.1451        0.945   0.0622
+vx          original    0.4271   0.0044        0.010   0.2691
+vx          final       0.4111   0.5898        1.435   0.1947
+vy          original    0.1773   0.0026        0.015   0.1137
+vy          final       0.1780   0.3467        1.948   0.1011
+variance    original    0.1973   0.0050        0.026   0.1740
+variance    final       0.2237   0.1840        0.823   0.1022
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/original_vs_final/comparison.json

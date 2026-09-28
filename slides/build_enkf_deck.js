@@ -113,14 +113,14 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
   title(s, "The problem: the EnKF's uncertainty had collapsed");
   card(s, 0.5, 1.45, 4.1, 3.3);
   s.addText("Ensemble spread (σ̂)", { x: 0.75, y: 1.65, w: 3.6, h: 0.3, fontFace: BODY, fontSize: 12, color: MUTED, margin: 0, isTextBox: true });
-  s.addText("0.0025", { x: 0.75, y: 1.95, w: 3.6, h: 0.7, fontFace: HEAD, fontSize: 36, bold: true, color: RED, margin: 0, isTextBox: true });
+  s.addText(cmp ? fmt(cmp.original.all.spread, 4) : "?", { x: 0.75, y: 1.95, w: 3.6, h: 0.7, fontFace: HEAD, fontSize: 36, bold: true, color: RED, margin: 0, isTextBox: true });
   s.addText("Actual error (RMSE)", { x: 0.75, y: 2.8, w: 3.6, h: 0.3, fontFace: BODY, fontSize: 12, color: MUTED, margin: 0, isTextBox: true });
-  s.addText("0.24", { x: 0.75, y: 3.1, w: 3.6, h: 0.7, fontFace: HEAD, fontSize: 36, bold: true, color: INK, margin: 0, isTextBox: true });
+  s.addText(cmp ? fmt(cmp.original.all.rmse, 2) : "?", { x: 0.75, y: 3.1, w: 3.6, h: 0.7, fontFace: HEAD, fontSize: 36, bold: true, color: INK, margin: 0, isTextBox: true });
   bullets(s, [
     [{ text: "σ̂ is the spread of the 100 members. ", bold: true }, { text: "It was about 1% of the real error: the filter was a hundred times too confident." }],
     [{ text: "So the robots were ignored. ", bold: true }, { text: "The Kalman update moved the estimate only 0.2% of the way towards the observations." }],
   ], { x: 4.95, y: 1.6, w: 4.55, h: 3.0, fontSize: 14, paraSpaceAfter: 14 });
-  foot(s, "Original configuration, test days.", n);
+  foot(s, "Original configuration; seven test days, unobserved walkable cells; spread = RMS ensemble spread.", n);
   s.addNotes("The EnKF's uncertainty is the spread of its 100 members. In the original filter the members almost agreed, so the spread was about 1% of the real error. Because the Kalman update weighs forecast against observations by their uncertainty, a filter that thinks its forecast is perfect ignores the robots: the update moved the estimate by only 0.2% of the gap.");
 }
 
@@ -258,15 +258,15 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
     ["Unobserved cells, 4 channels", "Original", "Final", "Ideal"],
     ["RMSE (lower is better)", fmt(o.rmse), fmt(f.rmse), "—"],
     ["Spread / RMSE", fmt(o.spread_rmse), fmt(f.spread_rmse), "1"],
-    ["CRPS skill (higher is better)", fmt(o.crps_skill), fmt(f.crps_skill), "> 0"],
+    ["CRPS (lower is better)", fmt(o.crps), fmt(f.crps), "—"],
   ], { x: 0.5, y: 1.45, w: 9.0, colW: [3.6, 1.8, 1.8, 1.8], rowH: 0.48 }, 2, "E8EEF5");
   const d = (a, b) => Number((100 * (b - a) / a).toFixed(0));
   bullets(s, [
-    [{ text: "Uncertainty: unusable → usable. ", bold: true, color: TEAL }, { text: `Spread from 1% of the error to ${fmt(f.spread_rmse, 2)}×.` }],
+    [{ text: "Uncertainty: unusable → usable. ", bold: true, color: TEAL }, { text: `Spread from 1% of the error to ${fmt(f.spread_rmse, 2)}× (now somewhat too wide); CRPS ${cmp ? Math.abs(d(o.crps, f.crps)) : "?"}% lower.` }],
     [{ text: "Accuracy kept. ", bold: true, color: TEAL }, { text: `RMSE ${f.rmse <= o.rmse ? "slightly lower" : "slightly higher"}; velocity variance is still ${cmp ? d(cmp.original.variance.rmse, cmp.final.variance.rmse) : "?"}% worse than the original.` }],
   ], { x: 0.5, y: 3.65, w: 9.0, h: 1.2, fontSize: 13 });
-  foot(s, "Seven test days, unobserved walkable cells, four channels; same code, observations and scoring for both.", n);
-  s.addNotes("Both filters run through the same code on the same observations and are scored exactly as in the six-method comparison. The uncertainty goes from unusable to usable: spread from 1% of the error to about 1.0 times it, and CRPS skill from negative, worse than a constant sigma, to positive. Pooled RMSE is slightly lower than the original; velocity variance is still somewhat worse.");
+  foot(s, "Seven test days, unobserved walkable cells, four channels; spread = RMS ensemble spread; same code, observations and scoring for both.", n);
+  s.addNotes("Both filters run through the same code on the same observations and are scored exactly as in the six-method comparison. The uncertainty goes from unusable to usable: spread from about 1% of the error to 1.4 times it, now somewhat too wide, mostly on the velocity channels; CRPS about 29% lower. Pooled RMSE is slightly lower than the original; velocity variance is still somewhat worse.");
 }
 
 // =====================================================================

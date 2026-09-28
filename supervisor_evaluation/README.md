@@ -69,8 +69,9 @@ t-1/t+1 context, complete 4DVarNet windows and the EnKF warmup) and the same cel
 (walkable, not observed at that frame, all four channels), in physical units.
 DINCAE's variance channel is log1p-transformed inside the model, so its physical
 predictive is a shifted log-normal and is scored with the closed-form log-normal
-CRPS; every other channel/method is Gaussian. The null model is each method's
-own N(point, RMSE^2) on the same cells. Output: `raw/uncertainty_unified.json`.
+CRPS; every other channel/method is Gaussian. Reported: CRPS, and spread/RMSE with
+spread = sqrt(mean sigma-hat^2), the usual ensemble definition. Output:
+`raw/uncertainty_unified.json`.
 
 The developer/package-maintainer runs this once after final model selection:
 
@@ -85,7 +86,7 @@ checkpoint elsewhere in `runs/`.
 ## Outputs
 
 The stable supervisor-facing products are `accuracy.csv`, `uncertainty.csv`,
-`calibration.csv`, `inference_time_controlled.csv`, `verification_report.json`, and the
+`uncertainty_by_channel.csv`, `inference_time_controlled.csv`, `verification_report.json`, and the
 summary figures below `figures/`. Method-native per-day JSON files are retained
 below `raw/` for auditability.
 
@@ -97,10 +98,9 @@ run metadata that is kept off the figures themselves.
 
 - `accuracy_rmse` — grouped bars of RMSE per method, pooled and per channel; the
   same numbers are in `accuracy_table.tex` with the best value per column in bold.
-- `uncertainty_summary` — pooled ("All") and per-channel (a) CRPS skill vs. the
-  constant-sigma null and (b) spread/RMSE; the pooled bars carry 95% bootstrap
-  intervals over the seven test days. Per-channel numbers:
-  `uncertainty_by_channel.csv`; interval coverage (not plotted): `calibration.csv`.
+- `uncertainty_summary` — pooled ("All") and per-channel (a) CRPS and (b)
+  spread/RMSE; the pooled bars carry 95% bootstrap intervals over the seven test
+  days. Per-channel numbers: `uncertainty_by_channel.csv`.
 - `inference_latency` — median GPU time per frame per method (bars, log scale).
 
 `images` adds `images/comparison_*.png`, `sample_manifest.csv`,

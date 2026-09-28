@@ -89,8 +89,10 @@ DINCAE needs t±1, 4DVarNet complete 200-frame windows, and the EnKF discards a
 500-frame warm-up), same cells, no clipping. DINCAE's velocity-variance channel
 is log1p-transformed inside the network, so its physical predictive distribution
 is a shifted log-normal and is scored with the closed-form log-normal CRPS
-(`compare/score_uncertainty.py`); everything else is Gaussian. The null model
-for CRPS skill is each method's own N(point, RMSE²) on the same cells.
+(`compare/score_uncertainty.py`); everything else is Gaussian. Two numbers are
+reported: CRPS, and spread/RMSE with spread = √(mean σ̂²), the usual ensemble
+definition (before 2026-09-28 the mean of σ̂ was used, and a CRPS skill against a
+constant-σ reference was reported instead of CRPS).
 
 **Every frame of every test day** is scored; nothing is subsampled. (The first
 400 frames of a day are an almost empty field — about 1/7 of the day's mean
@@ -206,7 +208,7 @@ the final ones:
 - **4DVarNet `aug0` / `vsb0` five-seed deep ensembles** — replaced by the single
   `aughead_obs` model.
 - **Uncertainty scored in DINCAE's normalised space** — coverage is unaffected by
-  that space, but CRPS skill and spread/RMSE are not (log1p compresses the large
+  that space, but CRPS and spread/RMSE are not (log1p compresses the large
   errors, and a constant σ there is a different null model). The final scores are all
   in physical units.
 - **The EnKF "ensemble collapse"** (spread ≈ 1% of the error, coverage 1.6% of a

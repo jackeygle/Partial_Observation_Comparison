@@ -506,50 +506,38 @@ def collect(output_dir: Path) -> None:
             w = csv.DictWriter(f, fields); w.writeheader(); w.writerows(accuracy_rows)
 
     uncertainty_rows = []
-    calibration_rows = []
     up = raw / "uncertainty_unified.json"
     if up.exists():
         doc = json.loads(up.read_text())
         for key in UNCERTAINTY_METHODS:
             r = doc["methods"][key]["results"]
-            metric, base = r["walkable_blind"], r["walkable_blind_constant_sigma_baseline"]
+            metric = r["walkable_blind"]
             uncertainty_rows.append({
                 "method": FINAL_CONFIG[key]["label"], "rmse": metric["rmse"],
-                "crps": metric["crps"], "crps_null": base["crps"],
-                "crps_skill": 1.0 - metric["crps"] / base["crps"],
-                "spread_skill": metric["spread_skill"],
-                "coverage90": metric["coverage"]["90"],
+                "spread": metric["spread"], "spread_rmse": metric["spread_skill"],
+                "crps": metric["crps"],
             })
             if len(doc["methods"][key].get("per_day") or []) >= 2:   # no interval from one day
                 ci = _bootstrap_days(doc["methods"][key]["per_day"])
-                for m in ("crps_skill", "spread_skill"):
+                for m in ("crps", "spread_rmse"):
                     uncertainty_rows[-1][f"{m}_lo"], uncertainty_rows[-1][f"{m}_hi"] = ci[m]
-            for nominal in range(10, 100, 10):
-                calibration_rows.append({
-                    "method": FINAL_CONFIG[key]["label"], "nominal": nominal / 100,
-                    "empirical": metric["coverage"][str(nominal)],
-                })
     channel_rows = []
     if up.exists():
         for key in UNCERTAINTY_METHODS:
             r = doc["methods"][key]["results"]
             for c in CHANNELS:
-                metric, base = r[f"channel_{c}"], r[f"channel_{c}_constant_sigma_baseline"]
+                metric = r[f"channel_{c}"]
                 channel_rows.append({
                     "method": FINAL_CONFIG[key]["label"], "channel": c, "rmse": metric["rmse"],
-                    "crps": metric["crps"], "crps_null": base["crps"],
-                    "crps_skill": 1.0 - metric["crps"] / base["crps"],
-                    "spread_skill": metric["spread_skill"],
-                    "coverage90": metric["coverage"]["90"],
+                    "spread": metric["spread"], "spread_rmse": metric["spread_skill"],
+                    "crps": metric["crps"],
                 })
         with (output_dir / "uncertainty_by_channel.csv").open("w", newline="") as f:
             w = csv.DictWriter(f, list(channel_rows[0])); w.writeheader(); w.writerows(channel_rows)
     if uncertainty_rows:
         with (output_dir / "uncertainty.csv").open("w", newline="") as f:
             w = csv.DictWriter(f, list(uncertainty_rows[0])); w.writeheader(); w.writerows(uncertainty_rows)
-    if calibration_rows:
-        with (output_dir / "calibration.csv").open("w", newline="") as f:
-            w = csv.DictWriter(f, list(calibration_rows[0])); w.writeheader(); w.writerows(calibration_rows)
+    (output_dir / "calibration.csv").unlink(missing_ok=True)   # interval coverage: no longer reported
     timing_rows = []
     import numpy as np
     for key, filename in (("senseiver_a", "senseiver_a_accuracy.json"),
@@ -621,23 +609,23 @@ CHANNEL_TEX = {"density": "Density", "vx": "$v_x$", "vy": "$v_y$", "variance": "
 
 def _bootstrap_days(per_day: list[dict[str, Any]], n_boot: int = 10000,
                     seed: int = 0) -> dict[str, tuple[float, float]]:
-    """95% percentile intervals over test days for the pooled uncertainty ratios.
+    """95% percentile intervals over test days for the pooled CRPS and spread/RMSE.
 
-    Days are resampled with replacement and the pooled ratios recomputed from the
+    Days are resampled with replacement and the pooled values recomputed from the
     per-day sums, so the interval reflects day-to-day variation (7 days), not the
     millions of correlated cells within a day.
     """
     import numpy as np
     n = np.asarray([d["n"] for d in per_day], dtype=np.float64)
     crps = np.asarray([d["crps"] for d in per_day]) * n
-    null = np.asarray([d["crps_null"] for d in per_day]) * n
-    sig = np.asarray([d["sigma_mean"] for d in per_day]) * n
+    var = np.asarray([d["spread"] for d in per_day]) ** 2 * n
     se = np.asarray([d["rmse"] for d in per_day]) ** 2 * n
     idx = np.random.default_rng(seed).integers(0, len(n), (n_boot, len(n)))
-    skill = 1.0 - crps[idx].sum(1) / null[idx].sum(1)
-    ratio = sig[idx].sum(1) / n[idx].sum(1) / np.sqrt(se[idx].sum(1) / n[idx].sum(1))
+    nn = n[idx].sum(1)
+    pooled_crps = crps[idx].sum(1) / nn
+    ratio = np.sqrt(var[idx].sum(1) / nn) / np.sqrt(se[idx].sum(1) / nn)
     q = lambda a: (float(np.percentile(a, 2.5)), float(np.percentile(a, 97.5)))
-    return {"crps_skill": q(skill), "spread_skill": q(ratio)}
+    return {"crps": q(pooled_crps), "spread_rmse": q(ratio)}
 
 
 def plot_summary(output_dir: Path) -> None:
@@ -717,13 +705,13 @@ def plot_summary(output_dir: Path) -> None:
         per_ch = {(r["method"], r["channel"]): r for r in chrows}
         groups = ["All"] + list(CHANNELS)
         glabels = ["All"] + [CHANNEL_TEX[c].replace("Velocity variance", "Vel. var.") for c in CHANNELS]
-        has_ci = all(r.get("crps_skill_lo") not in (None, "") for r in urows)
+        has_ci = all(r.get("crps_lo") not in (None, "") for r in urows)
 
         fig, (ax_c, ax_d) = ps.figure(ncols=2, rows_h=2.6, constrained_layout=True)
         x = np.arange(len(groups)); w = 0.8 / len(names)
         for ax, key, ylabel, ref, letter in (
-                (ax_c, "crps_skill", "CRPS skill (higher is better)", 0.0, "a"),
-                (ax_d, "spread_skill", "Spread / RMSE (1 = right size)", 1.0, "b")):
+                (ax_c, "crps", "CRPS (lower is better)", 0.0, "a"),
+                (ax_d, "spread_rmse", "Spread / RMSE (1 = right size)", 1.0, "b")):
             for i, m in enumerate(names):
                 v = np.array([float(pooled[m][key])] +
                              [float(per_ch[(m, c)][key]) for c in CHANNELS])
@@ -748,11 +736,9 @@ def plot_summary(output_dir: Path) -> None:
         captions.append(
             "**uncertainty_summary** — Predictive uncertainty on unobserved walkable cells, all "
             "methods scored in physical units on common frames; 'All' pools the four channels. "
-            "(a) CRPS skill "
-            "against a constant-sigma null N(point, RMSE²) fitted to the same method and cells "
-            "(per channel: that channel's own RMSE); below 0 the predicted uncertainty is worse "
-            "than a constant. (b) Mean predictive SD / RMSE; dashed line = 1, below it "
-            "under-dispersed. " + ("Error bars on 'All': 95% bootstrap intervals over the "
+            "(a) CRPS in each channel's physical unit (lower is better). (b) Spread / RMSE, "
+            "spread = root-mean-square predictive SD; dashed line = 1, below it the method is "
+            "overconfident. " + ("Error bars on 'All': 95% bootstrap intervals over the "
             f"{len(TEST_DATES)} test days (resampling days). " if has_ci else "") +
             "DINCAE's velocity-variance channel is log-normal in physical units and scored "
             "with the closed-form log-normal CRPS; all other channels are Gaussian.")
@@ -1267,8 +1253,8 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                              are Gaussian with sd * std[c]; var goes through log1p,
                              so its physical predictive is a shifted log-normal
 
-    No physical clipping: the scored distribution is each method's own.  The
-    constant-sigma null model is N(point, RMSE^2) of the same slice and method.
+    No physical clipping: the scored distribution is each method's own.  Reported:
+    RMSE, spread = sqrt(mean sigma^2), spread/RMSE and CRPS.
     Needs the EnKF exports from `full`/`smoke`; writes raw/uncertainty_unified.json.
     """
     import numpy as np
@@ -1311,9 +1297,6 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     keys = ("varnet_aughead", "dincae", "enkf")
     acc = {k: {"walkable_blind": su.Accumulator(),
                **{f"channel_{c}": su.Accumulator() for c in CHANNELS}} for k in keys}
-    # Point-estimate residuals of the scored cells, kept per channel for the null
-    # model, whose sigma (the slice RMSE) is only known after the last day.
-    resid: dict[str, list[list[Any]]] = {k: [[] for _ in CHANNELS] for k in keys}
     per_day = []
     # One accumulator per method and day, for day-level bootstrap intervals.
     day_acc: dict[str, list[Any]] = {k: [] for k in keys}
@@ -1382,8 +1365,6 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
             for k, (family, loc, scale) in parts.items():
                 for a in (acc[k]["walkable_blind"], acc[k][f"channel_{name}"], day_acc[k][-1]):
                     (a.add_lognormal1p if family == "lognormal1p" else a.add)(loc, scale, x)
-                point = np.expm1(loc) if family == "lognormal1p" else loc
-                resid[k][c].append((x - point).astype(np.float32))
         per_day.append({"day": day, "frames": [int(lo), int(hi)],
                         "scored_cells_per_channel": int(sel.sum())})
         print(f"[uncertainty] {day}: frames [{lo}, {hi}), {int(sel.sum())} cells/channel",
@@ -1395,34 +1376,18 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     methods = {}
     for k in keys:
         res = {t: a.result() for t, a in acc[k].items()}
-        slices = {"walkable_blind": [np.concatenate(r) for r in resid[k]]}
-        slices |= {f"channel_{c}": [np.concatenate(resid[k][i])] for i, c in enumerate(CHANNELS)}
-        for t, arrs in slices.items():
-            d = np.concatenate(arrs)
-            sigma0 = float(np.sqrt(np.mean(d.astype(np.float64) ** 2)))
-            null = su.Accumulator()
-            for i in range(0, d.size, 1 << 24):
-                chunk = d[i:i + (1 << 24)]
-                null.add(np.zeros_like(chunk), np.full(chunk.shape, sigma0), chunk)
-            res[f"{t}_constant_sigma_baseline"] = null.result()
-            res[t]["crps_skill"] = 1.0 - res[t]["crps"] / null.result()["crps"]
-        # Per day, scored against the pooled null sigma, so that summing any
-        # subset of days reproduces the pooled ratios (used for bootstrap CIs).
-        sigma0 = res["walkable_blind_constant_sigma_baseline"]["sigma_mean"]
+        # Per-day sums, so that any subset of days reproduces the pooled values
+        # (used for the bootstrap intervals).
         days_out = []
         for d, a in enumerate(day_acc[k]):
             r = a.result()
-            dres = np.concatenate([resid[k][c][d] for c in range(len(CHANNELS))])
-            null = su.Accumulator()
-            null.add(np.zeros_like(dres), np.full(dres.shape, sigma0), dres)
             days_out.append({"day": per_day[d]["day"], "n": r["n"], "crps": r["crps"],
-                             "crps_null": null.result()["crps"], "rmse": r["rmse"],
-                             "sigma_mean": r["sigma_mean"], "coverage": r["coverage"]})
+                             "rmse": r["rmse"], "spread": r["spread"]})
         methods[k] = {"label": FINAL_CONFIG[k]["label"], "results": res, "per_day": days_out}
         r = res["walkable_blind"]
         print(f"[uncertainty] {FINAL_CONFIG[k]['label']:<32} rmse {r['rmse']:.4f}  "
-              f"crps {r['crps']:.4f}  skill {r['crps_skill']:.4f}  "
-              f"sp/sk {r['spread_skill']:.3f}  cov90 {r['coverage'][90]:.3f}", flush=True)
+              f"crps {r['crps']:.4f}  spread {r['spread']:.4f}  "
+              f"spread/rmse {r['spread_skill']:.3f}", flush=True)
 
     doc = {"space": "physical units, all methods",
            "cells": "walkable and not observed at that frame; all four channels pooled",
@@ -1430,7 +1395,6 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
            "families": {"varnet_aughead": "gaussian", "enkf": "gaussian",
                         "dincae": {c: ("log1p-lognormal" if CHANNEL_TRANSFORM[i] == "log1p"
                                        else "gaussian") for i, c in enumerate(CHANNELS)}},
-           "null_model": "N(point, slice RMSE^2), per method and slice",
            "clipping": "none",
            "n_days": len(files), "frames_limit": frames, "per_day": per_day,
            "methods": methods}

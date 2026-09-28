@@ -94,7 +94,7 @@ variance cannot be negative, so the oversized noise was clipped at 0 and pushed 
 variance estimate up (0.23 on unobserved cells against a true 0.015). Keeping the
 bank at its measured size and dropping the per-channel factors that had compensated
 (`--bank-native-std`) lowers CRPS by 13.7% and RMSE by 7.8% on the seven validation
-days, better on every channel, and moves spread/RMSE from 1.23 to 1.03.
+days, better on every channel.
 
 **The bias correction is kept.** The filter keeps the original code's running bias
 estimate, `bias ← 0.95·bias + 0.05·(forecast mean − observation)` at observed cells,
@@ -109,14 +109,17 @@ the original forecast model fed one frame, independent Gaussian noise at 0.01 ×
 localisation, so the differences come from the forecast model, the process noise and
 the cross-channel weights.
 
-| | RMSE | spread/RMSE | CRPS | CRPS skill |
+| | RMSE | spread | spread/RMSE | CRPS |
 |---|---:|---:|---:|---:|
-| original | 0.264 | 0.010 | 0.161 | −0.252 |
-| final | 0.262 | 1.008 | 0.115 | 0.113 |
+| original | 0.264 | 0.004 | 0.014 | 0.161 |
+| final | 0.262 | 0.362 | 1.38 | 0.115 |
 
-The uncertainty goes from unusable to calibrated in size, with the mean as accurate
-as before; velocity variance is still 13% less accurate than in the original
-(RMSE 0.197 → 0.224).
+(spread = root-mean-square ensemble spread over the scored cells.) The uncertainty
+goes from about 1% of the error to somewhat too wide (1.38; per channel density
+0.94, vx 1.43, vy 1.95, velocity variance 0.82), CRPS falls by 29%, and the mean is
+as accurate as before; velocity variance is still 13% less accurate than in the
+original (RMSE 0.197 → 0.224). The noise was not re-tuned for the RMS definition of
+spread (adopted 2026-09-28): the selection used CRPS.
 
 The learned-covariance sequential Kalman filter (LCSKF), a separate answer to the
 same problem with a U-Net-predicted covariance, is **not in the final comparison**;

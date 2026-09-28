@@ -18,9 +18,12 @@ misreading the result):
                   centre" and "wrong width" at once, minimised at the true sigma
                   (a proper scoring rule). Same units as the data; reduces to MAE
                   as sigma -> 0.
-  spread/skill    mean(sigma) / rmse. Looks only at the **average scale**, entirely
-                  blind to which cells sigma actually lands on -- a constant-sigma
-                  null model always scores a perfect 1.00 on this.
+  spread/skill    spread / rmse, with spread = sqrt(mean(sigma^2)) -- the usual
+                  ensemble-forecasting definition (RMS spread against RMS error;
+                  ideal 1). Looks only at the **average scale**, entirely blind to
+                  which cells sigma actually lands on -- a constant-sigma null
+                  model always scores a perfect 1.00 on this. (Until 2026-09-28
+                  this was mean(sigma) / rmse, slightly lower for a varying sigma.)
   coverage        how much truth the nominal z% interval actually contains. The
                   most intuitive one, and what a downstream consumer (a robot's
                   planner) actually needs.
@@ -156,7 +159,7 @@ class Accumulator:
     """
 
     def __init__(self):
-        self.crps = self.nll = self.se = self.sig = 0.0
+        self.crps = self.nll = self.se = self.sig = self.sig2 = 0.0
         self.n = 0
         self.cov = {z: 0 for z in ZS}
 
@@ -166,6 +169,7 @@ class Accumulator:
         self.nll += nll.sum()
         self.se += (err ** 2).sum()
         self.sig += sigma.sum()
+        self.sig2 += (sigma ** 2).sum()
         self.n += err.size
         for z in ZS:
             self.cov[z] += int((r <= norm.ppf(0.5 + z / 200)).sum())
@@ -202,11 +206,13 @@ class Accumulator:
             return None
         rmse = float(np.sqrt(self.se / self.n))
         sig = float(self.sig / self.n)
+        spread = float(np.sqrt(self.sig2 / self.n))
         return {"rmse": rmse,
                 "crps": float(self.crps / self.n),
                 "nll": float(self.nll / self.n),
                 "sigma_mean": sig,
-                "spread_skill": sig / rmse if rmse > 0 else float("nan"),
+                "spread": spread,
+                "spread_skill": spread / rmse if rmse > 0 else float("nan"),
                 "coverage": {z: self.cov[z] / self.n for z in ZS},
                 "n": int(self.n)}
 

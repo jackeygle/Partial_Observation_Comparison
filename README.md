@@ -152,29 +152,24 @@ channel. Giving 4DVarNet an uncertainty output (aug. head) costs accuracy,
 mostly on $v_x$. The EnKF is competitive on density but has by far the largest
 error on velocity variance.
 
-### 2. Uncertainty — does the method know where it is likely to be wrong?
+### 2. Uncertainty — does the method know how wrong it is?
 
 Three methods output, for every cell, not only a value but also an uncertainty
 σ̂ ("I think the density here is 0.5, give or take 0.1"). Two numbers judge
 that σ̂:
 
-**CRPS skill — is σ̂ large where the error is large? Higher is better.** The
-CRPS (continuous ranked probability score) scores a prediction *together with*
-its σ̂ in each cell: it is lowest when the value is right and σ̂ matches how
-wrong the value actually is in that cell. The skill compares this against a
-simple reference that uses the same constant σ everywhere (the method's own
-average error): it knows *how large* errors are on average, but not *where*
-they are.
+**CRPS — the overall score of the prediction with its σ̂. Lower is better.** The
+CRPS (continuous ranked probability score) scores each cell's value *together
+with* its σ̂, in the channel's own unit: it is smallest when the value is right
+and σ̂ matches how wrong the value actually is in that cell. It cannot be improved
+by inflating or shrinking σ̂. Because it also scores the value, a more accurate
+method gets a lower CRPS too; it rates the probabilistic prediction as a whole.
 
-- CRPS skill = 0.275 means 27.5% better than that constant reference.
-- 0 means σ̂ tells you nothing beyond the average error.
-- Below 0 means σ̂ is worse than simply using a constant.
-
-**Spread / RMSE — is σ̂ the right size on average? 1 is ideal.** The average
-predicted σ̂ divided by the actual error. Below 1: the method is overconfident
-(its σ̂ is too small). Above 1: it is too cautious (σ̂ too large). This number
-only checks the average size, not the location — a constant σ scores a perfect
-1 — which is why CRPS skill is the main measure.
+**Spread / RMSE — is σ̂ the right size on average? 1 is ideal.** Spread is the
+root-mean-square of σ̂ over all scored cells, the usual definition for ensemble
+methods; RMSE is the actual error. Below 1: the method is overconfident (σ̂ too
+small). Above 1: it is too cautious (σ̂ too large). This only checks the overall
+size, not whether σ̂ is large in the right cells — that is what CRPS adds.
 
 **The range in brackets (95% interval)** shows how much a number depends on
 which days happened to be the test days: the result is recomputed 10,000 times,
@@ -182,42 +177,43 @@ each time on a random re-draw of the seven test days, and the range contains 95%
 of those results. When two methods' ranges do not overlap, the difference between
 them cannot be explained by which days were used for testing.
 
-| Method | CRPS skill (higher is better) | range over test days | Spread / RMSE (1 is ideal) |
-|---|---|---|---|
-| **DINCAE** | **0.275** | 0.266–0.283 | 0.58 |
-| 4DVarNet (aug. head) | 0.232 | 0.221–0.244 | 0.66 |
-| EnKF | 0.113 | 0.107–0.118 | 1.01 |
+| Method | CRPS (lower is better) | range over test days | Spread / RMSE (1 is ideal) | range over test days |
+|---|---|---|---|---|
+| **DINCAE** | **0.074** | 0.071–0.078 | **0.89** | 0.86–0.93 |
+| 4DVarNet (aug. head) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
+| EnKF | 0.115 | 0.113–0.117 | 1.38 | 1.35–1.42 |
 
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
 
-*How to read the figure:* (a) CRPS skill, (b) spread/RMSE; left group all
-channels together, then one group per channel. The small black bars on the
-"All" group are the 95% ranges above. In (a), a bar below the zero line means
-that channel's σ̂ is worse than a constant; in (b), the dashed line at 1 is the
-ideal size.
+*How to read the figure:* (a) CRPS, (b) spread/RMSE; left group all channels
+together, then one group per channel. The small black bars on the "All" group are
+the 95% ranges above. In (b), the dashed line at 1 is the ideal size.
 
-*What it shows:* DINCAE's σ̂ is the most informative, on every channel, and its
-range does not overlap 4DVarNet's, so the ranking is not down to the choice of
-test days. The two neural networks are overconfident (spread/RMSE 0.58 and
-0.66). The EnKF's σ̂ has the right size on average (1.01) but is the least
-informative of the three; on $v_y$ it is 1.75× too large and worse than a
-constant (bar below zero). Per-channel numbers: `uncertainty_by_channel.csv`.
+*What it shows:* DINCAE has the lowest CRPS, on every channel, and its range does
+not overlap the other two, so the ranking is not down to the choice of test days.
+It is also closest to the right size (0.89, slightly overconfident). 4DVarNet
+(aug. head) and the EnKF are too cautious on average (1.30 and 1.38): for
+4DVarNet this comes almost entirely from velocity variance, where its σ̂ is
+3.3× the error while the other channels are close to 1; for the EnKF from the
+velocity channels ($v_x$ 1.43, $v_y$ 1.95). Per-channel numbers:
+`uncertainty_by_channel.csv`.
 
-#### The math behind the two uncertainty numbers, and why they differ
+#### The math behind the two numbers
 
 For each scored cell $i$ (all cells of all frames, $N$ in total), a method gives a
 value $\mu_i$ and an uncertainty $\hat\sigma_i$; the truth is $x_i$ and the error
 is $e_i = x_i - \mu_i$.
 
-**Spread / RMSE** divides two averages that are computed *separately*:
+**Spread / RMSE** compares two averages that are computed *separately*:
 
 $$
-\text{Spread / RMSE} \;=\; \frac{\dfrac{1}{N}\sum_{i}\hat\sigma_i}{\sqrt{\dfrac{1}{N}\sum_{i} e_i^2}}
+\text{Spread / RMSE} \;=\; \frac{\sqrt{\dfrac{1}{N}\sum_{i}\hat\sigma_i^2}}{\sqrt{\dfrac{1}{N}\sum_{i} e_i^2}}
 $$
 
-The top only looks at the $\hat\sigma_i$, the bottom only at the $e_i$. Which
-$\hat\sigma$ belongs to which error is lost when each is averaged, so this number
-can only say whether σ̂ has the right overall size.
+If σ̂ is exactly right, the expected squared error in each cell is $\hat\sigma_i^2$,
+so the two averages agree and the ratio is 1. Which $\hat\sigma$ belongs to which
+error is lost when each is averaged, so this number can only say whether σ̂ has the
+right overall size.
 
 **CRPS** scores every cell's $\hat\sigma_i$ *against that same cell's* error. For a
 prediction that is a normal distribution $\mathcal{N}(\mu_i, \hat\sigma_i^2)$ it has
@@ -225,7 +221,8 @@ a closed form (Gneiting & Raftery, 2007):
 
 $$
 \text{CRPS}_i \;=\; \hat\sigma_i\left[\, z_i\,\big(2\Phi(z_i)-1\big) + 2\,\varphi(z_i) - \frac{1}{\sqrt{\pi}} \right],
-\qquad z_i = \frac{e_i}{\hat\sigma_i}
+\qquad z_i = \frac{e_i}{\hat\sigma_i},
+\qquad \text{CRPS} = \frac{1}{N}\sum_i \text{CRPS}_i
 $$
 
 where $\Phi$ and $\varphi$ are the standard normal distribution and density
@@ -234,30 +231,21 @@ it: a large error with a tiny $\hat\sigma_i$ is punished hard (overconfident), a
 a large $\hat\sigma_i$ where the error is small is punished too (too cautious).
 When $\hat\sigma_i \to 0$ it becomes the absolute error $|e_i|$. It is a *proper*
 score: a method gets its best expected CRPS only by reporting its honest
-uncertainty, so it cannot be improved by inflating or shrinking σ̂.
-
-**CRPS skill** compares the method's average CRPS with that of a reference that
-keeps the method's own values $\mu_i$ but uses one constant $\sigma = \text{RMSE}$
-in every cell — right on average, blind to where errors are:
-
-$$
-\text{CRPS skill} \;=\; 1 - \frac{\frac{1}{N}\sum_i \text{CRPS}_i(\mu_i, \hat\sigma_i)}{\frac{1}{N}\sum_i \text{CRPS}_i(\mu_i, \text{RMSE})}
-$$
+uncertainty.
 
 **A two-cell example.** Two methods predict the same values, so they have the
 same errors (0 in cell 1, 2 in cell 2), and the same set of σ̂ values — only in
 different cells:
 
-| | cell 1: error 0 | cell 2: error 2 | Spread / RMSE | CRPS skill |
+| | cell 1: error 0 | cell 2: error 2 | Spread / RMSE | CRPS |
 |---|---|---|---|---|
-| Method A: σ̂ | 0.01 | 2 | 0.71 | **+0.26** |
-| Method B: σ̂ | 2 | 0.01 | 0.71 | **−0.51** |
+| Method A: σ̂ | 0.01 | 2 | 1.00 | **0.60** |
+| Method B: σ̂ | 2 | 0.01 | 1.00 | **1.23** |
 
 A says "I am unsure" exactly where it is wrong; B says "I am sure" exactly where
-it is wrong. Spread/RMSE cannot tell them apart, because both have the same
-average σ̂ and the same RMSE. CRPS skill rates A clearly better than the constant
-reference and B clearly worse. This is why CRPS skill is the main uncertainty
-measure and spread/RMSE only a check on overall size.
+it is wrong. Spread/RMSE cannot tell them apart — both are a perfect 1.00. CRPS
+rates A twice as good as B. This is why CRPS is the main uncertainty measure and
+spread/RMSE only a check on overall size.
 
 (DINCAE predicts velocity variance on a log scale, so for that channel its
 prediction is a log-normal rather than a normal distribution; the CRPS then uses

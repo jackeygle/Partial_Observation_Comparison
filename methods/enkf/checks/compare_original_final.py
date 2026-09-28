@@ -10,8 +10,8 @@ exports exactly as supervisor_evaluation/evaluate.py scores the final EnKF:
     in the final comparison (DINCAE needs t+1, 4DVarNet complete 200-frame windows);
   * cells walkable and not observed at that frame, all four channels pooled (and per
     channel);
-  * Gaussian predictive N(mean, spread^2), CRPS skill against N(mean, RMSE^2) of the same
-    version and cells, spread/RMSE, coverage of the central 90% interval.
+  * Gaussian predictive N(mean, spread^2): RMSE, spread = sqrt(mean sigma^2), spread/RMSE
+    and CRPS.
 
 The final version's numbers must reproduce supervisor_evaluation's (checked below).
 
@@ -36,7 +36,6 @@ DT = 200
 
 def score_version(export_dir: str, warmup: int, days=DAYS) -> dict:
     acc = {"all": su.Accumulator(), **{c: su.Accumulator() for c in CHANNELS}}
-    resid = {c: [] for c in CHANNELS}
     for day in days:
         with np.load(os.path.join(export_dir, f"{day}.npz")) as z:
             mean, spread, truth = z["mean"], z["spread"], z["truth"]
@@ -49,22 +48,12 @@ def score_version(export_dir: str, warmup: int, days=DAYS) -> dict:
             mu, sd, x = mean[sl, i][sel], np.maximum(spread[sl, i][sel], 1e-12), truth[sl, i][sel]
             acc["all"].add(mu, sd, x)
             acc[c].add(mu, sd, x)
-            resid[c].append((x - mu).astype(np.float32))
         del mean, spread, truth
     out = {}
     for key, a in acc.items():
         r = a.result()
-        d = np.concatenate([np.concatenate(resid[c]) for c in CHANNELS] if key == "all"
-                           else resid[key])
-        null = su.Accumulator()
-        for j in range(0, d.size, 1 << 24):
-            chunk = d[j:j + (1 << 24)]
-            null.add(np.zeros_like(chunk), np.full(chunk.shape, r["rmse"]), chunk)
-        n_res = null.result()
-        out[key] = {"rmse": r["rmse"], "spread_mean": r["sigma_mean"],
-                    "spread_rmse": r["spread_skill"], "crps": r["crps"],
-                    "crps_null": n_res["crps"], "crps_skill": 1 - r["crps"] / n_res["crps"],
-                    "coverage90": r["coverage"][90], "n": r["n"]}
+        out[key] = {"rmse": r["rmse"], "spread": r["spread"],
+                    "spread_rmse": r["spread_skill"], "crps": r["crps"], "n": r["n"]}
     return out
 
 
@@ -98,12 +87,12 @@ def main() -> None:
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     json.dump(res, open(a.out, "w"), indent=2)
 
-    print(f"{'':12}{'':10}{'RMSE':>8}{'spread':>9}{'spread/RMSE':>13}{'CRPS skill':>12}{'cov90':>8}")
+    print(f"{'':12}{'':10}{'RMSE':>8}{'spread':>9}{'spread/RMSE':>13}{'CRPS':>9}")
     for key in ("all",) + CHANNELS:
         for v in (la, lb):
             r = res[v][key]
-            print(f"{key:12}{v:10}{r['rmse']:8.4f}{r['spread_mean']:9.4f}{r['spread_rmse']:13.3f}"
-                  f"{r['crps_skill']:12.3f}{r['coverage90']:8.3f}")
+            print(f"{key:12}{v:10}{r['rmse']:8.4f}{r['spread']:9.4f}{r['spread_rmse']:13.3f}"
+                  f"{r['crps']:9.4f}")
     print(f"[out] {a.out}")
 
 
