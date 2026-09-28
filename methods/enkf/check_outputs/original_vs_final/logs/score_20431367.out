@@ -1,0 +1,12 @@
+                          RMSE   spread  spread/RMSE  CRPS skill   cov90
+all         original    0.2636   0.0026        0.010      -0.252   0.025
+all         final       0.2828   0.3417        1.208       0.075   0.937
+density     original    0.1587   0.0006        0.004      -0.155   0.040
+density     final       0.1545   0.1258        0.814       0.175   0.920
+vx          original    0.4271   0.0038        0.009      -0.222   0.019
+vx          final       0.4189   0.6849        1.635      -0.036   0.938
+vy          original    0.1773   0.0017        0.009      -0.277   0.019
+vy          final       0.1830   0.3262        1.782      -0.133   0.943
+variance    original    0.1973   0.0043        0.022      -0.584   0.020
+variance    final       0.2951   0.2301        0.780       0.165   0.947
+[out] /scratch/work/zhangx29/Thesis_Project/methods/enkf/check_outputs/original_vs_final/comparison.json

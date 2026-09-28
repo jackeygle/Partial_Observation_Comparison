@@ -1,0 +1,89 @@
+[export] 1 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130616: exported 35127 frames, observed cells/frame mean 202.6
+[done] -> methods/enkf/check_outputs/bias_ema_validation/obs/obs_*.npz
+[residual] 1000/35127, 0.0046 s/frame
+[residual] 2000/35127, 0.0044 s/frame
+[residual] 3000/35127, 0.0043 s/frame
+[residual] 4000/35127, 0.0043 s/frame
+[residual] 5000/35127, 0.0043 s/frame
+[residual] 6000/35127, 0.0043 s/frame
+[residual] 7000/35127, 0.0043 s/frame
+[residual] 8000/35127, 0.0043 s/frame
+[residual] 9000/35127, 0.0043 s/frame
+[residual] 10000/35127, 0.0042 s/frame
+[residual] 11000/35127, 0.0042 s/frame
+[residual] 12000/35127, 0.0042 s/frame
+[residual] 13000/35127, 0.0042 s/frame
+[residual] 14000/35127, 0.0042 s/frame
+[residual] 15000/35127, 0.0042 s/frame
+[residual] 16000/35127, 0.0042 s/frame
+[residual] 17000/35127, 0.0042 s/frame
+[residual] 18000/35127, 0.0042 s/frame
+[residual] 19000/35127, 0.0042 s/frame
+[residual] 20000/35127, 0.0042 s/frame
+[residual] 21000/35127, 0.0042 s/frame
+[residual] 22000/35127, 0.0042 s/frame
+[residual] 23000/35127, 0.0042 s/frame
+[residual] 24000/35127, 0.0042 s/frame
+[residual] 25000/35127, 0.0042 s/frame
+[residual] 26000/35127, 0.0042 s/frame
+[residual] 27000/35127, 0.0042 s/frame
+[residual] 28000/35127, 0.0042 s/frame
+[residual] 29000/35127, 0.0042 s/frame
+[residual] 30000/35127, 0.0042 s/frame
+[residual] 31000/35127, 0.0042 s/frame
+[residual] 32000/35127, 0.0042 s/frame
+[residual] 33000/35127, 0.0042 s/frame
+[residual] 34000/35127, 0.0042 s/frame
+[residual] 35000/35127, 0.0042 s/frame
+[all] RMSE=0.18978 CRPS=0.07956 spread/skill=1.086 cov90=0.795
+[defined_blind] RMSE=0.34549 CRPS=0.13969 spread/skill=0.844 cov90=0.938
+[density] spearman=+0.921 AUSE=0.134
+[vx] spearman=+0.670 AUSE=0.266
+[vy] spearman=+0.665 AUSE=0.379
+[var] spearman=+0.936 AUSE=0.165
+[runtime] 185.92s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/with/atc-20130616.json
+[residual] 1000/35127, 0.0044 s/frame
+[residual] 2000/35127, 0.0043 s/frame
+[residual] 3000/35127, 0.0042 s/frame
+[residual] 4000/35127, 0.0042 s/frame
+[residual] 5000/35127, 0.0041 s/frame
+[residual] 6000/35127, 0.0041 s/frame
+[residual] 7000/35127, 0.0041 s/frame
+[residual] 8000/35127, 0.0042 s/frame
+[residual] 9000/35127, 0.0041 s/frame
+[residual] 10000/35127, 0.0041 s/frame
+[residual] 11000/35127, 0.0041 s/frame
+[residual] 12000/35127, 0.0041 s/frame
+[residual] 13000/35127, 0.0041 s/frame
+[residual] 14000/35127, 0.0041 s/frame
+[residual] 15000/35127, 0.0041 s/frame
+[residual] 16000/35127, 0.0041 s/frame
+[residual] 17000/35127, 0.0041 s/frame
+[residual] 18000/35127, 0.0041 s/frame
+[residual] 19000/35127, 0.0041 s/frame
+[residual] 20000/35127, 0.0041 s/frame
+[residual] 21000/35127, 0.0041 s/frame
+[residual] 22000/35127, 0.0041 s/frame
+[residual] 23000/35127, 0.0041 s/frame
+[residual] 24000/35127, 0.0041 s/frame
+[residual] 25000/35127, 0.0041 s/frame
+[residual] 26000/35127, 0.0041 s/frame
+[residual] 27000/35127, 0.0041 s/frame
+[residual] 28000/35127, 0.0041 s/frame
+[residual] 29000/35127, 0.0041 s/frame
+[residual] 30000/35127, 0.0041 s/frame
+[residual] 31000/35127, 0.0041 s/frame
+[residual] 32000/35127, 0.0041 s/frame
+[residual] 33000/35127, 0.0041 s/frame
+[residual] 34000/35127, 0.0041 s/frame
+[residual] 35000/35127, 0.0041 s/frame
+[all] RMSE=0.24524 CRPS=0.11192 spread/skill=0.935 cov90=0.911
+[defined_blind] RMSE=0.42477 CRPS=0.21137 spread/skill=0.824 cov90=0.928
+[density] spearman=+0.877 AUSE=0.146
+[vx] spearman=+0.776 AUSE=0.281
+[vy] spearman=+0.602 AUSE=0.497
+[var] spearman=+0.883 AUSE=0.162
+[runtime] 180.94s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/without/atc-20130616.json

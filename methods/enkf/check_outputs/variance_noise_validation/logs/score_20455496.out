@@ -1,0 +1,48 @@
+                          RMSE   spread  spread/RMSE  CRPS skill   cov90
+all         baseline    0.2759   0.3403        1.233       0.067   0.937
+all         var040      0.2674   0.3281        1.227       0.062   0.934
+density     baseline    0.1466   0.1217        0.831       0.173   0.922
+density     var040      0.1465   0.1226        0.837       0.173   0.920
+vx          baseline    0.4043   0.6841        1.692      -0.056   0.938
+vx          var040      0.3980   0.6738        1.693      -0.058   0.937
+vy          baseline    0.1818   0.3258        1.792      -0.135   0.943
+vy          var040      0.1788   0.3213        1.797      -0.139   0.942
+variance    baseline    0.2940   0.2293        0.780       0.167   0.947
+variance    var040      0.2722   0.1947        0.715       0.170   0.936
+[out] methods/enkf/check_outputs/variance_noise_validation/var040_vs_baseline.json
+                          RMSE   spread  spread/RMSE  CRPS skill   cov90
+all         baseline    0.2759   0.3403        1.233       0.067   0.937
+all         var020      0.2641   0.3191        1.208       0.061   0.926
+density     baseline    0.1466   0.1217        0.831       0.173   0.922
+density     var020      0.1465   0.1225        0.837       0.175   0.918
+vx          baseline    0.4043   0.6841        1.692      -0.056   0.938
+vx          var020      0.3951   0.6649        1.683      -0.056   0.936
+vy          baseline    0.1818   0.3258        1.792      -0.135   0.943
+vy          var020      0.1774   0.3170        1.787      -0.137   0.941
+variance    baseline    0.2940   0.2293        0.780       0.167   0.947
+variance    var020      0.2644   0.1720        0.651       0.168   0.910
+[out] methods/enkf/check_outputs/variance_noise_validation/var020_vs_baseline.json
+                          RMSE   spread  spread/RMSE  CRPS skill   cov90
+all         baseline    0.2759   0.3403        1.233       0.067   0.937
+all         var010      0.2627   0.3147        1.198       0.060   0.919
+density     baseline    0.1466   0.1217        0.831       0.173   0.922
+density     var010      0.1464   0.1225        0.837       0.175   0.917
+vx          baseline    0.4043   0.6841        1.692      -0.056   0.938
+vx          var010      0.3937   0.6600        1.677      -0.054   0.935
+vy          baseline    0.1818   0.3258        1.792      -0.135   0.943
+vy          var010      0.1767   0.3145        1.780      -0.135   0.941
+variance    baseline    0.2940   0.2293        0.780       0.167   0.947
+variance    var010      0.2615   0.1619        0.619       0.165   0.884
+[out] methods/enkf/check_outputs/variance_noise_validation/var010_vs_baseline.json
+                          RMSE   spread  spread/RMSE  CRPS skill   cov90
+all         baseline    0.2759   0.3403        1.233       0.067   0.937
+all         native      0.2543   0.2626        1.033       0.107   0.915
+density     baseline    0.1466   0.1217        0.831       0.173   0.922
+density     native      0.1458   0.1074        0.737       0.193   0.906
+vx          baseline    0.4043   0.6841        1.692      -0.056   0.938
+vx          native      0.3966   0.4858        1.225       0.072   0.912
+vy          baseline    0.1818   0.3258        1.792      -0.135   0.943
+vy          native      0.1764   0.3111        1.764      -0.128   0.939
+variance    baseline    0.2940   0.2293        0.780       0.167   0.947
+variance    native      0.2213   0.1460        0.660       0.159   0.901
+[out] methods/enkf/check_outputs/variance_noise_validation/native_vs_baseline.json

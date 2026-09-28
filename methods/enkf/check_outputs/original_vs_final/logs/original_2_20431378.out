@@ -1,0 +1,50 @@
+[gaussian] 1000/42890, 0.0036 s/frame
+[gaussian] 2000/42890, 0.0034 s/frame
+[gaussian] 3000/42890, 0.0033 s/frame
+[gaussian] 4000/42890, 0.0033 s/frame
+[gaussian] 5000/42890, 0.0033 s/frame
+[gaussian] 6000/42890, 0.0033 s/frame
+[gaussian] 7000/42890, 0.0033 s/frame
+[gaussian] 8000/42890, 0.0032 s/frame
+[gaussian] 9000/42890, 0.0032 s/frame
+[gaussian] 10000/42890, 0.0032 s/frame
+[gaussian] 11000/42890, 0.0032 s/frame
+[gaussian] 12000/42890, 0.0032 s/frame
+[gaussian] 13000/42890, 0.0032 s/frame
+[gaussian] 14000/42890, 0.0032 s/frame
+[gaussian] 15000/42890, 0.0032 s/frame
+[gaussian] 16000/42890, 0.0032 s/frame
+[gaussian] 17000/42890, 0.0032 s/frame
+[gaussian] 18000/42890, 0.0032 s/frame
+[gaussian] 19000/42890, 0.0032 s/frame
+[gaussian] 20000/42890, 0.0032 s/frame
+[gaussian] 21000/42890, 0.0032 s/frame
+[gaussian] 22000/42890, 0.0032 s/frame
+[gaussian] 23000/42890, 0.0032 s/frame
+[gaussian] 24000/42890, 0.0032 s/frame
+[gaussian] 25000/42890, 0.0032 s/frame
+[gaussian] 26000/42890, 0.0032 s/frame
+[gaussian] 27000/42890, 0.0032 s/frame
+[gaussian] 28000/42890, 0.0032 s/frame
+[gaussian] 29000/42890, 0.0032 s/frame
+[gaussian] 30000/42890, 0.0032 s/frame
+[gaussian] 31000/42890, 0.0032 s/frame
+[gaussian] 32000/42890, 0.0032 s/frame
+[gaussian] 33000/42890, 0.0032 s/frame
+[gaussian] 34000/42890, 0.0032 s/frame
+[gaussian] 35000/42890, 0.0032 s/frame
+[gaussian] 36000/42890, 0.0032 s/frame
+[gaussian] 37000/42890, 0.0032 s/frame
+[gaussian] 38000/42890, 0.0032 s/frame
+[gaussian] 39000/42890, 0.0032 s/frame
+[gaussian] 40000/42890, 0.0032 s/frame
+[gaussian] 41000/42890, 0.0032 s/frame
+[gaussian] 42000/42890, 0.0032 s/frame
+[all] RMSE=0.23516 CRPS=0.14026 spread/skill=0.011 cov90=0.058
+[defined_blind] RMSE=0.36809 CRPS=0.20734 spread/skill=0.004 cov90=0.028
+[density] spearman=+0.617 AUSE=0.590
+[vx] spearman=+0.075 AUSE=0.987
+[vy] spearman=+0.152 AUSE=1.037
+[var] spearman=+0.251 AUSE=0.738
+[runtime] 222.62s on Tesla V100-PCIE-32GB; failures=0
+[out] methods/enkf/check_outputs/original_vs_final/runs/atc-20130825.json

@@ -3,7 +3,7 @@
   "repo_root": "/scratch/work/zhangx29/Thesis_Project",
   "data_root": "/scratch/work/zhangx29/data",
   "python": "3.12.13",
-  "platform": "Linux-5.14.0-687.49.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "platform": "Linux-5.14.0-687.41.1.el9_8.x86_64-x86_64-with-glibc2.34",
   "packages": {
     "numpy": true,
     "scipy": true,
@@ -343,7 +343,16 @@
         36,
         12
       ]
-    }
+    },
+    "test_list": [
+      "20130811",
+      "20130818",
+      "20130825",
+      "20130901",
+      "20130915",
+      "20130922",
+      "20130929"
+    ]
   },
   "errors": [],
   "warnings": []

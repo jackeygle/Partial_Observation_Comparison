@@ -1,0 +1,55 @@
+{
+  "label": "original",
+  "day": "atc-20130811",
+  "frames": 39321,
+  "all": {
+    "absorption": 0.0021184148498199222,
+    "forecast_spread_observed": 0.002473172964528203,
+    "rmse_forecast_observed": 0.2578560294103937,
+    "rmse_analysis_observed": 0.25711540268405125,
+    "error_reduction_observed": 0.0028722490144440505,
+    "rmse_forecast_blind": 0.237963954849544,
+    "rmse_analysis_blind": 0.2379155909373086,
+    "error_reduction_blind": 0.00020324049609099504
+  },
+  "density": {
+    "absorption": -0.0001769877744314956,
+    "forecast_spread_observed": 0.0006317038787528872,
+    "rmse_forecast_observed": 0.16747939854737315,
+    "rmse_analysis_observed": 0.1675176144823124,
+    "error_reduction_observed": -0.00022818290052817325,
+    "rmse_forecast_blind": 0.1450996003546083,
+    "rmse_analysis_blind": 0.14512151003223808,
+    "error_reduction_blind": -0.00015099750499802944
+  },
+  "vx": {
+    "absorption": 0.00042861421329445915,
+    "forecast_spread_observed": 0.0035706234630197287,
+    "rmse_forecast_observed": 0.41906598125945177,
+    "rmse_analysis_observed": 0.418827239270872,
+    "error_reduction_observed": 0.0005697002363739267,
+    "rmse_forecast_blind": 0.3794642252412746,
+    "rmse_analysis_blind": 0.37940395804975674,
+    "error_reduction_blind": 0.00015882180060466933
+  },
+  "vy": {
+    "absorption": 0.0007858027605033138,
+    "forecast_spread_observed": 0.0015098834410309792,
+    "rmse_forecast_observed": 0.16371131449167392,
+    "rmse_analysis_observed": 0.1635675278227044,
+    "error_reduction_observed": 0.0008782940227191061,
+    "rmse_forecast_blind": 0.1594656627602766,
+    "rmse_analysis_blind": 0.1594575803405906,
+    "error_reduction_blind": 5.068438901578709e-05
+  },
+  "variance": {
+    "absorption": 0.018483386684669204,
+    "forecast_spread_observed": 0.004180481191724539,
+    "rmse_forecast_observed": 0.1883929073342372,
+    "rmse_analysis_observed": 0.1849339815025654,
+    "error_reduction_observed": 0.01836017013918223,
+    "rmse_forecast_blind": 0.18981855907666437,
+    "rmse_analysis_blind": 0.18968652471448927,
+    "error_reduction_blind": 0.0006955819431848642
+  }
+}

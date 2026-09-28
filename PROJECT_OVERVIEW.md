@@ -121,10 +121,13 @@ and SHA-256, and `evaluate.py verify` checks them before every run
 | `enkf_residual_q_bank.npz` | `methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz` | 8192 one-step forecast residual fields from the 32 training days |
 
 The EnKF's scalar settings (process-noise scale 1.5, AR(1) persistence 0.5,
-per-channel and blind-cell noise scales, cross-channel matrix, localisation
-radius 7, inflation 1.02) are frozen in `FINAL_CONFIG` at the top of
+blind-cell noise scales, cross-channel matrix, localisation radius 7, inflation
+1.02) are frozen in `FINAL_CONFIG` at the top of
 `supervisor_evaluation/evaluate.py`; they were selected on the validation days
-(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`).
+(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`). The noise
+bank is used at its own measured size (`bank_native_std`), not rescaled to the
+original project's `PROC_STD`; this last change was also chosen on the validation
+days (`methods/enkf/check_outputs/variance_noise_validation/`).
 
 ### Retraining
 
@@ -278,6 +281,8 @@ sbatch/_env.sh            the single environment entry point
 | DINCAE accuracy, σ̂ calibration, variance retention on its own | `methods.dincae.checks.evaluate` |
 | Which epoch of a run to report (validation split) | `methods.varnet.checks.select_checkpoint`, `methods.dincae.checks.select_checkpoint` |
 | Why did the original EnKF collapse? | `methods.enkf.checks.diag_proc_scale_sweep` |
+| Original vs final EnKF, scored identically | `methods.enkf.checks.compare_original_final` |
+| How much the Kalman update moves the EnKF towards the observations | `methods.enkf.checks.kalman_contribution` |
 | A reconstructed field as a picture, all methods | `supervisor_evaluation/evaluate.py images` (100 matched frames) |
 
 All take `--help`. The earlier diagnostics (solver checks, pipeline traces, EnKF

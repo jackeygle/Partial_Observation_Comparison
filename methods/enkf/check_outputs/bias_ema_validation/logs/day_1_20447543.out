@@ -1,0 +1,99 @@
+[export] 1 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130623: exported 40620 frames, observed cells/frame mean 200.3
+[done] -> methods/enkf/check_outputs/bias_ema_validation/obs/obs_*.npz
+[residual] 1000/40620, 0.0047 s/frame
+[residual] 2000/40620, 0.0045 s/frame
+[residual] 3000/40620, 0.0044 s/frame
+[residual] 4000/40620, 0.0043 s/frame
+[residual] 5000/40620, 0.0044 s/frame
+[residual] 6000/40620, 0.0044 s/frame
+[residual] 7000/40620, 0.0044 s/frame
+[residual] 8000/40620, 0.0044 s/frame
+[residual] 9000/40620, 0.0044 s/frame
+[residual] 10000/40620, 0.0044 s/frame
+[residual] 11000/40620, 0.0044 s/frame
+[residual] 12000/40620, 0.0044 s/frame
+[residual] 13000/40620, 0.0044 s/frame
+[residual] 14000/40620, 0.0044 s/frame
+[residual] 15000/40620, 0.0044 s/frame
+[residual] 16000/40620, 0.0044 s/frame
+[residual] 17000/40620, 0.0044 s/frame
+[residual] 18000/40620, 0.0044 s/frame
+[residual] 19000/40620, 0.0044 s/frame
+[residual] 20000/40620, 0.0044 s/frame
+[residual] 21000/40620, 0.0044 s/frame
+[residual] 22000/40620, 0.0044 s/frame
+[residual] 23000/40620, 0.0044 s/frame
+[residual] 24000/40620, 0.0044 s/frame
+[residual] 25000/40620, 0.0043 s/frame
+[residual] 26000/40620, 0.0043 s/frame
+[residual] 27000/40620, 0.0043 s/frame
+[residual] 28000/40620, 0.0043 s/frame
+[residual] 29000/40620, 0.0043 s/frame
+[residual] 30000/40620, 0.0043 s/frame
+[residual] 31000/40620, 0.0043 s/frame
+[residual] 32000/40620, 0.0043 s/frame
+[residual] 33000/40620, 0.0043 s/frame
+[residual] 34000/40620, 0.0043 s/frame
+[residual] 35000/40620, 0.0043 s/frame
+[residual] 36000/40620, 0.0043 s/frame
+[residual] 37000/40620, 0.0043 s/frame
+[residual] 38000/40620, 0.0043 s/frame
+[residual] 39000/40620, 0.0043 s/frame
+[residual] 40000/40620, 0.0043 s/frame
+[all] RMSE=0.19030 CRPS=0.07822 spread/skill=1.075 cov90=0.794
+[defined_blind] RMSE=0.35101 CRPS=0.13588 spread/skill=0.787 cov90=0.935
+[density] spearman=+0.928 AUSE=0.122
+[vx] spearman=+0.674 AUSE=0.252
+[vy] spearman=+0.676 AUSE=0.334
+[var] spearman=+0.942 AUSE=0.155
+[runtime] 235.26s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/with/atc-20130623.json
+[residual] 1000/40620, 0.0046 s/frame
+[residual] 2000/40620, 0.0045 s/frame
+[residual] 3000/40620, 0.0044 s/frame
+[residual] 4000/40620, 0.0044 s/frame
+[residual] 5000/40620, 0.0044 s/frame
+[residual] 6000/40620, 0.0044 s/frame
+[residual] 7000/40620, 0.0044 s/frame
+[residual] 8000/40620, 0.0043 s/frame
+[residual] 9000/40620, 0.0043 s/frame
+[residual] 10000/40620, 0.0043 s/frame
+[residual] 11000/40620, 0.0043 s/frame
+[residual] 12000/40620, 0.0043 s/frame
+[residual] 13000/40620, 0.0043 s/frame
+[residual] 14000/40620, 0.0043 s/frame
+[residual] 15000/40620, 0.0043 s/frame
+[residual] 16000/40620, 0.0043 s/frame
+[residual] 17000/40620, 0.0043 s/frame
+[residual] 18000/40620, 0.0043 s/frame
+[residual] 19000/40620, 0.0043 s/frame
+[residual] 20000/40620, 0.0043 s/frame
+[residual] 21000/40620, 0.0043 s/frame
+[residual] 22000/40620, 0.0043 s/frame
+[residual] 23000/40620, 0.0043 s/frame
+[residual] 24000/40620, 0.0043 s/frame
+[residual] 25000/40620, 0.0043 s/frame
+[residual] 26000/40620, 0.0043 s/frame
+[residual] 27000/40620, 0.0043 s/frame
+[residual] 28000/40620, 0.0043 s/frame
+[residual] 29000/40620, 0.0043 s/frame
+[residual] 30000/40620, 0.0043 s/frame
+[residual] 31000/40620, 0.0043 s/frame
+[residual] 32000/40620, 0.0043 s/frame
+[residual] 33000/40620, 0.0043 s/frame
+[residual] 34000/40620, 0.0043 s/frame
+[residual] 35000/40620, 0.0043 s/frame
+[residual] 36000/40620, 0.0043 s/frame
+[residual] 37000/40620, 0.0043 s/frame
+[residual] 38000/40620, 0.0043 s/frame
+[residual] 39000/40620, 0.0043 s/frame
+[residual] 40000/40620, 0.0043 s/frame
+[all] RMSE=0.24480 CRPS=0.11116 spread/skill=0.935 cov90=0.913
+[defined_blind] RMSE=0.43140 CRPS=0.21260 spread/skill=0.789 cov90=0.928
+[density] spearman=+0.887 AUSE=0.135
+[vx] spearman=+0.781 AUSE=0.273
+[vy] spearman=+0.615 AUSE=0.470
+[var] spearman=+0.891 AUSE=0.154
+[runtime] 228.19s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/without/atc-20130623.json

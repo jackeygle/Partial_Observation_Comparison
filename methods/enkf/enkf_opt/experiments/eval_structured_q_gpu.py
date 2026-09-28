@@ -233,8 +233,9 @@ class OnlineForecastCalibrator:
 
 class TorchEnKF:
     def __init__(self, model, ensemble, obs_std, radius, seed, device,
-                 cross_channel_matrix, input_frames=1):
+                 cross_channel_matrix, input_frames=1, bias_ema=True):
         self.model = model
+        self.bias_ema = bool(bias_ema)
         self.n = ensemble
         self.radius = radius
         self.device = device
@@ -277,7 +278,8 @@ class TorchEnKF:
         nz = obs_bias != 0
         # obs_idx is unique for this observation generator, so direct indexed EMA matches scatter.
         idx = obs_idx[nz]
-        self.bias[idx] = 0.95 * self.bias[idx] + 0.05 * obs_bias[nz]
+        if self.bias_ema:           # off: self.bias stays zero, the forecast is not debiased
+            self.bias[idx] = 0.95 * self.bias[idx] + 0.05 * obs_bias[nz]
         xa0 = xf - xm
         ya = yf - ym
         rdiag = self.obs_std[obs_idx].square()
@@ -380,6 +382,12 @@ def main():
     ap.add_argument("--forecast-calibration-channels", type=int, nargs=4,
                     default=(1, 1, 1, 1), metavar="ON",
                     help="four 0/1 switches for density, vx, vy and variance")
+    ap.add_argument("--bank-native-std", action="store_true",
+                    help="keep the residual bank's own per-channel size instead of rescaling "
+                         "it to PROC_STD (off by default, as in every earlier run)")
+    ap.add_argument("--no-bias-ema", action="store_true",
+                    help="switch off the per-cell EMA of (forecast mean - observation) that is "
+                         "subtracted from every forecast; on by default, as in the original filter")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     if not torch.cuda.is_available():
@@ -421,7 +429,7 @@ def main():
     if not np.isfinite(cross).all() or (cross < 0).any() or (cross > 1).any():
         raise ValueError("cross-channel matrix entries must be finite and in [0, 1]")
     filt = TorchEnKF(model, a.ensemble, obs_std, a.radius, a.seed, device, cross,
-                     input_frames=a.input_frames)
+                     input_frames=a.input_frames, bias_ema=not a.no_bias_ema)
     noise_gen = torch.Generator(device=device).manual_seed(a.seed + 104729)
     bank = None
     bank_bins = None
@@ -434,13 +442,18 @@ def main():
             bank_context = (z["forecast_density_mean"].astype(np.float32)
                             if a.residual_conditioning == "density4" else None)
         b4 = b.reshape(len(b), F, TOTAL)
-        b4 *= (np.asarray(PROC_STD, np.float32) /
-               np.maximum(b4.std(axis=(0, 2)), 1e-12))[None, :, None]
+        # Default: every channel is rescaled to PROC_STD, so the bank sets the noise's
+        # structure and PROC_STD its size. --bank-native-std keeps the bank's own size,
+        # i.e. the forecast model's measured one-step error.
+        if not a.bank_native_std:
+            b4 *= (np.asarray(PROC_STD, np.float32) /
+                   np.maximum(b4.std(axis=(0, 2)), 1e-12))[None, :, None]
         if density_log is not None:
             if density_log.shape != (len(b), TOTAL):
                 raise ValueError(f"unexpected density log-residual shape {density_log.shape}")
-            density_log *= np.float32(PROC_STD[0] / max(
-                density_log.std(dtype=np.float64), 1e-12))
+            if not a.bank_native_std:
+                density_log *= np.float32(PROC_STD[0] / max(
+                    density_log.std(dtype=np.float64), 1e-12))
             b4[:, 0] = density_log
         bank = torch.from_numpy(b).to(device)
         if bank_context is not None:
@@ -614,7 +627,7 @@ def main():
                                                   a.warmup, scores)
                         if a.density_calibration_grid else None)
     result = {"config": vars(a), "backend": "torch_cuda", "fix_localization": True,
-              "bias_ema": True, "inflation": 1.02, "proc_std": list(PROC_STD),
+              "bias_ema": not a.no_bias_ema, "bank_native_std": a.bank_native_std, "inflation": 1.02, "proc_std": list(PROC_STD),
               "frames_used": T, "n_analysis_failures": failures,
               "seconds": round(time.time() - t0, 2),
               "inference_seconds": inference_seconds,

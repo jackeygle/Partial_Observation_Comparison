@@ -1,0 +1,95 @@
+[export] 1 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130707: exported 38437 frames, observed cells/frame mean 202.1
+[done] -> methods/enkf/check_outputs/bias_ema_validation/obs/obs_*.npz
+[residual] 1000/38437, 0.0046 s/frame
+[residual] 2000/38437, 0.0044 s/frame
+[residual] 3000/38437, 0.0043 s/frame
+[residual] 4000/38437, 0.0042 s/frame
+[residual] 5000/38437, 0.0042 s/frame
+[residual] 6000/38437, 0.0042 s/frame
+[residual] 7000/38437, 0.0042 s/frame
+[residual] 8000/38437, 0.0042 s/frame
+[residual] 9000/38437, 0.0042 s/frame
+[residual] 10000/38437, 0.0042 s/frame
+[residual] 11000/38437, 0.0042 s/frame
+[residual] 12000/38437, 0.0042 s/frame
+[residual] 13000/38437, 0.0042 s/frame
+[residual] 14000/38437, 0.0042 s/frame
+[residual] 15000/38437, 0.0042 s/frame
+[residual] 16000/38437, 0.0042 s/frame
+[residual] 17000/38437, 0.0042 s/frame
+[residual] 18000/38437, 0.0042 s/frame
+[residual] 19000/38437, 0.0042 s/frame
+[residual] 20000/38437, 0.0042 s/frame
+[residual] 21000/38437, 0.0042 s/frame
+[residual] 22000/38437, 0.0042 s/frame
+[residual] 23000/38437, 0.0042 s/frame
+[residual] 24000/38437, 0.0042 s/frame
+[residual] 25000/38437, 0.0042 s/frame
+[residual] 26000/38437, 0.0042 s/frame
+[residual] 27000/38437, 0.0042 s/frame
+[residual] 28000/38437, 0.0042 s/frame
+[residual] 29000/38437, 0.0042 s/frame
+[residual] 30000/38437, 0.0042 s/frame
+[residual] 31000/38437, 0.0042 s/frame
+[residual] 32000/38437, 0.0042 s/frame
+[residual] 33000/38437, 0.0042 s/frame
+[residual] 34000/38437, 0.0042 s/frame
+[residual] 35000/38437, 0.0042 s/frame
+[residual] 36000/38437, 0.0042 s/frame
+[residual] 37000/38437, 0.0042 s/frame
+[residual] 38000/38437, 0.0042 s/frame
+[all] RMSE=0.19488 CRPS=0.08049 spread/skill=1.058 cov90=0.795
+[defined_blind] RMSE=0.35812 CRPS=0.14618 spread/skill=0.842 cov90=0.937
+[density] spearman=+0.924 AUSE=0.127
+[vx] spearman=+0.680 AUSE=0.255
+[vy] spearman=+0.669 AUSE=0.372
+[var] spearman=+0.937 AUSE=0.135
+[runtime] 201.16s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/with/atc-20130707.json
+[residual] 1000/38437, 0.0045 s/frame
+[residual] 2000/38437, 0.0043 s/frame
+[residual] 3000/38437, 0.0042 s/frame
+[residual] 4000/38437, 0.0042 s/frame
+[residual] 5000/38437, 0.0042 s/frame
+[residual] 6000/38437, 0.0042 s/frame
+[residual] 7000/38437, 0.0042 s/frame
+[residual] 8000/38437, 0.0041 s/frame
+[residual] 9000/38437, 0.0041 s/frame
+[residual] 10000/38437, 0.0041 s/frame
+[residual] 11000/38437, 0.0041 s/frame
+[residual] 12000/38437, 0.0041 s/frame
+[residual] 13000/38437, 0.0041 s/frame
+[residual] 14000/38437, 0.0041 s/frame
+[residual] 15000/38437, 0.0041 s/frame
+[residual] 16000/38437, 0.0041 s/frame
+[residual] 17000/38437, 0.0041 s/frame
+[residual] 18000/38437, 0.0041 s/frame
+[residual] 19000/38437, 0.0041 s/frame
+[residual] 20000/38437, 0.0041 s/frame
+[residual] 21000/38437, 0.0041 s/frame
+[residual] 22000/38437, 0.0041 s/frame
+[residual] 23000/38437, 0.0041 s/frame
+[residual] 24000/38437, 0.0041 s/frame
+[residual] 25000/38437, 0.0041 s/frame
+[residual] 26000/38437, 0.0041 s/frame
+[residual] 27000/38437, 0.0041 s/frame
+[residual] 28000/38437, 0.0041 s/frame
+[residual] 29000/38437, 0.0041 s/frame
+[residual] 30000/38437, 0.0041 s/frame
+[residual] 31000/38437, 0.0041 s/frame
+[residual] 32000/38437, 0.0041 s/frame
+[residual] 33000/38437, 0.0041 s/frame
+[residual] 34000/38437, 0.0041 s/frame
+[residual] 35000/38437, 0.0041 s/frame
+[residual] 36000/38437, 0.0041 s/frame
+[residual] 37000/38437, 0.0041 s/frame
+[residual] 38000/38437, 0.0041 s/frame
+[all] RMSE=0.24678 CRPS=0.11190 spread/skill=0.929 cov90=0.912
+[defined_blind] RMSE=0.43195 CRPS=0.21534 spread/skill=0.830 cov90=0.929
+[density] spearman=+0.878 AUSE=0.146
+[vx] spearman=+0.788 AUSE=0.271
+[vy] spearman=+0.608 AUSE=0.489
+[var] spearman=+0.885 AUSE=0.146
+[runtime] 198.96s on NVIDIA A100-SXM4-80GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/without/atc-20130707.json

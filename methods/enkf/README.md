@@ -12,9 +12,9 @@ uncertainty is the ensemble spread.
 | Part | What | Where |
 |---|---|---|
 | Forecast model | PedPred3, 5 frames in → 5 frames out, trained on the 32 training days; epoch 38 chosen on the full validation split | `runs/pedpred3_5to5_clip_s0/dyn150_best.pt` (trained by `lcskf/dynamics/train.py`) |
-| Process noise | **structured**: whole one-step forecast-residual fields sampled from a bank of 8192 built on training days only, scaled per channel, AR(1) in time | `enkf_opt/experiments/build_residual_q_bank.py` |
+| Process noise | **structured**: whole one-step forecast-residual fields sampled from a bank of 8192 built on training days only and mean-centred; used at the bank's own measured size ×1.5, AR(1) in time, larger on cells no robot currently sees; density perturbed in log1p space | `enkf_opt/experiments/build_residual_q_bank.py` |
 | Filter | 100 members, localisation radius 7, inflation 1.02, cross-channel coupling; runs on GPU | `enkf_opt/experiments/eval_structured_q_gpu.py` |
-| Settings | noise scale 1.5, AR(1) ρ 0.5, per-channel and blind-cell noise scales — selected on the validation days | `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`; selection record in `enkf_opt/experiments/outputs/optimization_report.md` |
+| Settings | noise scale 1.5, AR(1) ρ 0.5, blind-cell noise scales (1, 1.25, 1.4, 0.93), bank at its measured size (`bank_native_std`) — selected on the validation days | `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`; selection record in `enkf_opt/experiments/outputs/optimization_report.md` |
 
 `supervisor_evaluation/evaluate.py` runs this filter on the seven test days (about
 7 ms per frame on one V100, a few minutes per day), discards a 500-frame warm-up,
@@ -42,6 +42,10 @@ epochs (`runs/pedpred3_5to5_clip_s0/dyn150_pick.json`).
 | `checks/export_obs_for_enkf.py` | writes the robots' observations in the filter's format (used by the final evaluation) |
 | `checks/diag_proc_scale_sweep.py` | the collapse diagnosis: the original filter with only its noise multiplier changed |
 | `check_outputs/eval/proc_scale_*.json` | its results |
+| `checks/compare_original_final.py` | the original and the final filter scored identically on the test days → `check_outputs/original_vs_final/comparison.json` |
+| `checks/kalman_contribution.py` | how far the Kalman update moves the ensemble towards the observations → `check_outputs/kalman_contribution/` |
+| `check_outputs/bias_ema_validation/`, `check_outputs/variance_noise_validation/` | validation-day checks: bias correction on/off; noise at borrowed vs measured size |
+| `sbatch/` | the jobs that produced the four `check_outputs/` directories above |
 | `runs/pedpred3_5to5_clip_s0/`, `runs/pedpred3_5to5_s0/` | training logs of the forecast model (checkpoints gitignored) |
 
 The original read-only baseline copy (`enkf_lab/`), the bit-identity checks and
@@ -51,7 +55,7 @@ experiment are in the git tag `archive-full-2026-09-24`.
 ## History: the original filter's ensemble collapse, and what fixed it
 
 The original configuration — the vendored surrogate as forecast model and
-independent Gaussian process noise, run on CPU (~53 CPU-hours per day) — has an
+independent Gaussian process noise, run on CPU (~50 hours per day on 4 cores) — has an
 ensemble spread of only about 1% of its actual error, and a nominal 90% interval
 that contains the truth 1.6% of the time.
 
@@ -82,6 +86,32 @@ cross-channel structure of real errors: on seven full test days this lowers CRPS
 by 17.6% against full-strength Gaussian noise, on every day, and turns the vx
 spread–error correlation from −0.20 to +0.31. The noise scales were then tuned on
 validation days (`optimization_report.md`).
+
+**Noise size: the model's own measured error.** The bank was at first rescaled per
+channel to `PROC_STD`, which was measured for the original project's forecast model.
+For velocity variance that was about 4× the retrained model's real one-step error;
+variance cannot be negative, so the oversized noise was clipped at 0 and pushed the
+variance estimate up (0.23 on unobserved cells against a true 0.015). Keeping the
+bank at its measured size and dropping the per-channel factors that had compensated
+(`--bank-native-std`) lowers CRPS by 13.7% and RMSE by 7.8% on the seven validation
+days, better on every channel, and moves spread/RMSE from 1.23 to 1.03.
+
+**The bias correction is kept.** The filter keeps the original code's running bias
+estimate, `bias ← 0.95·bias + 0.05·(forecast mean − observation)` at observed cells,
+subtracted in the forecast. It is not textbook EnKF, but switching it off
+(`--no-bias-ema`) makes RMSE 25% worse on the validation days.
+
+**Original vs final, scored identically** (seven test days, unobserved walkable
+cells, four channels pooled; `checks/compare_original_final.py`):
+
+| | RMSE | spread/RMSE | CRPS | CRPS skill |
+|---|---:|---:|---:|---:|
+| original | 0.264 | 0.010 | 0.161 | −0.252 |
+| final | 0.262 | 1.008 | 0.115 | 0.113 |
+
+The uncertainty goes from unusable to calibrated in size, with the mean as accurate
+as before; velocity variance is still 13% less accurate than in the original
+(RMSE 0.197 → 0.224).
 
 The learned-covariance sequential Kalman filter (LCSKF), a separate answer to the
 same problem with a U-Net-predicted covariance, is **not in the final comparison**;

@@ -217,6 +217,9 @@ ensemble-space Kalman solve on GPU.  The principal uncertainty controls are:
 - `--scale`: common residual-Q scale;
 - `--temporal-rho`: variance-normalized AR(1) persistence;
 - `--channel-scales density vx vy variance`: global per-channel Q scale;
+- `--bank-native-std`: keep the residual bank at its own measured per-channel size
+  instead of rescaling it to `PROC_STD` (the original project's values);
+- `--no-bias-ema`: switch off the running bias correction (for the ablation only);
 - `--blind-channel-scales density vx vy variance`: an extra multiplier only on
   currently unobserved cells inside the fixed walkable map.
 - `--density-report-gain`, `--density-report-threshold` and
@@ -241,9 +244,13 @@ The last line is the validation-selected uncertainty-product calibration.  Omit
 it when the raw ensemble covariance, rather than calibrated reported sigma, is
 required for a subsequent assimilation step.
 
-**The final comparison uses `sp_b2` without that last line** — the raw ensemble
-spread, not a recalibrated reported sigma — together with the 5-frame PedPred3
-forecast model, the log1p density-noise space and a cross-channel matrix. The exact
+**The final comparison is `sp_b2` without that last line and with one later
+change**: the bank is kept at its measured size (`--bank-native-std`) and the
+per-channel scales become `1 1 1 1`, because `PROC_STD` belongs to the original
+forecast model and made the velocity-variance noise several times too large (chosen
+on the validation days, `../check_outputs/variance_noise_validation/`). It uses the
+raw ensemble spread, not a recalibrated reported sigma, together with the 5-frame
+PedPred3 forecast model, the log1p density-noise space and a cross-channel matrix. The exact
 arguments are built from `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`.  Output JSON files preserve both
 `scores` and `raw_scores_before_report_calibration` so the two cannot be
 silently confused.

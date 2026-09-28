@@ -1,0 +1,99 @@
+[export] 1 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130714: exported 40457 frames, observed cells/frame mean 202.1
+[done] -> methods/enkf/check_outputs/bias_ema_validation/obs/obs_*.npz
+[residual] 1000/40457, 0.0075 s/frame
+[residual] 2000/40457, 0.0072 s/frame
+[residual] 3000/40457, 0.0072 s/frame
+[residual] 4000/40457, 0.0071 s/frame
+[residual] 5000/40457, 0.0071 s/frame
+[residual] 6000/40457, 0.0071 s/frame
+[residual] 7000/40457, 0.0071 s/frame
+[residual] 8000/40457, 0.0071 s/frame
+[residual] 9000/40457, 0.0070 s/frame
+[residual] 10000/40457, 0.0070 s/frame
+[residual] 11000/40457, 0.0070 s/frame
+[residual] 12000/40457, 0.0070 s/frame
+[residual] 13000/40457, 0.0070 s/frame
+[residual] 14000/40457, 0.0070 s/frame
+[residual] 15000/40457, 0.0070 s/frame
+[residual] 16000/40457, 0.0070 s/frame
+[residual] 17000/40457, 0.0070 s/frame
+[residual] 18000/40457, 0.0070 s/frame
+[residual] 19000/40457, 0.0070 s/frame
+[residual] 20000/40457, 0.0070 s/frame
+[residual] 21000/40457, 0.0070 s/frame
+[residual] 22000/40457, 0.0070 s/frame
+[residual] 23000/40457, 0.0070 s/frame
+[residual] 24000/40457, 0.0070 s/frame
+[residual] 25000/40457, 0.0070 s/frame
+[residual] 26000/40457, 0.0070 s/frame
+[residual] 27000/40457, 0.0070 s/frame
+[residual] 28000/40457, 0.0070 s/frame
+[residual] 29000/40457, 0.0070 s/frame
+[residual] 30000/40457, 0.0070 s/frame
+[residual] 31000/40457, 0.0070 s/frame
+[residual] 32000/40457, 0.0070 s/frame
+[residual] 33000/40457, 0.0070 s/frame
+[residual] 34000/40457, 0.0070 s/frame
+[residual] 35000/40457, 0.0070 s/frame
+[residual] 36000/40457, 0.0070 s/frame
+[residual] 37000/40457, 0.0070 s/frame
+[residual] 38000/40457, 0.0070 s/frame
+[residual] 39000/40457, 0.0070 s/frame
+[residual] 40000/40457, 0.0070 s/frame
+[all] RMSE=0.19838 CRPS=0.08120 spread/skill=1.041 cov90=0.795
+[defined_blind] RMSE=0.36301 CRPS=0.15013 spread/skill=0.860 cov90=0.938
+[density] spearman=+0.919 AUSE=0.129
+[vx] spearman=+0.689 AUSE=0.252
+[vy] spearman=+0.678 AUSE=0.351
+[var] spearman=+0.936 AUSE=0.120
+[runtime] 377.46s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/with/atc-20130714.json
+[residual] 1000/40457, 0.0074 s/frame
+[residual] 2000/40457, 0.0072 s/frame
+[residual] 3000/40457, 0.0071 s/frame
+[residual] 4000/40457, 0.0070 s/frame
+[residual] 5000/40457, 0.0070 s/frame
+[residual] 6000/40457, 0.0070 s/frame
+[residual] 7000/40457, 0.0070 s/frame
+[residual] 8000/40457, 0.0070 s/frame
+[residual] 9000/40457, 0.0070 s/frame
+[residual] 10000/40457, 0.0070 s/frame
+[residual] 11000/40457, 0.0070 s/frame
+[residual] 12000/40457, 0.0070 s/frame
+[residual] 13000/40457, 0.0070 s/frame
+[residual] 14000/40457, 0.0070 s/frame
+[residual] 15000/40457, 0.0070 s/frame
+[residual] 16000/40457, 0.0070 s/frame
+[residual] 17000/40457, 0.0070 s/frame
+[residual] 18000/40457, 0.0070 s/frame
+[residual] 19000/40457, 0.0070 s/frame
+[residual] 20000/40457, 0.0070 s/frame
+[residual] 21000/40457, 0.0070 s/frame
+[residual] 22000/40457, 0.0070 s/frame
+[residual] 23000/40457, 0.0070 s/frame
+[residual] 24000/40457, 0.0070 s/frame
+[residual] 25000/40457, 0.0070 s/frame
+[residual] 26000/40457, 0.0070 s/frame
+[residual] 27000/40457, 0.0070 s/frame
+[residual] 28000/40457, 0.0070 s/frame
+[residual] 29000/40457, 0.0070 s/frame
+[residual] 30000/40457, 0.0070 s/frame
+[residual] 31000/40457, 0.0070 s/frame
+[residual] 32000/40457, 0.0070 s/frame
+[residual] 33000/40457, 0.0070 s/frame
+[residual] 34000/40457, 0.0070 s/frame
+[residual] 35000/40457, 0.0070 s/frame
+[residual] 36000/40457, 0.0070 s/frame
+[residual] 37000/40457, 0.0070 s/frame
+[residual] 38000/40457, 0.0070 s/frame
+[residual] 39000/40457, 0.0070 s/frame
+[residual] 40000/40457, 0.0070 s/frame
+[all] RMSE=0.25085 CRPS=0.11299 spread/skill=0.914 cov90=0.911
+[defined_blind] RMSE=0.43717 CRPS=0.21783 spread/skill=0.835 cov90=0.929
+[density] spearman=+0.869 AUSE=0.153
+[vx] spearman=+0.790 AUSE=0.267
+[vy] spearman=+0.614 AUSE=0.470
+[var] spearman=+0.882 AUSE=0.143
+[runtime] 374.23s on Tesla V100-SXM2-32GB; failures=0
+[out] methods/enkf/check_outputs/bias_ema_validation/without/atc-20130714.json

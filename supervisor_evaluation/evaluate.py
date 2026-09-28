@@ -97,7 +97,13 @@ FINAL_CONFIG: dict[str, dict[str, Any]] = {
         "localization_radius": 7,
         "q_scale": 1.5,
         "temporal_rho": 0.5,
-        "channel_scales": (2.0, 1.0, 1.0, 0.75),
+        # Noise sized by the forecast model's own measured one-step error (the residual
+        # bank's size), not rescaled to the original project's PROC_STD. Chosen on the 7
+        # validation days (methods/enkf/check_outputs/variance_noise_validation): the
+        # borrowed PROC_STD made the velocity-variance noise ~5x too large, and clipping
+        # at 0 pushed its mean up. The per-channel factors that compensated are now 1.
+        "bank_native_std": True,
+        "channel_scales": (1.0, 1.0, 1.0, 1.0),
         "blind_channel_scales": (1.0, 1.25, 1.4, 0.9333333),
         "cross_channel_matrix": (1.0, 0.5, 0.5, 0.1,
                                  0.5, 1.0, 0.5, 0.1,
@@ -403,6 +409,7 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
                 "--channel-scales", *map(str, cfg["channel_scales"]),
                 "--blind-channel-scales", *map(str, cfg["blind_channel_scales"]),
                 "--cross-channel-matrix", *map(str, cfg["cross_channel_matrix"]),
+                *(["--bank-native-std"] if cfg.get("bank_native_std") else []),
                 "--ensemble", str(cfg["ensemble"]), "--radius", str(cfg["localization_radius"]),
                 "--frames", "600" if mode == "smoke" else "1000000",
                 "--warmup", "100" if mode == "smoke" else "500",

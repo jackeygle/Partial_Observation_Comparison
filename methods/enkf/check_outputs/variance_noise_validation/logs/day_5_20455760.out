@@ -1,0 +1,180 @@
+[residual] 1000/37413, 0.0071 s/frame
+[residual] 2000/37413, 0.0069 s/frame
+[residual] 3000/37413, 0.0068 s/frame
+[residual] 4000/37413, 0.0068 s/frame
+[residual] 5000/37413, 0.0068 s/frame
+[residual] 6000/37413, 0.0067 s/frame
+[residual] 7000/37413, 0.0067 s/frame
+[residual] 8000/37413, 0.0067 s/frame
+[residual] 9000/37413, 0.0067 s/frame
+[residual] 10000/37413, 0.0067 s/frame
+[residual] 11000/37413, 0.0067 s/frame
+[residual] 12000/37413, 0.0067 s/frame
+[residual] 13000/37413, 0.0067 s/frame
+[residual] 14000/37413, 0.0067 s/frame
+[residual] 15000/37413, 0.0067 s/frame
+[residual] 16000/37413, 0.0067 s/frame
+[residual] 17000/37413, 0.0067 s/frame
+[residual] 18000/37413, 0.0067 s/frame
+[residual] 19000/37413, 0.0067 s/frame
+[residual] 20000/37413, 0.0067 s/frame
+[residual] 21000/37413, 0.0067 s/frame
+[residual] 22000/37413, 0.0067 s/frame
+[residual] 23000/37413, 0.0067 s/frame
+[residual] 24000/37413, 0.0067 s/frame
+[residual] 25000/37413, 0.0067 s/frame
+[residual] 26000/37413, 0.0067 s/frame
+[residual] 27000/37413, 0.0067 s/frame
+[residual] 28000/37413, 0.0067 s/frame
+[residual] 29000/37413, 0.0067 s/frame
+[residual] 30000/37413, 0.0067 s/frame
+[residual] 31000/37413, 0.0067 s/frame
+[residual] 32000/37413, 0.0067 s/frame
+[residual] 33000/37413, 0.0067 s/frame
+[residual] 34000/37413, 0.0067 s/frame
+[residual] 35000/37413, 0.0067 s/frame
+[residual] 36000/37413, 0.0067 s/frame
+[residual] 37000/37413, 0.0067 s/frame
+[all] RMSE=0.19144 CRPS=0.07988 spread/skill=1.034 cov90=0.791
+[defined_blind] RMSE=0.34908 CRPS=0.15197 spread/skill=0.913 cov90=0.935
+[density] spearman=+0.908 AUSE=0.140
+[vx] spearman=+0.677 AUSE=0.271
+[vy] spearman=+0.662 AUSE=0.401
+[var] spearman=+0.923 AUSE=0.198
+[runtime] 332.92s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/check_outputs/variance_noise_validation/var040/atc-20130721.json
+[residual] 1000/37413, 0.0074 s/frame
+[residual] 2000/37413, 0.0072 s/frame
+[residual] 3000/37413, 0.0071 s/frame
+[residual] 4000/37413, 0.0070 s/frame
+[residual] 5000/37413, 0.0070 s/frame
+[residual] 6000/37413, 0.0069 s/frame
+[residual] 7000/37413, 0.0069 s/frame
+[residual] 8000/37413, 0.0069 s/frame
+[residual] 9000/37413, 0.0069 s/frame
+[residual] 10000/37413, 0.0069 s/frame
+[residual] 11000/37413, 0.0069 s/frame
+[residual] 12000/37413, 0.0069 s/frame
+[residual] 13000/37413, 0.0069 s/frame
+[residual] 14000/37413, 0.0068 s/frame
+[residual] 15000/37413, 0.0068 s/frame
+[residual] 16000/37413, 0.0068 s/frame
+[residual] 17000/37413, 0.0068 s/frame
+[residual] 18000/37413, 0.0068 s/frame
+[residual] 19000/37413, 0.0068 s/frame
+[residual] 20000/37413, 0.0068 s/frame
+[residual] 21000/37413, 0.0068 s/frame
+[residual] 22000/37413, 0.0068 s/frame
+[residual] 23000/37413, 0.0068 s/frame
+[residual] 24000/37413, 0.0068 s/frame
+[residual] 25000/37413, 0.0068 s/frame
+[residual] 26000/37413, 0.0068 s/frame
+[residual] 27000/37413, 0.0068 s/frame
+[residual] 28000/37413, 0.0068 s/frame
+[residual] 29000/37413, 0.0069 s/frame
+[residual] 30000/37413, 0.0069 s/frame
+[residual] 31000/37413, 0.0069 s/frame
+[residual] 32000/37413, 0.0069 s/frame
+[residual] 33000/37413, 0.0069 s/frame
+[residual] 34000/37413, 0.0069 s/frame
+[residual] 35000/37413, 0.0069 s/frame
+[residual] 36000/37413, 0.0069 s/frame
+[residual] 37000/37413, 0.0069 s/frame
+[all] RMSE=0.18748 CRPS=0.07769 spread/skill=1.007 cov90=0.783
+[defined_blind] RMSE=0.34656 CRPS=0.15086 spread/skill=0.894 cov90=0.926
+[density] spearman=+0.908 AUSE=0.137
+[vx] spearman=+0.673 AUSE=0.272
+[vy] spearman=+0.660 AUSE=0.399
+[var] spearman=+0.921 AUSE=0.204
+[runtime] 339.36s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/check_outputs/variance_noise_validation/var020/atc-20130721.json
+[residual] 1000/37413, 0.0073 s/frame
+[residual] 2000/37413, 0.0070 s/frame
+[residual] 3000/37413, 0.0069 s/frame
+[residual] 4000/37413, 0.0069 s/frame
+[residual] 5000/37413, 0.0069 s/frame
+[residual] 6000/37413, 0.0069 s/frame
+[residual] 7000/37413, 0.0069 s/frame
+[residual] 8000/37413, 0.0068 s/frame
+[residual] 9000/37413, 0.0068 s/frame
+[residual] 10000/37413, 0.0068 s/frame
+[residual] 11000/37413, 0.0068 s/frame
+[residual] 12000/37413, 0.0068 s/frame
+[residual] 13000/37413, 0.0068 s/frame
+[residual] 14000/37413, 0.0068 s/frame
+[residual] 15000/37413, 0.0068 s/frame
+[residual] 16000/37413, 0.0068 s/frame
+[residual] 17000/37413, 0.0068 s/frame
+[residual] 18000/37413, 0.0068 s/frame
+[residual] 19000/37413, 0.0068 s/frame
+[residual] 20000/37413, 0.0068 s/frame
+[residual] 21000/37413, 0.0068 s/frame
+[residual] 22000/37413, 0.0068 s/frame
+[residual] 23000/37413, 0.0068 s/frame
+[residual] 24000/37413, 0.0068 s/frame
+[residual] 25000/37413, 0.0068 s/frame
+[residual] 26000/37413, 0.0068 s/frame
+[residual] 27000/37413, 0.0068 s/frame
+[residual] 28000/37413, 0.0068 s/frame
+[residual] 29000/37413, 0.0068 s/frame
+[residual] 30000/37413, 0.0068 s/frame
+[residual] 31000/37413, 0.0068 s/frame
+[residual] 32000/37413, 0.0068 s/frame
+[residual] 33000/37413, 0.0068 s/frame
+[residual] 34000/37413, 0.0068 s/frame
+[residual] 35000/37413, 0.0068 s/frame
+[residual] 36000/37413, 0.0068 s/frame
+[residual] 37000/37413, 0.0068 s/frame
+[all] RMSE=0.18564 CRPS=0.07668 spread/skill=0.989 cov90=0.773
+[defined_blind] RMSE=0.34544 CRPS=0.15047 spread/skill=0.883 cov90=0.916
+[density] spearman=+0.908 AUSE=0.136
+[vx] spearman=+0.670 AUSE=0.272
+[vy] spearman=+0.657 AUSE=0.398
+[var] spearman=+0.914 AUSE=0.224
+[runtime] 336.86s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/check_outputs/variance_noise_validation/var010/atc-20130721.json
+[residual] 1000/37413, 0.0077 s/frame
+[residual] 2000/37413, 0.0075 s/frame
+[residual] 3000/37413, 0.0074 s/frame
+[residual] 4000/37413, 0.0073 s/frame
+[residual] 5000/37413, 0.0073 s/frame
+[residual] 6000/37413, 0.0073 s/frame
+[residual] 7000/37413, 0.0073 s/frame
+[residual] 8000/37413, 0.0073 s/frame
+[residual] 9000/37413, 0.0073 s/frame
+[residual] 10000/37413, 0.0073 s/frame
+[residual] 11000/37413, 0.0073 s/frame
+[residual] 12000/37413, 0.0072 s/frame
+[residual] 13000/37413, 0.0072 s/frame
+[residual] 14000/37413, 0.0072 s/frame
+[residual] 15000/37413, 0.0072 s/frame
+[residual] 16000/37413, 0.0072 s/frame
+[residual] 17000/37413, 0.0072 s/frame
+[residual] 18000/37413, 0.0072 s/frame
+[residual] 19000/37413, 0.0072 s/frame
+[residual] 20000/37413, 0.0072 s/frame
+[residual] 21000/37413, 0.0072 s/frame
+[residual] 22000/37413, 0.0072 s/frame
+[residual] 23000/37413, 0.0072 s/frame
+[residual] 24000/37413, 0.0072 s/frame
+[residual] 25000/37413, 0.0072 s/frame
+[residual] 26000/37413, 0.0072 s/frame
+[residual] 27000/37413, 0.0072 s/frame
+[residual] 28000/37413, 0.0072 s/frame
+[residual] 29000/37413, 0.0072 s/frame
+[residual] 30000/37413, 0.0072 s/frame
+[residual] 31000/37413, 0.0072 s/frame
+[residual] 32000/37413, 0.0072 s/frame
+[residual] 33000/37413, 0.0072 s/frame
+[residual] 34000/37413, 0.0072 s/frame
+[residual] 35000/37413, 0.0072 s/frame
+[residual] 36000/37413, 0.0072 s/frame
+[residual] 37000/37413, 0.0072 s/frame
+[all] RMSE=0.18482 CRPS=0.07207 spread/skill=0.835 cov90=0.766
+[defined_blind] RMSE=0.33798 CRPS=0.14345 spread/skill=0.763 cov90=0.908
+[density] spearman=+0.913 AUSE=0.135
+[vx] spearman=+0.676 AUSE=0.271
+[vy] spearman=+0.663 AUSE=0.394
+[var] spearman=+0.921 AUSE=0.244
+[runtime] 354.95s on Tesla V100-SXM2-16GB; failures=0
+[out] methods/enkf/check_outputs/variance_noise_validation/native/atc-20130721.json

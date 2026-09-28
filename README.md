@@ -139,7 +139,7 @@ into one number.
 | DINCAE | 0.227 | 0.153 | 0.381 | 0.160 | 0.108 |
 | 4DVarNet | 0.231 | 0.176 | 0.361 | 0.178 | 0.140 |
 | 4DVarNet (aug. head) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
-| EnKF | 0.283 | 0.154 | 0.419 | 0.183 | 0.295 |
+| EnKF | 0.262 | 0.153 | 0.411 | 0.178 | 0.224 |
 
 ![Reconstruction accuracy](supervisor_evaluation/outputs/full/figures/accuracy_rmse.png)
 
@@ -186,7 +186,7 @@ them cannot be explained by which days were used for testing.
 |---|---|---|---|
 | **DINCAE** | **0.275** | 0.266–0.283 | 0.58 |
 | 4DVarNet (aug. head) | 0.232 | 0.221–0.244 | 0.66 |
-| EnKF | 0.075 | 0.068–0.081 | 1.21 |
+| EnKF | 0.113 | 0.107–0.118 | 1.01 |
 
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
 
@@ -199,9 +199,9 @@ ideal size.
 *What it shows:* DINCAE's σ̂ is the most informative, on every channel, and its
 range does not overlap 4DVarNet's, so the ranking is not down to the choice of
 test days. The two neural networks are overconfident (spread/RMSE 0.58 and
-0.66). The EnKF's σ̂ is somewhat too large on average (1.21) and badly placed on
-the velocity channels: there it is 1.6–1.8× too large and worse than a constant
-(bars below zero). Per-channel numbers: `uncertainty_by_channel.csv`.
+0.66). The EnKF's σ̂ has the right size on average (1.01) but is the least
+informative of the three; on $v_y$ it is 1.75× too large and worse than a
+constant (bar below zero). Per-channel numbers: `uncertainty_by_channel.csv`.
 
 #### The math behind the two uncertainty numbers, and why they differ
 

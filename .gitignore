@@ -66,3 +66,7 @@ compare/results/_*.json
 !supervisor_evaluation/models/*.pt
 !supervisor_evaluation/models/*.npz
 supervisor_evaluation/outputs/dev/
+
+# pptxgenjs install used by slides/build_enkf_deck.js
+slides/node_modules/
+slides/package-lock.json
