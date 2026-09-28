@@ -105,7 +105,7 @@ Senseiver and DINCAE are bit-reproducible.
 
 ## Where each final model comes from
 
-The nine files in `supervisor_evaluation/models/` are the only weights the
+The eight weight files in `supervisor_evaluation/models/` are the only weights the
 evaluation loads; `models/manifest.json` maps each to its training-run source
 and SHA-256, and `evaluate.py verify` checks them before every run
 (`evaluate.py prepare` rebuilds the package from the sources below).
@@ -216,8 +216,9 @@ the final ones:
   (`methods/enkf/checks/diag_proc_scale_sweep.py`, still in the tree, one day, 2000
   frames), so an earlier conclusion that no amount of noise can fix it was wrong.
   Full-strength independent noise still gives a spatially uninformative σ̂; the final
-  EnKF therefore samples the noise from real forecast residuals
-  (`methods/enkf/README.md`).
+  EnKF therefore samples the noise from real forecast residuals, at the forecast
+  model's own measured error size (`methods/enkf/README.md`, which also scores the
+  original and the final filter identically).
 - **The learned-covariance Kalman filter (LCSKF)** — a research line that replaces
   the EnKF's ensemble covariance with a learned one; not in the final comparison.
 - **Senseiver extensions after G-direct k=16** (temporal mixers, history loss, motion
@@ -271,6 +272,8 @@ methods/                  one directory per method; none imports another
   sbatch/ (training jobs) and runs/ (training logs; checkpoints gitignored)
 compare/                  the only code that imports more than one method:
                           cross-method scoring, shared metrics, plot style
+slides/                   build_enkf_deck.js -> the EnKF optimisation deck
+                          (enkf_optimisation.pptx / .pdf)
 sbatch/_env.sh            the single environment entry point
 ```
 
@@ -307,7 +310,7 @@ change on another machine. Rebuild the stages only if the raw data or the grid
 resolution changes; see `crowdcore/data/DOC_data_pipeline.md`.
 
 **In git:** code, configuration, the real ATC map, the split lists (copies in
-`supervisor_evaluation/data_split/`), the nine packaged final weights (126 MB,
+`supervisor_evaluation/data_split/`), the eight packaged final weight files (126 MB,
 `supervisor_evaluation/models/`), the original EnKF forecast model (`methods/enkf/enkf_opt/apt-ibex_train_model_28D.pth`, 14 MB), DINCAE's
 normalisation statistics, result JSON/CSV and figures.
 

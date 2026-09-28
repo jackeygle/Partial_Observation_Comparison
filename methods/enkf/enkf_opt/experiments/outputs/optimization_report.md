@@ -1,5 +1,12 @@
 # Structured-Q EnKF optimization report
 
+> **Historical record, superseded.** Tuned with the original forecast model and with the
+> residual bank rescaled to `PROC_STD`. The final EnKF keeps `scale 1.5`, `rho 0.5` and
+> the blind-cell factors (1, 1.25, 1.4, 0.93) from `sp_b2`, but uses the 5→5 PedPred3
+> forecast model, keeps the bank at its measured size with per-channel scales 1, 1, 1, 1,
+> and does **not** use the density calibration recommended at the end. Final configuration
+> and results: [`../../../README.md`](../../../README.md).
+
 Hyperparameters were selected exclusively on seven complete validation days. The selected candidates were then evaluated on seven complete held-out test days.
 
 ## Validation sweep

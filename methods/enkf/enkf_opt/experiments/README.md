@@ -1,5 +1,12 @@
 # Structured-Q EnKF experiment
 
+> **Historical record.** These are the first experiments with residual noise, run with
+> the original forecast model and with the bank rescaled to `PROC_STD` so that only the
+> noise *structure* differed from the Gaussian arm. The scales were then tuned
+> (`outputs/optimization_report.md`), the forecast model was replaced by the 5→5 PedPred3,
+> and the final EnKF uses the bank at its own measured size. Final configuration and
+> results: [`../../README.md`](../../README.md).
+
 This experiment keeps the original 100-member localized EnKF.  The Kalman
 background covariance is still the sample covariance of those members.  The
 only methodological change is the distribution used for additive process

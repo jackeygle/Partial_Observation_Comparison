@@ -11,7 +11,7 @@ rest of the repository (`crowdcore/`, `compare/`, `methods/`) and the data
 directory. `bench_inference.py` is called by it and is not run on its own.
 
 ```bash
-sbatch supervisor_evaluation/sbatch/smoke.sbatch   # ~5 min on gpu-debug: end-to-end check
+sbatch supervisor_evaluation/sbatch/smoke.sbatch   # ~2 min on gpu-debug: end-to-end check
 sbatch supervisor_evaluation/sbatch/full.sbatch    # complete evaluation -> outputs/full/
 ```
 

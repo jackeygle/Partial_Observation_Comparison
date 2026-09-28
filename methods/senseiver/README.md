@@ -162,8 +162,8 @@ observation set is compressed into a fixed-length representation --
 2.7e-7, padded to different lengths max|delta| = 0.0).
 
 **6 queries all 432 cells, not just the 290 walkable ones.** Reason: see deviation
-#1 -- robots can see cells they cannot drive into (measured 32.1%), and the
-evaluation convention scores non-walkable cells too.
+#1 -- robots can see cells they cannot drive into (measured 32.1%). The reported
+scores then use the walkable cells only.
 
 **Normalisation only happens at 4.** The first 4 dimensions of the tokens are
 `(Y - mean) / std`, but both 6's output and 7's loss operate on the **raw field**.
@@ -202,12 +202,12 @@ from the checkpoint: `decoder.postproc.weight` has shape `(4, 32)`,
    (`dataloaders.py:152`) and at test time does `output_im[data==0]=0`
    (`network_light.py:126`). That hack exists to skip regions with **nothing to
    reconstruct** (land in sea-temperature data, solid material in porous media).
-   No such cells exist on the ATC grid: density 0 is a valid value, non-walkable
-   regions still have a ground truth, and **the evaluation convention scores
-   them**. `check_sensors.py` measures **32.1% of observed cells falling on
-   non-walkable ground** (robots can see pillars they cannot drive into, see the
-   methods/varnet's README) -- further reason the query set cannot be clipped to
-   walkable cells.
+   On the ATC grid density 0 is a valid value ("nobody is here") and non-walkable
+   cells still have a ground truth, so zero cannot mean "invalid". A check script
+   (archive tag) measured **32.1% of observed cells falling on non-walkable ground**
+   (robots can see pillars they cannot drive into, see the methods/varnet README), so
+   those observations are real inputs and the query set is kept at all 432 cells.
+   Only walkable cells are scored.
 2. **Added dimension assertions to `Decoder`.** The decoder's cross-attention
    treats `dec_num_latent_channels` as the KV dimension, while the channel count
    of the incoming `z` is decided by the **encoder**; a mismatch between the two
@@ -270,31 +270,32 @@ from the checkpoint: `decoder.postproc.weight` has shape `(4, 32)`,
 
 ---
 
-## The fairness contract with the other two methods
+## The fairness contract with the other methods
 
-All three methods face **exactly the same** observations; differences only come
-from the method itself:
+Every method faces **exactly the same** observations; differences only come from
+the method itself:
 
 | Anchor | Approach |
 |---|---|
 | Observation parameters | read verbatim from `crowdcore/config.yaml`'s `observation` section; this directory sets no defaults of its own |
 | Observation generation | calls `om.generate_observations` + `nav.build_valid_mask_from_config` directly |
 | Data split | `om.split_files()`; 32 training days / 7 validation days / 7 test days, training days strictly earlier than test days |
-| Metrics | blind MSE (`mask<0.5`) + full-field MSE, on the raw field, four channels unweighted, including non-walkable cells |
+| Robot routes | seeded by the day's date (`trajectory_mode: per_day`), identical for every method on a day |
+| Metrics | pooled RMSE on unobserved walkable cells (the headline) and on all walkable cells, raw field, four channels unweighted; scored by `supervisor_evaluation/evaluate.py` |
 | Physical clipping | same as the EnKF: density[0,5], vx/vy[-5,5], var[0,2] (on by default) |
 | Initial value | none initialised from the ground truth |
 | Timing | only the model's forward pass is timed, not data preparation (a constant shared by all three methods) |
 
-Benchmark (full-day convention, blind MSE): **4DVarNet 0.0338**, **EnKF 0.0392**.
+Results are in the repository [README](../../README.md#results-and-how-to-read-them).
 
 ### One sentence that must go in the conclusions
 
-This version of Senseiver **reconstructs frame t from only frame t's observation**
-(as in the paper, with no temporal encoding at all -- the paper's sec.3 Discussion
-explicitly says a sin-cos time encoding was tried and failed). 4DVarNet, by
-contrast, sees a dT=200-frame time window. This is **not a fair comparison, it is a
-deliberate ablation**: it quantifies exactly "how much is the time dimension
-worth." Without this sentence, the table would be misread.
+**Senseiver-A reconstructs frame t from only frame t's observation** (as in the
+paper, with no temporal encoding at all -- the paper's sec.3 Discussion explicitly
+says a sin-cos time encoding was tried and failed), while 4DVarNet sees a 200-frame
+window and DINCAE t-1..t+1. Senseiver-G adds a causal 16-frame window of past
+observations. The gap between A and G is therefore what the time dimension is
+worth to this architecture; without this sentence, the table would be misread.
 
 ---
 
@@ -308,13 +309,9 @@ G replaces the 64 abstract latents with one latent token per grid cell (432 toke
 and reads each cell's output directly from its own token (`--latent-mode grid
 --readout direct`). On matched seeds it beat variant A clearly.
 
-**Temporal window.** The cell tokens' cross-attention reads the sensor tokens of the
-**last k frames** instead of the current frame only (`--time-window k`); the final
-model uses k = 16.
-
-Built on G-direct, the variant that beat A40. The 432 cell tokens' cross-attention
-now reads the sensor tokens of the **last k frames** instead of the current frame
-only. Each sensor token carries its relative time offset Δ = t_query - t_token
+**Temporal window.** The 432 cell tokens' cross-attention reads the sensor tokens
+of the **last k frames** instead of the current frame only (`--time-window k`); the
+final model uses k = 16. Each sensor token carries its relative time offset Δ = t_query - t_token
 (`positional.TemporalEncoding`): a learnable `nn.Embedding(k, 8)` plus the scalar
 Δ/k, concatenated before the encoder's preproc. So every cell can read what was seen
 at its own and at nearby positions over the last k-1 seconds.
@@ -377,7 +374,8 @@ report.
   keeps the last one).
 - **`--seed` is not only the initialisation**: it also seeds the robot paths that
   generate the training and validation observations (`DayBank(seed=...)`). Compare
-  variants at matched seeds. Evaluation observations are fixed (seed 0) regardless.
+  variants at matched seeds. The reported evaluation generates its own observations,
+  with routes seeded by each test day's date.
 - **A smoke test shorter than ~20 steps with `--amp` looks like "no learning"**: the loss is
   `reduction='sum'`, so GradScaler's initial scale (65536) overflows fp16 and it skips
   and halves for the first ~18-19 steps (measured: 19/40 for k=1, 18/40 for k=4; identical

@@ -27,8 +27,8 @@ imports code from the rest of the repository (`crowdcore/`, `compare/`,
 - **Environment:** `source sbatch/_env.sh` loads Triton's
   `scicomp-pytorch-env/2026.1` (Python 3.12) and sets `PYTHONPATH`; elsewhere,
   `pip install -r requirements.txt`. A GPU is required.
-- **Weights:** the nine files in `supervisor_evaluation/models/` are the frozen
-  final models and are part of the repository. `models/manifest.json` records
+- **Weights:** the eight weight files in `supervisor_evaluation/models/` are the
+  frozen final models and are part of the repository. `models/manifest.json` records
   their SHA-256; every run checks them first and refuses to start on a mismatch.
 - **Data:** not in the repository. Point `--data-root` (or `data.root` in
   `crowdcore/config.yaml`) at a directory laid out as described

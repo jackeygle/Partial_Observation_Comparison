@@ -188,8 +188,9 @@ observation-filled `X0`.
 | `observation.num_agents` | 3 | robots |
 | `observation.line_of_sight` | true | walls block sight (ray-cast on the real map) |
 | `observation.obs_std` | `[0.0569, 0.3147, 0.0862, 0.0064]` | per-channel sensor noise = **0.25 × 1.4826×MAD** on active cells (the derivation script is in the archive tag); the 0.25 is an assumption, not a spec |
-| `prior.hidden / kt,kh,kw / n_phi_layers / scale` | 32 / 3,3,3 / 2 / 2 | GENN Φ (two-scale) |
-| `solver` / `training` | — | `dT=200`, `n_iter=20`, ConvLSTM hidden 64, Adam 1e-3, batch 32 (see checkpoint) |
+| `prior.hidden / kt,kh,kw / n_phi_layers / scale` | 96 / 5,3,3 / 2 / 2 | GENN Φ (two-scale); 32 / 3,3,3 until 2026-09-09 |
+| `solver.lstm_hidden` | 64 | ConvLSTM of the learned gradient step |
+| `solver.n_iter`, `training.dT` | 15, 7 | config defaults only: the training jobs override them with `--dT 200` and an `--iter-schedule` that ends at 20 iterations; Adam 1e-3, batch 32 (each checkpoint stores its own args) |
 
 ---
 
@@ -208,5 +209,6 @@ git tag `archive-full-2026-09-24` (`git checkout archive-full-2026-09-24`).
 - **`/tmp` is node-local** — a compute node cannot read the login node's `/tmp`
   (incl. the session scratchpad). Write compute-node outputs to the shared project
   filesystem (`runs/`, …), not `/tmp`.
-- **Two projects, two `config.py`** — the EnKF driver imports only `pedpred.*` from
-  `methods/enkf/enkf_lab/`, never that copy's `config`, to avoid a module-name clash.
+- **Two `config.py`** — `methods/enkf/enkf_opt/pedpred/config.py` belongs to the EnKF's
+  vendored code and is only reached as `pedpred.config`; parameters for this method
+  come from `crowdcore/config.yaml` via `crowdcore.config`.

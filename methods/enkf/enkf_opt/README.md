@@ -6,6 +6,11 @@
 > (`checks/verify_enkf_opt.py`, `checks/verify_enkf_gain_mode.py`) and the benchmark
 > script quoted below are in the git tag `archive-full-2026-09-24`; the numbers below are
 > as measured with them.
+>
+> **The final EnKF does not run through this CPU code.** It is the GPU filter in
+> `experiments/eval_structured_q_gpu.py` (ensemble-space gain, corrected four-channel
+> localisation, cross-channel weights, structured residual noise); see
+> [`../README.md`](../README.md). Rounds 1-2 below are the history of the CPU copy.
 
 Starts as an exact copy of `../enkf_lab/` (which is itself a pristine copy of the
 `Partial_observation` baseline). Experimental changes go HERE; `enkf_lab` stays untouched so
@@ -190,7 +195,8 @@ The surrogate is reducible: `_f_model` now takes the device from the model inste
 CPU, so loading the model onto a GPU moves those convolutions there.
 That also fixes an actual bug — `ENKF.main()` and `ENKF.estimate_noise()` load the model with
 `DEVICE="cuda"` when a GPU is present, and the hard-coded CPU input tensor made them crash on a
-device mismatch.
+device mismatch. The GPU filter in `experiments/` later moved the whole step (forecast, noise,
+analysis) onto the GPU: about 7 ms per frame on a V100.
 
 ## A pre-existing bug that is preserved on purpose
 
@@ -202,11 +208,15 @@ Those rows land further from every grid cell than the localization radius, so th
 weights are all zero and those observations do not influence the analysis at all — the filter
 effectively assimilates only via the f=0 rows.
 
-This is NOT fixed here. It is what the published EnKF baseline numbers were produced with, and
-changing it would change results, which this copy is not allowed to do silently. It is also
-what makes the active-column shortcut in `gain_mode="ensemble"` so effective (~70% of rows
-dropped). If the baseline is ever re-run, this is the first thing to revisit — pass real
-`observed_cells` and the filter gets three more channels of information.
+This is NOT fixed in this CPU copy. It is what the early EnKF baseline numbers were produced
+with, and changing it would change results, which this copy is not allowed to do silently. It
+is also what makes the active-column shortcut in `gain_mode="ensemble"` so effective (~70% of
+rows dropped).
+
+**It is fixed in the GPU filter** (`experiments/eval_structured_q_gpu.py`,
+`localization_weights` takes the cell as `obs_idx mod H*W`), so all four observed channels are
+assimilated. Both the final EnKF and the rerun of the original configuration in
+`../check_outputs/original_vs_final/` use the fixed localisation.
 
 ## Structured-Q GPU experiments
 

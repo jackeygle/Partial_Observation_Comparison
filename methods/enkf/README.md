@@ -102,7 +102,12 @@ subtracted in the forecast. It is not textbook EnKF, but switching it off
 (`--no-bias-ema`) makes RMSE 25% worse on the validation days.
 
 **Original vs final, scored identically** (seven test days, unobserved walkable
-cells, four channels pooled; `checks/compare_original_final.py`):
+cells, four channels pooled; `checks/compare_original_final.py`). The original
+configuration is rerun through the same GPU filter (`sbatch/run_original_enkf.sbatch`):
+the original forecast model fed one frame, independent Gaussian noise at 0.01 ×
+`PROC_STD`, no cross-channel weighting. Both runs use the corrected four-channel
+localisation, so the differences come from the forecast model, the process noise and
+the cross-channel weights.
 
 | | RMSE | spread/RMSE | CRPS | CRPS skill |
 |---|---:|---:|---:|---:|

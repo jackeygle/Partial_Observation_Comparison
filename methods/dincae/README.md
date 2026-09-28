@@ -206,7 +206,7 @@ two numbers are key to explaining performance, not a bug.
 
 The reported number is `walkable_blind`: blind cells inside the walkable region, all
 four channels, with the same physical clipping as every other method -- the scope
-`compare/compare5.py` reports. `evaluate.py` also writes other cell sets (`ours_*`,
+`supervisor_evaluation/evaluate.py` reports. `evaluate.py` also writes other cell sets (`ours_*`,
 `v4dvar_*`, all cells, observed cells included) for reference; they are not reported.
 
 The scores are given in `_noclip` variants too. **The gap between `noclip` and `clip` is

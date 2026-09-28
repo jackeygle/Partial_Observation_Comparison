@@ -232,18 +232,18 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
     ["Forecast model", "original model, fed 1 frame", "our retrained model, 5 frames"],
     ["Process noise", "independent per cell, ×0.01", "real error maps, measured size ×1.5"],
     ["", "", "persist over time, more on unobserved cells"],
-    ["Kalman update", "radius 7, inflation 1.02", "same, + cross-channel weights"],
+    ["Kalman update", "radius 7, inflation 1.02", "same + cross-channel weights"],
     ["Bias correction", "yes", "same"],
   ];
   const t = rows.map((r, i) => r.map((c, j) => ({ text: c, options: {
     bold: i === 0 || j === 0, fontFace: BODY, fontSize: i === 0 ? 11 : 12.5,
-    color: i === 0 ? "FFFFFF" : (j === 2 && i >= 1 && i <= 3 ? TEAL : INK),
+    color: i === 0 ? "FFFFFF" : (j === 2 && i >= 1 && i <= 4 ? TEAL : INK),
     fill: { color: i === 0 ? SLATE : "FFFFFF" }, align: "left", valign: "middle" } })));
   s.addTable(t, { x: 0.5, y: 1.45, w: 9.0, colW: [2.2, 3.1, 3.7], rowH: 0.45, margin: 0.08,
     border: { type: "solid", pt: 0.5, color: RULE } });
   note(s, "Teal: changed. Everything else is identical, so the results on the next slide come from these changes.", 4.45, MUTED, { italic: true, fontSize: 11 });
   foot(s, "", n);
-  s.addNotes("Two things changed: the forecast model, now our retrained one seeing five frames, and the process noise. The Kalman update and the bias correction are the original ones, so the comparison on the next slide isolates these changes.");
+  s.addNotes("What changed: the forecast model, now our retrained one seeing five frames; the process noise; and cross-channel weights in the Kalman update. Localisation radius, inflation and the bias correction are the original ones. Both filters are run through the same GPU code, which also corrects the original localisation so velocity observations are assimilated; that correction applies to both, so the comparison on the next slide isolates these changes.");
 }
 
 // =====================================================================
@@ -279,7 +279,7 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
   const steps = [
     ["Forecast", "Each of the 100 members runs PedPred3 on its last 5 frames; bias subtracted.", [["retrained model", TEAL]]],
     ["Noise", "Each member adds one real error map (previous slides).", [["new", TEAL]]],
-    ["Kalman update", "Members pulled towards the robots' observations, localised.", [["original", SLATE]]],
+    ["Kalman update", "Members pulled towards the robots' observations, localised.", [["cross-channel weights", TEAL], ["radius, inflation", SLATE]]],
     ["Bias update", "Slow running estimate of the systematic error.", [["original", SLATE]]],
     ["Output", "Mean = reconstruction; spread = σ̂.", []],
   ];
@@ -290,8 +290,8 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
     numCircle(s, x + 0.12, y + 0.14, i + 1, NAVY);
     s.addText(head, { x: x + 0.56, y: y + 0.12, w: w - 0.62, h: 0.42, fontFace: BODY, fontSize: 12.5, bold: true, color: INK, valign: "middle", margin: 0, isTextBox: true });
     s.addText(body, { x: x + 0.12, y: y + 0.66, w: w - 0.24, h: 1.4, fontFace: BODY, fontSize: 11, color: INK, valign: "top", margin: 0, isTextBox: true });
-    tags.forEach(([t, c]) => {
-      const ty = y + h - 0.42;
+    tags.forEach(([t, c], j) => {
+      const ty = y + h - 0.42 - (tags.length - 1 - j) * 0.36;
       s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: x + 0.12, y: ty, w: w - 0.24, h: 0.28, rectRadius: 0.1, fill: { color: c }, line: { color: c } });
       s.addText(t, { x: x + 0.12, y: ty, w: w - 0.24, h: 0.28, fontFace: BODY, fontSize: 9, bold: true, color: "FFFFFF", align: "center", valign: "middle", margin: 0, isTextBox: true });
     });
@@ -299,7 +299,7 @@ const note = (s, text, y, color = INK, opt = {}) => s.addText(text, { x: 0.5, y,
   });
   note(s, "↻  step 5 feeds step 1 of the next frame (one second later)", 4.35, MUTED, { italic: true, fontSize: 11 });
   foot(s, "", n);
-  s.addNotes("Every second the filter forecasts each member with the retrained model, adds a real error map as noise, pulls the members towards the robots' observations, updates the slow bias estimate, and outputs the mean as the reconstruction and the spread as the uncertainty. Only the forecast model and the noise were changed; the update and the bias correction are the original ones. We checked the bias correction: switching it off makes RMSE 25% worse.");
+  s.addNotes("Every second the filter forecasts each member with the retrained model, adds a real error map as noise, pulls the members towards the robots' observations, updates the slow bias estimate, and outputs the mean as the reconstruction and the spread as the uncertainty. The forecast model, the noise and the cross-channel weights were changed; the localisation radius, inflation and the bias correction are the original ones. We checked the bias correction: switching it off makes RMSE 25% worse.");
 }
 
 const out = path.join(__dirname, "enkf_optimisation.pptx");
