@@ -117,6 +117,8 @@ CMAP = {
                                 # that one is reserved for spread
     "spread":    "Reds",       # ensemble spread / sigma-hat, sequential
     "signed":    "RdBu_r",     # signed quantities (vx, vy, residuals), zero-centred
+    "variance":  "YlOrBr",     # in-cell velocity variance, sequential
+    "coverage":  "BuGn",       # how often a cell is observed (fraction of time)
     "mask":      "gray",       # binary figures like walkable / observation masks
 }
 
@@ -145,13 +147,19 @@ def use(dpi: int = 200):
     """Tune rcParams. Call once per process.
 
     Look: left/bottom axes only in dark ink, light horizontal gridlines only (a
-    horizontal-bar or dot figure switches the grid to x itself), sans-serif.
+    horizontal-bar or dot figure switches the grid to x itself), Computer Modern text.
     """
     plt.rcParams.update({
         "figure.dpi": dpi,
         "savefig.dpi": dpi,
         "savefig.bbox": "tight",
-        "font.family": "DejaVu Sans",
+        # Computer Modern, the LaTeX body font (bundled with matplotlib as cmr10), so
+        # figure text matches the thesis text; maths in the same face.
+        "font.family": "serif",
+        "font.serif": ["cmr10"],
+        "mathtext.fontset": "cm",
+        "axes.unicode_minus": False,          # cmr10 has no U+2212 minus glyph
+        "axes.formatter.use_mathtext": True,
         "font.size": FS_LABEL,
         "axes.titlesize": FS_TITLE,
         "axes.labelsize": FS_LABEL,
