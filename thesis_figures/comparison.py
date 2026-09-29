@@ -46,9 +46,9 @@ def draw(day: str, frame: int) -> None:
 
     tw, gap = 12 * CELL, 0.52
     x0 = 0.95
-    page = (16.0, 2 * 36 * CELL + 2.35)
+    page = (16.0, 2 * 36 * CELL + 3.0)
     fig, ax = canvas(*page)
-    ytop = page[1] - 0.8 - 36 * CELL
+    ytop = page[1] - 0.8 - 36 * CELL                  # bottom 0.65 cm: the RMSE definition
     ybot = ytop - 0.55 - 36 * CELL
 
     def col_x(k):
@@ -78,8 +78,13 @@ def draw(day: str, frame: int) -> None:
         ax.add_patch(Rectangle((er[0], er[3] + 0.03), tw, 0.05, fc=method_color(label), ec="none"))
         ee = thumbnail(ax, field_rgb(e, walk, ps.CMAP["abs_error"], emax), x, ybot, CELL)
         rmse = float(np.sqrt(np.mean((p - truth)[blind] ** 2)))
-        text(ax, (ee[0] + ee[1]) / 2, ee[2] - 0.1, f"RMSE {rmse:.3f}", FS_SMALL - 0.5, color=GREY,
-             ha="center", va="top")
+        text(ax, (ee[0] + ee[1]) / 2, ee[2] - 0.1, f"frame RMSE\n{rmse:.3f}", FS_SMALL - 0.5, color=GREY,
+             ha="center", va="top", linespacing=1.1)
+    text(ax, 0.3, 0.02,
+         r"frame RMSE $= \sqrt{\mathrm{mean}_{j \in B}\,(\hat{x}_j - x_j)^2}$ of the density (people/m$^2$), "
+         r"this frame only, over its unobserved walkable cells $B$" "\n"
+         "(white in the mask). Test-set results over all frames are in the accuracy table.",
+         FS_SMALL - 0.5, color=GREY, va="bottom", linespacing=1.3)
     # colour bars at the right
     cb_x = col_x(8) - gap + 0.25
     for (y, cmap, vm, lab) in ((ytop, ps.CMAP["density"], vmax, r"people/m$^2$"),
