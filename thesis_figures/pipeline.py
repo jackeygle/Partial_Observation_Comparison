@@ -66,7 +66,7 @@ def main() -> None:
     arrow(ax, (ea[1] + 0.12, ty + th / 2), (eb[0] - 0.12, ty + th / 2))
 
     # (c) the six methods --------------------------------------------------------------
-    mx0, mx1 = eb[1] + 0.85, eb[1] + 0.85 + 4.45
+    mx0, mx1 = eb[1] + 0.7, eb[1] + 0.7 + 4.85
     my0, my1 = ty - 0.05, ty + th + 0.05
     frame_box(ax, mx0, my0, mx1, my1)
     stage((mx0 + mx1) / 2, "Reconstruction\nmethods")
@@ -74,7 +74,7 @@ def main() -> None:
             ("Senseiver-G (ours)", r"$y_{t-15:t}$", False),
             ("DINCAE", r"$y_{t-1:t+1}$", True),
             ("4DVarNet", "200 s", False),
-            ("4DVarNet (aug. head)", "200 s", True),
+            ("4DVarNet aug. var. (ours)", "200 s", True),
             ("EnKF", r"$y_{1:t}$", True)]
     step = (my1 - my0 - 0.55) / (len(rows) - 1)
     for i, (name, window, sig) in enumerate(rows):
@@ -87,7 +87,7 @@ def main() -> None:
     arrow(ax, (eb[1] + 0.12, ty + th / 2), (mx0 - 0.1, ty + th / 2))
 
     # (d) output: reconstruction and uncertainty -------------------------------------
-    xd = mx1 + 0.8
+    xd = mx1 + 0.65
     ed = thumbnail(ax, field_rgb(d["dincae_mean"][0], walk, ps.CMAP["density"], vmax), xd, ty, CELL)
     ed2 = thumbnail(ax, field_rgb(d["dincae_density_sigma"], walk, ps.CMAP["spread"], smax),
                     ed[1] + 0.25, ty, CELL)
@@ -97,7 +97,7 @@ def main() -> None:
     arrow(ax, (mx1 + 0.1, ty + th / 2), (ed[0] - 0.12, ty + th / 2))
 
     # (e) evaluation ------------------------------------------------------------------------
-    ex0, ex1 = ed2[1] + 0.8, 15.95
+    ex0, ex1 = ed2[1] + 0.6, 15.95
     frame_box(ax, ex0, my0, ex1, my1)
     stage((ex0 + ex1) / 2, "Evaluation")
     lines = [("accuracy", "RMSE"), ("uncertainty", "CRPS"), ("", "spread/RMSE"),

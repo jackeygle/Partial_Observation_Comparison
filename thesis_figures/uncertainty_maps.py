@@ -24,7 +24,7 @@ from thesis_figures.common import (FS, FS_SMALL, canvas, field_rgb, method_color
 from thesis_figures.comparison import FRAMES, SEL
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-METHODS = [("DINCAE", "DINCAE"), ("4DVarNet aughead_obs (single)", "4DVarNet (aug. head)"),
+METHODS = [("DINCAE", "DINCAE"), ("4DVarNet aughead_obs (single)", "4DVarNet aug. var. (ours)"),
            ("EnKF", "EnKF")]
 CELL = 0.1
 

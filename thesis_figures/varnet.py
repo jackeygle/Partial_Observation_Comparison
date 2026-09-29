@@ -1,4 +1,4 @@
-"""Thesis figure: 4DVarNet and the aug. head.
+"""Thesis figure: 4DVarNet and the augmented-variance 4DVarNet (aug. var.).
 
     python3 -m thesis_figures.varnet            # -> thesis_figures/out/varnet.{pdf,png}
 
@@ -6,7 +6,7 @@ The variational cost J(x) = a_obs^2 ||(x - y) * Omega||^2 + a_reg^2 ||x - Phi(x)
 200-s window, Phi the two-scale GENN prior, minimised by a learned gradient descent: the
 gradient from automatic differentiation goes through a ConvLSTM that outputs the update,
 for 20 iterations; Phi and the solver are trained end to end on the MSE to the truth.
-The aug. head (ours) iterates the state [x, log sigma^2]: both terms become Gaussian NLLs
+The aug. var. model (ours) iterates the state [x, log sigma^2]: both terms become Gaussian NLLs
 in that sigma^2, a variance head on [h, x] updates log sigma^2, and training uses the NLL.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ from thesis_figures.common import (FS, FS_SMALL, GREY, LINE, arrow, block, canva
                                    method_color, save, text, thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-AUG = method_color("4DVarNet (aug. head)")
+AUG = method_color("4DVarNet aug. var. (ours)")
 
 
 def main() -> None:
@@ -80,11 +80,11 @@ def main() -> None:
     text(ax, e1[1] + 1.02, yc - 0.55, "training loss", FS_SMALL - 0.5, color=GREY, ha="center",
          va="top")
 
-    # ---- the aug. head ------------------------------------------------------------------------------
+    # ---- the augmented variance ------------------------------------------------------------------------------
     by0, by1 = 0.1, 1.85
     ax.add_patch(Rectangle((2.1, by0), up[2] - 2.1, by1 - by0, fill=False, ec=AUG, lw=0.8,
                            ls=(0, (3, 1.5))))
-    text(ax, 2.25, by1 - 0.12, "4DVarNet (aug. head), ours", FS, color=AUG, va="top")
+    text(ax, 2.25, by1 - 0.12, "4DVarNet aug. var. (ours)", FS, color=AUG, va="top")
     lines = [r"state $[x,\ s]$ with $s = \log\sigma^2$",
              r"prior term: $(x-\Phi(x))^2 e^{-s} + s$;   observation term: $((x-y)^2e^{-s}+s)\odot\Omega$",
              r"a variance head on $[h,\ x]$ updates $s$ each iteration;  trained with the Gaussian NLL"]

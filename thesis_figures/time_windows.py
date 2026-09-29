@@ -29,14 +29,14 @@ def main() -> None:
         ("DINCAE", {-1, 0, 1}, False, False, False, True, "one second either side"),
         ("4DVarNet", set(range(LO, HI + 1)), True, True, False, False,
          r"fixed 200-s tile containing $t$"),
-        ("4DVarNet (aug. head)", set(range(LO, HI + 1)), True, True, False, True,
+        ("4DVarNet aug. var. (ours)", set(range(LO, HI + 1)), True, True, False, True,
          r"fixed 200-s tile containing $t$"),
         ("EnKF", set(range(LO, 1)), True, False, True, True, "all past, carried by the ensemble"),
     ]
     rh = 0.52
     page_h = 1.15 + len(rows) * rh + 0.2
     fig, ax = canvas(16.0, page_h)
-    x0 = 3.85                                        # left edge of the time axis
+    x0 = 4.0                                         # left edge of the time axis
     xt = lambda off: x0 + (off - LO) * PITCH         # square's left edge for an offset
     top = page_h - 0.75
 
@@ -53,7 +53,8 @@ def main() -> None:
     for i, (name, used, left, right, causal, sig, note) in enumerate(rows):
         y = top - i * rh                              # row centre
         col = method_color(name)
-        text(ax, 0.2, y, name, va="center")
+        text(ax, 0.2, y, name.replace(" (ours)", "\n(ours)") if len(name) > 20 else name,
+             va="center", linespacing=1.0)
         for off in range(LO, HI + 1):
             filled = off in used
             face = col if filled else "white"

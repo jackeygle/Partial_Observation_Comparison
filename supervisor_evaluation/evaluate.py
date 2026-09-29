@@ -601,7 +601,7 @@ SHORT_LABEL = {
     "senseiver_g": "Senseiver-G (ours)",
     "dincae": "DINCAE",
     "varnet_mse": "4DVarNet",
-    "varnet_aughead": "4DVarNet (aug. head)",
+    "varnet_aughead": "4DVarNet aug. var. (ours)",
     "enkf": "EnKF",
 }
 CHANNEL_TEX = {"density": "Density", "vx": "$v_x$", "vy": "$v_y$", "variance": "Velocity variance"}
@@ -775,7 +775,8 @@ def plot_summary(output_dir: Path) -> None:
                             ha="center", va="bottom", fontsize=fs_tick)
             ax.set_yscale("log")
             ax.set_ylim(min(median) / 3, max(median) * 3)
-            ax.set_xticks(xs, [short.get(m, m).replace(" (", "\n(") for m in names],
+            ax.set_xticks(xs, [short.get(m, m).replace(" aug. var.", "\naug. var.").replace(" (", "\n(")
+                                for m in names],
                           fontsize=fs_tick)
             ax.tick_params(axis="x", length=0)
             ax.set_ylabel("GPU time per frame (ms, log scale)")

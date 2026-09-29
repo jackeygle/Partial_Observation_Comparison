@@ -26,7 +26,7 @@ ROOT = os.path.dirname(HERE)
 SEL = os.path.join(ROOT, "supervisor_evaluation/outputs/full/images/selected_predictions.npz")
 ORDER = [("Senseiver-A", "Senseiver-A"), ("Senseiver-G", "Senseiver-G (ours)"),
          ("DINCAE", "DINCAE"), ("4DVarNet MSE", "4DVarNet"),
-         ("4DVarNet aughead_obs (single)", "4DVarNet (aug. head)"), ("EnKF", "EnKF")]
+         ("4DVarNet aughead_obs (single)", "4DVarNet aug. var. (ours)"), ("EnKF", "EnKF")]
 SEEN = "#a9c9ee"                                                 # as in the observation figure
 FRAMES = [("atc-20130811", 32778), ("atc-20130811", 13551)]      # a busy and a quieter frame
 CELL = 0.1
@@ -72,7 +72,7 @@ def draw(day: str, frame: int) -> None:
     for k, ((key, label), p, e) in enumerate(zip(ORDER, preds, errs)):
         x = col_x(k + 2)
         er = thumbnail(ax, field_rgb(p, walk, ps.CMAP["density"], vmax), x, ytop, CELL)
-        lab = label.replace(" (aug. head)", "\n(aug. head)").replace(" (ours)", "\n(ours)")
+        lab = label.replace(" aug. var.", "\naug. var.").replace(" (ours)", "\n(ours)")
         text(ax, (er[0] + er[1]) / 2, er[3] + 0.1, lab, FS_SMALL + 0.5, ha="center", va="bottom",
              linespacing=1.05, color=LINE)
         ax.add_patch(Rectangle((er[0], er[3] + 0.03), tw, 0.05, fc=method_color(label), ec="none"))

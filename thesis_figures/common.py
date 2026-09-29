@@ -137,7 +137,7 @@ def nice_top(v: float) -> float:
 
 
 METHOD_KEY = {"Senseiver-A": "Senseiver-A", "Senseiver-G (ours)": "Senseiver", "DINCAE": "DINCAE",
-              "4DVarNet": "4DVarNet", "4DVarNet (aug. head)": "4DVarNet+aug", "EnKF": "EnKF"}
+              "4DVarNet": "4DVarNet", "4DVarNet (aug. head)": "4DVarNet+aug", "4DVarNet aug. var. (ours)": "4DVarNet+aug", "EnKF": "EnKF"}
 
 
 def method_color(name: str) -> str:
