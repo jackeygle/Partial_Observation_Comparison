@@ -7,7 +7,7 @@ tokens of 4 observed values + a 64-d sin-cos position code (+ 8-d learned time e
 and the scalar offset for G), projected to 32 channels; 3 encoder blocks, each a
 cross-attention from the queries to the tokens followed by 3 self-attention layers
 (block 1 has its own weights, blocks 2 and 3 share one set). A decodes with a
-cross-attention from the 432 cells' position codes; G has no decoder, a linear head
+cross-attention from the 432 cells' queries [position code, learned vector q]; G has no decoder, a linear head
 shared by all cells reads each cell's token. Parts that G changes are drawn in G's colour. Output thumbnails are each
 model's own density reconstruction of the example frame.
 """
@@ -92,7 +92,7 @@ def main() -> None:
             arrow(ax, (sa[2] + 0.05, yc), (z[0] - 0.05, yc))
             de = block(ax, z[2] + 0.35, yc - bh / 2, 2.2, bh, "cross-attention", "decoder")
             arrow(ax, (z[2] + 0.05, yc), (de[0] - 0.05, yc))
-            text(ax, (de[0] + de[2]) / 2, de[1] - 0.45, r"queries: $\mathrm{PE}$ of all 432 cells",
+            text(ax, (de[0] + de[2]) / 2, de[1] - 0.45, r"queries: $[\mathrm{PE}(\chi),\ q]$ for all 432 cells",
                  FS_SMALL - 0.5, color=GREY, ha="center", va="center")
             arrow(ax, ((de[0] + de[2]) / 2, de[1] - 0.3), ((de[0] + de[2]) / 2, de[1] - 0.02))
             li = block(ax, de[2] + 0.35, yc - bh / 2, 0.95, bh, "linear")

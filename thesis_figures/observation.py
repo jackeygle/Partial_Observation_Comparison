@@ -52,8 +52,12 @@ def main() -> None:
     for tr in np.transpose(f["robot_tracks"], (1, 0, 2)):
         pts = np.array([cell_centre(ea, CELL, r, c) for r, c in tr])
         ax.plot(pts[:, 0], pts[:, 1], color=LINE, lw=0.6, zorder=4, clip_path=clip)
-    for r, c in {tuple(p) for p in f["robots"].tolist()}:
+    robots = [tuple(p) for p in f["robots"].tolist()]
+    for r, c in set(robots):                           # two robots can share a cell
         x, y = cell_centre(ea, CELL, r, c)
+        if robots.count((r, c)) > 1:
+            text(ax, x + 0.1, y + 0.1, rf"$\times{robots.count((r, c))}$", FS_SMALL - 1, zorder=6,
+                 bbox=dict(fc="white", ec="none", pad=0.3, alpha=0.8))
         circ = Circle((x, y), int(f["sensing_range"]) * CELL, fill=False, lw=0.6,
                       ls=(0, (2.5, 1.5)), ec=LINE, zorder=4)
         ax.add_patch(circ); circ.set_clip_path(clip)

@@ -5,7 +5,8 @@
 100 members. Forecast: each member runs PedPred3 on its last five analysed states and the
 running bias estimate is subtracted. Process noise: a whole one-step forecast-error map
 drawn from a bank of 8,192 built on the training days, AR(1) in time (rho = 0.5), scaled
-by 1.5 and more on cells no robot sees, member mean removed. Analysis: localised Kalman
+by 1.5 and, on cells no robot sees now, by per-channel factors (1, 1.25, 1.4, 0.93), member
+mean removed. Analysis: localised Kalman
 update (radius 7 cells, inflation 1.02, cross-channel weights) with perturbed observations.
 Output: ensemble mean and spread. Bias: 0.95 * bias + 0.05 * (forecast mean - y) at observed
 cells. Thumbnails: the final EnKF on the example frame.
@@ -51,7 +52,7 @@ def main() -> None:
     arrow(ax, (en[2] + 0.08, yc), (fc[0] - 0.05, yc))
 
     nz = block(ax, fc[2] + 0.45, yc - bh / 2, 3.05, bh, r"$+$ process noise $q_i$",
-               "real error map, AR(1), " r"$\times1.5$" "\nmore where no robot sees", edge=C, lw=0.9)
+               "real error map, AR(1), " r"$\times1.5$" "\nchannel factors on blind cells", edge=C, lw=0.9)
     arrow(ax, (fc[2] + 0.05, yc), (nz[0] - 0.05, yc))
     bank = cards(ax, nz[0] + 0.35, nz[3] + 0.4, 0.9, 0.45, n=4, off=0.07)
     text(ax, bank[2] + 0.12, (bank[1] + bank[3]) / 2, "8,192 one-step\nforecast errors\n(training days)",

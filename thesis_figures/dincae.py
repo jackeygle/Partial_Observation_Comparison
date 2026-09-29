@@ -8,7 +8,7 @@ observed), plus the two cell coordinates and the cos/sin of the daily and weekly
 30 channels. A U-Net with three mean-pooling levels (36x12 -> 18x6 -> 9x3 -> 5x2, 32/64/96
 filters) and additive skips; a second, identical U-Net refines from [input, first output].
 The output per variable is (m/sigma^2, log 1/sigma^2), i.e. a mean and a sigma-hat,
-trained with a Gaussian negative log-likelihood. Thumbnails: DINCAE on the example frame.
+trained with a Gaussian negative log-likelihood on both outputs (weights 0.3 and 0.7). Thumbnails: DINCAE on the example frame.
 """
 from __future__ import annotations
 
@@ -101,9 +101,9 @@ def main() -> None:
     text(ax, (e2[0] + e2[1]) / 2, e2[2] - 0.08, r"$\hat{\sigma}_t$", 9, ha="center")
     text(ax, (e1[0] + e2[1]) / 2, e1[3] + 0.15, "mean and\nuncertainty", FS_SMALL, ha="center",
          va="bottom", linespacing=1.1)
-    block(ax, e2[1] + 0.45, yc - 0.45, 2.3, 0.9, "Gaussian NLL", "against the truth")
+    block(ax, e2[1] + 0.45, yc - 0.5, 2.5, 1.0, "Gaussian NLL", "both outputs,\n" r"weights 0.3, 0.7")
     arrow(ax, (e2[1] + 0.08, yc), (e2[1] + 0.4, yc), color=GREY)
-    text(ax, e2[1] + 1.6, yc - 0.6, "training loss", FS_SMALL - 0.5, color=GREY, ha="center",
+    text(ax, e2[1] + 1.7, yc - 0.6, "training loss", FS_SMALL - 0.5, color=GREY, ha="center",
          va="top")
 
     save(fig, os.path.join(HERE, "out", "dincae"))
