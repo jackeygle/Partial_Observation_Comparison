@@ -70,20 +70,21 @@ def main() -> None:
     my0, my1 = ty - 0.05, ty + th + 0.05
     frame_box(ax, mx0, my0, mx1, my1)
     stage((mx0 + mx1) / 2, "Reconstruction\nmethods")
-    rows = [("Senseiver-A", r"$y_t$", False),
-            ("Senseiver-G (ours)", r"$y_{t-15:t}$", False),
-            ("DINCAE", r"$y_{t-1:t+1}$", True),
+    rows = [("Senseiver-A", r"$t$ only", False),          # observations used for frame t
+            ("Senseiver-G (ours)", "last 16 s", False),
+            ("DINCAE", r"$t \pm 1$ s", True),
             ("4DVarNet", "200 s", False),
             ("4DVarNet aug. var. (ours)", "200 s", True),
-            ("EnKF", r"$y_{1:t}$", True)]
+            ("EnKF", "all past", True)]
     step = (my1 - my0 - 0.55) / (len(rows) - 1)
     for i, (name, window, sig) in enumerate(rows):
         y = my1 - 0.3 - i * step
         ax.add_patch(Rectangle((mx0 + 0.18, y - 0.08), 0.16, 0.16, fc=method_color(name), ec="none"))
         text(ax, mx0 + 0.45, y, name + (r"$^{\ast}$" if sig else ""), va="center")
         text(ax, mx1 - 0.15, y, window, FS_SMALL, color=GREY, ha="right", va="center")
-    text(ax, mx0, my0 - 0.1, r"$^{\ast}$ also predicts its uncertainty $\hat{\sigma}_t$",
-         FS_SMALL, color=GREY)
+    text(ax, mx0, my0 - 0.1, "right: observations used for frame $t$\n"
+         r"$^{\ast}$ also predicts its uncertainty $\hat{\sigma}_t$",
+         FS_SMALL, color=GREY, linespacing=1.2)
     arrow(ax, (eb[1] + 0.12, ty + th / 2), (mx0 - 0.1, ty + th / 2))
 
     # (d) output: reconstruction and uncertainty -------------------------------------
@@ -92,6 +93,8 @@ def main() -> None:
     ed2 = thumbnail(ax, field_rgb(d["dincae_density_sigma"], walk, ps.CMAP["spread"], smax),
                     ed[1] + 0.25, ty, CELL)
     stage((ed[0] + ed2[1]) / 2, "Output")
+    text(ax, (ed[0] + ed2[1]) / 2, ty - 0.55, "(example: DINCAE)", FS_SMALL, color=GREY,
+         ha="center", va="top")
     text(ax, (ed[0] + ed[1]) / 2, ty - 0.12, r"$\hat{x}_t$", 9, ha="center")
     text(ax, (ed2[0] + ed2[1]) / 2, ty - 0.12, r"$\hat{\sigma}_t$", 9, ha="center")
     arrow(ax, (mx1 + 0.1, ty + th / 2), (ed[0] - 0.12, ty + th / 2))

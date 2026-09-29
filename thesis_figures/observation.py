@@ -23,7 +23,7 @@ from thesis_figures.common import (FS_SMALL, GREY, LINE, WALL, canvas, cell_cent
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CELL = 0.12
-PAGE = (16.0, 6.3)
+PAGE = (16.0, 7.25)
 SEEN = "#a9c9ee"
 
 
@@ -33,7 +33,7 @@ def main() -> None:
     walk, seen = f["walkable"], f["observed"]
     H, W = walk.shape
     fig, ax = canvas(*PAGE)
-    ty = 1.25
+    ty = 2.2
     th = H * CELL
 
     # ---- (a) one frame ---------------------------------------------------------------------
@@ -73,6 +73,16 @@ def main() -> None:
         else:
             ax.add_patch(Rectangle((ea[0], y - 0.09), 0.18, 0.18,
                                    fc=SEEN if kind == "seen" else WALL, ec="none"))
+        text(ax, ea[0] + 0.28, y, lab, FS_SMALL, va="center")
+    # the marks drawn on (a)
+    for k, lab in enumerate(["robot", "route, last 20 s", "sensing range"]):
+        y, xm = ly - (3 + k) * 0.32, ea[0] + 0.09
+        if k == 0:
+            ax.plot(xm, y, marker="o", ms=4, mfc=LINE, mec="white", mew=0.6)
+        elif k == 1:
+            ax.plot([xm - 0.09, xm + 0.09], [y, y], color=LINE, lw=0.6)
+        else:
+            ax.plot([xm - 0.09, xm + 0.09], [y, y], color=LINE, lw=0.6, ls=(0, (2.5, 1.5)))
         text(ax, ea[0] + 0.28, y, lab, FS_SMALL, va="center")
 
     # ---- (b) how often each cell is observed ------------------------------------------------
@@ -122,7 +132,7 @@ def main() -> None:
                  f"{cdf[sec]:.2f} within {sec} s", fontsize=FS_SMALL,
                  ha="left" if right else "right", va="top" if right else "bottom")
     axd.set_xlabel("seconds since last observed", fontsize=FS_SMALL + 0.5)
-    axd.set_ylabel("share of blind cells", fontsize=FS_SMALL + 0.5)
+    axd.set_ylabel("share of blind cells seen within", fontsize=FS_SMALL + 0.5)
     axd.tick_params(labelsize=FS_SMALL)
     axd.set_title("(d) age of blind cells", loc="left", fontsize=FS_SMALL + 0.5)
 

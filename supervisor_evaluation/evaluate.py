@@ -725,7 +725,8 @@ def plot_summary(output_dir: Path) -> None:
         x = np.arange(len(groups)); w = 0.8 / len(names)
         for ax, key, ylabel, ref, letter in (
                 (ax_c, "crps", "CRPS (lower is better)", 0.0, "a"),
-                (ax_d, "spread_rmse", "Spread / RMSE (1 = right size)", 1.0, "b")):
+                (ax_d, "spread_rmse", "Spread / RMSE\n" r"($>1$: $\hat{\sigma}$ too large, $<1$: too small)",
+                 1.0, "b")):
             for i, m in enumerate(names):
                 v = np.array([float(pooled[m][key])] +
                              [float(per_ch[(m, c)][key]) for c in CHANNELS])

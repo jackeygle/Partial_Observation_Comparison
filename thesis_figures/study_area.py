@@ -57,6 +57,18 @@ def main() -> None:
     max_.fill(corners[:, 0], corners[:, 1], color=ps.METHOD_COLORS["DINCAE"], alpha=0.12, lw=0)
     max_.plot(corners[:, 0], corners[:, 1], color=ps.METHOD_COLORS["DINCAE"], lw=0.9)
     max_.plot(*o, "o", ms=2.6, color=LINE)
+    # grid axes: local x (rows, along the corridor) and y (columns, across it), from cell (0, 0)
+    for vec, length, lab in ((R[:, 0], 14.0, r"$x$"), (R[:, 1], 8.0, r"$y$")):
+        tip = o + length * vec
+        max_.annotate("", xy=tip, xytext=o, zorder=5,
+                      arrowprops=dict(arrowstyle="-|>", color=LINE, lw=1.1, mutation_scale=8,
+                                      shrinkA=0, shrinkB=0))
+        # label beside the middle of the arrow, just outside the rectangle (the other axis
+        # points into it, so step against it)
+        other = R[:, 1] if lab == r"$x$" else R[:, 0]
+        max_.text(*(o + 0.55 * length * vec - 2.6 * other), lab, fontsize=FS_SMALL + 1.5,
+                  ha="center", va="center", zorder=6,
+                  bbox=dict(fc="white", ec="none", pad=0.5))
     max_.plot([xlim[0] + 3, xlim[0] + 13], [ylim[0] + 3] * 2, color=LINE, lw=1.0)   # scale bar
     max_.text(xlim[0] + 8, ylim[0] + 4, "10 m", fontsize=FS_SMALL, ha="center", va="bottom")
     max_.text(corners[1, 0] + 1.5, corners[1, 1] + 1.0, r"$36\times12$ m grid", fontsize=FS_SMALL,
@@ -104,6 +116,17 @@ def main() -> None:
                 ax.plot([ext[0] + j * CELL] * 2, [ext[2], ext[3]], color="#e3e3e3", lw=0.2, zorder=2)
             text(ax, (ext[0] + ext[1]) / 2, ext[2] - 0.12, f"{int(walk.sum())} of 432\nwalkable",
                  FS_SMALL - 0.5, color=GREY, ha="center")
+            # the same grid axes as in (a): +x down the rows, +y along the columns
+            for (dx, dy), lab, off in (((0.0, -0.75), r"$x$", (-0.13, 0.0)),
+                                       ((0.55, 0.0), r"$y$", (0.0, 0.13))):
+                ax.annotate("", xy=(ext[0] + 0.1 + dx, ext[3] - 0.1 + dy),
+                            xytext=(ext[0] + 0.1, ext[3] - 0.1),
+                            arrowprops=dict(arrowstyle="-|>", color=LINE, lw=0.8, mutation_scale=6,
+                                            shrinkA=0, shrinkB=0), zorder=7)
+            text(ax, ext[0] + 0.1 + 0.16, ext[3] - 0.1 - 0.75, r"$x$", FS_SMALL + 0.5, va="bottom",
+                 zorder=7)
+            text(ax, ext[0] + 0.1 + 0.55, ext[3] - 0.1 - 0.16, r"$y$", FS_SMALL + 0.5, ha="center",
+                 va="top", zorder=7)
 
     save(fig, os.path.join(HERE, "out", "study_area"))
 
