@@ -640,6 +640,14 @@ def plot_summary(output_dir: Path) -> None:
     from compare import plotstyle as ps
 
     ps.use(dpi=300)
+    # Match thesis_figures/: 8 pt text, 7 pt ticks and legends, thin lines.
+    plt.rcParams.update({
+        "font.size": 8, "axes.labelsize": 8, "axes.titlesize": 8,
+        "xtick.labelsize": 7, "ytick.labelsize": 7, "legend.fontsize": 7,
+        "axes.linewidth": 0.6, "xtick.major.width": 0.6, "ytick.major.width": 0.6,
+        "xtick.minor.width": 0.5, "ytick.minor.width": 0.5, "grid.linewidth": 0.5,
+        "lines.linewidth": 0.8})
+    fs_tick = 7
     fig_dir = output_dir / "figures"; fig_dir.mkdir(exist_ok=True)
     # Superseded file names from the previous figure set.
     for old in ("channel_rmse", "crps_skill", "spread_skill", "calibration_curve",
@@ -651,17 +659,20 @@ def plot_summary(output_dir: Path) -> None:
     captions: list[str] = []
 
     def save(fig, stem: str) -> None:
-        fig.savefig(fig_dir / f"{stem}.png")
+        fig.savefig(fig_dir / f"{stem}.pdf")                # vector, for LaTeX
+        fig.savefig(fig_dir / f"{stem}.png")                # preview
         plt.close(fig)
 
     def panel(ax, letter: str) -> None:
-        ax.set_title(f"({letter})", loc="left", fontweight="bold", fontsize=ps.FS_LABEL)
+        ax.set_title(f"({letter})", loc="left", fontsize=8)
 
     # ---- 1. Reconstruction accuracy: grouped bars, pooled + per channel ----------
     acc_path = output_dir / "accuracy.csv"
     if acc_path.exists():
         rows = list(csv.DictReader(acc_path.open()))
-        cols = [("blind_rmse", "All channels")] + [(f"{c}_rmse", CHANNEL_TEX[c]) for c in CHANNELS]
+        cols = [("blind_rmse", "All")] + [
+            (f"{c}_rmse", CHANNEL_TEX[c].replace("Velocity variance", "Vel. var."))
+            for c in CHANNELS]
         fig, ax = ps.figure(rows_h=2.6, constrained_layout=True)
         n, x = len(rows), np.arange(len(cols))
         w = 0.8 / n
@@ -677,7 +688,9 @@ def plot_summary(output_dir: Path) -> None:
         captions.append(
             "**accuracy_rmse** — Reconstruction RMSE on walkable cells that are not observed "
             "at that frame, pooled over the four state channels (left group) and per channel, "
-            f"over the {len(TEST_DATES)} held-out test days. Lower is better; exact values in "
+            f"over the {len(TEST_DATES)} held-out test days (frames 1 to T-2 of each day; EnKF "
+            "from frame 500, after its warm-up, i.e. without the first ~1.3% of each day). "
+            "Predictions clipped to the physical bounds. Lower is better; exact values in "
             "accuracy_table.tex.")
         # The same numbers as a LaTeX table (best per column in bold).
         head = ["Method", "All", "All walkable"] + [CHANNEL_TEX[c] for c in CHANNELS]
@@ -698,7 +711,8 @@ def plot_summary(output_dir: Path) -> None:
     unc_path = output_dir / "uncertainty.csv"
     ch_path = output_dir / "uncertainty_by_channel.csv"
     if unc_path.exists() and ch_path.exists():
-        urows = list(csv.DictReader(unc_path.open()))
+        order = [FINAL_CONFIG[k]["label"] for k in FINAL_CONFIG]   # same order as accuracy
+        urows = sorted(csv.DictReader(unc_path.open()), key=lambda r: order.index(r["method"]))
         chrows = list(csv.DictReader(ch_path.open()))
         names = [r["method"] for r in urows]
         pooled = {r["method"]: r for r in urows}
@@ -722,16 +736,16 @@ def plot_summary(output_dir: Path) -> None:
                     lo, hi = float(pooled[m][f"{key}_lo"]), float(pooled[m][f"{key}_hi"])
                     ax.errorbar(xs[0], v[0], yerr=[[max(v[0] - lo, 0.0)], [max(hi - v[0], 0.0)]],
                                 fmt="none",
-                                ecolor=ps.INK, elinewidth=0.8, capsize=2)
-            ax.axhline(ref, ls="--" if ref else "-", lw=0.8,
+                                ecolor=ps.INK, elinewidth=0.6, capsize=1.5, capthick=0.6)
+            ax.axhline(ref, ls="--" if ref else "-", lw=0.6,
                        color=ps.INK_MUTED if ref else ps.AXIS)
-            ax.axvline(0.5, color=ps.RULE, lw=0.8)      # separates pooled from channels
-            ax.set_xticks(x, glabels, fontsize=ps.FS_TICK)
+            ax.axvline(0.5, color=ps.RULE, lw=0.6)      # separates pooled from channels
+            ax.set_xticks(x, glabels, fontsize=fs_tick)
             ax.tick_params(axis="x", length=0)
             ax.set_ylabel(ylabel)
             panel(ax, letter)
-        fig.legend(*ax_c.get_legend_handles_labels(), loc="outside lower center",
-                   ncol=len(names), handlelength=1.8)
+        fig.legend(*ax_c.get_legend_handles_labels(), loc="outside upper center",
+                   ncol=len(names), handlelength=1.2, columnspacing=1.5)
         save(fig, "uncertainty_summary")
         captions.append(
             "**uncertainty_summary** — Predictive uncertainty on unobserved walkable cells, all "
@@ -758,11 +772,11 @@ def plot_summary(output_dir: Path) -> None:
             ax.bar(xs, median, 0.62, color=[ps.method_color(m) for m in names])
             for xi, v in zip(xs, median):
                 ax.annotate(f"{v:.2g}", (xi, v), xytext=(0, 2), textcoords="offset points",
-                            ha="center", va="bottom", fontsize=ps.FS_TICK)
+                            ha="center", va="bottom", fontsize=fs_tick)
             ax.set_yscale("log")
             ax.set_ylim(min(median) / 3, max(median) * 3)
             ax.set_xticks(xs, [short.get(m, m).replace(" (", "\n(") for m in names],
-                          fontsize=ps.FS_TICK - 0.5)
+                          fontsize=fs_tick)
             ax.tick_params(axis="x", length=0)
             ax.set_ylabel("GPU time per frame (ms, log scale)")
             save(fig, "inference_latency")
