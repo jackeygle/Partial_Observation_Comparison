@@ -274,8 +274,7 @@ methods/                  one directory per method; none imports another
   sbatch/ (training jobs) and runs/ (training logs; checkpoints gitignored)
 compare/                  the only code that imports more than one method:
                           cross-method scoring, shared metrics, plot style
-slides/                   build_enkf_deck.js -> the EnKF optimisation deck
-                          (enkf_optimisation.pptx / .pdf)
+thesis_figures/           the thesis's schematics and example figures (see its README)
 sbatch/_env.sh            the single environment entry point
 ```
 
