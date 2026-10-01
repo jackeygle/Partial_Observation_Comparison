@@ -142,6 +142,10 @@ def main():
     ap.add_argument("--out", default="runs/senseiver_A")
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--allow-cpu", action="store_true")
+    ap.add_argument("--save-every-epoch", action="store_true",
+                    help="also keep every epoch's weights as epoch_NNN.pt, so the epoch can be "
+                         "chosen afterwards on the whole validation split "
+                         "(checks/select_checkpoint.py); training itself is unchanged")
     args = ap.parse_args()
 
 
@@ -267,6 +271,9 @@ def main():
         torch.save(ck, last_p)
         if improved:
             torch.save(ck, os.path.join(args.out, "best.pt"))
+        if args.save_every_epoch:
+            torch.save({k: v for k, v in ck.items() if k != "optimizer"},
+                       os.path.join(args.out, f"epoch_{ep:03d}.pt"))
     print("[done]", flush=True)
 
 
