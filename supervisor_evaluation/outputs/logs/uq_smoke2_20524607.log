@@ -1,0 +1,9 @@
+[verify] PASS -> supervisor_evaluation/outputs/dev/uq_smoke/verification_report.json
+[uncertainty] atc-20130811: frames [500, 1399), 111518 cells/channel
+[uncertainty] atc-20130818: frames [500, 1399), 117246 cells/channel
+[uncertainty] 4DVarNet aughead_obs (single)    rmse 0.2324  crps 0.0762  spread 0.2493  spread/rmse 1.072
+[uncertainty] DINCAE                           rmse 0.1809  crps 0.0497  spread 0.1567  spread/rmse 0.866
+[uncertainty] Localized EnKF (100 members)     rmse 0.2369  crps 0.1040  spread 0.3567  spread/rmse 1.506
+[uncertainty] wrote supervisor_evaluation/outputs/dev/uq_smoke/raw/uncertainty_unified.json
+[collect] 1 accuracy rows, 3 uncertainty rows
+[plot] figures written under supervisor_evaluation/outputs/dev/uq_smoke/figures
