@@ -1,15 +1,15 @@
 {
-  "created": "2026-09-23T21:42:48+0300",
+  "created": "2026-10-02T13:17:48+0300",
   "files": {
     "senseiver_A.pt": {
-      "bytes": 1029398,
-      "sha256": "f909bb3a61949cd018cace4c1bf3d6dd4423f230851f1b0328b683f8f1ba8874",
-      "source": "methods/senseiver/runs/senseiver_A/best.pt"
+      "bytes": 425611,
+      "sha256": "50c21c608c5b2f68c3fe1608a74eb18ee9e0112ff0629fc6fa3b25f5e319795d",
+      "source": "methods/senseiver/runs/senseiver_A_full/epoch_086.pt"
     },
     "senseiver_G_k16.pt": {
-      "bytes": 904834,
-      "sha256": "b20c145d7077ff771312d4b676f6998e3d75674682e8631242df4f14911b7491",
-      "source": "methods/senseiver/runs/capacity/base32_k16_s123/best.pt"
+      "bytes": 382795,
+      "sha256": "a49464af512f6480d42c41f6c310e0f61af084fb52957aa9e7abea5c6c60dae0",
+      "source": "methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt"
     },
     "dincae_epoch60.pt": {
       "bytes": 1288437,

@@ -44,7 +44,7 @@ TEST_DATES = (
 FINAL_CONFIG: dict[str, dict[str, Any]] = {
     "senseiver_a": {
         "label": "Senseiver-A",
-        "source": "methods/senseiver/runs/senseiver_A/best.pt",
+        "source": "methods/senseiver/runs/senseiver_A_full/epoch_086.pt",
         "file": "senseiver_A.pt",
         "temporal_context": "t",
         "causal": True,
@@ -52,7 +52,7 @@ FINAL_CONFIG: dict[str, dict[str, Any]] = {
     },
     "senseiver_g": {
         "label": "Senseiver-G Temporal (ours)",
-        "source": "methods/senseiver/runs/capacity/base32_k16_s123/best.pt",
+        "source": "methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt",
         "file": "senseiver_G_k16.pt",
         "temporal_context": "t-15..t",
         "causal": True,

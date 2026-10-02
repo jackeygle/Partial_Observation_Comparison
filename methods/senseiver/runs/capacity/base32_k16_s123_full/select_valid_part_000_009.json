@@ -1,0 +1,82 @@
+{
+ "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/capacity/base32_k16_s123_full",
+ "split": "valid",
+ "days": [
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "frames": "all but the first and last of each day",
+ "trajectory_mode": "fixed",
+ "observation_base_seed": 123,
+ "scope": "walkable (blind cells inside the walkable region, four channels, clipped)",
+ "rows": [
+  {
+   "epoch": 0,
+   "ckpt": "epoch_000.pt",
+   "mse": 0.04542118158445424,
+   "rmse": 0.21312245678119948
+  },
+  {
+   "epoch": 1,
+   "ckpt": "epoch_001.pt",
+   "mse": 0.041841123341100225,
+   "rmse": 0.20455102869724276
+  },
+  {
+   "epoch": 2,
+   "ckpt": "epoch_002.pt",
+   "mse": 0.0401330117898182,
+   "rmse": 0.2003322534935855
+  },
+  {
+   "epoch": 3,
+   "ckpt": "epoch_003.pt",
+   "mse": 0.03925981672583563,
+   "rmse": 0.19814090119365974
+  },
+  {
+   "epoch": 4,
+   "ckpt": "epoch_004.pt",
+   "mse": 0.038655314186801314,
+   "rmse": 0.19660954754742027
+  },
+  {
+   "epoch": 5,
+   "ckpt": "epoch_005.pt",
+   "mse": 0.03810499140070231,
+   "rmse": 0.19520499840091776
+  },
+  {
+   "epoch": 6,
+   "ckpt": "epoch_006.pt",
+   "mse": 0.037611702262917365,
+   "rmse": 0.1939373668556871
+  },
+  {
+   "epoch": 7,
+   "ckpt": "epoch_007.pt",
+   "mse": 0.03748407596625638,
+   "rmse": 0.1936080472662652
+  },
+  {
+   "epoch": 8,
+   "ckpt": "epoch_008.pt",
+   "mse": 0.03712529832977124,
+   "rmse": 0.19267926284312809
+  },
+  {
+   "epoch": 9,
+   "ckpt": "epoch_009.pt",
+   "mse": 0.036899790611700824,
+   "rmse": 0.19209318210623932
+  }
+ ],
+ "selected_epoch": 9,
+ "selected_ckpt": "epoch_009.pt",
+ "selected_rmse": 0.19209318210623932
+}

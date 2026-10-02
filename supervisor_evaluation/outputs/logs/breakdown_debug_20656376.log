@@ -1,0 +1,15 @@
+[breakdown] atc-20130811: 39300 common frames
+[breakdown] atc-20130818: 38300 common frames
+[breakdown] atc-20130825: 42300 common frames
+[breakdown] atc-20130901: 39100 common frames
+[breakdown] atc-20130915: 38700 common frames
+[breakdown] atc-20130922: 38300 common frames
+[breakdown] atc-20130929: 37300 common frames
+{
+ "Senseiver-A": 0.2227538387304366,
+ "Senseiver-G": 0.19671413529972712,
+ "DINCAE": 0.22701306920795314,
+ "4DVarNet": 0.2306261412818062,
+ "4DVarNet aug. var.": 0.29491654804294665,
+ "EnKF": 0.2617383456140277
+}

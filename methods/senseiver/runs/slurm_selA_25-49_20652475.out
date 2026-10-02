@@ -1,0 +1,33 @@
+[data] atc-20130616_corridor_1.0s.h5: 35127 frames, observation seed 123 (fixed)
+[data] atc-20130623_corridor_1.0s.h5: 40620 frames, observation seed 123 (fixed)
+[data] atc-20130630_corridor_1.0s.h5: 40710 frames, observation seed 123 (fixed)
+[data] atc-20130707_corridor_1.0s.h5: 38437 frames, observation seed 123 (fixed)
+[data] atc-20130714_corridor_1.0s.h5: 40457 frames, observation seed 123 (fixed)
+[data] atc-20130721_corridor_1.0s.h5: 37413 frames, observation seed 123 (fixed)
+[data] atc-20130728_corridor_1.0s.h5: 36979 frames, observation seed 123 (fixed)
+[select] epoch  25  blind walkable RMSE 0.21385
+[select] epoch  26  blind walkable RMSE 0.21362
+[select] epoch  27  blind walkable RMSE 0.21319
+[select] epoch  28  blind walkable RMSE 0.21342
+[select] epoch  29  blind walkable RMSE 0.21372
+[select] epoch  30  blind walkable RMSE 0.21359
+[select] epoch  31  blind walkable RMSE 0.21381
+[select] epoch  32  blind walkable RMSE 0.21339
+[select] epoch  33  blind walkable RMSE 0.21323
+[select] epoch  34  blind walkable RMSE 0.21361
+[select] epoch  35  blind walkable RMSE 0.21365
+[select] epoch  36  blind walkable RMSE 0.21320
+[select] epoch  37  blind walkable RMSE 0.21303
+[select] epoch  38  blind walkable RMSE 0.21347
+[select] epoch  39  blind walkable RMSE 0.21353
+[select] epoch  40  blind walkable RMSE 0.21310
+[select] epoch  41  blind walkable RMSE 0.21325
+[select] epoch  42  blind walkable RMSE 0.21316
+[select] epoch  43  blind walkable RMSE 0.21325
+[select] epoch  44  blind walkable RMSE 0.21362
+[select] epoch  45  blind walkable RMSE 0.21295
+[select] epoch  46  blind walkable RMSE 0.21304
+[select] epoch  47  blind walkable RMSE 0.21296
+[select] epoch  48  blind walkable RMSE 0.21315
+[select] epoch  49  blind walkable RMSE 0.21299
+[select] selected epoch 45 (RMSE 0.21295) -> select_valid_part_025_049.json

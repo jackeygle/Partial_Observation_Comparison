@@ -1,0 +1,172 @@
+{
+ "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/senseiver_A_full",
+ "split": "valid",
+ "days": [
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "frames": "all but the first and last of each day",
+ "trajectory_mode": "fixed",
+ "observation_base_seed": 123,
+ "scope": "walkable (blind cells inside the walkable region, four channels, clipped)",
+ "rows": [
+  {
+   "epoch": 25,
+   "ckpt": "epoch_025.pt",
+   "mse": 0.045732741449141426,
+   "rmse": 0.21385214857265622
+  },
+  {
+   "epoch": 26,
+   "ckpt": "epoch_026.pt",
+   "mse": 0.045633116209478936,
+   "rmse": 0.21361909139746602
+  },
+  {
+   "epoch": 27,
+   "ckpt": "epoch_027.pt",
+   "mse": 0.04544892531098448,
+   "rmse": 0.2131875355432031
+  },
+  {
+   "epoch": 28,
+   "ckpt": "epoch_028.pt",
+   "mse": 0.04554735733064602,
+   "rmse": 0.21341826850259568
+  },
+  {
+   "epoch": 29,
+   "ckpt": "epoch_029.pt",
+   "mse": 0.04567825598521208,
+   "rmse": 0.2137247201079278
+  },
+  {
+   "epoch": 30,
+   "ckpt": "epoch_030.pt",
+   "mse": 0.04561923288805743,
+   "rmse": 0.2135865934183544
+  },
+  {
+   "epoch": 31,
+   "ckpt": "epoch_031.pt",
+   "mse": 0.045716213658636665,
+   "rmse": 0.21381350204941843
+  },
+  {
+   "epoch": 32,
+   "ckpt": "epoch_032.pt",
+   "mse": 0.04553463339944997,
+   "rmse": 0.21338845657497496
+  },
+  {
+   "epoch": 33,
+   "ckpt": "epoch_033.pt",
+   "mse": 0.0454687455998981,
+   "rmse": 0.21323401604785786
+  },
+  {
+   "epoch": 34,
+   "ckpt": "epoch_034.pt",
+   "mse": 0.04562898526446473,
+   "rmse": 0.21360942222773024
+  },
+  {
+   "epoch": 35,
+   "ckpt": "epoch_035.pt",
+   "mse": 0.045648009799681324,
+   "rmse": 0.21365394871071614
+  },
+  {
+   "epoch": 36,
+   "ckpt": "epoch_036.pt",
+   "mse": 0.04545549560633244,
+   "rmse": 0.21320294464742376
+  },
+  {
+   "epoch": 37,
+   "ckpt": "epoch_037.pt",
+   "mse": 0.04538208174131864,
+   "rmse": 0.2130307060996575
+  },
+  {
+   "epoch": 38,
+   "ckpt": "epoch_038.pt",
+   "mse": 0.04556866206929973,
+   "rmse": 0.21346817577639
+  },
+  {
+   "epoch": 39,
+   "ckpt": "epoch_039.pt",
+   "mse": 0.04559560261966268,
+   "rmse": 0.21353126848230608
+  },
+  {
+   "epoch": 40,
+   "ckpt": "epoch_040.pt",
+   "mse": 0.045410016587512154,
+   "rmse": 0.21309626131753734
+  },
+  {
+   "epoch": 41,
+   "ckpt": "epoch_041.pt",
+   "mse": 0.04547473548679332,
+   "rmse": 0.21324806092153176
+  },
+  {
+   "epoch": 42,
+   "ckpt": "epoch_042.pt",
+   "mse": 0.04543813656901515,
+   "rmse": 0.21316223063435782
+  },
+  {
+   "epoch": 43,
+   "ckpt": "epoch_043.pt",
+   "mse": 0.04547605715726049,
+   "rmse": 0.2132511598028496
+  },
+  {
+   "epoch": 44,
+   "ckpt": "epoch_044.pt",
+   "mse": 0.04563234912230671,
+   "rmse": 0.21361729593435713
+  },
+  {
+   "epoch": 45,
+   "ckpt": "epoch_045.pt",
+   "mse": 0.04534839951411233,
+   "rmse": 0.2129516365612444
+  },
+  {
+   "epoch": 46,
+   "ckpt": "epoch_046.pt",
+   "mse": 0.04538565163650154,
+   "rmse": 0.21303908476263583
+  },
+  {
+   "epoch": 47,
+   "ckpt": "epoch_047.pt",
+   "mse": 0.04535206337352921,
+   "rmse": 0.2129602389497373
+  },
+  {
+   "epoch": 48,
+   "ckpt": "epoch_048.pt",
+   "mse": 0.045434215291339036,
+   "rmse": 0.2131530325642566
+  },
+  {
+   "epoch": 49,
+   "ckpt": "epoch_049.pt",
+   "mse": 0.045363298848989375,
+   "rmse": 0.21298661659594806
+  }
+ ],
+ "selected_epoch": 45,
+ "selected_ckpt": "epoch_045.pt",
+ "selected_rmse": 0.2129516365612444
+}

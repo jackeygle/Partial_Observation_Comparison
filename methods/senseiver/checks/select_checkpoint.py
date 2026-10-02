@@ -66,12 +66,22 @@ def main() -> None:
     ap.add_argument("--chunk", type=int, default=512)
     ap.add_argument("--days", type=int, default=0, help="first N days only (smoke test)")
     ap.add_argument("--frames", type=int, default=0, help="first N frames per day (smoke test)")
+    ap.add_argument("--epochs", default="",
+                    help="score only epochs A-B (inclusive) and write select_valid_part_A_B.json, "
+                         "so several jobs can share the work; then run with --merge")
+    ap.add_argument("--merge", action="store_true",
+                    help="combine the select_valid_part_*.json files into select_valid.json")
     a = ap.parse_args()
+    if a.merge:                                   # bookkeeping only, no GPU needed
+        merge(a.run_dir)
+        return
     if not torch.cuda.is_available():
         raise SystemExit("No GPU: run this on a GPU node")
     dev = torch.device("cuda")
-
     ckpts = sorted(glob.glob(os.path.join(a.run_dir, "epoch_*.pt")))
+    if a.epochs:
+        lo, hi = (int(v) for v in a.epochs.split("-"))
+        ckpts = [p for p in ckpts if lo <= int(re.search(r"epoch_(\d+)", p).group(1)) <= hi]
     if not ckpts:
         raise SystemExit(f"no epoch_*.pt in {a.run_dir}; train with --save-every-epoch")
     args0 = torch.load(ckpts[0], map_location="cpu", weights_only=False)["args"]
@@ -133,9 +143,35 @@ def main() -> None:
            "rows": rows, "selected_epoch": best["epoch"], "selected_ckpt": best["ckpt"],
            "selected_rmse": best["rmse"]}
     name = "select_valid.json" if not (a.days or a.frames) else "select_valid_smoke.json"
+    if a.epochs and not (a.days or a.frames):
+        name = f"select_valid_part_{lo:03d}_{hi:03d}.json"
     with open(os.path.join(a.run_dir, name), "w") as f:
         json.dump(out, f, indent=1)
     print(f"[select] selected epoch {best['epoch']} (RMSE {best['rmse']:.5f}) -> {name}", flush=True)
+
+
+def merge(run_dir: str) -> None:
+    """Combine the per-range parts; every epoch_*.pt of the run must be scored exactly once."""
+    parts = sorted(glob.glob(os.path.join(run_dir, "select_valid_part_*.json")))
+    docs = [json.load(open(p)) for p in parts]
+    rows = sorted((r for d in docs for r in d["rows"]), key=lambda r: r["epoch"])
+    want = sorted(int(re.search(r"epoch_(\d+)", p).group(1))
+                  for p in glob.glob(os.path.join(run_dir, "epoch_*.pt")))
+    if [r["epoch"] for r in rows] != want:
+        raise SystemExit(f"parts cover epochs {[r['epoch'] for r in rows]}, run has {want}")
+    for key in ("split", "days", "frames", "trajectory_mode", "observation_base_seed", "scope"):
+        if len({json.dumps(d[key]) for d in docs}) != 1:
+            raise SystemExit(f"parts disagree on {key}")
+    best = min(rows, key=lambda r: r["mse"])
+    out = {**{k: docs[0][k] for k in ("run_dir", "split", "days", "frames", "trajectory_mode",
+                                      "observation_base_seed", "scope")},
+           "parts": [os.path.basename(p) for p in parts], "rows": rows,
+           "selected_epoch": best["epoch"], "selected_ckpt": best["ckpt"],
+           "selected_rmse": best["rmse"]}
+    with open(os.path.join(run_dir, "select_valid.json"), "w") as f:
+        json.dump(out, f, indent=1)
+    print(f"[merge] {len(rows)} epochs; selected epoch {best['epoch']} "
+          f"(RMSE {best['rmse']:.5f}) -> select_valid.json", flush=True)
 
 
 if __name__ == "__main__":

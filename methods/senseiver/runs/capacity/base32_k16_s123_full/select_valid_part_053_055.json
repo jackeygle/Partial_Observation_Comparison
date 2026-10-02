@@ -1,0 +1,40 @@
+{
+ "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/capacity/base32_k16_s123_full",
+ "split": "valid",
+ "days": [
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "frames": "all but the first and last of each day",
+ "trajectory_mode": "fixed",
+ "observation_base_seed": 123,
+ "scope": "walkable (blind cells inside the walkable region, four channels, clipped)",
+ "rows": [
+  {
+   "epoch": 53,
+   "ckpt": "epoch_053.pt",
+   "mse": 0.03533260796958357,
+   "rmse": 0.18796969960497242
+  },
+  {
+   "epoch": 54,
+   "ckpt": "epoch_054.pt",
+   "mse": 0.035245732685105495,
+   "rmse": 0.18773846884723838
+  },
+  {
+   "epoch": 55,
+   "ckpt": "epoch_055.pt",
+   "mse": 0.03527462559997848,
+   "rmse": 0.18781540298915445
+  }
+ ],
+ "selected_epoch": 54,
+ "selected_ckpt": "epoch_054.pt",
+ "selected_rmse": 0.18773846884723838
+}
