@@ -13,7 +13,7 @@ by `supervisor_evaluation/evaluate.py` (see the repository [README](../../README
 | Row | Run | What it is |
 |---|---|---|
 | 4DVarNet | `runs/varnet_mse5_h96_s3/ckpt_00080.pt` | plain MSE (Eq. 14); of five seeds, the one with the lowest validation error |
-| 4DVarNet (aug. head) | `runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | ours: σ inside the prior (`aug0`), a Gaussian-NLL observation term, and a dedicated variance head |
+| 4DVarNet aug. var. (ours) | `runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | ours: σ inside the prior (`aug0`), a Gaussian-NLL observation term, and a dedicated variance head |
 
 This README is written so someone else can reproduce the whole thing from the raw
 data. **All parameters live in `crowdcore/config.yaml` (single source of truth)**; every
@@ -33,7 +33,7 @@ source sbatch/_env.sh           # module load + PYTHONPATH
 for s in 0 1 2 3 4; do
   sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
 done
-#    and the uncertainty model (aug. head), one seed
+#    and the uncertainty model (aug. var. model), one seed
 sbatch --job-name=varnet_aughead_s0 methods/varnet/sbatch/submit_aughead_chain.sbatch 0 0
 
 # 3. choose each run's epoch on the validation split (-> runs/<run>/select_valid.json)
@@ -60,7 +60,7 @@ sbatch supervisor_evaluation/sbatch/full.sbatch
 | `../../crowdcore/navigation.py` | walkable map / obstacles / A*; `build_valid_mask_from_config` |
 | `prior_model.py` | Component 2: GENN dynamical prior Φ |
 | `variational_solver.py` | Component 3: variational cost + learned-gradient-descent solver (`GradSolver`) |
-| `losses.py` | the training losses (MSE, Eq. 14; Gaussian NLL for the aug. head) |
+| `losses.py` | the training losses (MSE, Eq. 14; Gaussian NLL for the aug. var. model) |
 | `train.py` | end-to-end training (Φ + solver + cost weights, one loss) |
 | `checks/select_checkpoint.py` | picks each run's epoch on the validation split -> `select_valid.json` |
 | `checks/model_io.py` | `load_solver`, `reported_ckpt` (resolves the selected checkpoint) |
@@ -171,7 +171,7 @@ srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \
 
 The reported evaluation is `supervisor_evaluation/evaluate.py`: it scores both 4DVarNet
 models next to the other methods, with the same test days, observations, cell set and
-clip bounds, and scores the aug. head's σ̂ in physical units on the same frames as DINCAE
+clip bounds, and scores the aug. var. model's σ̂ in physical units on the same frames as DINCAE
 and the EnKF. Neither 4DVarNet model is initialised from truth: the solver starts from the
 observation-filled `X0`.
 

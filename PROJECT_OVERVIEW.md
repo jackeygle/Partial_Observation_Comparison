@@ -40,7 +40,7 @@ drift apart.
 | **Senseiver-G (ours)** | `methods/senseiver/` | our extension: one latent token per grid cell ("G-direct") and a 16-frame causal window of past observations | none |
 | DINCAE | `methods/dincae/` | DINCAE 2.0 (Barth et al. 2022), trained with full-field supervision | σ̂ from the network's variance output |
 | 4DVarNet | `methods/varnet/` | 4DVarNet (Fablet et al. 2020), plain MSE loss (Eq. 14), 200-frame window | none |
-| 4DVarNet (aug. head) | `methods/varnet/` | 4DVarNet with σ inside the prior (`aug0`), a Gaussian-NLL observation term and a dedicated variance head (**ours**) | σ̂ from the variance head |
+| 4DVarNet aug. var. (ours) | `methods/varnet/` | 4DVarNet with σ inside the prior (`aug0`), a Gaussian-NLL observation term and a dedicated variance head (**ours**) | σ̂ from the variance head |
 | EnKF | `methods/enkf/` | localised ensemble Kalman filter, 100 members, PedPred3 5→5 forecast model, structured process noise sampled from training-day forecast residuals | ensemble spread |
 
 Three rules hold for every row:
@@ -94,7 +94,9 @@ reported: CRPS, and spread/RMSE with spread = √(mean σ̂²), the usual ensemb
 definition (before 2026-09-28 the mean of σ̂ was used, and a CRPS skill against a
 constant-σ reference was reported instead of CRPS).
 
-**Every frame of every test day** is scored; nothing is subsampled. (The first
+**All frames of every test day** are scored (except each day's first and last frame,
+the EnKF's 500-frame warm-up, and 4DVarNet's frames after the last complete window);
+nothing is subsampled. (The first
 400 frames of a day are an almost empty field — about 1/7 of the day's mean
 density — so a subset starting at frame 0 flatters every method.)
 
@@ -107,26 +109,29 @@ Senseiver and DINCAE are bit-reproducible.
 
 ## Where each final model comes from
 
-The eight weight files in `supervisor_evaluation/models/` are the only weights the
+The eight files in `supervisor_evaluation/models/` (six networks' weights, DINCAE's
+normalisation statistics and the EnKF's noise bank) are the only weights the
 evaluation loads; `models/manifest.json` maps each to its training-run source
 and SHA-256, and `evaluate.py verify` checks them before every run
 (`evaluate.py prepare` rebuilds the package from the sources below).
 
 | Packaged file | Source | Chosen how |
 |---|---|---|
-| `senseiver_A.pt` | `methods/senseiver/runs/senseiver_A/best.pt` | best validation epoch |
-| `senseiver_G_k16.pt` | `methods/senseiver/runs/capacity/base32_k16_s123/best.pt` | best validation epoch (56 of 60) |
+| `senseiver_A.pt` | `methods/senseiver/runs/senseiver_A_full/epoch_086.pt` | `methods/senseiver/checks/select_checkpoint.py` on all seven validation days, every frame (epoch 86 of 100; `select_valid.json` in the run) |
+| `senseiver_G_k16.pt` | `methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt` | the same (epoch 57 of 60) |
 | `dincae_epoch60.pt` + `dincae_state_stats.npz` | `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, `methods/dincae/artifacts/state_stats.npz` | `methods/dincae/checks/select_checkpoint.py` on validation |
 | `varnet_mse_s3_epoch80.pt` | `methods/varnet/runs/varnet_mse5_h96_s3/ckpt_00080.pt` | epoch per run by `checks/select_checkpoint.py`; seed 3 has the lowest validation error of the five |
 | `varnet_aughead_obs_s0.pt` | `methods/varnet/runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | `select_valid.json` in that run (epoch 90) |
 | `pedpred3_5to5_epoch38.pt` | `methods/enkf/runs/pedpred3_5to5_clip_s0/dyn150_best.pt` | best epoch on the full validation split (`dyn150_pick.json`) |
 | `enkf_residual_q_bank.npz` | `methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz` | 8192 one-step forecast residual fields from the 32 training days |
 
-The EnKF's scalar settings (process-noise scale 1.5, AR(1) persistence 0.5,
-blind-cell noise scales, cross-channel matrix, localisation radius 7, inflation
-1.02) are frozen in `FINAL_CONFIG` at the top of
-`supervisor_evaluation/evaluate.py`; they were selected on the validation days
-(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`). The noise
+The EnKF's scalar settings are frozen in `FINAL_CONFIG` at the top of
+`supervisor_evaluation/evaluate.py`. The process-noise scale 1.5, AR(1) persistence
+0.5 and blind-cell noise scales were selected on the validation days, in a sweep run
+with the original forecast model and kept when PedPred3 5→5 replaced it
+(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`). The
+localisation radius 7, inflation 1.02 and the bias update are the original filter's;
+the cross-channel matrix was not part of the validation sweep. The noise
 bank is used at its own measured size (`bank_native_std`), not rescaled to the
 original project's `PROC_STD`; this last change was also chosen on the validation
 days (`methods/enkf/check_outputs/variance_noise_validation/`).
@@ -144,7 +149,7 @@ done
 sbatch --export=ALL,RUNS="mse5_h96_s0 mse5_h96_s1 mse5_h96_s2 mse5_h96_s3 mse5_h96_s4" \
   methods/varnet/sbatch/submit_select.sbatch
 
-# 4DVarNet (aug. head): one seed, then its epoch on validation
+# 4DVarNet aug. var. (ours): one seed, then its epoch on validation
 sbatch --job-name=varnet_aughead_s0 methods/varnet/sbatch/submit_aughead_chain.sbatch 0 0
 sbatch --export=ALL,RUNS="aughead_obs_h96_s0" methods/varnet/sbatch/submit_select.sbatch
 
@@ -153,10 +158,15 @@ python3 -m methods.dincae.state
 sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_ff
 python3 -m methods.dincae.checks.select_checkpoint
 
-# Senseiver-A (up to a day) and Senseiver-G (grid latent, direct read-out, 16-frame window)
-sbatch methods/senseiver/sbatch/submit_train.sbatch --out runs/senseiver_A
-EPOCHS=60 OUT=runs/capacity/base32_k16_s123 sbatch methods/senseiver/sbatch/submit_train.sbatch \
-  --latent-mode grid --readout direct --time-window 16 --seed 123
+# Senseiver-A and Senseiver-G (grid latent, direct read-out, 16-frame window), seed 123
+# (the default), keeping every epoch; then each run's epoch on the whole validation split
+EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_full \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch --save-every-epoch
+EPOCHS=60 OUT=$PWD/methods/senseiver/runs/capacity/base32_k16_s123_full \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch \
+  --latent-mode grid --readout direct --time-window 16 --save-every-epoch
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_full
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/capacity/base32_k16_s123_full
 
 # EnKF forecast model (PedPred3, 5 frames in -> 5 out). The first run diverged at
 # epoch 30; the reported one restarts from its epoch-29 weights with a fresh
@@ -264,7 +274,7 @@ crowdcore/                shared by every method, method-agnostic
   assets/atc_map/           the map (ROS occupancy grid)
   data/                     raw CSV -> gridded H5 pipeline (DOC_data_pipeline.md)
 methods/                  one directory per method; none imports another
-  varnet/                   4DVarNet (MSE and aug. head)
+  varnet/                   4DVarNet (MSE and aug. var.)
   dincae/                   DINCAE
   senseiver/                Senseiver (A, and the G / temporal extensions)
   enkf/                     EnKF: enkf_opt/ (filter code + the final structured-noise
@@ -283,7 +293,7 @@ sbatch/_env.sh            the single environment entry point
 | Question | Script |
 |---|---|
 | DINCAE accuracy, σ̂ calibration, variance retention on its own | `methods.dincae.checks.evaluate` |
-| Which epoch of a run to report (validation split) | `methods.varnet.checks.select_checkpoint`, `methods.dincae.checks.select_checkpoint` |
+| Which epoch of a run to report (validation split) | `methods.varnet.checks.select_checkpoint`, `methods.dincae.checks.select_checkpoint`, `methods.senseiver.checks.select_checkpoint` |
 | Why did the original EnKF collapse? | `methods.enkf.checks.diag_proc_scale_sweep` |
 | Original vs final EnKF, scored identically | `methods.enkf.checks.compare_original_final` |
 | How much the Kalman update moves the EnKF towards the observations | `methods.enkf.checks.kalman_contribution` |

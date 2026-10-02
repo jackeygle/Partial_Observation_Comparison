@@ -27,8 +27,9 @@ imports code from the rest of the repository (`crowdcore/`, `compare/`,
 - **Environment:** `source sbatch/_env.sh` loads Triton's
   `scicomp-pytorch-env/2026.1` (Python 3.12) and sets `PYTHONPATH`; elsewhere,
   `pip install -r requirements.txt`. A GPU is required.
-- **Weights:** the eight weight files in `supervisor_evaluation/models/` are the
-  frozen final models and are part of the repository. `models/manifest.json` records
+- **Weights:** the eight files in `supervisor_evaluation/models/` (the weights of
+  the six trained networks, DINCAE's normalisation statistics and the EnKF's noise
+  bank) are the frozen final models and are part of the repository. `models/manifest.json` records
   their SHA-256; every run checks them first and refuses to start on a mismatch.
 - **Data:** not in the repository. Point `--data-root` (or `data.root` in
   `crowdcore/config.yaml`) at a directory laid out as described
@@ -53,13 +54,16 @@ latest — so no afternoon is seen from both sides of a boundary.
 | Split | Days | Frames | Date range | Used for |
 |---|---|---|---|---|
 | train | 32 | 1,262,518 | 2012-10-28 → 2013-06-09 | fitting weights and all training-derived statistics |
-| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing checkpoints and calibration constants |
+| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing checkpoints (every model's epoch on all seven days, every frame) and the EnKF's noise settings |
 | test | 7 | 277,543 | 2013-08-11 → 2013-09-29 | every reported number |
 
 Test days: `20130811 20130818 20130825 20130901 20130915 20130922 20130929`.
 There is no recording for the Sundays 2013-08-04 and 2013-09-08 in the source
-data, which is why they are missing. Every frame of every test day is scored
-(about 38,000–43,000 frames per day, ~11 hours); nothing is subsampled.
+data, which is why they are missing. All frames of every test day are scored
+(about 38,000–43,000 frames per day, ~11 hours), except the first and last frame
+of a day (DINCAE needs a neighbouring frame), the EnKF's 500-frame warm-up, and,
+for 4DVarNet, the frames after the last complete 200-frame window; nothing is
+subsampled.
 
 **Where the split is defined.** The code reads three list files from the data
 root, `sunday_atc_{train,valid,test}.lst` (one `ATC/Sundays/atc-YYYYMMDD.h5`
@@ -77,8 +81,8 @@ same days.
   lists. No retraining is needed.
 - *Different train or valid days:* the packaged weights are no longer valid.
   Besides the model weights, these are fitted on the training days and must be
-  rebuilt with the new split: the walkable-cell mask (a cell is walkable if its
-  density exceeds 0.5 on some training day; cached as
+  rebuilt with the new split: the walkable-cell mask (besides the map, a cell must
+  have a density above 0.5 on some training day; cached as
   `grid_cache/visited_union_train_tau0.5_corridor.npy` — delete it and it is
   recomputed from the training list), DINCAE's normalisation statistics
   (`methods/dincae/artifacts/state_stats.npz`), and the EnKF's residual noise
@@ -134,11 +138,11 @@ into one number.
 
 | Method | All | Density | $v_x$ | $v_y$ | Vel. var. |
 |---|---|---|---|---|---|
-| Senseiver-A | 0.222 | 0.156 | 0.372 | 0.154 | 0.107 |
-| **Senseiver-G (ours)** | **0.197** | **0.133** | **0.326** | **0.145** | **0.103** |
+| Senseiver-A | 0.223 | 0.157 | 0.373 | 0.154 | 0.107 |
+| **Senseiver-G (ours)** | **0.197** | **0.132** | **0.325** | **0.144** | **0.102** |
 | DINCAE | 0.227 | 0.153 | 0.381 | 0.160 | 0.108 |
 | 4DVarNet | 0.231 | 0.176 | 0.361 | 0.178 | 0.140 |
-| 4DVarNet (aug. head) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
+| 4DVarNet aug. var. (ours) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
 | EnKF | 0.262 | 0.153 | 0.411 | 0.178 | 0.224 |
 
 ![Reconstruction accuracy](supervisor_evaluation/outputs/full/figures/accuracy_rmse.png)
@@ -148,7 +152,7 @@ all channels together); each colour is one method, the same colour in every
 figure. A shorter bar is a smaller error.
 
 *What it shows:* Senseiver-G has the smallest error overall and on every
-channel. Giving 4DVarNet an uncertainty output (aug. head) costs accuracy,
+channel. Giving 4DVarNet an uncertainty output (aug. var.) costs accuracy,
 mostly on $v_x$. The EnKF is competitive on density but has by far the largest
 error on velocity variance.
 
@@ -180,7 +184,7 @@ them cannot be explained by which days were used for testing.
 | Method | CRPS (lower is better) | range over test days | Spread / RMSE (1 is ideal) | range over test days |
 |---|---|---|---|---|
 | **DINCAE** | **0.074** | 0.071–0.078 | **0.89** | 0.86–0.93 |
-| 4DVarNet (aug. head) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
+| 4DVarNet aug. var. (ours) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
 | EnKF | 0.115 | 0.113–0.117 | 1.38 | 1.35–1.42 |
 
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
@@ -192,7 +196,7 @@ the 95% ranges above. In (b), the dashed line at 1 is the ideal size.
 *What it shows:* DINCAE has the lowest CRPS, on every channel, and its range does
 not overlap the other two, so the ranking is not down to the choice of test days.
 It is also closest to the right size (0.89, slightly overconfident). 4DVarNet
-(aug. head) and the EnKF are too cautious on average (1.30 and 1.38): for
+(aug. var.) and the EnKF are too cautious on average (1.30 and 1.38): for
 4DVarNet this comes almost entirely from velocity variance, where its σ̂ is
 3.3× the error while the other channels are close to 1; for the EnKF from the
 velocity channels ($v_x$ 1.43, $v_y$ 1.95). Per-channel numbers:

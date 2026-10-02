@@ -47,11 +47,22 @@ python3 supervisor_evaluation/evaluate.py benchmark \
   --data-root /scratch/work/zhangx29/data \
   --output-dir supervisor_evaluation/outputs/full
 
-# One image per matched time point: Truth + observations + all five methods.
+# One image per matched time point: truth + observations + all six methods.
 # Run after `full`, because the EnKF posterior is reused from its saved exports.
 python3 supervisor_evaluation/evaluate.py images --n-images 100 \
   --data-root /scratch/work/zhangx29/data \
   --output-dir supervisor_evaluation/outputs/full
+```
+
+The error breakdown of the thesis (by the time since a blind cell was last observed,
+by crowd size, by test day, and on empty/occupied cells) is a separate script. It runs
+all six methods on the frames common to all of them and also re-scores every method
+on its own frame range, which must reproduce `accuracy.csv`. Run after `full`:
+
+```bash
+python3 supervisor_evaluation/breakdown.py \
+  --data-root /scratch/work/zhangx29/data \
+  --output-dir supervisor_evaluation/outputs/full      # -> outputs/full/breakdown/
 ```
 
 Uncertainty (4DVarNet aughead_obs, DINCAE, EnKF) is scored by one function in

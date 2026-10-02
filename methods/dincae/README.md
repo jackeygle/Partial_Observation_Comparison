@@ -79,7 +79,8 @@ cd methods/dincae               # python below runs from here; sbatch from the r
 python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
 
 # 2. Training (GPU node)
-(cd ../.. && sbatch methods/dincae/sbatch/submit_train.sbatch) # 200 epochs, self-chaining + --resume
+(cd ../.. && EPOCHS=150 sbatch methods/dincae/sbatch/submit_train.sbatch) # self-chaining + --resume
+#   (the reported run used a 150-epoch budget; the script's default is 200)
 #   -> runs/dincae_ff/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
 #   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 

@@ -22,8 +22,16 @@ reason.
 
 | checkpoint | row in the final comparison | what it is |
 |---|---|---|
-| `runs/senseiver_A/best.pt` | Senseiver-A | faithful reproduction of the paper (variant A); blind walkable RMSE 0.222 |
-| `runs/capacity/base32_k16_s123/best.pt` | **Senseiver-G (ours)** | one latent token per grid cell with direct read-out ("G-direct"), plus a 16-frame causal observation window (k=16); 60 epochs, seed 123; blind walkable RMSE 0.197, the best of the six methods |
+| `runs/senseiver_A_full/epoch_086.pt` | Senseiver-A | faithful reproduction of the paper (variant A); 100 epochs, seed 123; test blind walkable RMSE 0.223 |
+| `runs/capacity/base32_k16_s123_full/epoch_057.pt` | **Senseiver-G (ours)** | one latent token per grid cell with direct read-out ("G-direct"), plus a 16-frame causal observation window (k=16); 60 epochs, seed 123; test blind walkable RMSE 0.197, the best of the six methods |
+
+Both runs keep every epoch (`--save-every-epoch`), and the reported epoch is chosen
+by `checks/select_checkpoint.py` on all seven validation days, every frame, blind
+walkable cells, clipped -- the same scope as DINCAE's and 4DVarNet's selection
+(`select_valid.json` in each run). The earlier runs `runs/senseiver_A/` and
+`runs/capacity/base32_k16_s123/` (same settings) kept only `best.pt`, chosen by
+`train.py`'s own score on three validation days, every 20th frame; they are kept
+for reference and are no longer the reported models.
 
 Both are packaged in `supervisor_evaluation/models/` and scored by
 `supervisor_evaluation/evaluate.py` (numbers in the repository
@@ -39,19 +47,27 @@ geodesic spatial bias — none beat it; their code, runs and results are in the 
 ```bash
 source sbatch/_env.sh           # from the repository root
 
-# Senseiver-A (self-chains to 100 epochs) -> runs/senseiver_A/{last.pt, best.pt, metrics.jsonl}
-sbatch methods/senseiver/sbatch/submit_train.sbatch --out runs/senseiver_A
+# Senseiver-A (self-chains to 100 epochs), every epoch kept
+EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_full \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch --save-every-epoch
 
-# Senseiver-G: grid latent, direct read-out, 16-frame window, 60 epochs, seed 123
-EPOCHS=60 OUT=runs/capacity/base32_k16_s123 sbatch methods/senseiver/sbatch/submit_train.sbatch \
-  --latent-mode grid --readout direct --time-window 16 --seed 123
+# Senseiver-G: grid latent, direct read-out, 16-frame window, 60 epochs, seed 123 (default)
+EPOCHS=60 OUT=$PWD/methods/senseiver/runs/capacity/base32_k16_s123_full \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch \
+  --latent-mode grid --readout direct --time-window 16 --save-every-epoch
+
+# The epoch of each run, on the whole validation split -> <run>/select_valid.json
+# (--epochs A-B splits the work over several jobs; then --merge)
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_full
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/capacity/base32_k16_s123_full
 
 # Evaluation against the other methods
 python3 supervisor_evaluation/evaluate.py prepare
 sbatch supervisor_evaluation/sbatch/full.sbatch
 ```
 
-`best.pt` is chosen on the validation days during training. **torch only runs on GPU
+`train.py`'s `best.pt` uses a quick validation score (three days, every 20th
+frame) and is not the reported checkpoint. **torch only runs on GPU
 nodes** (`sbatch`, or `srun -p gpu-debug --gres=gpu:1`), never on the login node.
 
 ---

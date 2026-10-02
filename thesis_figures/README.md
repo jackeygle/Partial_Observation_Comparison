@@ -21,10 +21,14 @@ python3 -m thesis_figures.<name>            # -> out/<name>.pdf, out/<name>.png
 | `time_windows` | which seconds of observations each method uses to reconstruct frame $t$ |
 | `senseiver` | Senseiver-A and Senseiver-G (ours) |
 | `dincae` | DINCAE: information-form input, U-Net, refinement, mean and sigma-hat |
-| `varnet` | 4DVarNet (variational cost, learned gradient descent) and the aug. head (ours) |
+| `varnet` | 4DVarNet (variational cost, learned gradient descent) and the aug. var. model (ours) |
 | `enkf` | the EnKF cycle with structured process noise |
 | `comparison` | the six density reconstructions and their errors on one test frame (two frames) |
 | `uncertainty_maps` | error against predicted sigma-hat for the three probabilistic methods |
+| `attention_block` | inside one Senseiver encoder block: the cross-attention and self-attention layers |
+| `pedpred` | the PedPred3 forecast model of the EnKF (encoder and forecaster) |
+| `data_processing` | preprocessing of the ATC tracking records into the gridded state |
+| `breakdown` | error by age of the blind cell, crowd size and test day (reads `outputs/full/breakdown/`, from `supervisor_evaluation/breakdown.py`) |
 
 The example frame is test day 2013-08-11, frame 32778 (a busy second); `comparison` and
 `uncertainty_maps` also draw frame 13551. Reconstructions come from the evaluation's saved
