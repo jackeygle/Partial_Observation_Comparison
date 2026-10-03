@@ -72,6 +72,9 @@ def parse_args():
                    help="encoding cache directory (deterministic encoding, built once). Empty string = no cache")
     p.add_argument("--amp", action="store_true", help="bf16 autocast")
     p.add_argument("--resume", action="store_true")
+    p.add_argument("--trajectory-mode", choices=["fixed", "per_day"], default=None,
+                   help="robot routes of the training and validation days; default: config "
+                        "observation.trajectory_mode. runs/dincae_ff was trained with fixed")
     p.add_argument("--full-field-loss", action=argparse.BooleanOptionalAction, default=True,
                    help="ABLATION: supervise every cell (the target on undefined "
                         "cells is physical 0), instead of the information form's "
@@ -95,6 +98,8 @@ def main():
     dev_files = om.split_files("valid")
     if a.days:
         train_files, dev_files = train_files[: a.days], dev_files[:1]
+    if a.trajectory_mode:                               # before any observation is generated
+        om.TRAJECTORY_MODE = a.trajectory_mode
     oc = obs_config()
     a.trajectory_mode = oc["trajectory_mode"]           # saved in every checkpoint's args
     print(f"observation config (from 4dvarnet_enkf/config.yaml): num_agents={oc['num_agents']} "
