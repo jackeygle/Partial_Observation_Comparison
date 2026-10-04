@@ -44,7 +44,7 @@ def skip(ax, x_from, x_to, yc):
 
 def layer(ax, yc, cross: bool) -> None:
     x = 1.75
-    text(ax, 0.2, yc, "latents\n" r"$N \times 32$", FS_SMALL, ha="left", va="center",
+    text(ax, 0.2, yc, "latents\n" r"$N_z \times 32$", FS_SMALL, ha="left", va="center",
          linespacing=1.15)
     x_in = 1.05
     ln1 = block(ax, x, yc - BH / 2, 1.45, BH, "LayerNorm", size=FS_SMALL)
@@ -73,7 +73,7 @@ def layer(ax, yc, cross: bool) -> None:
     plus(ax, p2, yc)
     skip(ax, p1 + R + 0.2, p2, yc)
     arrow(ax, (p2 + R + 0.02, yc), (p2 + R + 0.5, yc))
-    text(ax, p2 + R + 0.58, yc, "latents\n" r"$N \times 32$", FS_SMALL, va="center",
+    text(ax, p2 + R + 0.58, yc, "latents\n" r"$N_z \times 32$", FS_SMALL, va="center",
          linespacing=1.15)
 
     # the two halves of the layer
@@ -93,7 +93,7 @@ def layer(ax, yc, cross: bool) -> None:
         text(ax, xm + 0.08, (lnk[3] + at[1]) / 2 - 0.06, "K, V", FS_SMALL - 1, color=GREY,
              va="center")
         arrow(ax, (lnk[0] - 0.55, (lnk[1] + lnk[3]) / 2), (lnk[0] - 0.05, (lnk[1] + lnk[3]) / 2))
-        text(ax, lnk[0] - 0.63, (lnk[1] + lnk[3]) / 2, "sensor tokens\n" r"$M \times 32$", FS_SMALL,
+        text(ax, lnk[0] - 0.63, (lnk[1] + lnk[3]) / 2, "sensor tokens\n" r"$N_s \times 32$", FS_SMALL,
              ha="right", va="center", linespacing=1.15)
         text(ax, lnk[2] + 0.25, (lnk[1] + lnk[3]) / 2,
              "attention: every latent collects\ninformation from all sensor tokens", FS_SMALL - 0.5,
