@@ -104,7 +104,10 @@ FINAL_CONFIG: dict[str, dict[str, Any]] = {
         # at 0 pushed its mean up. The per-channel factors that compensated are now 1.
         "bank_native_std": True,
         "channel_scales": (1.0, 1.0, 1.0, 1.0),
-        "blind_channel_scales": (1.0, 1.25, 1.4, 0.9333333),
+        # (1, 1, 1, 1) = candidate E2, chosen on the validation days over the earlier
+        # blind-cell factors (1, 1.25, 1.4, 0.93): see RESELECTION_PROTOCOL.md and
+        # outputs/reselect/enkf_validation.json
+        "blind_channel_scales": (1.0, 1.0, 1.0, 1.0),
         "cross_channel_matrix": (1.0, 0.5, 0.5, 0.1,
                                  0.5, 1.0, 0.5, 0.1,
                                  0.5, 0.5, 1.0, 0.1,

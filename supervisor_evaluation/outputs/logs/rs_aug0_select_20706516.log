@@ -1,0 +1,22 @@
+[select] varnet_aug0_h96_s0: 8 candidates (epochs 80..149, all at 20 iterations) | 7 valid days | walkable 290/432 | cuda
+  atc-20130616: best epoch 149 (0.076433)
+  atc-20130623: best epoch 149 (0.076887)
+  atc-20130630: best epoch 149 (0.072482)
+  atc-20130707: best epoch 149 (0.086284)
+  atc-20130714: best epoch 120 (0.093432)
+  atc-20130721: best epoch 120 (0.093294)
+  atc-20130728: best epoch 149 (0.077528)
+
+  epoch   walkable blind MSE      RMSE
+     80             0.084221    0.2902
+     90             0.082914    0.2879
+    100             0.084036    0.2899
+    110             0.083286    0.2886
+    120             0.082431    0.2871
+    130             0.083147    0.2884
+    140             0.082994    0.2881
+    149             0.082387    0.2870  <-- selected
+
+[select] epoch 149  MSE 0.082387  RMSE 0.2870
+[select] spread across the 8 candidates: 0.001835 (2.2% of the winner) -- if this is small, the choice of epoch barely matters and any of them would do.
+[select] wrote /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_aug0_h96_s0/select_valid.json

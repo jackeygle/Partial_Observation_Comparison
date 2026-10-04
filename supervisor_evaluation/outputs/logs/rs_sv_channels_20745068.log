@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/checks/channel_scores.py", line 73, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/checks/channel_scores.py", line 62, in main
+    print(f"[channels] {fp.name.split('_')[0]} done", flush=True)
+                        ^^^^^^^
+AttributeError: 'str' object has no attribute 'name'

@@ -1,0 +1,31 @@
+{
+  "split": "valid",
+  "days": [
+    "atc-20130616_corridor_1.0s.h5",
+    "atc-20130623_corridor_1.0s.h5",
+    "atc-20130630_corridor_1.0s.h5",
+    "atc-20130707_corridor_1.0s.h5",
+    "atc-20130714_corridor_1.0s.h5",
+    "atc-20130721_corridor_1.0s.h5",
+    "atc-20130728_corridor_1.0s.h5"
+  ],
+  "cells": "blind walkable, every frame in a complete window, unclipped",
+  "rule": "lowest CRPS",
+  "candidates": {
+    "aug0": {
+      "checkpoint": "ckpt_00149.pt",
+      "rmse": 0.3094678466092471,
+      "crps": 0.11744910226440668,
+      "spread_rmse": 0.9721126058246761,
+      "n": 136931508
+    },
+    "aughead": {
+      "checkpoint": "ckpt_00090.pt",
+      "rmse": 0.2816535994655667,
+      "crps": 0.09987159403019263,
+      "spread_rmse": 1.2785903214656704,
+      "n": 136931508
+    }
+  },
+  "winner": "aughead"
+}

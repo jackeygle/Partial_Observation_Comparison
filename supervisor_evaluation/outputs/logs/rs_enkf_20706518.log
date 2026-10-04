@@ -1,0 +1,1331 @@
+[run] methods.enkf.checks.export_obs_for_enkf --split valid --frames 0 --outdir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --obs-every-k 1
+[export] 7 valid days, frames whole day, obs_std=[0.05690936 0.31472942 0.08616199 0.00644609]
+  atc-20130616: exported 35127 frames, observed cells/frame mean 202.6
+  atc-20130623: exported 40620 frames, observed cells/frame mean 200.3
+  atc-20130630: exported 40710 frames, observed cells/frame mean 202.6
+  atc-20130707: exported 38437 frames, observed cells/frame mean 202.1
+  atc-20130714: exported 40457 frames, observed cells/frame mean 202.1
+  atc-20130721: exported 37413 frames, observed cells/frame mean 202.8
+  atc-20130728: exported 36979 frames, observed cells/frame mean 202.9
+[done] -> /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations/obs_*.npz
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130616 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130616.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130616.json --bank-native-std
+[residual] 1000/35127, 0.0059 s/frame
+[residual] 2000/35127, 0.0056 s/frame
+[residual] 3000/35127, 0.0055 s/frame
+[residual] 4000/35127, 0.0054 s/frame
+[residual] 5000/35127, 0.0054 s/frame
+[residual] 6000/35127, 0.0054 s/frame
+[residual] 7000/35127, 0.0054 s/frame
+[residual] 8000/35127, 0.0054 s/frame
+[residual] 9000/35127, 0.0054 s/frame
+[residual] 10000/35127, 0.0054 s/frame
+[residual] 11000/35127, 0.0054 s/frame
+[residual] 12000/35127, 0.0054 s/frame
+[residual] 13000/35127, 0.0054 s/frame
+[residual] 14000/35127, 0.0054 s/frame
+[residual] 15000/35127, 0.0054 s/frame
+[residual] 16000/35127, 0.0053 s/frame
+[residual] 17000/35127, 0.0053 s/frame
+[residual] 18000/35127, 0.0053 s/frame
+[residual] 19000/35127, 0.0053 s/frame
+[residual] 20000/35127, 0.0053 s/frame
+[residual] 21000/35127, 0.0053 s/frame
+[residual] 22000/35127, 0.0053 s/frame
+[residual] 23000/35127, 0.0053 s/frame
+[residual] 24000/35127, 0.0053 s/frame
+[residual] 25000/35127, 0.0053 s/frame
+[residual] 26000/35127, 0.0053 s/frame
+[residual] 27000/35127, 0.0053 s/frame
+[residual] 28000/35127, 0.0053 s/frame
+[residual] 29000/35127, 0.0053 s/frame
+[residual] 30000/35127, 0.0053 s/frame
+[residual] 31000/35127, 0.0053 s/frame
+[residual] 32000/35127, 0.0053 s/frame
+[residual] 33000/35127, 0.0053 s/frame
+[residual] 34000/35127, 0.0053 s/frame
+[residual] 35000/35127, 0.0053 s/frame
+[all] RMSE=0.17560 CRPS=0.06774 spread/skill=1.393 cov90=0.772
+[defined_blind] RMSE=0.32966 CRPS=0.13031 spread/skill=1.007 cov90=0.911
+[density] spearman=+0.925 AUSE=0.126
+[vx] spearman=+0.658 AUSE=0.268
+[vy] spearman=+0.659 AUSE=0.373
+[var] spearman=+0.934 AUSE=0.230
+[runtime] 251.05s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130616.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130623 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130623.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130623.json --bank-native-std
+[residual] 1000/40620, 0.0058 s/frame
+[residual] 2000/40620, 0.0055 s/frame
+[residual] 3000/40620, 0.0055 s/frame
+[residual] 4000/40620, 0.0054 s/frame
+[residual] 5000/40620, 0.0054 s/frame
+[residual] 6000/40620, 0.0054 s/frame
+[residual] 7000/40620, 0.0054 s/frame
+[residual] 8000/40620, 0.0054 s/frame
+[residual] 9000/40620, 0.0054 s/frame
+[residual] 10000/40620, 0.0053 s/frame
+[residual] 11000/40620, 0.0053 s/frame
+[residual] 12000/40620, 0.0053 s/frame
+[residual] 13000/40620, 0.0053 s/frame
+[residual] 14000/40620, 0.0053 s/frame
+[residual] 15000/40620, 0.0053 s/frame
+[residual] 16000/40620, 0.0053 s/frame
+[residual] 17000/40620, 0.0053 s/frame
+[residual] 18000/40620, 0.0053 s/frame
+[residual] 19000/40620, 0.0053 s/frame
+[residual] 20000/40620, 0.0053 s/frame
+[residual] 21000/40620, 0.0053 s/frame
+[residual] 22000/40620, 0.0053 s/frame
+[residual] 23000/40620, 0.0053 s/frame
+[residual] 24000/40620, 0.0053 s/frame
+[residual] 25000/40620, 0.0053 s/frame
+[residual] 26000/40620, 0.0053 s/frame
+[residual] 27000/40620, 0.0053 s/frame
+[residual] 28000/40620, 0.0053 s/frame
+[residual] 29000/40620, 0.0053 s/frame
+[residual] 30000/40620, 0.0053 s/frame
+[residual] 31000/40620, 0.0053 s/frame
+[residual] 32000/40620, 0.0053 s/frame
+[residual] 33000/40620, 0.0053 s/frame
+[residual] 34000/40620, 0.0053 s/frame
+[residual] 35000/40620, 0.0053 s/frame
+[residual] 36000/40620, 0.0053 s/frame
+[residual] 37000/40620, 0.0053 s/frame
+[residual] 38000/40620, 0.0053 s/frame
+[residual] 39000/40620, 0.0053 s/frame
+[residual] 40000/40620, 0.0053 s/frame
+[all] RMSE=0.17621 CRPS=0.06635 spread/skill=1.388 cov90=0.773
+[defined_blind] RMSE=0.33413 CRPS=0.12694 spread/skill=0.964 cov90=0.910
+[density] spearman=+0.932 AUSE=0.112
+[vx] spearman=+0.664 AUSE=0.251
+[vy] spearman=+0.668 AUSE=0.331
+[var] spearman=+0.941 AUSE=0.215
+[runtime] 289.47s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130623.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130630 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130630.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130630.json --bank-native-std
+[residual] 1000/40710, 0.0058 s/frame
+[residual] 2000/40710, 0.0055 s/frame
+[residual] 3000/40710, 0.0055 s/frame
+[residual] 4000/40710, 0.0054 s/frame
+[residual] 5000/40710, 0.0054 s/frame
+[residual] 6000/40710, 0.0054 s/frame
+[residual] 7000/40710, 0.0054 s/frame
+[residual] 8000/40710, 0.0054 s/frame
+[residual] 9000/40710, 0.0054 s/frame
+[residual] 10000/40710, 0.0054 s/frame
+[residual] 11000/40710, 0.0054 s/frame
+[residual] 12000/40710, 0.0053 s/frame
+[residual] 13000/40710, 0.0053 s/frame
+[residual] 14000/40710, 0.0053 s/frame
+[residual] 15000/40710, 0.0053 s/frame
+[residual] 16000/40710, 0.0053 s/frame
+[residual] 17000/40710, 0.0053 s/frame
+[residual] 18000/40710, 0.0053 s/frame
+[residual] 19000/40710, 0.0053 s/frame
+[residual] 20000/40710, 0.0053 s/frame
+[residual] 21000/40710, 0.0053 s/frame
+[residual] 22000/40710, 0.0053 s/frame
+[residual] 23000/40710, 0.0053 s/frame
+[residual] 24000/40710, 0.0053 s/frame
+[residual] 25000/40710, 0.0053 s/frame
+[residual] 26000/40710, 0.0053 s/frame
+[residual] 27000/40710, 0.0053 s/frame
+[residual] 28000/40710, 0.0053 s/frame
+[residual] 29000/40710, 0.0053 s/frame
+[residual] 30000/40710, 0.0053 s/frame
+[residual] 31000/40710, 0.0053 s/frame
+[residual] 32000/40710, 0.0053 s/frame
+[residual] 33000/40710, 0.0056 s/frame
+[residual] 34000/40710, 0.0056 s/frame
+[residual] 35000/40710, 0.0056 s/frame
+[residual] 36000/40710, 0.0055 s/frame
+[residual] 37000/40710, 0.0055 s/frame
+[residual] 38000/40710, 0.0055 s/frame
+[residual] 39000/40710, 0.0055 s/frame
+[residual] 40000/40710, 0.0055 s/frame
+[all] RMSE=0.17153 CRPS=0.06535 spread/skill=1.421 cov90=0.774
+[defined_blind] RMSE=0.32339 CRPS=0.12219 spread/skill=0.981 cov90=0.911
+[density] spearman=+0.930 AUSE=0.123
+[vx] spearman=+0.663 AUSE=0.255
+[vy] spearman=+0.666 AUSE=0.347
+[var] spearman=+0.940 AUSE=0.185
+[runtime] 298.02s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130630.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130707 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130707.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130707.json --bank-native-std
+[residual] 1000/38437, 0.0058 s/frame
+[residual] 2000/38437, 0.0055 s/frame
+[residual] 3000/38437, 0.0054 s/frame
+[residual] 4000/38437, 0.0054 s/frame
+[residual] 5000/38437, 0.0054 s/frame
+[residual] 6000/38437, 0.0054 s/frame
+[residual] 7000/38437, 0.0054 s/frame
+[residual] 8000/38437, 0.0053 s/frame
+[residual] 9000/38437, 0.0053 s/frame
+[residual] 10000/38437, 0.0053 s/frame
+[residual] 11000/38437, 0.0053 s/frame
+[residual] 12000/38437, 0.0053 s/frame
+[residual] 13000/38437, 0.0053 s/frame
+[residual] 14000/38437, 0.0053 s/frame
+[residual] 15000/38437, 0.0053 s/frame
+[residual] 16000/38437, 0.0053 s/frame
+[residual] 17000/38437, 0.0053 s/frame
+[residual] 18000/38437, 0.0053 s/frame
+[residual] 19000/38437, 0.0053 s/frame
+[residual] 20000/38437, 0.0053 s/frame
+[residual] 21000/38437, 0.0053 s/frame
+[residual] 22000/38437, 0.0053 s/frame
+[residual] 23000/38437, 0.0053 s/frame
+[residual] 24000/38437, 0.0053 s/frame
+[residual] 25000/38437, 0.0053 s/frame
+[residual] 26000/38437, 0.0053 s/frame
+[residual] 27000/38437, 0.0053 s/frame
+[residual] 28000/38437, 0.0053 s/frame
+[residual] 29000/38437, 0.0053 s/frame
+[residual] 30000/38437, 0.0053 s/frame
+[residual] 31000/38437, 0.0053 s/frame
+[residual] 32000/38437, 0.0053 s/frame
+[residual] 33000/38437, 0.0053 s/frame
+[residual] 34000/38437, 0.0053 s/frame
+[residual] 35000/38437, 0.0053 s/frame
+[residual] 36000/38437, 0.0053 s/frame
+[residual] 37000/38437, 0.0053 s/frame
+[residual] 38000/38437, 0.0053 s/frame
+[all] RMSE=0.18064 CRPS=0.06876 spread/skill=1.354 cov90=0.771
+[defined_blind] RMSE=0.34051 CRPS=0.13597 spread/skill=1.001 cov90=0.911
+[density] spearman=+0.926 AUSE=0.118
+[vx] spearman=+0.671 AUSE=0.255
+[vy] spearman=+0.661 AUSE=0.366
+[var] spearman=+0.934 AUSE=0.184
+[runtime] 274.45s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130707.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130714 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130714.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130714.json --bank-native-std
+[residual] 1000/40457, 0.0058 s/frame
+[residual] 2000/40457, 0.0055 s/frame
+[residual] 3000/40457, 0.0055 s/frame
+[residual] 4000/40457, 0.0056 s/frame
+[residual] 5000/40457, 0.0055 s/frame
+[residual] 6000/40457, 0.0055 s/frame
+[residual] 7000/40457, 0.0055 s/frame
+[residual] 8000/40457, 0.0054 s/frame
+[residual] 9000/40457, 0.0054 s/frame
+[residual] 10000/40457, 0.0054 s/frame
+[residual] 11000/40457, 0.0054 s/frame
+[residual] 12000/40457, 0.0054 s/frame
+[residual] 13000/40457, 0.0054 s/frame
+[residual] 14000/40457, 0.0054 s/frame
+[residual] 15000/40457, 0.0054 s/frame
+[residual] 16000/40457, 0.0054 s/frame
+[residual] 17000/40457, 0.0054 s/frame
+[residual] 18000/40457, 0.0054 s/frame
+[residual] 19000/40457, 0.0054 s/frame
+[residual] 20000/40457, 0.0054 s/frame
+[residual] 21000/40457, 0.0054 s/frame
+[residual] 22000/40457, 0.0053 s/frame
+[residual] 23000/40457, 0.0053 s/frame
+[residual] 24000/40457, 0.0053 s/frame
+[residual] 25000/40457, 0.0053 s/frame
+[residual] 26000/40457, 0.0053 s/frame
+[residual] 27000/40457, 0.0053 s/frame
+[residual] 28000/40457, 0.0053 s/frame
+[residual] 29000/40457, 0.0053 s/frame
+[residual] 30000/40457, 0.0053 s/frame
+[residual] 31000/40457, 0.0053 s/frame
+[residual] 32000/40457, 0.0053 s/frame
+[residual] 33000/40457, 0.0056 s/frame
+[residual] 34000/40457, 0.0056 s/frame
+[residual] 35000/40457, 0.0056 s/frame
+[residual] 36000/40457, 0.0056 s/frame
+[residual] 37000/40457, 0.0056 s/frame
+[residual] 38000/40457, 0.0056 s/frame
+[residual] 39000/40457, 0.0056 s/frame
+[residual] 40000/40457, 0.0056 s/frame
+[all] RMSE=0.18488 CRPS=0.06978 spread/skill=1.324 cov90=0.770
+[defined_blind] RMSE=0.34595 CRPS=0.13978 spread/skill=1.006 cov90=0.910
+[density] spearman=+0.923 AUSE=0.121
+[vx] spearman=+0.680 AUSE=0.252
+[vy] spearman=+0.670 AUSE=0.345
+[var] spearman=+0.934 AUSE=0.160
+[runtime] 300.93s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130714.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130721 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130721.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130721.json --bank-native-std
+[residual] 1000/37413, 0.0058 s/frame
+[residual] 2000/37413, 0.0055 s/frame
+[residual] 3000/37413, 0.0054 s/frame
+[residual] 4000/37413, 0.0054 s/frame
+[residual] 5000/37413, 0.0054 s/frame
+[residual] 6000/37413, 0.0054 s/frame
+[residual] 7000/37413, 0.0054 s/frame
+[residual] 8000/37413, 0.0054 s/frame
+[residual] 9000/37413, 0.0053 s/frame
+[residual] 10000/37413, 0.0053 s/frame
+[residual] 11000/37413, 0.0053 s/frame
+[residual] 12000/37413, 0.0053 s/frame
+[residual] 13000/37413, 0.0053 s/frame
+[residual] 14000/37413, 0.0053 s/frame
+[residual] 15000/37413, 0.0053 s/frame
+[residual] 16000/37413, 0.0053 s/frame
+[residual] 17000/37413, 0.0053 s/frame
+[residual] 18000/37413, 0.0053 s/frame
+[residual] 19000/37413, 0.0053 s/frame
+[residual] 20000/37413, 0.0053 s/frame
+[residual] 21000/37413, 0.0053 s/frame
+[residual] 22000/37413, 0.0053 s/frame
+[residual] 23000/37413, 0.0053 s/frame
+[residual] 24000/37413, 0.0053 s/frame
+[residual] 25000/37413, 0.0053 s/frame
+[residual] 26000/37413, 0.0053 s/frame
+[residual] 27000/37413, 0.0053 s/frame
+[residual] 28000/37413, 0.0053 s/frame
+[residual] 29000/37413, 0.0053 s/frame
+[residual] 30000/37413, 0.0053 s/frame
+[residual] 31000/37413, 0.0053 s/frame
+[residual] 32000/37413, 0.0053 s/frame
+[residual] 33000/37413, 0.0053 s/frame
+[residual] 34000/37413, 0.0053 s/frame
+[residual] 35000/37413, 0.0053 s/frame
+[residual] 36000/37413, 0.0053 s/frame
+[residual] 37000/37413, 0.0053 s/frame
+[all] RMSE=0.18484 CRPS=0.07207 spread/skill=1.324 cov90=0.766
+[defined_blind] RMSE=0.33801 CRPS=0.14345 spread/skill=1.051 cov90=0.908
+[density] spearman=+0.913 AUSE=0.135
+[vx] spearman=+0.676 AUSE=0.271
+[vy] spearman=+0.662 AUSE=0.394
+[var] spearman=+0.921 AUSE=0.240
+[runtime] 270.72s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130721.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1.0 1.25 1.4 0.9333333 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130728 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130728.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130728.json --bank-native-std
+[residual] 1000/36979, 0.0058 s/frame
+[residual] 2000/36979, 0.0055 s/frame
+[residual] 3000/36979, 0.0055 s/frame
+[residual] 4000/36979, 0.0054 s/frame
+[residual] 5000/36979, 0.0054 s/frame
+[residual] 6000/36979, 0.0054 s/frame
+[residual] 7000/36979, 0.0054 s/frame
+[residual] 8000/36979, 0.0054 s/frame
+[residual] 9000/36979, 0.0054 s/frame
+[residual] 10000/36979, 0.0054 s/frame
+[residual] 11000/36979, 0.0054 s/frame
+[residual] 12000/36979, 0.0054 s/frame
+[residual] 13000/36979, 0.0053 s/frame
+[residual] 14000/36979, 0.0053 s/frame
+[residual] 15000/36979, 0.0053 s/frame
+[residual] 16000/36979, 0.0053 s/frame
+[residual] 17000/36979, 0.0053 s/frame
+[residual] 18000/36979, 0.0053 s/frame
+[residual] 19000/36979, 0.0053 s/frame
+[residual] 20000/36979, 0.0053 s/frame
+[residual] 21000/36979, 0.0053 s/frame
+[residual] 22000/36979, 0.0053 s/frame
+[residual] 23000/36979, 0.0053 s/frame
+[residual] 24000/36979, 0.0053 s/frame
+[residual] 25000/36979, 0.0053 s/frame
+[residual] 26000/36979, 0.0053 s/frame
+[residual] 27000/36979, 0.0053 s/frame
+[residual] 28000/36979, 0.0053 s/frame
+[residual] 29000/36979, 0.0053 s/frame
+[residual] 30000/36979, 0.0053 s/frame
+[residual] 31000/36979, 0.0053 s/frame
+[residual] 32000/36979, 0.0053 s/frame
+[residual] 33000/36979, 0.0053 s/frame
+[residual] 34000/36979, 0.0053 s/frame
+[residual] 35000/36979, 0.0053 s/frame
+[residual] 36000/36979, 0.0053 s/frame
+[all] RMSE=0.17403 CRPS=0.06775 spread/skill=1.402 cov90=0.771
+[defined_blind] RMSE=0.32383 CRPS=0.13141 spread/skill=1.051 cov90=0.912
+[density] spearman=+0.918 AUSE=0.137
+[vx] spearman=+0.666 AUSE=0.267
+[vy] spearman=+0.664 AUSE=0.380
+[var] spearman=+0.933 AUSE=0.165
+[runtime] 265.67s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E1_atc-20130728.json
+[enkf] E1: RMSE 0.25421  CRPS 0.11248  spread/RMSE 1.419
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130616 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130616.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130616.json --bank-native-std
+[residual] 1000/35127, 0.0057 s/frame
+[residual] 2000/35127, 0.0054 s/frame
+[residual] 3000/35127, 0.0054 s/frame
+[residual] 4000/35127, 0.0053 s/frame
+[residual] 5000/35127, 0.0053 s/frame
+[residual] 6000/35127, 0.0053 s/frame
+[residual] 7000/35127, 0.0053 s/frame
+[residual] 8000/35127, 0.0053 s/frame
+[residual] 9000/35127, 0.0053 s/frame
+[residual] 10000/35127, 0.0053 s/frame
+[residual] 11000/35127, 0.0053 s/frame
+[residual] 12000/35127, 0.0052 s/frame
+[residual] 13000/35127, 0.0052 s/frame
+[residual] 14000/35127, 0.0052 s/frame
+[residual] 15000/35127, 0.0052 s/frame
+[residual] 16000/35127, 0.0052 s/frame
+[residual] 17000/35127, 0.0052 s/frame
+[residual] 18000/35127, 0.0052 s/frame
+[residual] 19000/35127, 0.0052 s/frame
+[residual] 20000/35127, 0.0052 s/frame
+[residual] 21000/35127, 0.0052 s/frame
+[residual] 22000/35127, 0.0052 s/frame
+[residual] 23000/35127, 0.0052 s/frame
+[residual] 24000/35127, 0.0052 s/frame
+[residual] 25000/35127, 0.0052 s/frame
+[residual] 26000/35127, 0.0052 s/frame
+[residual] 27000/35127, 0.0052 s/frame
+[residual] 28000/35127, 0.0052 s/frame
+[residual] 29000/35127, 0.0052 s/frame
+[residual] 30000/35127, 0.0052 s/frame
+[residual] 31000/35127, 0.0052 s/frame
+[residual] 32000/35127, 0.0052 s/frame
+[residual] 33000/35127, 0.0052 s/frame
+[residual] 34000/35127, 0.0052 s/frame
+[residual] 35000/35127, 0.0052 s/frame
+[all] RMSE=0.17105 CRPS=0.06495 spread/skill=1.302 cov90=0.771
+[defined_blind] RMSE=0.32544 CRPS=0.12866 spread/skill=0.899 cov90=0.901
+[density] spearman=+0.925 AUSE=0.120
+[vx] spearman=+0.656 AUSE=0.268
+[vy] spearman=+0.661 AUSE=0.371
+[var] spearman=+0.932 AUSE=0.259
+[runtime] 247.4s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130616.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130623 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130623.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130623.json --bank-native-std
+[residual] 1000/40620, 0.0056 s/frame
+[residual] 2000/40620, 0.0054 s/frame
+[residual] 3000/40620, 0.0053 s/frame
+[residual] 4000/40620, 0.0053 s/frame
+[residual] 5000/40620, 0.0053 s/frame
+[residual] 6000/40620, 0.0053 s/frame
+[residual] 7000/40620, 0.0053 s/frame
+[residual] 8000/40620, 0.0052 s/frame
+[residual] 9000/40620, 0.0052 s/frame
+[residual] 10000/40620, 0.0052 s/frame
+[residual] 11000/40620, 0.0052 s/frame
+[residual] 12000/40620, 0.0052 s/frame
+[residual] 13000/40620, 0.0052 s/frame
+[residual] 14000/40620, 0.0052 s/frame
+[residual] 15000/40620, 0.0052 s/frame
+[residual] 16000/40620, 0.0052 s/frame
+[residual] 17000/40620, 0.0052 s/frame
+[residual] 18000/40620, 0.0052 s/frame
+[residual] 19000/40620, 0.0052 s/frame
+[residual] 20000/40620, 0.0052 s/frame
+[residual] 21000/40620, 0.0052 s/frame
+[residual] 22000/40620, 0.0052 s/frame
+[residual] 23000/40620, 0.0052 s/frame
+[residual] 24000/40620, 0.0052 s/frame
+[residual] 25000/40620, 0.0052 s/frame
+[residual] 26000/40620, 0.0052 s/frame
+[residual] 27000/40620, 0.0052 s/frame
+[residual] 28000/40620, 0.0052 s/frame
+[residual] 29000/40620, 0.0052 s/frame
+[residual] 30000/40620, 0.0052 s/frame
+[residual] 31000/40620, 0.0052 s/frame
+[residual] 32000/40620, 0.0052 s/frame
+[residual] 33000/40620, 0.0052 s/frame
+[residual] 34000/40620, 0.0052 s/frame
+[residual] 35000/40620, 0.0052 s/frame
+[residual] 36000/40620, 0.0052 s/frame
+[residual] 37000/40620, 0.0052 s/frame
+[residual] 38000/40620, 0.0052 s/frame
+[residual] 39000/40620, 0.0052 s/frame
+[residual] 40000/40620, 0.0052 s/frame
+[all] RMSE=0.17097 CRPS=0.06342 spread/skill=1.301 cov90=0.772
+[defined_blind] RMSE=0.32955 CRPS=0.12577 spread/skill=0.864 cov90=0.899
+[density] spearman=+0.932 AUSE=0.106
+[vx] spearman=+0.659 AUSE=0.253
+[vy] spearman=+0.672 AUSE=0.330
+[var] spearman=+0.939 AUSE=0.246
+[runtime] 283.86s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130623.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130630 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130630.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130630.json --bank-native-std
+[residual] 1000/40710, 0.0057 s/frame
+[residual] 2000/40710, 0.0054 s/frame
+[residual] 3000/40710, 0.0054 s/frame
+[residual] 4000/40710, 0.0053 s/frame
+[residual] 5000/40710, 0.0053 s/frame
+[residual] 6000/40710, 0.0053 s/frame
+[residual] 7000/40710, 0.0053 s/frame
+[residual] 8000/40710, 0.0053 s/frame
+[residual] 9000/40710, 0.0053 s/frame
+[residual] 10000/40710, 0.0053 s/frame
+[residual] 11000/40710, 0.0053 s/frame
+[residual] 12000/40710, 0.0053 s/frame
+[residual] 13000/40710, 0.0053 s/frame
+[residual] 14000/40710, 0.0053 s/frame
+[residual] 15000/40710, 0.0052 s/frame
+[residual] 16000/40710, 0.0052 s/frame
+[residual] 17000/40710, 0.0052 s/frame
+[residual] 18000/40710, 0.0052 s/frame
+[residual] 19000/40710, 0.0052 s/frame
+[residual] 20000/40710, 0.0052 s/frame
+[residual] 21000/40710, 0.0052 s/frame
+[residual] 22000/40710, 0.0052 s/frame
+[residual] 23000/40710, 0.0052 s/frame
+[residual] 24000/40710, 0.0052 s/frame
+[residual] 25000/40710, 0.0052 s/frame
+[residual] 26000/40710, 0.0052 s/frame
+[residual] 27000/40710, 0.0052 s/frame
+[residual] 28000/40710, 0.0052 s/frame
+[residual] 29000/40710, 0.0052 s/frame
+[residual] 30000/40710, 0.0052 s/frame
+[residual] 31000/40710, 0.0052 s/frame
+[residual] 32000/40710, 0.0052 s/frame
+[residual] 33000/40710, 0.0052 s/frame
+[residual] 34000/40710, 0.0052 s/frame
+[residual] 35000/40710, 0.0052 s/frame
+[residual] 36000/40710, 0.0052 s/frame
+[residual] 37000/40710, 0.0052 s/frame
+[residual] 38000/40710, 0.0052 s/frame
+[residual] 39000/40710, 0.0052 s/frame
+[residual] 40000/40710, 0.0052 s/frame
+[all] RMSE=0.16647 CRPS=0.06248 spread/skill=1.333 cov90=0.773
+[defined_blind] RMSE=0.31897 CRPS=0.12097 spread/skill=0.879 cov90=0.901
+[density] spearman=+0.931 AUSE=0.117
+[vx] spearman=+0.658 AUSE=0.257
+[vy] spearman=+0.669 AUSE=0.348
+[var] spearman=+0.939 AUSE=0.212
+[runtime] 287.02s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130630.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130707 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130707.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130707.json --bank-native-std
+[residual] 1000/38437, 0.0057 s/frame
+[residual] 2000/38437, 0.0054 s/frame
+[residual] 3000/38437, 0.0054 s/frame
+[residual] 4000/38437, 0.0053 s/frame
+[residual] 5000/38437, 0.0053 s/frame
+[residual] 6000/38437, 0.0053 s/frame
+[residual] 7000/38437, 0.0053 s/frame
+[residual] 8000/38437, 0.0053 s/frame
+[residual] 9000/38437, 0.0053 s/frame
+[residual] 10000/38437, 0.0052 s/frame
+[residual] 11000/38437, 0.0052 s/frame
+[residual] 12000/38437, 0.0052 s/frame
+[residual] 13000/38437, 0.0052 s/frame
+[residual] 14000/38437, 0.0052 s/frame
+[residual] 15000/38437, 0.0052 s/frame
+[residual] 16000/38437, 0.0052 s/frame
+[residual] 17000/38437, 0.0052 s/frame
+[residual] 18000/38437, 0.0052 s/frame
+[residual] 19000/38437, 0.0052 s/frame
+[residual] 20000/38437, 0.0052 s/frame
+[residual] 21000/38437, 0.0052 s/frame
+[residual] 22000/38437, 0.0052 s/frame
+[residual] 23000/38437, 0.0052 s/frame
+[residual] 24000/38437, 0.0052 s/frame
+[residual] 25000/38437, 0.0052 s/frame
+[residual] 26000/38437, 0.0052 s/frame
+[residual] 27000/38437, 0.0052 s/frame
+[residual] 28000/38437, 0.0053 s/frame
+[residual] 29000/38437, 0.0053 s/frame
+[residual] 30000/38437, 0.0053 s/frame
+[residual] 31000/38437, 0.0053 s/frame
+[residual] 32000/38437, 0.0052 s/frame
+[residual] 33000/38437, 0.0052 s/frame
+[residual] 34000/38437, 0.0052 s/frame
+[residual] 35000/38437, 0.0052 s/frame
+[residual] 36000/38437, 0.0052 s/frame
+[residual] 37000/38437, 0.0052 s/frame
+[residual] 38000/38437, 0.0052 s/frame
+[all] RMSE=0.17624 CRPS=0.06602 spread/skill=1.265 cov90=0.771
+[defined_blind] RMSE=0.33636 CRPS=0.13424 spread/skill=0.895 cov90=0.900
+[density] spearman=+0.927 AUSE=0.113
+[vx] spearman=+0.667 AUSE=0.255
+[vy] spearman=+0.664 AUSE=0.363
+[var] spearman=+0.933 AUSE=0.209
+[runtime] 272.5s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130707.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130714 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130714.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130714.json --bank-native-std
+[residual] 1000/40457, 0.0057 s/frame
+[residual] 2000/40457, 0.0055 s/frame
+[residual] 3000/40457, 0.0054 s/frame
+[residual] 4000/40457, 0.0053 s/frame
+[residual] 5000/40457, 0.0053 s/frame
+[residual] 6000/40457, 0.0053 s/frame
+[residual] 7000/40457, 0.0053 s/frame
+[residual] 8000/40457, 0.0053 s/frame
+[residual] 9000/40457, 0.0053 s/frame
+[residual] 10000/40457, 0.0053 s/frame
+[residual] 11000/40457, 0.0053 s/frame
+[residual] 12000/40457, 0.0053 s/frame
+[residual] 13000/40457, 0.0053 s/frame
+[residual] 14000/40457, 0.0053 s/frame
+[residual] 15000/40457, 0.0052 s/frame
+[residual] 16000/40457, 0.0052 s/frame
+[residual] 17000/40457, 0.0052 s/frame
+[residual] 18000/40457, 0.0052 s/frame
+[residual] 19000/40457, 0.0052 s/frame
+[residual] 20000/40457, 0.0052 s/frame
+[residual] 21000/40457, 0.0052 s/frame
+[residual] 22000/40457, 0.0052 s/frame
+[residual] 23000/40457, 0.0052 s/frame
+[residual] 24000/40457, 0.0052 s/frame
+[residual] 25000/40457, 0.0052 s/frame
+[residual] 26000/40457, 0.0052 s/frame
+[residual] 27000/40457, 0.0052 s/frame
+[residual] 28000/40457, 0.0052 s/frame
+[residual] 29000/40457, 0.0052 s/frame
+[residual] 30000/40457, 0.0052 s/frame
+[residual] 31000/40457, 0.0052 s/frame
+[residual] 32000/40457, 0.0052 s/frame
+[residual] 33000/40457, 0.0052 s/frame
+[residual] 34000/40457, 0.0052 s/frame
+[residual] 35000/40457, 0.0052 s/frame
+[residual] 36000/40457, 0.0052 s/frame
+[residual] 37000/40457, 0.0052 s/frame
+[residual] 38000/40457, 0.0052 s/frame
+[residual] 39000/40457, 0.0052 s/frame
+[residual] 40000/40457, 0.0052 s/frame
+[all] RMSE=0.18084 CRPS=0.06717 spread/skill=1.235 cov90=0.769
+[defined_blind] RMSE=0.34218 CRPS=0.13805 spread/skill=0.898 cov90=0.899
+[density] spearman=+0.923 AUSE=0.117
+[vx] spearman=+0.678 AUSE=0.252
+[vy] spearman=+0.675 AUSE=0.342
+[var] spearman=+0.932 AUSE=0.178
+[runtime] 287.85s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130714.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130721 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130721.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130721.json --bank-native-std
+[residual] 1000/37413, 0.0057 s/frame
+[residual] 2000/37413, 0.0055 s/frame
+[residual] 3000/37413, 0.0054 s/frame
+[residual] 4000/37413, 0.0053 s/frame
+[residual] 5000/37413, 0.0053 s/frame
+[residual] 6000/37413, 0.0053 s/frame
+[residual] 7000/37413, 0.0053 s/frame
+[residual] 8000/37413, 0.0053 s/frame
+[residual] 9000/37413, 0.0053 s/frame
+[residual] 10000/37413, 0.0053 s/frame
+[residual] 11000/37413, 0.0053 s/frame
+[residual] 12000/37413, 0.0053 s/frame
+[residual] 13000/37413, 0.0053 s/frame
+[residual] 14000/37413, 0.0053 s/frame
+[residual] 15000/37413, 0.0053 s/frame
+[residual] 16000/37413, 0.0053 s/frame
+[residual] 17000/37413, 0.0053 s/frame
+[residual] 18000/37413, 0.0053 s/frame
+[residual] 19000/37413, 0.0052 s/frame
+[residual] 20000/37413, 0.0052 s/frame
+[residual] 21000/37413, 0.0052 s/frame
+[residual] 22000/37413, 0.0052 s/frame
+[residual] 23000/37413, 0.0052 s/frame
+[residual] 24000/37413, 0.0052 s/frame
+[residual] 25000/37413, 0.0052 s/frame
+[residual] 26000/37413, 0.0052 s/frame
+[residual] 27000/37413, 0.0052 s/frame
+[residual] 28000/37413, 0.0052 s/frame
+[residual] 29000/37413, 0.0052 s/frame
+[residual] 30000/37413, 0.0052 s/frame
+[residual] 31000/37413, 0.0052 s/frame
+[residual] 32000/37413, 0.0052 s/frame
+[residual] 33000/37413, 0.0052 s/frame
+[residual] 34000/37413, 0.0052 s/frame
+[residual] 35000/37413, 0.0052 s/frame
+[residual] 36000/37413, 0.0052 s/frame
+[residual] 37000/37413, 0.0052 s/frame
+[all] RMSE=0.18133 CRPS=0.06961 spread/skill=1.232 cov90=0.765
+[defined_blind] RMSE=0.33425 CRPS=0.14121 spread/skill=0.938 cov90=0.897
+[density] spearman=+0.913 AUSE=0.132
+[vx] spearman=+0.673 AUSE=0.271
+[vy] spearman=+0.665 AUSE=0.393
+[var] spearman=+0.918 AUSE=0.271
+[runtime] 268.12s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130721.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130728 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130728.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130728.json --bank-native-std
+[residual] 1000/36979, 0.0056 s/frame
+[residual] 2000/36979, 0.0054 s/frame
+[residual] 3000/36979, 0.0054 s/frame
+[residual] 4000/36979, 0.0053 s/frame
+[residual] 5000/36979, 0.0053 s/frame
+[residual] 6000/36979, 0.0053 s/frame
+[residual] 7000/36979, 0.0053 s/frame
+[residual] 8000/36979, 0.0053 s/frame
+[residual] 9000/36979, 0.0053 s/frame
+[residual] 10000/36979, 0.0053 s/frame
+[residual] 11000/36979, 0.0052 s/frame
+[residual] 12000/36979, 0.0052 s/frame
+[residual] 13000/36979, 0.0052 s/frame
+[residual] 14000/36979, 0.0052 s/frame
+[residual] 15000/36979, 0.0052 s/frame
+[residual] 16000/36979, 0.0052 s/frame
+[residual] 17000/36979, 0.0052 s/frame
+[residual] 18000/36979, 0.0052 s/frame
+[residual] 19000/36979, 0.0052 s/frame
+[residual] 20000/36979, 0.0052 s/frame
+[residual] 21000/36979, 0.0052 s/frame
+[residual] 22000/36979, 0.0052 s/frame
+[residual] 23000/36979, 0.0052 s/frame
+[residual] 24000/36979, 0.0052 s/frame
+[residual] 25000/36979, 0.0052 s/frame
+[residual] 26000/36979, 0.0052 s/frame
+[residual] 27000/36979, 0.0052 s/frame
+[residual] 28000/36979, 0.0052 s/frame
+[residual] 29000/36979, 0.0052 s/frame
+[residual] 30000/36979, 0.0052 s/frame
+[residual] 31000/36979, 0.0052 s/frame
+[residual] 32000/36979, 0.0052 s/frame
+[residual] 33000/36979, 0.0052 s/frame
+[residual] 34000/36979, 0.0052 s/frame
+[residual] 35000/36979, 0.0052 s/frame
+[residual] 36000/36979, 0.0052 s/frame
+[all] RMSE=0.16975 CRPS=0.06502 spread/skill=1.309 cov90=0.770
+[defined_blind] RMSE=0.32009 CRPS=0.12938 spread/skill=0.936 cov90=0.903
+[density] spearman=+0.919 AUSE=0.132
+[vx] spearman=+0.663 AUSE=0.267
+[vy] spearman=+0.667 AUSE=0.380
+[var] spearman=+0.932 AUSE=0.183
+[runtime] 262.04s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E2_atc-20130728.json
+[enkf] E2: RMSE 0.24509  CRPS 0.10418  spread/RMSE 1.268
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130616 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130616.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130616.json --bank-native-std
+[residual] 1000/35127, 0.0057 s/frame
+[residual] 2000/35127, 0.0054 s/frame
+[residual] 3000/35127, 0.0054 s/frame
+[residual] 4000/35127, 0.0053 s/frame
+[residual] 5000/35127, 0.0053 s/frame
+[residual] 6000/35127, 0.0053 s/frame
+[residual] 7000/35127, 0.0053 s/frame
+[residual] 8000/35127, 0.0053 s/frame
+[residual] 9000/35127, 0.0053 s/frame
+[residual] 10000/35127, 0.0053 s/frame
+[residual] 11000/35127, 0.0052 s/frame
+[residual] 12000/35127, 0.0052 s/frame
+[residual] 13000/35127, 0.0052 s/frame
+[residual] 14000/35127, 0.0052 s/frame
+[residual] 15000/35127, 0.0052 s/frame
+[residual] 16000/35127, 0.0052 s/frame
+[residual] 17000/35127, 0.0052 s/frame
+[residual] 18000/35127, 0.0052 s/frame
+[residual] 19000/35127, 0.0052 s/frame
+[residual] 20000/35127, 0.0052 s/frame
+[residual] 21000/35127, 0.0052 s/frame
+[residual] 22000/35127, 0.0052 s/frame
+[residual] 23000/35127, 0.0052 s/frame
+[residual] 24000/35127, 0.0052 s/frame
+[residual] 25000/35127, 0.0052 s/frame
+[residual] 26000/35127, 0.0052 s/frame
+[residual] 27000/35127, 0.0052 s/frame
+[residual] 28000/35127, 0.0052 s/frame
+[residual] 29000/35127, 0.0052 s/frame
+[residual] 30000/35127, 0.0052 s/frame
+[residual] 31000/35127, 0.0052 s/frame
+[residual] 32000/35127, 0.0052 s/frame
+[residual] 33000/35127, 0.0052 s/frame
+[residual] 34000/35127, 0.0052 s/frame
+[residual] 35000/35127, 0.0052 s/frame
+[all] RMSE=0.17444 CRPS=0.06915 spread/skill=1.490 cov90=0.778
+[defined_blind] RMSE=0.32899 CRPS=0.12980 spread/skill=1.012 cov90=0.913
+[density] spearman=+0.925 AUSE=0.125
+[vx] spearman=+0.659 AUSE=0.267
+[vy] spearman=+0.663 AUSE=0.350
+[var] spearman=+0.933 AUSE=0.229
+[runtime] 247.44s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130616.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130623 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130623.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130623.json --bank-native-std
+[residual] 1000/40620, 0.0057 s/frame
+[residual] 2000/40620, 0.0054 s/frame
+[residual] 3000/40620, 0.0053 s/frame
+[residual] 4000/40620, 0.0053 s/frame
+[residual] 5000/40620, 0.0053 s/frame
+[residual] 6000/40620, 0.0053 s/frame
+[residual] 7000/40620, 0.0053 s/frame
+[residual] 8000/40620, 0.0053 s/frame
+[residual] 9000/40620, 0.0052 s/frame
+[residual] 10000/40620, 0.0052 s/frame
+[residual] 11000/40620, 0.0052 s/frame
+[residual] 12000/40620, 0.0052 s/frame
+[residual] 13000/40620, 0.0052 s/frame
+[residual] 14000/40620, 0.0052 s/frame
+[residual] 15000/40620, 0.0052 s/frame
+[residual] 16000/40620, 0.0052 s/frame
+[residual] 17000/40620, 0.0052 s/frame
+[residual] 18000/40620, 0.0052 s/frame
+[residual] 19000/40620, 0.0052 s/frame
+[residual] 20000/40620, 0.0052 s/frame
+[residual] 21000/40620, 0.0052 s/frame
+[residual] 22000/40620, 0.0052 s/frame
+[residual] 23000/40620, 0.0052 s/frame
+[residual] 24000/40620, 0.0052 s/frame
+[residual] 25000/40620, 0.0052 s/frame
+[residual] 26000/40620, 0.0052 s/frame
+[residual] 27000/40620, 0.0052 s/frame
+[residual] 28000/40620, 0.0052 s/frame
+[residual] 29000/40620, 0.0052 s/frame
+[residual] 30000/40620, 0.0052 s/frame
+[residual] 31000/40620, 0.0052 s/frame
+[residual] 32000/40620, 0.0052 s/frame
+[residual] 33000/40620, 0.0052 s/frame
+[residual] 34000/40620, 0.0052 s/frame
+[residual] 35000/40620, 0.0052 s/frame
+[residual] 36000/40620, 0.0052 s/frame
+[residual] 37000/40620, 0.0052 s/frame
+[residual] 38000/40620, 0.0052 s/frame
+[residual] 39000/40620, 0.0052 s/frame
+[residual] 40000/40620, 0.0052 s/frame
+[all] RMSE=0.17512 CRPS=0.06785 spread/skill=1.483 cov90=0.779
+[defined_blind] RMSE=0.33399 CRPS=0.12664 spread/skill=0.968 cov90=0.911
+[density] spearman=+0.932 AUSE=0.112
+[vx] spearman=+0.663 AUSE=0.251
+[vy] spearman=+0.670 AUSE=0.313
+[var] spearman=+0.940 AUSE=0.213
+[runtime] 285.25s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130623.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130630 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130630.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130630.json --bank-native-std
+[residual] 1000/40710, 0.0056 s/frame
+[residual] 2000/40710, 0.0054 s/frame
+[residual] 3000/40710, 0.0053 s/frame
+[residual] 4000/40710, 0.0053 s/frame
+[residual] 5000/40710, 0.0053 s/frame
+[residual] 6000/40710, 0.0053 s/frame
+[residual] 7000/40710, 0.0052 s/frame
+[residual] 8000/40710, 0.0052 s/frame
+[residual] 9000/40710, 0.0052 s/frame
+[residual] 10000/40710, 0.0052 s/frame
+[residual] 11000/40710, 0.0052 s/frame
+[residual] 12000/40710, 0.0052 s/frame
+[residual] 13000/40710, 0.0052 s/frame
+[residual] 14000/40710, 0.0052 s/frame
+[residual] 15000/40710, 0.0052 s/frame
+[residual] 16000/40710, 0.0052 s/frame
+[residual] 17000/40710, 0.0052 s/frame
+[residual] 18000/40710, 0.0052 s/frame
+[residual] 19000/40710, 0.0052 s/frame
+[residual] 20000/40710, 0.0052 s/frame
+[residual] 21000/40710, 0.0052 s/frame
+[residual] 22000/40710, 0.0052 s/frame
+[residual] 23000/40710, 0.0052 s/frame
+[residual] 24000/40710, 0.0052 s/frame
+[residual] 25000/40710, 0.0052 s/frame
+[residual] 26000/40710, 0.0052 s/frame
+[residual] 27000/40710, 0.0052 s/frame
+[residual] 28000/40710, 0.0052 s/frame
+[residual] 29000/40710, 0.0052 s/frame
+[residual] 30000/40710, 0.0052 s/frame
+[residual] 31000/40710, 0.0052 s/frame
+[residual] 32000/40710, 0.0052 s/frame
+[residual] 33000/40710, 0.0052 s/frame
+[residual] 34000/40710, 0.0052 s/frame
+[residual] 35000/40710, 0.0052 s/frame
+[residual] 36000/40710, 0.0052 s/frame
+[residual] 37000/40710, 0.0052 s/frame
+[residual] 38000/40710, 0.0052 s/frame
+[residual] 39000/40710, 0.0052 s/frame
+[residual] 40000/40710, 0.0052 s/frame
+[all] RMSE=0.17049 CRPS=0.06692 spread/skill=1.520 cov90=0.779
+[defined_blind] RMSE=0.32326 CRPS=0.12187 spread/skill=0.985 cov90=0.912
+[density] spearman=+0.931 AUSE=0.123
+[vx] spearman=+0.661 AUSE=0.255
+[vy] spearman=+0.668 AUSE=0.328
+[var] spearman=+0.940 AUSE=0.183
+[runtime] 284.57s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130630.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130707 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130707.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130707.json --bank-native-std
+[residual] 1000/38437, 0.0057 s/frame
+[residual] 2000/38437, 0.0054 s/frame
+[residual] 3000/38437, 0.0054 s/frame
+[residual] 4000/38437, 0.0053 s/frame
+[residual] 5000/38437, 0.0053 s/frame
+[residual] 6000/38437, 0.0053 s/frame
+[residual] 7000/38437, 0.0053 s/frame
+[residual] 8000/38437, 0.0053 s/frame
+[residual] 9000/38437, 0.0052 s/frame
+[residual] 10000/38437, 0.0052 s/frame
+[residual] 11000/38437, 0.0052 s/frame
+[residual] 12000/38437, 0.0052 s/frame
+[residual] 13000/38437, 0.0052 s/frame
+[residual] 14000/38437, 0.0052 s/frame
+[residual] 15000/38437, 0.0052 s/frame
+[residual] 16000/38437, 0.0052 s/frame
+[residual] 17000/38437, 0.0052 s/frame
+[residual] 18000/38437, 0.0052 s/frame
+[residual] 19000/38437, 0.0052 s/frame
+[residual] 20000/38437, 0.0052 s/frame
+[residual] 21000/38437, 0.0052 s/frame
+[residual] 22000/38437, 0.0052 s/frame
+[residual] 23000/38437, 0.0052 s/frame
+[residual] 24000/38437, 0.0052 s/frame
+[residual] 25000/38437, 0.0052 s/frame
+[residual] 26000/38437, 0.0052 s/frame
+[residual] 27000/38437, 0.0052 s/frame
+[residual] 28000/38437, 0.0052 s/frame
+[residual] 29000/38437, 0.0052 s/frame
+[residual] 30000/38437, 0.0052 s/frame
+[residual] 31000/38437, 0.0052 s/frame
+[residual] 32000/38437, 0.0052 s/frame
+[residual] 33000/38437, 0.0052 s/frame
+[residual] 34000/38437, 0.0052 s/frame
+[residual] 35000/38437, 0.0052 s/frame
+[residual] 36000/38437, 0.0052 s/frame
+[residual] 37000/38437, 0.0052 s/frame
+[residual] 38000/38437, 0.0052 s/frame
+[all] RMSE=0.17978 CRPS=0.07025 spread/skill=1.446 cov90=0.778
+[defined_blind] RMSE=0.34040 CRPS=0.13574 spread/skill=1.006 cov90=0.912
+[density] spearman=+0.927 AUSE=0.117
+[vx] spearman=+0.671 AUSE=0.255
+[vy] spearman=+0.664 AUSE=0.345
+[var] spearman=+0.934 AUSE=0.185
+[runtime] 271.54s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130707.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130714 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130714.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130714.json --bank-native-std
+[residual] 1000/40457, 0.0057 s/frame
+[residual] 2000/40457, 0.0055 s/frame
+[residual] 3000/40457, 0.0054 s/frame
+[residual] 4000/40457, 0.0054 s/frame
+[residual] 5000/40457, 0.0053 s/frame
+[residual] 6000/40457, 0.0053 s/frame
+[residual] 7000/40457, 0.0053 s/frame
+[residual] 8000/40457, 0.0053 s/frame
+[residual] 9000/40457, 0.0053 s/frame
+[residual] 10000/40457, 0.0053 s/frame
+[residual] 11000/40457, 0.0053 s/frame
+[residual] 12000/40457, 0.0053 s/frame
+[residual] 13000/40457, 0.0053 s/frame
+[residual] 14000/40457, 0.0053 s/frame
+[residual] 15000/40457, 0.0053 s/frame
+[residual] 16000/40457, 0.0053 s/frame
+[residual] 17000/40457, 0.0053 s/frame
+[residual] 18000/40457, 0.0053 s/frame
+[residual] 19000/40457, 0.0053 s/frame
+[residual] 20000/40457, 0.0053 s/frame
+[residual] 21000/40457, 0.0053 s/frame
+[residual] 22000/40457, 0.0053 s/frame
+[residual] 23000/40457, 0.0053 s/frame
+[residual] 24000/40457, 0.0053 s/frame
+[residual] 25000/40457, 0.0053 s/frame
+[residual] 26000/40457, 0.0052 s/frame
+[residual] 27000/40457, 0.0052 s/frame
+[residual] 28000/40457, 0.0052 s/frame
+[residual] 29000/40457, 0.0052 s/frame
+[residual] 30000/40457, 0.0052 s/frame
+[residual] 31000/40457, 0.0052 s/frame
+[residual] 32000/40457, 0.0052 s/frame
+[residual] 33000/40457, 0.0052 s/frame
+[residual] 34000/40457, 0.0052 s/frame
+[residual] 35000/40457, 0.0052 s/frame
+[residual] 36000/40457, 0.0052 s/frame
+[residual] 37000/40457, 0.0052 s/frame
+[residual] 38000/40457, 0.0052 s/frame
+[residual] 39000/40457, 0.0052 s/frame
+[residual] 40000/40457, 0.0052 s/frame
+[all] RMSE=0.18400 CRPS=0.07121 spread/skill=1.415 cov90=0.777
+[defined_blind] RMSE=0.34587 CRPS=0.13956 spread/skill=1.011 cov90=0.912
+[density] spearman=+0.923 AUSE=0.121
+[vx] spearman=+0.681 AUSE=0.251
+[vy] spearman=+0.674 AUSE=0.326
+[var] spearman=+0.933 AUSE=0.156
+[runtime] 288.51s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130714.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130721 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130721.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130721.json --bank-native-std
+[residual] 1000/37413, 0.0057 s/frame
+[residual] 2000/37413, 0.0054 s/frame
+[residual] 3000/37413, 0.0054 s/frame
+[residual] 4000/37413, 0.0053 s/frame
+[residual] 5000/37413, 0.0053 s/frame
+[residual] 6000/37413, 0.0053 s/frame
+[residual] 7000/37413, 0.0053 s/frame
+[residual] 8000/37413, 0.0053 s/frame
+[residual] 9000/37413, 0.0053 s/frame
+[residual] 10000/37413, 0.0053 s/frame
+[residual] 11000/37413, 0.0053 s/frame
+[residual] 12000/37413, 0.0053 s/frame
+[residual] 13000/37413, 0.0053 s/frame
+[residual] 14000/37413, 0.0052 s/frame
+[residual] 15000/37413, 0.0052 s/frame
+[residual] 16000/37413, 0.0052 s/frame
+[residual] 17000/37413, 0.0052 s/frame
+[residual] 18000/37413, 0.0052 s/frame
+[residual] 19000/37413, 0.0052 s/frame
+[residual] 20000/37413, 0.0052 s/frame
+[residual] 21000/37413, 0.0052 s/frame
+[residual] 22000/37413, 0.0052 s/frame
+[residual] 23000/37413, 0.0052 s/frame
+[residual] 24000/37413, 0.0052 s/frame
+[residual] 25000/37413, 0.0052 s/frame
+[residual] 26000/37413, 0.0052 s/frame
+[residual] 27000/37413, 0.0052 s/frame
+[residual] 28000/37413, 0.0052 s/frame
+[residual] 29000/37413, 0.0052 s/frame
+[residual] 30000/37413, 0.0052 s/frame
+[residual] 31000/37413, 0.0052 s/frame
+[residual] 32000/37413, 0.0052 s/frame
+[residual] 33000/37413, 0.0052 s/frame
+[residual] 34000/37413, 0.0052 s/frame
+[residual] 35000/37413, 0.0052 s/frame
+[residual] 36000/37413, 0.0052 s/frame
+[residual] 37000/37413, 0.0052 s/frame
+[all] RMSE=0.18388 CRPS=0.07333 spread/skill=1.417 cov90=0.774
+[defined_blind] RMSE=0.33758 CRPS=0.14308 spread/skill=1.058 cov90=0.911
+[density] spearman=+0.913 AUSE=0.135
+[vx] spearman=+0.675 AUSE=0.270
+[vy] spearman=+0.666 AUSE=0.373
+[var] spearman=+0.921 AUSE=0.237
+[runtime] 267.47s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130721.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind residual --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1.0 1.25 1.4 0.9333333 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130728 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130728.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130728.json --bank-native-std
+[residual] 1000/36979, 0.0056 s/frame
+[residual] 2000/36979, 0.0054 s/frame
+[residual] 3000/36979, 0.0054 s/frame
+[residual] 4000/36979, 0.0053 s/frame
+[residual] 5000/36979, 0.0053 s/frame
+[residual] 6000/36979, 0.0053 s/frame
+[residual] 7000/36979, 0.0053 s/frame
+[residual] 8000/36979, 0.0053 s/frame
+[residual] 9000/36979, 0.0053 s/frame
+[residual] 10000/36979, 0.0053 s/frame
+[residual] 11000/36979, 0.0053 s/frame
+[residual] 12000/36979, 0.0053 s/frame
+[residual] 13000/36979, 0.0053 s/frame
+[residual] 14000/36979, 0.0053 s/frame
+[residual] 15000/36979, 0.0052 s/frame
+[residual] 16000/36979, 0.0052 s/frame
+[residual] 17000/36979, 0.0052 s/frame
+[residual] 18000/36979, 0.0052 s/frame
+[residual] 19000/36979, 0.0052 s/frame
+[residual] 20000/36979, 0.0052 s/frame
+[residual] 21000/36979, 0.0052 s/frame
+[residual] 22000/36979, 0.0052 s/frame
+[residual] 23000/36979, 0.0052 s/frame
+[residual] 24000/36979, 0.0052 s/frame
+[residual] 25000/36979, 0.0052 s/frame
+[residual] 26000/36979, 0.0052 s/frame
+[residual] 27000/36979, 0.0052 s/frame
+[residual] 28000/36979, 0.0052 s/frame
+[residual] 29000/36979, 0.0052 s/frame
+[residual] 30000/36979, 0.0052 s/frame
+[residual] 31000/36979, 0.0052 s/frame
+[residual] 32000/36979, 0.0052 s/frame
+[residual] 33000/36979, 0.0052 s/frame
+[residual] 34000/36979, 0.0052 s/frame
+[residual] 35000/36979, 0.0052 s/frame
+[residual] 36000/36979, 0.0052 s/frame
+[all] RMSE=0.17306 CRPS=0.06924 spread/skill=1.500 cov90=0.777
+[defined_blind] RMSE=0.32348 CRPS=0.13105 spread/skill=1.055 cov90=0.914
+[density] spearman=+0.919 AUSE=0.136
+[vx] spearman=+0.665 AUSE=0.266
+[vy] spearman=+0.668 AUSE=0.362
+[var] spearman=+0.933 AUSE=0.165
+[runtime] 262.26s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E3_atc-20130728.json
+[enkf] E3: RMSE 0.25223  CRPS 0.11174  spread/RMSE 1.436
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130616 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130616.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130616.json
+[gaussian] 1000/35127, 0.0056 s/frame
+[gaussian] 2000/35127, 0.0054 s/frame
+[gaussian] 3000/35127, 0.0053 s/frame
+[gaussian] 4000/35127, 0.0053 s/frame
+[gaussian] 5000/35127, 0.0052 s/frame
+[gaussian] 6000/35127, 0.0052 s/frame
+[gaussian] 7000/35127, 0.0052 s/frame
+[gaussian] 8000/35127, 0.0052 s/frame
+[gaussian] 9000/35127, 0.0052 s/frame
+[gaussian] 10000/35127, 0.0052 s/frame
+[gaussian] 11000/35127, 0.0054 s/frame
+[gaussian] 12000/35127, 0.0054 s/frame
+[gaussian] 13000/35127, 0.0054 s/frame
+[gaussian] 14000/35127, 0.0054 s/frame
+[gaussian] 15000/35127, 0.0053 s/frame
+[gaussian] 16000/35127, 0.0053 s/frame
+[gaussian] 17000/35127, 0.0053 s/frame
+[gaussian] 18000/35127, 0.0053 s/frame
+[gaussian] 19000/35127, 0.0053 s/frame
+[gaussian] 20000/35127, 0.0053 s/frame
+[gaussian] 21000/35127, 0.0053 s/frame
+[gaussian] 22000/35127, 0.0053 s/frame
+[gaussian] 23000/35127, 0.0053 s/frame
+[gaussian] 24000/35127, 0.0053 s/frame
+[gaussian] 25000/35127, 0.0053 s/frame
+[gaussian] 26000/35127, 0.0053 s/frame
+[gaussian] 27000/35127, 0.0053 s/frame
+[gaussian] 28000/35127, 0.0052 s/frame
+[gaussian] 29000/35127, 0.0052 s/frame
+[gaussian] 30000/35127, 0.0052 s/frame
+[gaussian] 31000/35127, 0.0052 s/frame
+[gaussian] 32000/35127, 0.0052 s/frame
+[gaussian] 33000/35127, 0.0052 s/frame
+[gaussian] 34000/35127, 0.0052 s/frame
+[gaussian] 35000/35127, 0.0052 s/frame
+[all] RMSE=0.23752 CRPS=0.11906 spread/skill=1.473 cov90=0.969
+[defined_blind] RMSE=0.35301 CRPS=0.14204 spread/skill=0.877 cov90=0.922
+[density] spearman=+0.909 AUSE=0.138
+[vx] spearman=+0.556 AUSE=0.459
+[vy] spearman=+0.468 AUSE=0.713
+[var] spearman=+0.804 AUSE=0.277
+[runtime] 247.84s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130616.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130623 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130623.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130623.json
+[gaussian] 1000/40620, 0.0056 s/frame
+[gaussian] 2000/40620, 0.0054 s/frame
+[gaussian] 3000/40620, 0.0053 s/frame
+[gaussian] 4000/40620, 0.0053 s/frame
+[gaussian] 5000/40620, 0.0052 s/frame
+[gaussian] 6000/40620, 0.0052 s/frame
+[gaussian] 7000/40620, 0.0052 s/frame
+[gaussian] 8000/40620, 0.0052 s/frame
+[gaussian] 9000/40620, 0.0052 s/frame
+[gaussian] 10000/40620, 0.0052 s/frame
+[gaussian] 11000/40620, 0.0052 s/frame
+[gaussian] 12000/40620, 0.0052 s/frame
+[gaussian] 13000/40620, 0.0052 s/frame
+[gaussian] 14000/40620, 0.0052 s/frame
+[gaussian] 15000/40620, 0.0052 s/frame
+[gaussian] 16000/40620, 0.0052 s/frame
+[gaussian] 17000/40620, 0.0052 s/frame
+[gaussian] 18000/40620, 0.0052 s/frame
+[gaussian] 19000/40620, 0.0052 s/frame
+[gaussian] 20000/40620, 0.0052 s/frame
+[gaussian] 21000/40620, 0.0052 s/frame
+[gaussian] 22000/40620, 0.0052 s/frame
+[gaussian] 23000/40620, 0.0052 s/frame
+[gaussian] 24000/40620, 0.0052 s/frame
+[gaussian] 25000/40620, 0.0052 s/frame
+[gaussian] 26000/40620, 0.0052 s/frame
+[gaussian] 27000/40620, 0.0052 s/frame
+[gaussian] 28000/40620, 0.0052 s/frame
+[gaussian] 29000/40620, 0.0052 s/frame
+[gaussian] 30000/40620, 0.0052 s/frame
+[gaussian] 31000/40620, 0.0052 s/frame
+[gaussian] 32000/40620, 0.0052 s/frame
+[gaussian] 33000/40620, 0.0052 s/frame
+[gaussian] 34000/40620, 0.0052 s/frame
+[gaussian] 35000/40620, 0.0052 s/frame
+[gaussian] 36000/40620, 0.0052 s/frame
+[gaussian] 37000/40620, 0.0052 s/frame
+[gaussian] 38000/40620, 0.0052 s/frame
+[gaussian] 39000/40620, 0.0052 s/frame
+[gaussian] 40000/40620, 0.0052 s/frame
+[all] RMSE=0.24098 CRPS=0.11871 spread/skill=1.450 cov90=0.970
+[defined_blind] RMSE=0.36098 CRPS=0.13949 spread/skill=0.830 cov90=0.923
+[density] spearman=+0.923 AUSE=0.137
+[vx] spearman=+0.578 AUSE=0.451
+[vy] spearman=+0.510 AUSE=0.654
+[var] spearman=+0.809 AUSE=0.267
+[runtime] 283.88s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130623.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130630 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130630.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130630.json
+[gaussian] 1000/40710, 0.0056 s/frame
+[gaussian] 2000/40710, 0.0054 s/frame
+[gaussian] 3000/40710, 0.0053 s/frame
+[gaussian] 4000/40710, 0.0053 s/frame
+[gaussian] 5000/40710, 0.0053 s/frame
+[gaussian] 6000/40710, 0.0053 s/frame
+[gaussian] 7000/40710, 0.0052 s/frame
+[gaussian] 8000/40710, 0.0052 s/frame
+[gaussian] 9000/40710, 0.0052 s/frame
+[gaussian] 10000/40710, 0.0052 s/frame
+[gaussian] 11000/40710, 0.0052 s/frame
+[gaussian] 12000/40710, 0.0052 s/frame
+[gaussian] 13000/40710, 0.0052 s/frame
+[gaussian] 14000/40710, 0.0052 s/frame
+[gaussian] 15000/40710, 0.0052 s/frame
+[gaussian] 16000/40710, 0.0052 s/frame
+[gaussian] 17000/40710, 0.0052 s/frame
+[gaussian] 18000/40710, 0.0052 s/frame
+[gaussian] 19000/40710, 0.0052 s/frame
+[gaussian] 20000/40710, 0.0052 s/frame
+[gaussian] 21000/40710, 0.0052 s/frame
+[gaussian] 22000/40710, 0.0052 s/frame
+[gaussian] 23000/40710, 0.0052 s/frame
+[gaussian] 24000/40710, 0.0052 s/frame
+[gaussian] 25000/40710, 0.0052 s/frame
+[gaussian] 26000/40710, 0.0052 s/frame
+[gaussian] 27000/40710, 0.0052 s/frame
+[gaussian] 28000/40710, 0.0052 s/frame
+[gaussian] 29000/40710, 0.0052 s/frame
+[gaussian] 30000/40710, 0.0052 s/frame
+[gaussian] 31000/40710, 0.0052 s/frame
+[gaussian] 32000/40710, 0.0052 s/frame
+[gaussian] 33000/40710, 0.0052 s/frame
+[gaussian] 34000/40710, 0.0052 s/frame
+[gaussian] 35000/40710, 0.0052 s/frame
+[gaussian] 36000/40710, 0.0052 s/frame
+[gaussian] 37000/40710, 0.0052 s/frame
+[gaussian] 38000/40710, 0.0052 s/frame
+[gaussian] 39000/40710, 0.0052 s/frame
+[gaussian] 40000/40710, 0.0052 s/frame
+[all] RMSE=0.23587 CRPS=0.11728 spread/skill=1.480 cov90=0.972
+[defined_blind] RMSE=0.34901 CRPS=0.13389 spread/skill=0.847 cov90=0.928
+[density] spearman=+0.922 AUSE=0.140
+[vx] spearman=+0.579 AUSE=0.445
+[vy] spearman=+0.507 AUSE=0.662
+[var] spearman=+0.809 AUSE=0.262
+[runtime] 284.85s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130630.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130707 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130707.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130707.json
+[gaussian] 1000/38437, 0.0056 s/frame
+[gaussian] 2000/38437, 0.0054 s/frame
+[gaussian] 3000/38437, 0.0053 s/frame
+[gaussian] 4000/38437, 0.0053 s/frame
+[gaussian] 5000/38437, 0.0052 s/frame
+[gaussian] 6000/38437, 0.0052 s/frame
+[gaussian] 7000/38437, 0.0052 s/frame
+[gaussian] 8000/38437, 0.0052 s/frame
+[gaussian] 9000/38437, 0.0052 s/frame
+[gaussian] 10000/38437, 0.0052 s/frame
+[gaussian] 11000/38437, 0.0052 s/frame
+[gaussian] 12000/38437, 0.0052 s/frame
+[gaussian] 13000/38437, 0.0052 s/frame
+[gaussian] 14000/38437, 0.0052 s/frame
+[gaussian] 15000/38437, 0.0052 s/frame
+[gaussian] 16000/38437, 0.0052 s/frame
+[gaussian] 17000/38437, 0.0052 s/frame
+[gaussian] 18000/38437, 0.0052 s/frame
+[gaussian] 19000/38437, 0.0052 s/frame
+[gaussian] 20000/38437, 0.0052 s/frame
+[gaussian] 21000/38437, 0.0052 s/frame
+[gaussian] 22000/38437, 0.0052 s/frame
+[gaussian] 23000/38437, 0.0052 s/frame
+[gaussian] 24000/38437, 0.0052 s/frame
+[gaussian] 25000/38437, 0.0052 s/frame
+[gaussian] 26000/38437, 0.0052 s/frame
+[gaussian] 27000/38437, 0.0052 s/frame
+[gaussian] 28000/38437, 0.0052 s/frame
+[gaussian] 29000/38437, 0.0052 s/frame
+[gaussian] 30000/38437, 0.0052 s/frame
+[gaussian] 31000/38437, 0.0052 s/frame
+[gaussian] 32000/38437, 0.0052 s/frame
+[gaussian] 33000/38437, 0.0052 s/frame
+[gaussian] 34000/38437, 0.0052 s/frame
+[gaussian] 35000/38437, 0.0052 s/frame
+[gaussian] 36000/38437, 0.0052 s/frame
+[gaussian] 37000/38437, 0.0052 s/frame
+[gaussian] 38000/38437, 0.0052 s/frame
+[all] RMSE=0.24575 CRPS=0.12140 spread/skill=1.423 cov90=0.966
+[defined_blind] RMSE=0.36826 CRPS=0.14966 spread/skill=0.862 cov90=0.917
+[density] spearman=+0.914 AUSE=0.136
+[vx] spearman=+0.580 AUSE=0.444
+[vy] spearman=+0.473 AUSE=0.692
+[var] spearman=+0.804 AUSE=0.265
+[runtime] 269.36s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130707.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130714 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130714.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130714.json
+[gaussian] 1000/40457, 0.0056 s/frame
+[gaussian] 2000/40457, 0.0054 s/frame
+[gaussian] 3000/40457, 0.0053 s/frame
+[gaussian] 4000/40457, 0.0053 s/frame
+[gaussian] 5000/40457, 0.0052 s/frame
+[gaussian] 6000/40457, 0.0052 s/frame
+[gaussian] 7000/40457, 0.0052 s/frame
+[gaussian] 8000/40457, 0.0052 s/frame
+[gaussian] 9000/40457, 0.0052 s/frame
+[gaussian] 10000/40457, 0.0052 s/frame
+[gaussian] 11000/40457, 0.0052 s/frame
+[gaussian] 12000/40457, 0.0052 s/frame
+[gaussian] 13000/40457, 0.0052 s/frame
+[gaussian] 14000/40457, 0.0052 s/frame
+[gaussian] 15000/40457, 0.0052 s/frame
+[gaussian] 16000/40457, 0.0052 s/frame
+[gaussian] 17000/40457, 0.0052 s/frame
+[gaussian] 18000/40457, 0.0052 s/frame
+[gaussian] 19000/40457, 0.0052 s/frame
+[gaussian] 20000/40457, 0.0052 s/frame
+[gaussian] 21000/40457, 0.0052 s/frame
+[gaussian] 22000/40457, 0.0052 s/frame
+[gaussian] 23000/40457, 0.0052 s/frame
+[gaussian] 24000/40457, 0.0052 s/frame
+[gaussian] 25000/40457, 0.0052 s/frame
+[gaussian] 26000/40457, 0.0052 s/frame
+[gaussian] 27000/40457, 0.0052 s/frame
+[gaussian] 28000/40457, 0.0052 s/frame
+[gaussian] 29000/40457, 0.0052 s/frame
+[gaussian] 30000/40457, 0.0052 s/frame
+[gaussian] 31000/40457, 0.0052 s/frame
+[gaussian] 32000/40457, 0.0052 s/frame
+[gaussian] 33000/40457, 0.0052 s/frame
+[gaussian] 34000/40457, 0.0052 s/frame
+[gaussian] 35000/40457, 0.0051 s/frame
+[gaussian] 36000/40457, 0.0051 s/frame
+[gaussian] 37000/40457, 0.0051 s/frame
+[gaussian] 38000/40457, 0.0051 s/frame
+[gaussian] 39000/40457, 0.0051 s/frame
+[gaussian] 40000/40457, 0.0051 s/frame
+[all] RMSE=0.24901 CRPS=0.12240 spread/skill=1.403 cov90=0.965
+[defined_blind] RMSE=0.37640 CRPS=0.15495 spread/skill=0.861 cov90=0.915
+[density] spearman=+0.907 AUSE=0.136
+[vx] spearman=+0.583 AUSE=0.440
+[vy] spearman=+0.479 AUSE=0.689
+[var] spearman=+0.797 AUSE=0.265
+[runtime] 283.83s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130714.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130721 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130721.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130721.json
+[gaussian] 1000/37413, 0.0056 s/frame
+[gaussian] 2000/37413, 0.0054 s/frame
+[gaussian] 3000/37413, 0.0053 s/frame
+[gaussian] 4000/37413, 0.0053 s/frame
+[gaussian] 5000/37413, 0.0052 s/frame
+[gaussian] 6000/37413, 0.0052 s/frame
+[gaussian] 7000/37413, 0.0052 s/frame
+[gaussian] 8000/37413, 0.0052 s/frame
+[gaussian] 9000/37413, 0.0052 s/frame
+[gaussian] 10000/37413, 0.0052 s/frame
+[gaussian] 11000/37413, 0.0052 s/frame
+[gaussian] 12000/37413, 0.0052 s/frame
+[gaussian] 13000/37413, 0.0052 s/frame
+[gaussian] 14000/37413, 0.0052 s/frame
+[gaussian] 15000/37413, 0.0052 s/frame
+[gaussian] 16000/37413, 0.0052 s/frame
+[gaussian] 17000/37413, 0.0052 s/frame
+[gaussian] 18000/37413, 0.0052 s/frame
+[gaussian] 19000/37413, 0.0052 s/frame
+[gaussian] 20000/37413, 0.0052 s/frame
+[gaussian] 21000/37413, 0.0052 s/frame
+[gaussian] 22000/37413, 0.0052 s/frame
+[gaussian] 23000/37413, 0.0052 s/frame
+[gaussian] 24000/37413, 0.0052 s/frame
+[gaussian] 25000/37413, 0.0052 s/frame
+[gaussian] 26000/37413, 0.0052 s/frame
+[gaussian] 27000/37413, 0.0052 s/frame
+[gaussian] 28000/37413, 0.0052 s/frame
+[gaussian] 29000/37413, 0.0052 s/frame
+[gaussian] 30000/37413, 0.0052 s/frame
+[gaussian] 31000/37413, 0.0052 s/frame
+[gaussian] 32000/37413, 0.0052 s/frame
+[gaussian] 33000/37413, 0.0052 s/frame
+[gaussian] 34000/37413, 0.0052 s/frame
+[gaussian] 35000/37413, 0.0052 s/frame
+[gaussian] 36000/37413, 0.0052 s/frame
+[gaussian] 37000/37413, 0.0052 s/frame
+[all] RMSE=0.24634 CRPS=0.12371 spread/skill=1.422 cov90=0.962
+[defined_blind] RMSE=0.36530 CRPS=0.15836 spread/skill=0.924 cov90=0.915
+[density] spearman=+0.889 AUSE=0.145
+[vx] spearman=+0.565 AUSE=0.447
+[vy] spearman=+0.425 AUSE=0.760
+[var] spearman=+0.785 AUSE=0.293
+[runtime] 265.04s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130721.json
+[run] methods.enkf.enkf_opt.experiments.eval_structured_q_gpu --noise-kind gaussian --density-noise-space log1p --log-density-mean-correction ensemble --model-checkpoint /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/pedpred3_5to5_epoch38.pt --input-frames 5 --bank /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/models/enkf_residual_q_bank.npz --scale 1.5 --temporal-rho 0.5 --channel-scales 1 1 1 1 --blind-channel-scales 1 1 1 1 --cross-channel-matrix 1.0 0.5 0.5 0.1 0.5 1.0 0.5 0.1 0.5 0.5 1.0 0.1 0.1 0.1 0.1 1.0 --ensemble 100 --radius 7 --frames 1000000 --warmup 500 --day atc-20130728 --obs-dir /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_observations --calibration-export /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130728.npz --out /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130728.json
+[gaussian] 1000/36979, 0.0056 s/frame
+[gaussian] 2000/36979, 0.0054 s/frame
+[gaussian] 3000/36979, 0.0053 s/frame
+[gaussian] 4000/36979, 0.0053 s/frame
+[gaussian] 5000/36979, 0.0053 s/frame
+[gaussian] 6000/36979, 0.0052 s/frame
+[gaussian] 7000/36979, 0.0052 s/frame
+[gaussian] 8000/36979, 0.0052 s/frame
+[gaussian] 9000/36979, 0.0052 s/frame
+[gaussian] 10000/36979, 0.0052 s/frame
+[gaussian] 11000/36979, 0.0052 s/frame
+[gaussian] 12000/36979, 0.0052 s/frame
+[gaussian] 13000/36979, 0.0052 s/frame
+[gaussian] 14000/36979, 0.0052 s/frame
+[gaussian] 15000/36979, 0.0052 s/frame
+[gaussian] 16000/36979, 0.0052 s/frame
+[gaussian] 17000/36979, 0.0052 s/frame
+[gaussian] 18000/36979, 0.0052 s/frame
+[gaussian] 19000/36979, 0.0052 s/frame
+[gaussian] 20000/36979, 0.0052 s/frame
+[gaussian] 21000/36979, 0.0052 s/frame
+[gaussian] 22000/36979, 0.0052 s/frame
+[gaussian] 23000/36979, 0.0052 s/frame
+[gaussian] 24000/36979, 0.0052 s/frame
+[gaussian] 25000/36979, 0.0052 s/frame
+[gaussian] 26000/36979, 0.0052 s/frame
+[gaussian] 27000/36979, 0.0052 s/frame
+[gaussian] 28000/36979, 0.0052 s/frame
+[gaussian] 29000/36979, 0.0052 s/frame
+[gaussian] 30000/36979, 0.0052 s/frame
+[gaussian] 31000/36979, 0.0052 s/frame
+[gaussian] 32000/36979, 0.0052 s/frame
+[gaussian] 33000/36979, 0.0052 s/frame
+[gaussian] 34000/36979, 0.0052 s/frame
+[gaussian] 35000/36979, 0.0052 s/frame
+[gaussian] 36000/36979, 0.0052 s/frame
+[all] RMSE=0.23541 CRPS=0.11887 spread/skill=1.485 cov90=0.969
+[defined_blind] RMSE=0.34831 CRPS=0.14330 spread/skill=0.915 cov90=0.926
+[density] spearman=+0.900 AUSE=0.140
+[vx] spearman=+0.569 AUSE=0.442
+[vy] spearman=+0.471 AUSE=0.700
+[var] spearman=+0.801 AUSE=0.261
+[runtime] 260.1s on Tesla V100-PCIE-32GB; failures=0
+[out] /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf/E4_atc-20130728.json
+[enkf] E4: RMSE 0.30168  CRPS 0.15052  spread/RMSE 1.336
+[enkf] winner E2 -> /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/enkf_validation.json

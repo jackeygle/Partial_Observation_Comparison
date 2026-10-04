@@ -73,3 +73,4 @@ slides/package-lock.json
 
 # thesis figure caches (small; let the figures be redrawn without the data)
 !thesis_figures/data/*.npz
+supervisor_evaluation/outputs/full_before_reselect/

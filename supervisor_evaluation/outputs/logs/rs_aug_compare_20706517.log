@@ -1,0 +1,10 @@
+[aug] atc-20130616 done
+[aug] atc-20130623 done
+[aug] atc-20130630 done
+[aug] atc-20130707 done
+[aug] atc-20130714 done
+[aug] atc-20130721 done
+[aug] atc-20130728 done
+[aug] aug0 (ckpt_00149.pt): RMSE 0.30947  CRPS 0.11745  spread/RMSE 0.972
+[aug] aughead (ckpt_00090.pt): RMSE 0.28165  CRPS 0.09987  spread/RMSE 1.279
+[aug] winner aughead -> /scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/reselect/aug_validation.json

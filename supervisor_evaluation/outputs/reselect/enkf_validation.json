@@ -1,0 +1,106 @@
+{
+  "split": "valid",
+  "days": [
+    "atc-20130616",
+    "atc-20130623",
+    "atc-20130630",
+    "atc-20130707",
+    "atc-20130714",
+    "atc-20130721",
+    "atc-20130728"
+  ],
+  "cells": "blind walkable, every frame after the warm-up",
+  "rule": "lowest CRPS among candidates with RMSE <= 1.05 x RMSE(E2)",
+  "candidates": {
+    "E1": {
+      "rmse": 0.2542120517418766,
+      "crps": 0.11247757571771382,
+      "spread_rmse": 1.419221068792796,
+      "n": 135452664,
+      "config": {
+        "channel": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "blind": [
+          1.0,
+          1.25,
+          1.4,
+          0.9333333
+        ],
+        "kind": "residual"
+      }
+    },
+    "E2": {
+      "rmse": 0.24509487987240422,
+      "crps": 0.1041848992109779,
+      "spread_rmse": 1.2683937236805929,
+      "n": 135452664,
+      "config": {
+        "channel": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "blind": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "kind": "residual"
+      }
+    },
+    "E3": {
+      "rmse": 0.25223201082674934,
+      "crps": 0.11174038247101445,
+      "spread_rmse": 1.4356125802300352,
+      "n": 135452664,
+      "config": {
+        "channel": [
+          1.0,
+          1.25,
+          1.4,
+          0.9333333
+        ],
+        "blind": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "kind": "residual"
+      }
+    },
+    "E4": {
+      "rmse": 0.3016750685496875,
+      "crps": 0.15051628712078652,
+      "spread_rmse": 1.3355123591558011,
+      "n": 135452664,
+      "config": {
+        "channel": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "blind": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "kind": "gaussian"
+      }
+    }
+  },
+  "eligible": [
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "winner": "E2"
+}

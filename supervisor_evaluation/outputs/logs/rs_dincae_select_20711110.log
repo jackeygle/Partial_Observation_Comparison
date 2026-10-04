@@ -1,0 +1,13 @@
+[early_stop] epoch 30: valid blind walkable RMSE 0.30431
+[early_stop] epoch 40: valid blind walkable RMSE 0.29801
+[early_stop] epoch 50: valid blind walkable RMSE 0.29481
+[early_stop] epoch 60: valid blind walkable RMSE 0.30424
+[early_stop] epoch 70: valid blind walkable RMSE 0.31109
+[early_stop] epoch 80: valid blind walkable RMSE 0.29698
+[early_stop] epoch 90: valid blind walkable RMSE 0.32350
+[early_stop] epoch 100: valid blind walkable RMSE 0.32000
+[early_stop] epoch 110: valid blind walkable RMSE 0.31358
+[early_stop] epoch 120: valid blind walkable RMSE 0.34391
+[early_stop] epoch 130: valid blind walkable RMSE 0.31223
+[early_stop] epoch 140: valid blind walkable RMSE 0.29216
+[early_stop] best epoch 140 (RMSE 0.29216), newest 140: continue

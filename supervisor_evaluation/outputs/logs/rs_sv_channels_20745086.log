@@ -1,0 +1,11 @@
+[channels] atc-20130616 done
+[channels] atc-20130623 done
+[channels] atc-20130630 done
+[channels] atc-20130707 done
+[channels] atc-20130714 done
+[channels] atc-20130721 done
+[channels] atc-20130728 done
+k1 {'pooled_rmse': 0.20985, 'density_rmse': 0.14656, 'vx_rmse': 0.35029, 'vy_rmse': 0.1498, 'var_rmse': 0.09762}
+k4 {'pooled_rmse': 0.19744, 'density_rmse': 0.13645, 'vx_rmse': 0.32693, 'vy_rmse': 0.14544, 'var_rmse': 0.09634}
+k8 {'pooled_rmse': 0.19201, 'density_rmse': 0.13107, 'vx_rmse': 0.3171, 'vy_rmse': 0.14358, 'var_rmse': 0.09555}
+k16 {'pooled_rmse': 0.1886, 'density_rmse': 0.12664, 'vx_rmse': 0.3117, 'vy_rmse': 0.14162, 'var_rmse': 0.095}

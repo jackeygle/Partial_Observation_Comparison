@@ -1,0 +1,21 @@
+{
+ "scores": {
+  "80": 0.057061844278963395,
+  "90": 0.05785613124837035,
+  "100": 0.05938276743645514
+ },
+ "days": [
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "min_epoch": 80,
+ "patience": 20,
+ "best_epoch": 80,
+ "newest_epoch": 100,
+ "stop": true
+}

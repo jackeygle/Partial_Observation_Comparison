@@ -93,3 +93,17 @@ on, every new checkpoint is scored on the validation split as in rule 3; trainin
 once the best checkpoint is 20 (4DVarNet) or 30 (DINCAE) epochs old. Applied to the seven
 existing runs of these methods, this rule selects the same epoch as their full 150-epoch
 selection in every case.
+
+## Outcome (validation split only; recorded before the test days were touched again)
+
+| method | candidates (validation blind walkable RMSE / CRPS) | winner | change |
+|---|---|---|---|
+| Senseiver-G, latent | A40 0.2130; G-direct k=1 0.2099 | G-direct | none |
+| Senseiver-G, window | k=1 0.2099; k=4 0.1974; k=8 0.1920; k=16 0.1886 (no channel worse than k=1) | k = 16 | none |
+| 4DVarNet | 32/3 0.2488; 64/5 0.2389; 96/5 0.2268 (both new runs early-stopped at epoch 100) | 96/5 | none |
+| 4DVarNet aug. var. | aug0 CRPS 0.1174; aughead CRPS 0.0999 | aughead | none |
+| DINCAE | observed-value loss 0.2948 (stopping rule: epoch 50); full-field 0.2165 | full-field | none |
+| EnKF | E1 0.2542 / 0.1125; E2 0.2451 / 0.1042; E3 0.2522 / 0.1117; E4 0.3017 / 0.1505 | E2 | blind-cell factors dropped |
+
+Records: `outputs/reselect/{aug_validation,enkf_validation,senseiver_window_channels}.json`,
+each candidate run's `select_valid.json` / `early_stop.json`.

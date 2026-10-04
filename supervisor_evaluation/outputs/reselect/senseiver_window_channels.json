@@ -1,0 +1,34 @@
+{
+  "k1": {
+    "checkpoint": "methods/senseiver/runs/reselect/gdirect_k1_s123/epoch_033.pt",
+    "pooled_rmse": 0.20985203116338438,
+    "density_rmse": 0.14655789967716776,
+    "vx_rmse": 0.35028995735546675,
+    "vy_rmse": 0.1498007617851457,
+    "var_rmse": 0.09761638960904444
+  },
+  "k4": {
+    "checkpoint": "methods/senseiver/runs/reselect/gdirect_k4_s123/epoch_033.pt",
+    "pooled_rmse": 0.1974441646566732,
+    "density_rmse": 0.1364482776147972,
+    "vx_rmse": 0.3269333054087947,
+    "vy_rmse": 0.14543603623955637,
+    "var_rmse": 0.09634123385782094
+  },
+  "k8": {
+    "checkpoint": "methods/senseiver/runs/reselect/gdirect_k8_s123/epoch_030.pt",
+    "pooled_rmse": 0.19201450304842085,
+    "density_rmse": 0.13107178565809682,
+    "vx_rmse": 0.31710088794613817,
+    "vy_rmse": 0.143580036334881,
+    "var_rmse": 0.09555241785518026
+  },
+  "k16": {
+    "checkpoint": "methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_038.pt",
+    "pooled_rmse": 0.18859745795433544,
+    "density_rmse": 0.12663813622245956,
+    "vx_rmse": 0.3117019790473069,
+    "vy_rmse": 0.141617121296027,
+    "var_rmse": 0.09500133817620511
+  }
+}
