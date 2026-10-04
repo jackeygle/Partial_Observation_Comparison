@@ -14,7 +14,7 @@ uncertainty is the ensemble spread.
 | Forecast model | PedPred3, 5 frames in → 5 frames out, trained on the 32 training days; epoch 38 chosen on the full validation split | `runs/pedpred3_5to5_clip_s0/dyn150_best.pt` (trained by `lcskf/dynamics/train.py`) |
 | Process noise | **structured**: whole one-step forecast-residual fields sampled from a bank of 8192 built on training days only and mean-centred; used at the bank's own measured size ×1.5, AR(1) in time, larger on cells no robot currently sees; density perturbed in log1p space | `enkf_opt/experiments/build_residual_q_bank.py` |
 | Filter | 100 members, localisation radius 7, inflation 1.02, cross-channel coupling; runs on GPU | `enkf_opt/experiments/eval_structured_q_gpu.py` |
-| Settings | noise scale 1.5, AR(1) ρ 0.5, blind-cell noise scales (1, 1.25, 1.4, 0.93), bank at its measured size (`bank_native_std`) — selected on the validation days | `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`; selection record in `enkf_opt/experiments/outputs/optimization_report.md` |
+| Settings | noise scale 1.5, AR(1) ρ 0.5, no extra per-channel factors (candidate E2 of `supervisor_evaluation/RESELECTION_PROTOCOL.md`), bank at its measured size (`bank_native_std`) — selected on the validation days | `FINAL_CONFIG["enkf"]` in `supervisor_evaluation/evaluate.py`; selection record in `enkf_opt/experiments/outputs/optimization_report.md` |
 
 `supervisor_evaluation/evaluate.py` runs this filter on the seven test days (about
 7 ms per frame on one V100, a few minutes per day), discards a 500-frame warm-up,
@@ -112,13 +112,12 @@ the cross-channel weights.
 | | RMSE | spread | spread/RMSE | CRPS |
 |---|---:|---:|---:|---:|
 | original | 0.264 | 0.004 | 0.014 | 0.161 |
-| final | 0.262 | 0.362 | 1.38 | 0.115 |
+| final | 0.254 | 0.312 | 1.23 | 0.107 |
 
 (spread = root-mean-square ensemble spread over the scored cells.) The uncertainty
-goes from about 1% of the error to somewhat too wide (1.38; per channel density
-0.94, vx 1.43, vy 1.95, velocity variance 0.82), CRPS falls by 29%, and the mean is
-as accurate as before; velocity variance is still 13% less accurate than in the
-original (RMSE 0.197 → 0.224). The noise was not re-tuned for the RMS definition of
+goes from about 1% of the error to somewhat too wide (1.23; per channel density
+1.00, vx 1.27, vy 1.55, velocity variance 0.86), CRPS falls by 34%, and the mean is
+4% more accurate; the velocity-variance RMSE is unchanged (0.197). The noise was not re-tuned for the RMS definition of
 spread (adopted 2026-09-28): the selection used CRPS.
 
 The learned-covariance sequential Kalman filter (LCSKF), a separate answer to the

@@ -126,10 +126,13 @@ and SHA-256, and `evaluate.py verify` checks them before every run
 | `enkf_residual_q_bank.npz` | `methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz` | 8192 one-step forecast residual fields from the 32 training days |
 
 The EnKF's scalar settings are frozen in `FINAL_CONFIG` at the top of
-`supervisor_evaluation/evaluate.py`. The process-noise scale 1.5, AR(1) persistence
-0.5 and blind-cell noise scales were selected on the validation days, in a sweep run
-with the original forecast model and kept when PedPred3 5→5 replaced it
-(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`). The
+`supervisor_evaluation/evaluate.py`. The process-noise scale 1.5 and AR(1) persistence
+0.5 were selected on the validation days, in a sweep run with the original forecast
+model and kept when PedPred3 5→5 replaced it
+(`methods/enkf/enkf_opt/experiments/outputs/optimization_report.md`). The residual
+noise without extra per-channel factors (E2) was chosen over blind-cell factors, all-cell
+factors and Gaussian noise on the validation days
+(`supervisor_evaluation/RESELECTION_PROTOCOL.md`). The
 localisation radius 7, inflation 1.02 and the bias update are the original filter's;
 the cross-channel matrix was not part of the validation sweep. The noise
 bank is used at its own measured size (`bank_native_std`), not rescaled to the

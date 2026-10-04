@@ -143,7 +143,7 @@ into one number.
 | DINCAE | 0.227 | 0.153 | 0.381 | 0.160 | 0.108 |
 | 4DVarNet | 0.231 | 0.176 | 0.361 | 0.178 | 0.140 |
 | 4DVarNet aug. var. (ours) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
-| EnKF | 0.262 | 0.153 | 0.411 | 0.178 | 0.224 |
+| EnKF | 0.253 | 0.156 | 0.404 | 0.174 | 0.197 |
 
 ![Reconstruction accuracy](supervisor_evaluation/outputs/full/figures/accuracy_rmse.png)
 
@@ -185,7 +185,7 @@ them cannot be explained by which days were used for testing.
 |---|---|---|---|---|
 | **DINCAE** | **0.074** | 0.071–0.078 | **0.89** | 0.86–0.93 |
 | 4DVarNet aug. var. (ours) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
-| EnKF | 0.115 | 0.113–0.117 | 1.38 | 1.35–1.42 |
+| EnKF | 0.107 | 0.105–0.109 | 1.23 | 1.20–1.27 |
 
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
 
@@ -194,12 +194,13 @@ together, then one group per channel. The small black bars on the "All" group ar
 the 95% ranges above. In (b), the dashed line at 1 is the ideal size.
 
 *What it shows:* DINCAE has the lowest CRPS, on every channel, and its range does
-not overlap the other two, so the ranking is not down to the choice of test days.
-It is also closest to the right size (0.89, slightly overconfident). 4DVarNet
-(aug. var.) and the EnKF are too cautious on average (1.30 and 1.38): for
-4DVarNet this comes almost entirely from velocity variance, where its σ̂ is
-3.3× the error while the other channels are close to 1; for the EnKF from the
-velocity channels ($v_x$ 1.43, $v_y$ 1.95). Per-channel numbers:
+not overlap the other two, so its lead is not down to the choice of test days.
+4DVarNet (aug. var.) and the EnKF are on par (0.106 and 0.107, overlapping
+ranges, each better on some test days). DINCAE is also closest to the right size
+(0.89, slightly overconfident). 4DVarNet (aug. var.) and the EnKF are too
+cautious on average (1.30 and 1.23): for 4DVarNet this comes almost entirely from
+velocity variance, where its σ̂ is 3.3× the error while the other channels are
+close to 1; for the EnKF from the velocity channels ($v_x$ 1.27, $v_y$ 1.55). Per-channel numbers:
 `uncertainty_by_channel.csv`.
 
 #### The math behind the two numbers
@@ -266,8 +267,8 @@ same GPU (one Tesla V100) and the same frames.
 10× the one below — because the methods differ by a factor of about 260. Read
 the value printed on each bar rather than comparing bar heights.
 
-*What it shows:* DINCAE is the fastest (0.027 ms per frame) and the EnKF, which
-runs 100 forecast members, the slowest (7.1 ms). Every method is far faster than
+*What it shows:* DINCAE is the fastest (0.029 ms per frame) and the EnKF, which
+runs 100 forecast members, the slowest (7.6 ms). Every method is far faster than
 the data itself, which arrives at one frame per second.
 
 ### Files
