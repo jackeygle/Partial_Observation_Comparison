@@ -153,10 +153,13 @@ class GENN(nn.Module):
     """
 
     def __init__(self, n_channels=4, hidden=32, kt=3, kh=3, kw=3,
-                 n_phi_layers=2, two_scale=True, scale=2):
+                 n_phi_layers=2, two_scale=True, scale=2, fold_axes="ct"):
         super().__init__()
+        if fold_axes not in ("ct", "legacy"):
+            raise ValueError(f"fold_axes must be 'ct' or 'legacy', got {fold_axes!r}")
         self.two_scale = two_scale
         self.scale = scale
+        self.fold_axes = fold_axes
         self.branch_fine = _GENNBranch(n_channels, hidden, kt, kh, kw, n_phi_layers)
         if two_scale:
             self.branch_coarse = _GENNBranch(n_channels, hidden, kt, kh, kw, n_phi_layers)
@@ -173,15 +176,36 @@ class GENN(nn.Module):
         # Φ₁ runs at the COARSE resolution (that is what makes this multi-scale: on the
         # half-size grid its 3×3 kernel covers 6×6 original cells), and Φ₂ sees x itself.
         B, C, T, H, W = x.shape
-        # Dw: average pooling over H,W only. avg_pool2d takes 4D, so fold T into the batch
-        # axis — the T axis is never touched, keeping the zero-centre property along time.
-        xr = x.reshape(B * T, C, H, W)
+        legacy = self.fold_axes == "legacy"
+        # Dw: average pooling over H,W only. avg_pool2d takes 4D, so T has to go into the
+        # batch axis. A bare reshape of (B,C,T,H,W) does NOT do that: it puts C in the batch
+        # slot and T in the channel slot. Pooling is per plane, so the bare reshape and the
+        # reshape back cancel and the pooled field is still correct -- but `self.up` is a
+        # ConvTranspose2d, which MIXES its channel axis, so under the bare reshape it mixes
+        # four consecutive FRAMES of one state variable instead of the four state variables
+        # of one frame. That also lets x(s) back into Φ(x)(s) through the coarse output at a
+        # neighbouring frame, which the zero centre tap is there to prevent.
+        # fold_axes="ct" transposes C and T first and is the intended form; "legacy"
+        # reproduces the bare reshape, for checkpoints trained before the fix.
+        if legacy:
+            xr = x.reshape(B * T, C, H, W)
+        else:
+            xr = x.permute(0, 2, 1, 3, 4).reshape(B * T, C, H, W)
         coarse = F.avg_pool2d(xr, kernel_size=self.scale, ceil_mode=True)   # (B*T, C, Hc, Wc)
         Hc, Wc = coarse.shape[-2:]
-        coarse = self.branch_coarse(coarse.reshape(B, C, T, Hc, Wc))        # Φ₁ at coarse res
+        if legacy:
+            coarse = coarse.reshape(B, C, T, Hc, Wc)
+        else:
+            coarse = coarse.reshape(B, T, C, Hc, Wc).permute(0, 2, 1, 3, 4)
+        coarse = self.branch_coarse(coarse)                                 # Φ₁ at coarse res
         # Up: ConvTranspose back to the fine grid; crop in case ceil_mode padded the pooling.
-        up = self.up(coarse.reshape(B * T, C, Hc, Wc))[..., :H, :W]
-        return up.reshape(B, C, T, H, W) + self.branch_fine(x)              # + Φ₂(x)
+        if legacy:
+            up = self.up(coarse.reshape(B * T, C, Hc, Wc))[..., :H, :W]
+            up = up.reshape(B, C, T, H, W)
+        else:
+            up = self.up(coarse.permute(0, 2, 1, 3, 4).reshape(B * T, C, Hc, Wc))[..., :H, :W]
+            up = up.reshape(B, T, C, H, W).permute(0, 2, 1, 3, 4)
+        return up + self.branch_fine(x)                                     # + Φ₂(x)
 
 
 def prior_residual(x, phi):

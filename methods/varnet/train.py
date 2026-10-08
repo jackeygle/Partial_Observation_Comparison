@@ -214,6 +214,15 @@ def main():
                     help="robot routes per training day: per_day = data seed + the day's date, fixed = "
                          "the same routes every day (all runs before 2026-09-17). Default: config "
                          "observation.trajectory_mode")
+    ap.add_argument("--fold-axes", choices=("ct", "legacy"), default="ct",
+                    help="how the coarse branch of the GENN prior folds the time axis into "
+                         "the batch axis before its 2-D pooling and transposed convolution. "
+                         "'ct' transposes channel and time first, so the transposed "
+                         "convolution mixes the four state variables of one frame -- the "
+                         "intended form. 'legacy' reproduces the bare reshape used before "
+                         "2026-10-08, which mixes four consecutive frames of one state "
+                         "variable instead and lets x(s) back into Phi(x)(s); it exists only "
+                         "to reload checkpoints trained that way")
     ap.add_argument("--var-eps", type=float, default=1e-6,
                     help="minimum variance added after the softplus. 1e-6 is the value "
                          "Lakshminarayanan et al. give in Sec. 2.2.1 footnote 2; it is there "
@@ -284,6 +293,14 @@ def main():
                 f"ABORT: {_last} was trained with trajectory_mode={_prev!r} but this run would "
                 f"build {args.trajectory_mode!r} data. Resuming would switch the robot routes mid-"
                 f"training. Pass --trajectory-mode {_prev} to continue it, or use a new --outdir.")
+        # Same hazard for the prior's axis fold: the weights have the same shapes either way,
+        # so a resume with the other fold loads silently and changes what they mean.
+        _pf = torch.load(_last, map_location="cpu").get("args", {}).get("fold_axes", "legacy")
+        if _pf != args.fold_axes:
+            raise SystemExit(
+                f"ABORT: {_last} was trained with fold_axes={_pf!r} but this run would use "
+                f"{args.fold_axes!r}. The weights would load but the coarse branch would mix a "
+                f"different axis. Pass --fold-axes {_pf} to continue it, or use a new --outdir.")
     torch.manual_seed(init_seed)                            # weights only
 
     # ---- data ----
@@ -307,7 +324,8 @@ def main():
     # ---- model ----
     P = config.CFG["prior"]
     phi = GENN(n_channels=C, hidden=args.hidden, kt=args.kt, kh=args.kh, kw=args.kw,
-               n_phi_layers=args.n_phi_layers, two_scale=P["two_scale"], scale=P["scale"])
+               n_phi_layers=args.n_phi_layers, two_scale=P["two_scale"], scale=P["scale"],
+               fold_axes=args.fold_axes)
     n_phi_param = sum(p.numel() for p in phi.parameters())
     solver = GradSolver(phi, n_channels=C, dT=T, n_iter=args.n_iter,
                         hidden_ch=args.lstm_hidden,

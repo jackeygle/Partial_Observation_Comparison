@@ -44,7 +44,12 @@ fi
 S=${1:?usage: sbatch --job-name=varnet_aughead_sM methods/varnet/sbatch/submit_aughead_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=aughead_obs   # BETA ignored; the loss is Eq.1 as written
-OUTDIR=runs/varnet_${TAG}_h96_s${S}
+# OUTDIR is additive, as in submit_mse5_chain.sbatch: unset, this script behaves exactly as it
+# always has. Pass it as positional 4 to train a second arm (e.g. after the coarse-branch axis
+# fix of 2026-10-08) without touching the existing run -- --resume matches on path, and train.py
+# aborts if a run's saved fold_axes or trajectory_mode differs from the one this run would use,
+# so a wrong OUTDIR fails loudly instead of silently changing the model mid-training.
+OUTDIR=${4:-${OUTDIR:-runs/varnet_${TAG}_h96_s${S}}}
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
@@ -81,7 +86,7 @@ else
     cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
     sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME \
            --dependency=afterany:$SLURM_JOB_ID \
-           methods/varnet/sbatch/submit_aughead_chain.sbatch $S $BETA $((GEN+1))
+           methods/varnet/sbatch/submit_aughead_chain.sbatch $S $BETA $((GEN+1)) "$OUTDIR"
     cd "$THESIS_ROOT/methods/varnet"
     echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 fi

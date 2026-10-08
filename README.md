@@ -162,6 +162,23 @@ channel. Giving 4DVarNet an uncertainty output (aug. var.) costs accuracy,
 mostly on $v_x$. The EnKF is competitive on density but has by far the largest
 error on velocity variance.
 
+**Two references that need no model.** 79% of the scored blind cells are empty
+and the velocity of an empty cell is defined as zero, so the "All" column needs
+a floor to be read against. On the frames common to all six methods
+(`supervisor_evaluation/checks/trivial_baselines.py`, no GPU, no training):
+
+| Prediction | All | Density | $v_x$ | $v_y$ | Vel. var. |
+|---|---|---|---|---|---|
+| All zero | 0.248 | 0.188 | 0.413 | 0.166 | 0.114 |
+| Carry-forward (the 4DVarNet solver's initial state) | 0.355 | 0.211 | 0.618 | 0.236 | 0.149 |
+
+Predicting zero everywhere beats the EnKF (0.254) and the augmented 4DVarNet
+(0.296) on the pooled number, and the augmented model on all four channels; the
+other four methods beat it, by 6–20%. Carry-forward is the weaker reference and
+all six methods beat it — useful for the 4DVarNet models in particular, since it
+is where their solver starts: 0.355 to 0.233 for the plain model and to 0.296
+for the augmented one.
+
 ### 2. Uncertainty — does the method know how wrong it is?
 
 Three methods provide a predictive distribution for every cell. DINCAE and

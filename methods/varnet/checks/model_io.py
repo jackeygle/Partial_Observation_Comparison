@@ -110,7 +110,12 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
                n_phi_layers=g("n_phi_layers"),
                # architecture read off the weights, so it always matches what is in the file
                two_scale=any("branch_coarse" in k for k in sd),
-               scale=P["scale"])
+               scale=P["scale"],
+               # Checkpoints trained before the coarse-branch axis fix carry no
+               # "fold_axes" in their args and must keep the behaviour they were
+               # trained with: loading them with the corrected fold would change
+               # what the weights mean.
+               fold_axes=a.get("fold_axes", "legacy"))
     n_it = n_iter if n_iter is not None else ck.get("n_iter_eff", a["n_iter"])
     solver = GradSolver(phi, n_channels=4, dT=a["dT"], n_iter=n_it,
                         hidden_ch=a["lstm_hidden"],

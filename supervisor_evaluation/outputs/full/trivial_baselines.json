@@ -1,0 +1,82 @@
+{
+ "support": "blind walkable cells, lo=500 hi=min(n-1, floor(n/200)*200), as the unified uncertainty protocol",
+ "scored_cells_per_channel": 34853660,
+ "per_day": [
+  {
+   "day": "atc-20130811",
+   "frames": [
+    500,
+    39800
+   ],
+   "blind_cells": 5048181
+  },
+  {
+   "day": "atc-20130818",
+   "frames": [
+    500,
+    38800
+   ],
+   "blind_cells": 4844975
+  },
+  {
+   "day": "atc-20130825",
+   "frames": [
+    500,
+    42800
+   ],
+   "blind_cells": 5449209
+  },
+  {
+   "day": "atc-20130901",
+   "frames": [
+    500,
+    39600
+   ],
+   "blind_cells": 4966114
+  },
+  {
+   "day": "atc-20130915",
+   "frames": [
+    500,
+    39200
+   ],
+   "blind_cells": 4930763
+  },
+  {
+   "day": "atc-20130922",
+   "frames": [
+    500,
+    38800
+   ],
+   "blind_cells": 4867436
+  },
+  {
+   "day": "atc-20130929",
+   "frames": [
+    500,
+    37800
+   ],
+   "blind_cells": 4746982
+  }
+ ],
+ "results": {
+  "zero": {
+   "pooled_rmse": 0.24813025008814674,
+   "channel_rmse": [
+    0.18818686194726972,
+    0.4128696804495582,
+    0.1655931854245286,
+    0.11391976532674926
+   ]
+  },
+  "carry_forward": {
+   "pooled_rmse": 0.35504115881218484,
+   "channel_rmse": [
+    0.21077882366718204,
+    0.6177608639514889,
+    0.23626955070972872,
+    0.14945701614045517
+   ]
+  }
+ }
+}
