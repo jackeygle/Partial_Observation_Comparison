@@ -1,0 +1,24 @@
+[verify] PASS -> supervisor_evaluation/outputs/full/verification_report.json
+[images] atc-20130811: 14 common-frame samples complete
+[images] atc-20130818: 14 common-frame samples complete
+[images] atc-20130825: 16 common-frame samples complete
+[images] atc-20130901: 14 common-frame samples complete
+[images] atc-20130915: 14 common-frame samples complete
+[images] atc-20130922: 14 common-frame samples complete
+[images] atc-20130929: 14 common-frame samples complete
+[images] wrote 100 comparison boards to supervisor_evaluation/outputs/full/images
+[breakdown] atc-20130811: 39300 common frames
+[breakdown] atc-20130818: 38300 common frames
+[breakdown] atc-20130825: 42300 common frames
+[breakdown] atc-20130901: 39100 common frames
+[breakdown] atc-20130915: 38700 common frames
+[breakdown] atc-20130922: 38300 common frames
+[breakdown] atc-20130929: 37300 common frames
+{
+ "Senseiver-A": 0.22263931025380843,
+ "Senseiver-G": 0.1964095632461962,
+ "DINCAE": 0.22622729974635875,
+ "4DVarNet": 0.23168793777929397,
+ "4DVarNet aug. var.": 0.29491588756718207,
+ "EnKF": 0.2533916415158563
+}

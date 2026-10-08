@@ -182,6 +182,24 @@ class Accumulator:
         self._add(crps_gaussian(mu, sigma, x), nll_gaussian(mu, sigma, x),
                   x - mu, sigma, np.abs(x - mu) / sigma)
 
+    def add_ensemble_crps(self, crps, mu, sigma, x):
+        """Pool a pointwise CRPS computed elsewhere -- the empirical CRPS of the EnKF's own
+        100 members, from the filter's export -- while RMSE, spread and coverage keep coming
+        from (mu, sigma).
+
+        The ensemble is what the filter actually delivers, so its empirical CRPS scores the
+        real predictive distribution instead of the Gaussian summary N(mu, sigma^2). Scoring
+        the summary charges the filter for probability mass below the physical bounds that
+        its clipped members never carry: measured at 3.3% of the density CRPS and 1.4% of
+        the velocity-variance CRPS. RMSE depends on mu alone and is unchanged; spread/RMSE
+        and coverage remain statements about the Gaussian summary and are reported as such.
+        """
+        crps, mu = _f64(crps).ravel(), _f64(mu).ravel()
+        sigma, x = _f64(sigma).ravel(), _f64(x).ravel()
+        if x.size == 0:
+            return
+        self._add(crps, nll_gaussian(mu, sigma, x), x - mu, sigma, np.abs(x - mu) / sigma)
+
     def add_lognormal1p(self, m, s, v):
         """Predictive log1p(V) ~ N(m, s^2), everything scored in the units of v.
 

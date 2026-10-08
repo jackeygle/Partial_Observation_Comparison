@@ -1,0 +1,23 @@
+[data] atc-20130616_corridor_1.0s.h5: 35127 frames, observation seed 735035 (per_day)
+[data] atc-20130623_corridor_1.0s.h5: 40620 frames, observation seed 735042 (per_day)
+[data] atc-20130630_corridor_1.0s.h5: 40710 frames, observation seed 735049 (per_day)
+[data] atc-20130707_corridor_1.0s.h5: 38437 frames, observation seed 735056 (per_day)
+[data] atc-20130714_corridor_1.0s.h5: 40457 frames, observation seed 735063 (per_day)
+[data] atc-20130721_corridor_1.0s.h5: 37413 frames, observation seed 735070 (per_day)
+[data] atc-20130728_corridor_1.0s.h5: 36979 frames, observation seed 735077 (per_day)
+[select] epoch  30  blind walkable RMSE 0.18927
+[select] epoch  31  blind walkable RMSE 0.18910
+[select] epoch  32  blind walkable RMSE 0.18937
+[select] epoch  33  blind walkable RMSE 0.18857
+[select] epoch  34  blind walkable RMSE 0.18889
+[select] epoch  35  blind walkable RMSE 0.18899
+[select] epoch  36  blind walkable RMSE 0.18868
+[select] epoch  37  blind walkable RMSE 0.18845
+[select] epoch  38  blind walkable RMSE 0.18829
+[select] epoch  39  blind walkable RMSE 0.18845
+[select] epoch  40  blind walkable RMSE 0.18841
+[select] epoch  41  blind walkable RMSE 0.18834
+[select] epoch  42  blind walkable RMSE 0.18809
+[select] epoch  43  blind walkable RMSE 0.18883
+[select] epoch  44  blind walkable RMSE 0.18864
+[select] selected epoch 42 (RMSE 0.18809) -> select_valid_part_030_044.json

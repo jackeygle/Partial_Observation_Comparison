@@ -1,0 +1,12 @@
+[data] atc-20130616_corridor_1.0s.h5: 35127 frames, observation seed 735035 (per_day)
+[data] atc-20130623_corridor_1.0s.h5: 40620 frames, observation seed 735042 (per_day)
+[data] atc-20130630_corridor_1.0s.h5: 40710 frames, observation seed 735049 (per_day)
+[data] atc-20130707_corridor_1.0s.h5: 38437 frames, observation seed 735056 (per_day)
+[data] atc-20130714_corridor_1.0s.h5: 40457 frames, observation seed 735063 (per_day)
+[data] atc-20130721_corridor_1.0s.h5: 37413 frames, observation seed 735070 (per_day)
+[data] atc-20130728_corridor_1.0s.h5: 36979 frames, observation seed 735077 (per_day)
+[select] epoch   0  blind walkable RMSE 0.21247
+[select] epoch   1  blind walkable RMSE 0.20429
+[select] epoch   2  blind walkable RMSE 0.20045
+[select] epoch   3  blind walkable RMSE 0.19836
+[2026-10-07T15:27:16.490] error: *** JOB 20816896 ON gpu29 CANCELLED AT 2026-10-07T15:27:16 DUE to SIGNAL Terminated ***

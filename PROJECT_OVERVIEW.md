@@ -50,7 +50,8 @@ Three rules hold for every row:
   single models would give one method five times the training.
 - **Every choice is made on the validation split**: the checkpoint epoch of
   every learned model, which 4DVarNet seed represents it, and the EnKF's noise
-  configuration. The test days are touched only by the final evaluation.
+  configuration. The reported test scores use these fixed choices; earlier
+  exploratory work had also inspected the same test dates.
 - **Identical observations.** Every method sees the same simulated robot
   observations of a day (routes seeded by the date, see
   [README.md](README.md#observation-protocol)).
@@ -89,9 +90,11 @@ DINCAE needs t±1, 4DVarNet complete 200-frame windows, and the EnKF discards a
 500-frame warm-up), same cells, no clipping. DINCAE's velocity-variance channel
 is log1p-transformed inside the network, so its physical predictive distribution
 is a shifted log-normal and is scored with the closed-form log-normal CRPS
-(`compare/score_uncertainty.py`); everything else is Gaussian. Two numbers are
-reported: CRPS, and spread/RMSE with spread = √(mean σ̂²), the usual ensemble
-definition (before 2026-09-28 the mean of σ̂ was used, and a CRPS skill against a
+(`compare/score_uncertainty.py`); DINCAE's other channels and augmented
+4DVarNet use Gaussian CRPS, while the EnKF uses empirical CRPS of its 100
+analysis members. Two numbers are reported: CRPS, and spread/RMSE with
+spread = √(mean σ̂²), the usual ensemble definition (before 2026-09-28 the
+mean of σ̂ was used, and a CRPS skill against a
 constant-σ reference was reported instead of CRPS).
 
 **All frames of every test day** are scored (except each day's first and last frame,
@@ -109,18 +112,19 @@ Senseiver and DINCAE are bit-reproducible.
 
 ## Where each final model comes from
 
-The eight files in `supervisor_evaluation/models/` (six networks' weights, DINCAE's
-normalisation statistics and the EnKF's noise bank) are the only weights the
-evaluation loads; `models/manifest.json` maps each to its training-run source
+The eight artifacts recorded in `supervisor_evaluation/models/manifest.json`
+(six networks' weights, DINCAE's normalisation statistics and the EnKF's
+noise bank) are the only ones the evaluation loads; the manifest maps each
+to its training-run source
 and SHA-256, and `evaluate.py verify` checks them before every run
 (`evaluate.py prepare` rebuilds the package from the sources below).
 
 | Packaged file | Source | Chosen how |
 |---|---|---|
-| `senseiver_A.pt` | `methods/senseiver/runs/senseiver_A_full/epoch_086.pt` | `methods/senseiver/checks/select_checkpoint.py` on all seven validation days, every frame (epoch 86 of 100; `select_valid.json` in the run) |
-| `senseiver_G_k16.pt` | `methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt` | the same (epoch 57 of 60) |
-| `dincae_epoch60.pt` + `dincae_state_stats.npz` | `methods/dincae/runs/dincae_ff/ckpt_00060.pt`, `methods/dincae/artifacts/state_stats.npz` | `methods/dincae/checks/select_checkpoint.py` on validation |
-| `varnet_mse_s3_epoch80.pt` | `methods/varnet/runs/varnet_mse5_h96_s3/ckpt_00080.pt` | epoch per run by `checks/select_checkpoint.py`; seed 3 has the lowest validation error of the five |
+| `senseiver_A_pd.pt` | `methods/senseiver/runs/senseiver_A_pd/epoch_092.pt` | `methods/senseiver/checks/select_checkpoint.py` on all seven validation days, every frame (epoch 92 of 100; `select_valid.json` in the run) |
+| `senseiver_G_k16_pd.pt` | `methods/senseiver/runs/sv_G_k16_pd/epoch_054.pt` | the same (epoch 54 of 60) |
+| `dincae_pd_epoch140.pt` + `dincae_state_stats.npz` | `methods/dincae/runs/dincae_ff_pd/ckpt_00140.pt`, `methods/dincae/artifacts/state_stats.npz` | `methods/dincae/checks/select_checkpoint.py` on validation (epoch 140) |
+| `varnet_mse_pd_s3_epoch80.pt` | `methods/varnet/runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt` | seed 3 chosen from five earlier fixed-route runs; final per-day run selected epoch 80 on validation |
 | `varnet_aughead_obs_s0.pt` | `methods/varnet/runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | `select_valid.json` in that run (epoch 90) |
 | `pedpred3_5to5_epoch38.pt` | `methods/enkf/runs/pedpred3_5to5_clip_s0/dyn150_best.pt` | best epoch on the full validation split (`dyn150_pick.json`) |
 | `enkf_residual_q_bank.npz` | `methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz` | 8192 one-step forecast residual fields from the 32 training days |
@@ -145,31 +149,41 @@ All commands from the repository root, after `source sbatch/_env.sh`. The
 4DVarNet and EnKF-dynamics jobs self-resubmit until their epoch budget is done.
 
 ```bash
-# 4DVarNet, plain MSE: five seeds, then pick every run's epoch on validation
-for s in 0 1 2 3 4; do
-  sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
-done
-sbatch --export=ALL,RUNS="mse5_h96_s0 mse5_h96_s1 mse5_h96_s2 mse5_h96_s3 mse5_h96_s4" \
+# 4DVarNet, plain MSE: seed 3 came from five earlier fixed-route runs.
+# Retrain it with per-day routes, then select its epoch on validation.
+sbatch --job-name=varnet_mse5_h96_pd_s3 \
+  methods/varnet/sbatch/submit_mse5_chain.sbatch \
+  3 0 1 per_day runs/varnet_mse5_h96_pd_s3 1
+# After the training chain finishes:
+sbatch --export=ALL,RUNS="mse5_h96_pd_s3" \
   methods/varnet/sbatch/submit_select.sbatch
 
-# 4DVarNet aug. var. (ours): one seed, then its epoch on validation
+# 4DVarNet aug. var. (ours): one seed, per-day routes from config.yaml,
+# then its epoch on validation.
 sbatch --job-name=varnet_aughead_s0 methods/varnet/sbatch/submit_aughead_chain.sbatch 0 0
+# After this training chain finishes:
 sbatch --export=ALL,RUNS="aughead_obs_h96_s0" methods/varnet/sbatch/submit_select.sbatch
 
-# DINCAE: normalisation stats (once), training (~16-27 GPU-hours), checkpoint choice
+# DINCAE: normalisation stats (once), 150-epoch budget, per-day routes.
 python3 -m methods.dincae.state
-sbatch methods/dincae/sbatch/submit_train.sbatch --out runs/dincae_ff
-python3 -m methods.dincae.checks.select_checkpoint
+EPOCHS=150 OUT=$PWD/methods/dincae/runs/dincae_ff_pd \
+  sbatch methods/dincae/sbatch/submit_train.sbatch --trajectory-mode per_day
+# After training finishes, run selection on a GPU node.
+python3 -m methods.dincae.checks.select_checkpoint \
+  --run-dir methods/dincae/runs/dincae_ff_pd
 
-# Senseiver-A and Senseiver-G (grid latent, direct read-out, 16-frame window), seed 123
-# (the default), keeping every epoch; then each run's epoch on the whole validation split
-EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_full \
-  sbatch methods/senseiver/sbatch/submit_train.sbatch --save-every-epoch
-EPOCHS=60 OUT=$PWD/methods/senseiver/runs/capacity/base32_k16_s123_full \
+# Senseiver-A and Senseiver-G (grid latent, direct read-out, 16-frame window),
+# seed 123 (the default), per-day routes, keeping every epoch.
+EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_pd \
   sbatch methods/senseiver/sbatch/submit_train.sbatch \
-  --latent-mode grid --readout direct --time-window 16 --save-every-epoch
-sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_full
-sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/capacity/base32_k16_s123_full
+  --save-every-epoch --trajectory-mode per_day
+EPOCHS=60 OUT=$PWD/methods/senseiver/runs/sv_G_k16_pd \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch \
+  --latent-mode grid --readout direct --time-window 16 \
+  --save-every-epoch --trajectory-mode per_day
+# After both training chains finish:
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_pd
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/sv_G_k16_pd
 
 # EnKF forecast model (PedPred3, 5 frames in -> 5 out). The first run diverged at
 # epoch 30; the reported one restarts from its epoch-29 weights with a fresh

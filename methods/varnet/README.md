@@ -12,8 +12,8 @@ by `supervisor_evaluation/evaluate.py` (see the repository [README](../../README
 
 | Row | Run | What it is |
 |---|---|---|
-| 4DVarNet | `runs/varnet_mse5_h96_s3/ckpt_00080.pt` | plain MSE (Eq. 14); of five seeds, the one with the lowest validation error |
-| 4DVarNet aug. var. (ours) | `runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | ours: σ inside the prior (`aug0`), a Gaussian-NLL observation term, and a dedicated variance head |
+| 4DVarNet | `runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt` | plain MSE; seed 3 chosen among five earlier fixed-route runs, then retrained once with per-day routes and selected at epoch 80 |
+| 4DVarNet aug. var. (ours) | `runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt` | per-day routes; ours: σ inside the prior (`aug0`), a Gaussian-NLL observation term, and a dedicated variance head |
 
 This README is written so someone else can reproduce the whole thing from the raw
 data. **All parameters live in `crowdcore/config.yaml` (single source of truth)**; every
@@ -29,15 +29,16 @@ source sbatch/_env.sh           # module load + PYTHONPATH
 
 # 1. (data is already gridded — see "Data" below if you must rebuild from CSV)
 
-# 2. train: plain MSE, 5 seeds (full 32-day train split, paper window dT=200), self-chaining
-for s in 0 1 2 3 4; do
-  sbatch --job-name=varnet_mse5_h96_s$s methods/varnet/sbatch/submit_mse5_chain.sbatch $s 0
-done
-#    and the uncertainty model (aug. var. model), one seed
+# 2. train: final plain MSE model, seed 3 chosen from five earlier fixed-route runs
+#    (full 32-day train split, paper window dT=200), self-chaining
+sbatch --job-name=varnet_mse5_h96_pd_s3 \
+  methods/varnet/sbatch/submit_mse5_chain.sbatch \
+  3 0 1 per_day runs/varnet_mse5_h96_pd_s3 1
+#    and the uncertainty model (aug. var. model), one seed, using per_day from config.yaml
 sbatch --job-name=varnet_aughead_s0 methods/varnet/sbatch/submit_aughead_chain.sbatch 0 0
 
-# 3. choose each run's epoch on the validation split (-> runs/<run>/select_valid.json)
-sbatch --export=ALL,RUNS="mse5_h96_s0 mse5_h96_s1 mse5_h96_s2 mse5_h96_s3 mse5_h96_s4 aughead_obs_h96_s0" \
+# 3. after both training chains finish, choose each run's epoch on validation (-> runs/<run>/select_valid.json)
+sbatch --export=ALL,RUNS="mse5_h96_pd_s3 aughead_obs_h96_s0" \
   methods/varnet/sbatch/submit_select.sbatch
 
 # 4. evaluate against the other methods on the 7 test days
@@ -66,7 +67,7 @@ sbatch supervisor_evaluation/sbatch/full.sbatch
 | `checks/model_io.py` | `load_solver`, `reported_ckpt` (resolves the selected checkpoint) |
 | `checks/eval_comprehensive.py` | helpers shared by the evaluators |
 | `sbatch/` | training (`submit_mse5_chain`, `submit_aughead_chain`) and selection (`submit_select`) jobs |
-| `runs/varnet_mse5_h96_s<seed>/`, `runs/varnet_aughead_obs_h96_s0/` | training logs (`metrics.jsonl`) and `select_valid.json` of the runs behind the two final models; checkpoints are gitignored |
+| `runs/varnet_mse5_h96_pd_s3/`, `runs/varnet_aughead_obs_h96_s0/` | training logs (`metrics.jsonl`) and `select_valid.json` of the runs behind the two final models; checkpoints are gitignored |
 
 ---
 
@@ -108,7 +109,7 @@ split, is in the repository [README](../../README.md#dataset-split).
 | split | days | date range | used for |
 |---|---|---|---|
 | **train** | 32 | 2012-10-28 → 2013-06-09 | training |
-| valid | 7 | 2013-06-16 → 2013-07-28 | choosing each run's epoch and the reported seed |
+| valid | 7 | 2013-06-16 → 2013-07-28 | choosing each run's epoch; seed 3 came from the earlier five-run comparison |
 | **test** | 7 | 2013-08-11 → 2013-09-29 | the final evaluation, identical days for every method |
 
 Train is strictly earlier than validation, validation strictly earlier than test.
@@ -147,10 +148,13 @@ hand-derived gradient) → `ConvLSTM2d` → `x ← x − u/n_iter`. Φ and the s
 ## Train
 
 ```bash
-(cd ../.. && sbatch --job-name=varnet_mse5_h96_s0 methods/varnet/sbatch/submit_mse5_chain.sbatch 0 0) # one seed, self-chaining --resume
+# From the repository root: selected seed 3, per-day routes, self-chaining --resume.
+sbatch --job-name=varnet_mse5_h96_pd_s3 \
+  methods/varnet/sbatch/submit_mse5_chain.sbatch \
+  3 0 1 per_day runs/varnet_mse5_h96_pd_s3 1
 #   runs: train.py --hidden 96 --kt 5 --days 32 --dT 200 --epochs 150 --batch 32 --amp --loss supervised
 #         --iter-schedule 0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4   (§3.4 curriculum)
-#   out : runs/varnet_mse5_h96_s0/ckpt_<epoch>.pt every 10 epochs, varnet_last.pt (resume) + metrics.jsonl
+#   out : runs/varnet_mse5_h96_pd_s3/ckpt_<epoch>.pt every 10 epochs, varnet_last.pt (resume) + metrics.jsonl
 
 # quick smoke test
 srun --partition=gpu-debug --gres=gpu:1 --time=00:15:00 \

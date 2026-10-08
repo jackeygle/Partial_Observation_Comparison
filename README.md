@@ -27,10 +27,15 @@ imports code from the rest of the repository (`crowdcore/`, `compare/`,
 - **Environment:** `source sbatch/_env.sh` loads Triton's
   `scicomp-pytorch-env/2026.1` (Python 3.12) and sets `PYTHONPATH`; elsewhere,
   `pip install -r requirements.txt`. A GPU is required.
-- **Weights:** the eight files in `supervisor_evaluation/models/` (the weights of
-  the six trained networks, DINCAE's normalisation statistics and the EnKF's noise
-  bank) are the frozen final models and are part of the repository. `models/manifest.json` records
-  their SHA-256; every run checks them first and refuses to start on a mismatch.
+- **Weights:** the eight files listed in `supervisor_evaluation/models/manifest.json`
+  (the weights of the six reported networks, DINCAE's normalisation statistics and
+  the EnKF's noise bank) are the frozen final models and are part of the
+  repository. The manifest records their SHA-256; every run checks them first and
+  refuses to start on a mismatch, and `evaluate.py` loads only these eight.
+  `senseiver_A.pt`, `senseiver_G_k16.pt`, `dincae_epoch60.pt` and
+  `varnet_mse_s3_epoch80.pt` sit in the same directory but are **not** used by any
+  reported result: they are the superseded checkpoints trained with one robot
+  route replayed across days, kept for provenance.
 - **Data:** not in the repository. Point `--data-root` (or `data.root` in
   `crowdcore/config.yaml`) at a directory laid out as described
   [below](#data-layout). The two job scripts use `/scratch/work/zhangx29/data`;
@@ -114,10 +119,11 @@ On average about 56% of walkable cells are observed at a frame; the other 44%
 are the blind cells the headline scores are computed on. Observations carry
 per-channel Gaussian noise. Robot routes are seeded by the day's date, so every
 day has its own routes and every script sees the same observations for a day.
+The final learned checkpoints were trained with this per-day route mode.
 
 ## Results, and how to read them
 
-All numbers are over the seven test days, on **unobserved walkable cells**:
+Accuracy and uncertainty numbers are over the seven test days, on **unobserved walkable cells**:
 cells inside the corridor that no robot sees at that frame (about 44% of
 walkable cells). Reconstructing them is the actual task; obstacle cells are
 never scored. The four quantities being reconstructed are:
@@ -138,10 +144,10 @@ into one number.
 
 | Method | All | Density | $v_x$ | $v_y$ | Vel. var. |
 |---|---|---|---|---|---|
-| Senseiver-A | 0.223 | 0.157 | 0.373 | 0.154 | 0.107 |
-| **Senseiver-G (ours)** | **0.197** | **0.132** | **0.325** | **0.144** | **0.102** |
-| DINCAE | 0.227 | 0.153 | 0.381 | 0.160 | 0.108 |
-| 4DVarNet | 0.231 | 0.176 | 0.361 | 0.178 | 0.140 |
+| Senseiver-A | 0.223 | 0.156 | 0.372 | 0.155 | 0.107 |
+| **Senseiver-G (ours)** | **0.196** | **0.132** | **0.325** | **0.144** | **0.102** |
+| DINCAE | 0.226 | 0.155 | 0.378 | 0.161 | 0.108 |
+| 4DVarNet | 0.232 | 0.178 | 0.362 | 0.179 | 0.140 |
 | 4DVarNet aug. var. (ours) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
 | EnKF | 0.253 | 0.156 | 0.404 | 0.174 | 0.197 |
 
@@ -158,16 +164,19 @@ error on velocity variance.
 
 ### 2. Uncertainty — does the method know how wrong it is?
 
-Three methods output, for every cell, not only a value but also an uncertainty
-σ̂ ("I think the density here is 0.5, give or take 0.1"). Two numbers judge
-that σ̂:
+Three methods provide a predictive distribution for every cell. DINCAE and
+augmented 4DVarNet predict a value and standard deviation σ̂; the EnKF provides
+100 analysis members, whose spread supplies σ̂ for calibration. Two numbers
+judge their probabilistic predictions:
 
-**CRPS — the overall score of the prediction with its σ̂. Lower is better.** The
-CRPS (continuous ranked probability score) scores each cell's value *together
-with* its σ̂, in the channel's own unit: it is smallest when the value is right
-and σ̂ matches how wrong the value actually is in that cell. It cannot be improved
-by inflating or shrinking σ̂. Because it also scores the value, a more accurate
-method gets a lower CRPS too; it rates the probabilistic prediction as a whole.
+**CRPS — the overall score of the predictive distribution. Lower is better.** The
+CRPS (continuous ranked probability score) scores each cell's predictive
+distribution in the channel's own unit: it is smallest when the prediction is
+accurate and its uncertainty matches the error. The EnKF is scored from its
+100 members directly; the other methods use their fitted distributions.
+Inflating or shrinking uncertainty alone cannot reliably improve this proper
+score. Because CRPS also scores the predicted value, it rates the probabilistic
+prediction as a whole.
 
 **Spread / RMSE — is σ̂ the right size on average? 1 is ideal.** Spread is the
 root-mean-square of σ̂ over all scored cells, the usual definition for ensemble
@@ -178,14 +187,15 @@ size, not whether σ̂ is large in the right cells — that is what CRPS adds.
 **The range in brackets (95% interval)** shows how much a number depends on
 which days happened to be the test days: the result is recomputed 10,000 times,
 each time on a random re-draw of the seven test days, and the range contains 95%
-of those results. When two methods' ranges do not overlap, the difference between
-them cannot be explained by which days were used for testing.
+of those results. These intervals describe sensitivity to the choice of test
+days; comparing two methods also calls for paired differences on the same
+resampled days.
 
 | Method | CRPS (lower is better) | range over test days | Spread / RMSE (1 is ideal) | range over test days |
 |---|---|---|---|---|
-| **DINCAE** | **0.074** | 0.071–0.078 | **0.89** | 0.86–0.93 |
+| **DINCAE** | **0.074** | 0.071–0.078 | **0.86** | 0.83–0.90 |
 | 4DVarNet aug. var. (ours) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
-| EnKF | 0.107 | 0.105–0.109 | 1.23 | 1.20–1.27 |
+| EnKF | 0.098 | 0.096–0.100 | 1.23 | 1.20–1.27 |
 
 ![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
 
@@ -193,14 +203,13 @@ them cannot be explained by which days were used for testing.
 together, then one group per channel. The small black bars on the "All" group are
 the 95% ranges above. In (b), the dashed line at 1 is the ideal size.
 
-*What it shows:* DINCAE has the lowest CRPS, on every channel, and its range does
-not overlap the other two, so its lead is not down to the choice of test days.
-4DVarNet (aug. var.) and the EnKF are on par (0.106 and 0.107, overlapping
-ranges, each better on some test days). DINCAE is also closest to the right size
-(0.89, slightly overconfident). 4DVarNet (aug. var.) and the EnKF are too
-cautious on average (1.30 and 1.23): for 4DVarNet this comes almost entirely from
-velocity variance, where its σ̂ is 3.3× the error while the other channels are
-close to 1; for the EnKF from the velocity channels ($v_x$ 1.27, $v_y$ 1.55). Per-channel numbers:
+*What it shows:* DINCAE has the lowest pooled CRPS (0.074) and leads on three
+of four channels; the EnKF leads on density. The EnKF has the next-lowest pooled
+CRPS (0.098), followed by augmented 4DVarNet (0.106). DINCAE's spread/RMSE is
+0.86, indicating overall underdispersion. Augmented 4DVarNet and the EnKF are
+overdispersed overall (1.30 and 1.23): for augmented 4DVarNet, the variance
+channel has spread/RMSE 3.29 while its other channels are near 1; for the EnKF,
+$v_x$ is 1.27 and $v_y$ is 1.55. Per-channel numbers:
 `uncertainty_by_channel.csv`.
 
 #### The math behind the two numbers
@@ -220,7 +229,7 @@ so the two averages agree and the ratio is 1. Which $\hat\sigma$ belongs to whic
 error is lost when each is averaged, so this number can only say whether σ̂ has the
 right overall size.
 
-**CRPS** scores every cell's $\hat\sigma_i$ *against that same cell's* error. For a
+**CRPS** scores each cell's predictive distribution against its truth. For a
 prediction that is a normal distribution $\mathcal{N}(\mu_i, \hat\sigma_i^2)$ it has
 a closed form (Gneiting & Raftery, 2007):
 
@@ -252,9 +261,20 @@ it is wrong. Spread/RMSE cannot tell them apart — both are a perfect 1.00. CRP
 rates A twice as good as B. This is why CRPS is the main uncertainty measure and
 spread/RMSE only a check on overall size.
 
-(DINCAE predicts velocity variance on a log scale, so for that channel its
-prediction is a log-normal rather than a normal distribution; the CRPS then uses
-the corresponding closed form for a log-normal, in the same physical units.)
+DINCAE's velocity-variance channel uses a shifted log-normal CRPS in physical
+units. The EnKF is scored with the **empirical CRPS of its 100 analysis members**
+$x_1,\dots,x_N$ ($N = 100$), so the Gaussian formula above is not applied to its
+ensemble:
+
+$$
+\text{CRPS}_i \;=\; \frac{1}{N}\sum_{k} |x_k - y| \;-\; \frac{1}{2N^{2}}\sum_{k}\sum_{l} |x_k - x_l|
+$$
+
+with $y$ the truth in that cell. This form makes no assumption about the shape of
+the ensemble distribution, so it also charges the filter for the skewness and the
+clipping at zero that a mean-and-spread summary would hide; scoring the same runs
+through the Gaussian formula instead gives a pooled CRPS of 0.107 rather than
+0.098.
 
 ### 3. Inference time — how fast is each method?
 
@@ -264,11 +284,11 @@ same GPU (one Tesla V100) and the same frames.
 ![Inference time](supervisor_evaluation/outputs/full/figures/inference_latency.png)
 
 *How to read the figure:* the vertical axis is logarithmic — each grid line is
-10× the one below — because the methods differ by a factor of about 260. Read
+10× the one below — because the methods differ by a factor of about 270. Read
 the value printed on each bar rather than comparing bar heights.
 
-*What it shows:* DINCAE is the fastest (0.029 ms per frame) and the EnKF, which
-runs 100 forecast members, the slowest (7.6 ms). Every method is far faster than
+*What it shows:* DINCAE is the fastest (0.022 ms per frame) and the EnKF, which
+runs 100 forecast members, the slowest (5.9 ms). Every method is far faster than
 the data itself, which arrives at one frame per second.
 
 ### Files

@@ -3,7 +3,7 @@
   "repo_root": "/scratch/work/zhangx29/Thesis_Project",
   "data_root": "/scratch/work/zhangx29/data",
   "python": "3.12.13",
-  "platform": "Linux-5.14.0-687.53.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "platform": "Linux-5.14.0-687.50.1.el9_8.x86_64-x86_64-with-glibc2.34",
   "packages": {
     "numpy": true,
     "scipy": true,
@@ -12,10 +12,10 @@
     "matplotlib": true
   },
   "models": {
-    "dincae_epoch60.pt": {
+    "dincae_pd_epoch140.pt": {
       "exists": true,
       "bytes": 1288437,
-      "sha256": "42abc4b26334ce70663283e23a7e1905a94f2a4de2fc63baa19a43ce276e94b4",
+      "sha256": "2859009285d3654a3327ac7684f3a5cd6f459241e511b1518f534465d65d05a2",
       "hash_ok": true
     },
     "dincae_state_stats.npz": {
@@ -38,16 +38,16 @@
       "sha256": "4f3f261b28b6bff6e03b7b33e47b7df291cb650864357014bfbd0535eccb1491",
       "hash_ok": true
     },
-    "senseiver_A.pt": {
+    "senseiver_A_pd.pt": {
       "exists": true,
       "bytes": 425611,
-      "sha256": "50c21c608c5b2f68c3fe1608a74eb18ee9e0112ff0629fc6fa3b25f5e319795d",
+      "sha256": "97154e4d5c59fd399ad2bd748481ba18ef1f102ab8c921efb8fae38eca11e41a",
       "hash_ok": true
     },
-    "senseiver_G_k16.pt": {
+    "senseiver_G_k16_pd.pt": {
       "exists": true,
       "bytes": 382795,
-      "sha256": "a49464af512f6480d42c41f6c310e0f61af084fb52957aa9e7abea5c6c60dae0",
+      "sha256": "23358b5c9db500dd420a4300c95c0df2d5185a0f94cb92f87bbc298b499df62d",
       "hash_ok": true
     },
     "varnet_aughead_obs_s0.pt": {
@@ -56,10 +56,10 @@
       "sha256": "272abccc188e2e47ff79d922101ba91c1c945cac9610624f5e792d7d8b04cb57",
       "hash_ok": true
     },
-    "varnet_mse_s3_epoch80.pt": {
+    "varnet_mse_pd_s3_epoch80.pt": {
       "exists": true,
       "bytes": 25184373,
-      "sha256": "2ae4fa42654f0696346783bf33d2ab53e2e53ce48850e61c6bafe9a8ab9777df",
+      "sha256": "0b0f9aa8c6b42ceab8224409428e947c3eba5f6ef0c8278f6f4827db1265ebc2",
       "hash_ok": true
     }
   },

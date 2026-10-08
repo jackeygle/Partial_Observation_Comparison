@@ -6,8 +6,8 @@ One of the six methods in the final comparison (row "DINCAE"). It shares only th
 data pipeline and the **exact same observation configuration** with the other methods
 (`crowdcore/`), and imports none of them.
 
-**Final model:** `runs/dincae_ff/ckpt_00060.pt`, packaged as
-`supervisor_evaluation/models/dincae_epoch60.pt` together with
+**Final model:** `runs/dincae_ff_pd/ckpt_00140.pt`, packaged as
+`supervisor_evaluation/models/dincae_pd_epoch140.pt` together with
 `artifacts/state_stats.npz`. The reported numbers come from
 `supervisor_evaluation/evaluate.py` (see the repository [README](../../README.md)).
 There, DINCAE's σ̂ is scored in **physical units** on the same frames and cells as the
@@ -60,8 +60,8 @@ Identifiers in the code follow this table: `residual_mse()`, `resid_std`,
 | `sbatch/submit_train.sbatch` | training job (self-chaining) |
 | `artifacts/state_stats.npz` | per-cell mean field and per-channel residual std (read by training and inference) |
 | `cache/` | the encoding cache (~13 GB, gitignored, safe to delete and rebuild) |
-| `check_outputs/` | the validation-split checkpoint choice and the final checkpoint's test metrics |
-| `runs/dincae_ff/` | the final run: `metrics.jsonl` (checkpoints gitignored) |
+| `check_outputs/` | validation checkpoint choices and optional method-native test diagnostics; final comparison scores are under `supervisor_evaluation/outputs/full/` |
+| `runs/dincae_ff_pd/` | the final per-day-route run: `metrics.jsonl` (checkpoints gitignored) |
 
 The encoding self-checks and the scripts that measured the data itself (coverage,
 observation age, temporal decorrelation), quoted below, are in the git tag
@@ -79,18 +79,19 @@ cd methods/dincae               # python below runs from here; sbatch from the r
 python3 -m methods.dincae.state         # -> artifacts/state_stats.npz
 
 # 2. Training (GPU node)
-(cd ../.. && EPOCHS=150 sbatch methods/dincae/sbatch/submit_train.sbatch) # self-chaining + --resume
+(cd ../.. && EPOCHS=150 OUT="$PWD/methods/dincae/runs/dincae_ff_pd" \
+  sbatch methods/dincae/sbatch/submit_train.sbatch --trajectory-mode per_day) # self-chaining + --resume
 #   (the reported run used a 150-epoch budget; the script's default is 200)
-#   -> runs/dincae_ff/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
+#   -> runs/dincae_ff_pd/{last.pt, ckpt_*.pt, metrics.jsonl}   (full-field supervision, the default)
 #   the first epoch builds cache/ (~13 GB); every epoch after that only reads it
 
-# 3. Checkpoint choice and evaluation (GPU node)
-python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff   # pick the epoch on validation
-python3 -m methods.dincae.checks.evaluate --run-dir runs/dincae_ff \
-    --ckpt-glob "$PWD/runs/dincae_ff/ckpt_00060.pt" --split test
+# 3. After training finishes: checkpoint choice and evaluation (GPU node)
+python3 -m methods.dincae.checks.select_checkpoint --run-dir runs/dincae_ff_pd   # pick the epoch on validation
+python3 -m methods.dincae.checks.evaluate --run-dir runs/dincae_ff_pd \
+    --ckpt-glob "$PWD/runs/dincae_ff_pd/ckpt_00140.pt" --split test
 #   -> check_outputs/eval/dincae_metrics_test.json
 #   The comparison with the other methods is supervisor_evaluation/evaluate.py.
-#   (the PUBLISHED configuration: runs/dincae_ff at the single epoch-60 checkpoint
+#   (the reported configuration: runs/dincae_ff_pd at the single epoch-140 checkpoint
 #    chosen on the validation split. Averaging checkpoints needs an explicit
 #    --average-checkpoints, see "Checkpoint policy" below.)
 ```
@@ -244,9 +245,9 @@ be reported separately).
 ## Checkpoint policy
 
 Every **published** DINCAE number comes from a single checkpoint,
-`runs/dincae_ff/ckpt_00060.pt`, chosen on the **validation** split by
+`runs/dincae_ff_pd/ckpt_00140.pt`, chosen on the **validation** split by
 `checks/select_checkpoint.py` (walkable-blind MSE; result in
-`check_outputs/eval/select_dincae_ff_valid.json`) -- matching the other methods, none
+`check_outputs/eval/select_dincae_ff_pd_valid.json`) -- matching the other methods, none
 of which ensemble or average.
 
 The reference implementation instead averages the outputs of checkpoints saved

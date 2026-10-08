@@ -1,0 +1,4 @@
+[early_stop] epoch 90: valid blind walkable RMSE 0.24988
+[early_stop] epoch 100: valid blind walkable RMSE 0.24907
+[early_stop] best epoch 80 (RMSE 0.24879), newest 100: STOP
+[chain] early stop -- no resume, no successor.

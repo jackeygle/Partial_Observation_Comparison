@@ -44,32 +44,32 @@ TEST_DATES = (
 FINAL_CONFIG: dict[str, dict[str, Any]] = {
     "senseiver_a": {
         "label": "Senseiver-A",
-        "source": "methods/senseiver/runs/senseiver_A_full/epoch_086.pt",
-        "file": "senseiver_A.pt",
+        "source": "methods/senseiver/runs/senseiver_A_pd/epoch_092.pt",
+        "file": "senseiver_A_pd.pt",
         "temporal_context": "t",
         "causal": True,
         "uncertainty": False,
     },
     "senseiver_g": {
         "label": "Senseiver-G Temporal (ours)",
-        "source": "methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt",
-        "file": "senseiver_G_k16.pt",
+        "source": "methods/senseiver/runs/sv_G_k16_pd/epoch_054.pt",
+        "file": "senseiver_G_k16_pd.pt",
         "temporal_context": "t-15..t",
         "causal": True,
         "uncertainty": False,
     },
     "dincae": {
         "label": "DINCAE",
-        "source": "methods/dincae/runs/dincae_ff/ckpt_00060.pt",
-        "file": "dincae_epoch60.pt",
+        "source": "methods/dincae/runs/dincae_ff_pd/ckpt_00140.pt",
+        "file": "dincae_pd_epoch140.pt",
         "temporal_context": "t-1,t,t+1",
         "causal": False,
         "uncertainty": True,
     },
     "varnet_mse": {
         "label": "4DVarNet MSE",
-        "source": "methods/varnet/runs/varnet_mse5_h96_s3/ckpt_00080.pt",
-        "file": "varnet_mse_s3_epoch80.pt",
+        "source": "methods/varnet/runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt",
+        "file": "varnet_mse_pd_s3_epoch80.pt",
         "temporal_context": "200-frame window",
         "causal": False,
         "uncertainty": False,
@@ -349,24 +349,24 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
 
     if "senseiver_a" in methods:
         _python_module("compare.compare5", [
-            "--senseiver", str(MODELS / "senseiver_A.pt"), "--arms", "",
+            "--senseiver", str(MODELS / "senseiver_A_pd.pt"), "--arms", "",
             "--no-with-ensemble", "--days", days, "--frames", frames,
             "--out", str(raw / "senseiver_a_accuracy.json"),
         ], ROOT, data_root)
     if "senseiver_g" in methods:
         _python_module("compare.compare5", [
-            "--senseiver", str(MODELS / "senseiver_G_k16.pt"), "--arms", "",
+            "--senseiver", str(MODELS / "senseiver_G_k16_pd.pt"), "--arms", "",
             "--no-with-ensemble", "--days", days, "--frames", frames,
             "--out", str(raw / "senseiver_g_accuracy.json"),
         ], ROOT, data_root)
     if "dincae" in methods:
-        dargs = ["--run-dir", str(MODELS), "--ckpt-glob", str(MODELS / "dincae_epoch60.pt"),
+        dargs = ["--run-dir", str(MODELS), "--ckpt-glob", str(MODELS / "dincae_pd_epoch140.pt"),
                  "--split", "test", "--days", days, "--frames", frames,
                  "--out", str(raw / "dincae_accuracy")]
         _python_module("methods.dincae.checks.evaluate", dargs, ROOT, data_root)
     if "varnet_mse" in methods:
-        args = ["--senseiver", str(MODELS / "senseiver_A.pt"),
-                "--varnet-checkpoints", f"MSE={MODELS / 'varnet_mse_s3_epoch80.pt'}",
+        args = ["--senseiver", str(MODELS / "senseiver_A_pd.pt"),
+                "--varnet-checkpoints", f"MSE={MODELS / 'varnet_mse_pd_s3_epoch80.pt'}",
                 "--arms", "", "--no-with-ensemble",
                 "--days", days, "--frames", frames,
                 "--out", str(raw / "varnet_mse_accuracy.json")]
@@ -374,7 +374,7 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
     if "varnet_aughead" in methods:
         # Score the same single checkpoint's mean on the common physical-space
         # reconstruction protocol used by the other deterministic methods.
-        args = ["--senseiver", str(MODELS / "senseiver_A.pt"),
+        args = ["--senseiver", str(MODELS / "senseiver_A_pd.pt"),
                 "--varnet-checkpoints", f"aughead_obs={MODELS / 'varnet_aughead_obs_s0.pt'}",
                 "--arms", "", "--no-with-ensemble",
                 "--days", days, "--frames", frames,
@@ -417,6 +417,7 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
                 "--frames", "600" if mode == "smoke" else "1000000",
                 "--warmup", "100" if mode == "smoke" else "500",
                 "--day", day, "--obs-dir", str(obs_dir),
+                "--ensemble-crps",          # score the members, not a Gaussian summary
                 "--calibration-export", str(export_dir / f"{day}.npz"),
                 "--out", str(enkf_dir / f"{day}.json"),
             ]
@@ -1267,7 +1268,9 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     observed at that frame, all four channels).  Predictive families:
 
       4DVarNet aughead_obs   N(mean, sd^2) from the learned variance head
-      EnKF                   N(ensemble mean, ensemble spread^2), from the saved exports
+      EnKF                   the 100-member ensemble itself (empirical CRPS) when the
+                             export carries it, else N(ensemble mean, spread^2); RMSE,
+                             spread/RMSE and coverage always from (mean, spread)
       DINCAE                 N in its standardised space mapped back: density/vx/vy
                              are Gaussian with sd * std[c]; var goes through log1p,
                              so its physical predictive is a shifted log-normal
@@ -1319,6 +1322,7 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     per_day = []
     # One accumulator per method and day, for day-level bootstrap intervals.
     day_acc: dict[str, list[Any]] = {k: [] for k in keys}
+    enkf_family: str | None = None
 
     for fp in files:
         day = fp.name.split("_")[0]
@@ -1366,6 +1370,24 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
         with np.load(enkf_npz) as en:
             e_mean = en["mean"][lo - warmup:hi - warmup]
             e_sd = en["spread"][lo - warmup:hi - warmup]
+            # Empirical CRPS of the ensemble as delivered, when the filter exported its two
+            # components (eval_structured_q_gpu.py --ensemble-crps). Plain estimator, i.e. the
+            # CRPS of the 100-member empirical distribution itself; the fair (ensemble-size
+            # corrected) variant is ens_mae - ens_pair * n/(n-1) from the same two arrays.
+            has_mae, has_pair = "ens_mae" in en.files, "ens_pair" in en.files
+            if has_mae != has_pair:
+                raise RuntimeError(f"incomplete EnKF CRPS components in {enkf_npz}")
+            day_family = "empirical_ensemble" if has_mae else "gaussian"
+            if enkf_family is None:
+                enkf_family = day_family
+            elif enkf_family != day_family:
+                raise RuntimeError("EnKF exports mix empirical-ensemble and Gaussian CRPS")
+            e_crps = None
+            if has_mae:
+                if "ens_members" not in en.files or int(en["ens_members"]) != FINAL_CONFIG["enkf"]["ensemble"]:
+                    raise RuntimeError(f"EnKF ensemble size mismatch in {enkf_npz}")
+                e_crps = (en["ens_mae"][lo - warmup:hi - warmup]
+                          - en["ens_pair"][lo - warmup:hi - warmup])
             if not np.array_equal(en["observed"][lo - warmup:hi - warmup], Omask[lo:hi]) or \
                     not np.allclose(en["truth"][lo - warmup:hi - warmup], truth, rtol=0, atol=1e-6):
                 raise RuntimeError(f"EnKF export alignment check failed on {day}")
@@ -1383,7 +1405,12 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
             }
             for k, (family, loc, scale) in parts.items():
                 for a in (acc[k]["walkable_blind"], acc[k][f"channel_{name}"], day_acc[k][-1]):
-                    (a.add_lognormal1p if family == "lognormal1p" else a.add)(loc, scale, x)
+                    if k == "enkf" and e_crps is not None:
+                        a.add_ensemble_crps(e_crps[:, c][sel], loc, scale, x)
+                    elif family == "lognormal1p":
+                        a.add_lognormal1p(loc, scale, x)
+                    else:
+                        a.add(loc, scale, x)
         per_day.append({"day": day, "frames": [int(lo), int(hi)],
                         "scored_cells_per_channel": int(sel.sum())})
         print(f"[uncertainty] {day}: frames [{lo}, {hi}), {int(sel.sum())} cells/channel",
@@ -1411,7 +1438,7 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     doc = {"space": "physical units, all methods",
            "cells": "walkable and not observed at that frame; all four channels pooled",
            "frames": "common support: DINCAE t-1/t+1, complete 4DVarNet windows, after EnKF warmup",
-           "families": {"varnet_aughead": "gaussian", "enkf": "gaussian",
+           "families": {"varnet_aughead": "gaussian", "enkf": enkf_family,
                         "dincae": {c: ("log1p-lognormal" if CHANNEL_TRANSFORM[i] == "log1p"
                                        else "gaussian") for i, c in enumerate(CHANNELS)}},
            "clipping": "none",

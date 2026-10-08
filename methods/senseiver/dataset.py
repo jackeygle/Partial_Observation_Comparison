@@ -86,18 +86,26 @@ def load_day(path, stride=4, seed=0, frames=0, obs_every_k=None, add_noise=None)
     return Xs, Ys, Om
 
 
-def day_observation_seed(base_seed, day_index, trajectory_mode):
+def day_observation_seed(base_seed, day, trajectory_mode):
     """Return a reproducible observation seed for one day.
 
-    ``fixed`` preserves the original protocol: every day replays exactly the
-    same robot trajectory.  ``per_day`` keeps the experiment deterministic but
-    gives day ``i`` its own trajectory.
+    Delegates to ``crowdcore.observation_model.day_seed`` -- the SAME function
+    4DVarNet and DINCAE use -- so that one route seed has exactly one
+    definition in the project:
+
+      fixed   : every day replays the base seed (the original protocol).
+      per_day : the seed is keyed on the day's DATE, so a per_day Senseiver
+                trains on exactly the routes the other methods train on.
+
+    Until 2026-10-05 ``per_day`` here added the day's INDEX within the split
+    instead, giving seeds base..base+31 (123..154 with the default base seed)
+    while the other methods used base + the date's ordinal (~735,0xx). The two
+    never coincided, so a per_day Senseiver trained on different routes than a
+    per_day 4DVarNet on the same day. ``fixed`` is unaffected: day_seed returns
+    the base seed without looking at the date, so every existing checkpoint
+    keeps its exact training data.
     """
-    if trajectory_mode == "fixed":
-        return int(base_seed)
-    if trajectory_mode == "per_day":
-        return int(base_seed) + int(day_index)
-    raise ValueError(f"unknown trajectory_mode={trajectory_mode!r}")
+    return om.day_seed(day, base_seed, trajectory_mode)
 
 
 class DayBank:
@@ -117,7 +125,7 @@ class DayBank:
         self.observation_seeds = []
         Xs, Ys, Os = [], [], []
         for i, f in enumerate(files):
-            day_seed = day_observation_seed(seed, i, trajectory_mode)
+            day_seed = day_observation_seed(seed, f, trajectory_mode)
             self.observation_seeds.append(day_seed)
             x, y, o = load_day(f, stride, day_seed, frames, obs_every_k, add_noise)
             Xs.append(x); Ys.append(y); Os.append(o)
@@ -173,7 +181,7 @@ class TemporalDayBank:
         self.Yd, self.Od, self.frames = [], [], []
         Xs, day_of, frame_of = [], [], []
         for d, f in enumerate(files):
-            day_seed = day_observation_seed(seed, d, trajectory_mode)
+            day_seed = day_observation_seed(seed, f, trajectory_mode)
             self.observation_seeds.append(day_seed)
             X, Y, Om = load_day(f, 1, day_seed, frames, obs_every_k, add_noise)  # full frame rate
             idx = np.arange(0, X.shape[0], stride)                            # == DayBank's targets

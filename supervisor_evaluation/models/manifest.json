@@ -1,25 +1,25 @@
 {
-  "created": "2026-10-02T13:17:48+0300",
+  "created": "2026-10-07T18:08:25+0300",
   "files": {
-    "senseiver_A.pt": {
+    "senseiver_A_pd.pt": {
       "bytes": 425611,
-      "sha256": "50c21c608c5b2f68c3fe1608a74eb18ee9e0112ff0629fc6fa3b25f5e319795d",
-      "source": "methods/senseiver/runs/senseiver_A_full/epoch_086.pt"
+      "sha256": "97154e4d5c59fd399ad2bd748481ba18ef1f102ab8c921efb8fae38eca11e41a",
+      "source": "methods/senseiver/runs/senseiver_A_pd/epoch_092.pt"
     },
-    "senseiver_G_k16.pt": {
+    "senseiver_G_k16_pd.pt": {
       "bytes": 382795,
-      "sha256": "a49464af512f6480d42c41f6c310e0f61af084fb52957aa9e7abea5c6c60dae0",
-      "source": "methods/senseiver/runs/capacity/base32_k16_s123_full/epoch_057.pt"
+      "sha256": "23358b5c9db500dd420a4300c95c0df2d5185a0f94cb92f87bbc298b499df62d",
+      "source": "methods/senseiver/runs/sv_G_k16_pd/epoch_054.pt"
     },
-    "dincae_epoch60.pt": {
+    "dincae_pd_epoch140.pt": {
       "bytes": 1288437,
-      "sha256": "42abc4b26334ce70663283e23a7e1905a94f2a4de2fc63baa19a43ce276e94b4",
-      "source": "methods/dincae/runs/dincae_ff/ckpt_00060.pt"
+      "sha256": "2859009285d3654a3327ac7684f3a5cd6f459241e511b1518f534465d65d05a2",
+      "source": "methods/dincae/runs/dincae_ff_pd/ckpt_00140.pt"
     },
-    "varnet_mse_s3_epoch80.pt": {
+    "varnet_mse_pd_s3_epoch80.pt": {
       "bytes": 25184373,
-      "sha256": "2ae4fa42654f0696346783bf33d2ab53e2e53ce48850e61c6bafe9a8ab9777df",
-      "source": "methods/varnet/runs/varnet_mse5_h96_s3/ckpt_00080.pt"
+      "sha256": "0b0f9aa8c6b42ceab8224409428e947c3eba5f6ef0c8278f6f4827db1265ebc2",
+      "source": "methods/varnet/runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt"
     },
     "varnet_aughead_obs_s0.pt": {
       "bytes": 55598389,

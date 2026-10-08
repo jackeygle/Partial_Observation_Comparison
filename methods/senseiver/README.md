@@ -18,12 +18,12 @@ reason.
 
 ---
 
-## Status: closed (2026-09-18); both final models come from here
+## Status: final per-day checkpoints selected (2026-10-07)
 
 | checkpoint | row in the final comparison | what it is |
 |---|---|---|
-| `runs/senseiver_A_full/epoch_086.pt` | Senseiver-A | faithful reproduction of the paper (variant A); 100 epochs, seed 123; test blind walkable RMSE 0.223 |
-| `runs/capacity/base32_k16_s123_full/epoch_057.pt` | **Senseiver-G (ours)** | one latent token per grid cell with direct read-out ("G-direct"), plus a 16-frame causal observation window (k=16); 60 epochs, seed 123; test blind walkable RMSE 0.197, the best of the six methods |
+| `runs/senseiver_A_pd/epoch_092.pt` | Senseiver-A | paper architecture (variant A); 100 epochs, seed 123, per-day routes; test blind walkable RMSE 0.223 |
+| `runs/sv_G_k16_pd/epoch_054.pt` | **Senseiver-G (ours)** | one latent token per grid cell with direct read-out, plus a 16-frame causal window; 60 epochs, seed 123, per-day routes; test blind walkable RMSE 0.196 |
 
 Both runs keep every epoch (`--save-every-epoch`), and the reported epoch is chosen
 by `checks/select_checkpoint.py` on all seven validation days, every frame, blind
@@ -32,6 +32,9 @@ walkable cells, clipped -- the same scope as DINCAE's and 4DVarNet's selection
 `runs/capacity/base32_k16_s123/` (same settings) kept only `best.pt`, chosen by
 `train.py`'s own score on three validation days, every 20th frame; they are kept
 for reference and are no longer the reported models.
+The later fixed-route full runs `runs/senseiver_A_full/` and
+`runs/capacity/base32_k16_s123_full/` were superseded by the
+per-day route retraining shown above.
 
 Both are packaged in `supervisor_evaluation/models/` and scored by
 `supervisor_evaluation/evaluate.py` (numbers in the repository
@@ -48,18 +51,18 @@ geodesic spatial bias — none beat it; their code, runs and results are in the 
 source sbatch/_env.sh           # from the repository root
 
 # Senseiver-A (self-chains to 100 epochs), every epoch kept
-EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_full \
-  sbatch methods/senseiver/sbatch/submit_train.sbatch --save-every-epoch
+EPOCHS=100 OUT=$PWD/methods/senseiver/runs/senseiver_A_pd \
+  sbatch methods/senseiver/sbatch/submit_train.sbatch --save-every-epoch --trajectory-mode per_day
 
 # Senseiver-G: grid latent, direct read-out, 16-frame window, 60 epochs, seed 123 (default)
-EPOCHS=60 OUT=$PWD/methods/senseiver/runs/capacity/base32_k16_s123_full \
+EPOCHS=60 OUT=$PWD/methods/senseiver/runs/sv_G_k16_pd \
   sbatch methods/senseiver/sbatch/submit_train.sbatch \
-  --latent-mode grid --readout direct --time-window 16 --save-every-epoch
+  --latent-mode grid --readout direct --time-window 16 --save-every-epoch --trajectory-mode per_day
 
-# The epoch of each run, on the whole validation split -> <run>/select_valid.json
+# After both training chains finish, select each epoch on the whole validation split -> <run>/select_valid.json
 # (--epochs A-B splits the work over several jobs; then --merge)
-sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_full
-sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/capacity/base32_k16_s123_full
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/senseiver_A_pd
+sbatch methods/senseiver/sbatch/select_checkpoint.sbatch methods/senseiver/runs/sv_G_k16_pd
 
 # Evaluation against the other methods
 python3 supervisor_evaluation/evaluate.py prepare

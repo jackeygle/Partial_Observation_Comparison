@@ -1,0 +1,94 @@
+[data] atc-20130616_corridor_1.0s.h5: 35127 frames, observation seed 735035 (per_day)
+[data] atc-20130623_corridor_1.0s.h5: 40620 frames, observation seed 735042 (per_day)
+[data] atc-20130630_corridor_1.0s.h5: 40710 frames, observation seed 735049 (per_day)
+[data] atc-20130707_corridor_1.0s.h5: 38437 frames, observation seed 735056 (per_day)
+[data] atc-20130714_corridor_1.0s.h5: 40457 frames, observation seed 735063 (per_day)
+[data] atc-20130721_corridor_1.0s.h5: 37413 frames, observation seed 735070 (per_day)
+[data] atc-20130728_corridor_1.0s.h5: 36979 frames, observation seed 735077 (per_day)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/checks/select_checkpoint.py", line 178, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/checks/select_checkpoint.py", line 126, in main
+    pred = np.clip(predict(model, Yf, Of, f, dev), LO, HI)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/checks/select_checkpoint.py", line 55, in predict
+    return model.reconstruct(tok.to(dev), pad.to(dev), dt.to(dev),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/network.py", line 176, in reconstruct
+    out = self.forward(tokens, pad_mask, coords, dt, cell_idx)  # (B, HW, C)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/network.py", line 164, in forward
+    z = self.encoder(tokens, self.pos_enc, pad_mask)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 307, in forward
+    x_latent = (self.layer_1(x_latent, x, pad_mask)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 60, in forward
+    inputs = module(*inputs)
+             ^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 60, in forward
+    inputs = module(*inputs)
+             ^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 103, in forward
+    x = self.module(*args, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 142, in forward
+    return self.attention(x_q, x_kv, pad_mask=pad_mask, attn_mask=attn_mask)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/model.py", line 125, in forward
+    return self.attention(x_q, x_kv, x_kv,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/activation.py", line 1491, in forward
+    attn_output, attn_output_weights = F.multi_head_attention_forward(
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/functional.py", line 6590, in multi_head_attention_forward
+    attn_output_weights = softmax(attn_output_weights, dim=-1)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/functional.py", line 2157, in softmax
+    ret = input.softmax(dim)
+          ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 6.67 GiB. GPU 0 has a total capacity of 15.77 GiB of which 6.42 GiB is free. Including non-PyTorch memory, this process has 9.34 GiB memory in use. Of the allocated memory 8.93 GiB is allocated by PyTorch, and 49.87 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

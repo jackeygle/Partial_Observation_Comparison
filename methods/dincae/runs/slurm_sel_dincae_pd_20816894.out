@@ -1,0 +1,17 @@
+[select] /scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_ff_pd: 12 checkpoints, 7 valid days, scope=walkable blind
+
+  epoch   30  ckpt_00030.pt    0.048111
+  epoch   40  ckpt_00040.pt    0.049798
+  epoch   50  ckpt_00050.pt    0.047268
+  epoch   60  ckpt_00060.pt    0.048511
+  epoch   70  ckpt_00070.pt    0.048112
+  epoch   80  ckpt_00080.pt    0.047843
+  epoch   90  ckpt_00090.pt    0.048240
+  epoch  100  ckpt_00100.pt    0.047925
+  epoch  110  ckpt_00110.pt    0.047442
+  epoch  120  ckpt_00120.pt    0.052534
+  epoch  130  ckpt_00130.pt    0.046888
+  epoch  140  ckpt_00140.pt    0.046569
+
+[best] epoch 140 (ckpt_00140.pt) walkable blind MSE 0.046569
+[out] /scratch/work/zhangx29/Thesis_Project/methods/dincae/check_outputs/eval/select_dincae_ff_pd_valid.json

@@ -1,7 +1,7 @@
 method,median_ms_per_frame,p95_ms_per_frame,gpu,scope,min_output_block_frames,repeats
-Senseiver-A,0.14189729001373053,0.14362674206495285,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
-Senseiver-G Temporal (ours),0.8466722800706824,0.8468652461500218,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
-DINCAE,0.028974858578294516,0.029357457533478737,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
-4DVarNet MSE,0.3341235484307011,0.33447276925047237,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",200,3
-4DVarNet aughead_obs (single),0.37843403328831,0.3793159778385113,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",200,3
-Localized EnKF (100 members),7.590089639027913,7.851311047871907,Tesla V100-SXM2-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
+Senseiver-A,0.1076551132913058,0.11089625642246877,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
+Senseiver-G Temporal (ours),0.8574789717871075,0.8576248376824273,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
+DINCAE,0.022135003237053752,0.022757174796424806,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3
+4DVarNet MSE,0.35178216504088294,0.3518440715076091,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",200,3
+4DVarNet aughead_obs (single),0.3994931666723763,0.39949588310749584,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",200,3
+Localized EnKF (100 members),5.8795662720998125,6.482912739117941,Tesla V100-PCIE-32GB,"predictor compute, prebuilt inputs; same GPU and frames",1,3

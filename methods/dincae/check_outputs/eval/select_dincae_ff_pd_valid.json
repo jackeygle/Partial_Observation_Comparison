@@ -1,0 +1,73 @@
+{
+  "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/dincae/runs/dincae_ff_pd",
+  "split": "valid",
+  "scope": "walkable blind",
+  "n_days": 7,
+  "rows": [
+    {
+      "epoch": 30,
+      "ckpt": "ckpt_00030.pt",
+      "walkable_blind_mse": 0.048110531459913605
+    },
+    {
+      "epoch": 40,
+      "ckpt": "ckpt_00040.pt",
+      "walkable_blind_mse": 0.049797905403151904
+    },
+    {
+      "epoch": 50,
+      "ckpt": "ckpt_00050.pt",
+      "walkable_blind_mse": 0.04726805550380782
+    },
+    {
+      "epoch": 60,
+      "ckpt": "ckpt_00060.pt",
+      "walkable_blind_mse": 0.04851069498932627
+    },
+    {
+      "epoch": 70,
+      "ckpt": "ckpt_00070.pt",
+      "walkable_blind_mse": 0.04811205564945948
+    },
+    {
+      "epoch": 80,
+      "ckpt": "ckpt_00080.pt",
+      "walkable_blind_mse": 0.047842619388446105
+    },
+    {
+      "epoch": 90,
+      "ckpt": "ckpt_00090.pt",
+      "walkable_blind_mse": 0.04824026431534856
+    },
+    {
+      "epoch": 100,
+      "ckpt": "ckpt_00100.pt",
+      "walkable_blind_mse": 0.04792503996091544
+    },
+    {
+      "epoch": 110,
+      "ckpt": "ckpt_00110.pt",
+      "walkable_blind_mse": 0.04744227273763553
+    },
+    {
+      "epoch": 120,
+      "ckpt": "ckpt_00120.pt",
+      "walkable_blind_mse": 0.05253403654646848
+    },
+    {
+      "epoch": 130,
+      "ckpt": "ckpt_00130.pt",
+      "walkable_blind_mse": 0.04688765541959457
+    },
+    {
+      "epoch": 140,
+      "ckpt": "ckpt_00140.pt",
+      "walkable_blind_mse": 0.04656926470487055
+    }
+  ],
+  "best": {
+    "epoch": 140,
+    "ckpt": "ckpt_00140.pt",
+    "walkable_blind_mse": 0.04656926470487055
+  }
+}

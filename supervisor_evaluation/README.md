@@ -25,7 +25,7 @@ and verify results go to `outputs/dev/`, never into `outputs/full/`.
 From the repository root, in the project PyTorch environment:
 
 ```bash
-module load scicomp-pytorch-env/2026.1
+source sbatch/_env.sh
 
 # Check packages, checkpoint hashes, HDF5 schema, shapes, and test dates.
 python3 supervisor_evaluation/evaluate.py verify \
@@ -80,8 +80,11 @@ t-1/t+1 context, complete 4DVarNet windows and the EnKF warmup) and the same cel
 (walkable, not observed at that frame, all four channels), in physical units.
 DINCAE's variance channel is log1p-transformed inside the model, so its physical
 predictive is a shifted log-normal and is scored with the closed-form log-normal
-CRPS; every other channel/method is Gaussian. Reported: CRPS, and spread/RMSE with
-spread = sqrt(mean sigma-hat^2), the usual ensemble definition. Output:
+CRPS. Its other channels and the augmented 4DVarNet use Gaussian CRPS. The EnKF
+uses empirical CRPS of its 100 analysis members. Spread/RMSE uses
+spread = sqrt(mean sigma-hat^2), where sigma-hat is the predictive standard
+deviation or ensemble spread. The EnKF's NLL and coverage fields use its
+Gaussian mean-and-spread summary. Output:
 `raw/uncertainty_unified.json`.
 
 The developer/package-maintainer runs this once after final model selection:

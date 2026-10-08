@@ -46,15 +46,50 @@ fi
 S=${1:?usage: sbatch --job-name=varnet_mse5_sM methods/varnet/sbatch/submit_mse5_chain.sbatch <seed> 0}
 BETA=${2:?missing beta}
 TAG=mse5   # BETA is ignored here; kept so the chain's argument list is unchanged
-OUTDIR=runs/varnet_${TAG}_h96_s${S}
+# MODE / OUTDIR are additive: unset, this script behaves exactly as it always has (no
+# --trajectory-mode on the command line, so train.py falls back to config
+# observation.trajectory_mode). Set MODE=per_day with its own OUTDIR to train the route-matched
+# arm without touching the fixed-route run: --resume matches on path, and train.py aborts if a
+# run's saved trajectory_mode differs from the one the data would be built with, so a wrong
+# OUTDIR fails loudly instead of silently switching routes mid-training.
+MODE=${4:-${MODE:-}}
+OUTDIR=${5:-${OUTDIR:-runs/varnet_${TAG}_h96_s${S}}}
+EARLY_STOP=${6:-${EARLY_STOP:-1}}
+MODE_ARG=""
+[ -n "$MODE" ] && MODE_ARG="--trajectory-mode $MODE"
 EPOCHS=150
 SCHED='0:5:1e-3,25:10:7e-4,50:15:5e-4,75:20:3e-4'
 
 DONE=$(python3 -c "import torch,os; p='$OUTDIR/varnet_last.pt'; print(1 if (os.path.exists(p) and int(torch.load(p,map_location='cpu').get('epoch',-1))+1>=$EPOCHS) else 0)" 2>/dev/null)
 if [ "$DONE" = "1" ]; then
+    [ "$EARLY_STOP" = 1 ] && python3 -u -m methods.varnet.checks.early_stop --run-dir $OUTDIR
     echo "[chain] target $EPOCHS epochs reached — stopping chain."
     exit 0
 fi
+
+# EARLY STOPPING (the wiring of submit_reselect_chain.sbatch, which is where it was first used).
+# Scores the checkpoints this run has produced on the validation split, with exactly the score
+# the final epoch selection uses (blind walkable RMSE, all seven validation days, clipped), and
+# stops the chain once the best checkpoint is --patience (20) epochs older than the newest.
+# It does NOT change which checkpoint is finally selected: selection stays post-hoc over the
+# saved snapshots, so stopping only avoids burning GPU on a tail that is already past its
+# optimum -- measured on the existing runs, runs/varnet_mse5_h96_s3 peaked at epoch 80 and then
+# sat flat to 149 (0.0485 -> 0.0494), i.e. 69 of its 150 epochs changed nothing.
+# Default on; EARLY_STOP=0 (positional arg 6) reproduces the original fixed-budget recipe that
+# the published checkpoints were trained with.
+if [ "$EARLY_STOP" = 1 ]; then
+    python3 -u -m methods.varnet.checks.early_stop --run-dir $OUTDIR
+    if [ $? -eq 3 ]; then echo "[chain] early stop — no resume, no successor."; exit 0; fi
+fi
+
+# Partition list for the SUCCESSORS. The #SBATCH --partition line above only applies to the
+# generation submitted from the command line; every generation after that re-submits itself, and
+# until 2026-10-07 it inherited only gpu-h200-141g-m. That partition is low priority on nodes it
+# shares with gpu-h200-141g-short, so generation 5 of the per_day run sat in
+# "Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions"
+# and was eventually requeued-held after a launch failure. A 3h segment fits every partition
+# below (the binding cap is gpu-h200-141g-m's 8h), so widening costs nothing.
+CHAIN_PARTS=${CHAIN_PARTS:-gpu-h200-141g-m,gpu-h200-141g-short,gpu-h100-80g,gpu-h100-80g-short,gpu-a100-80g,gpu-v100-32g,gpu-v100-16g}
 
 # --export=NONE is REQUIRED: without it each generation re-runs `module load` on an inherited
 # environment, PATH grows by one copy per generation, and after ~6 generations every command
@@ -64,8 +99,12 @@ fi
 # protection is train_varnet.py's CUDA guard, which now aborts in seconds instead of running for
 # hours on CPU; this exclude just avoids burning chain generations on a known-bad node.
 cd "$THESIS_ROOT"   # resubmit from the repo root: #SBATCH --output and _env.sh resolve against it
-sbatch --export=NONE --exclude=gpu51 --job-name=$SLURM_JOB_NAME --dependency=afterany:$SLURM_JOB_ID \
-       methods/varnet/sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1))
+# MODE/OUTDIR travel as positional args, not --export: --export=NONE has to stay (see above),
+# and `--export=VAR` without ALL is read as "ALL plus VAR" by some Slurm builds, which would
+# bring back the PATH accumulation this flag exists to prevent.
+sbatch --export=NONE --partition="$CHAIN_PARTS" --job-name=$SLURM_JOB_NAME \
+       --dependency=afterany:$SLURM_JOB_ID \
+       methods/varnet/sbatch/submit_mse5_chain.sbatch $S $BETA $((GEN+1)) "$MODE" "$OUTDIR" "$EARLY_STOP"
 cd "$THESIS_ROOT/methods/varnet"
 echo "[chain] submitted successor (afterany:$SLURM_JOB_ID)"
 
@@ -88,4 +127,5 @@ python3 -u -m methods.varnet.train --resume \
     --days 32 --dT 200 --epochs $EPOCHS --batch 32 --amp \
     --loss supervised \
     --iter-schedule "$SCHED" --clip-grad 1.0 \
+    $MODE_ARG \
     --outdir $OUTDIR

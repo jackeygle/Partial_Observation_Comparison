@@ -1,0 +1,18 @@
+[data] atc-20130616_corridor_1.0s.h5: 35127 frames, observation seed 123 (fixed)
+[data] atc-20130623_corridor_1.0s.h5: 40620 frames, observation seed 123 (fixed)
+[data] atc-20130630_corridor_1.0s.h5: 40710 frames, observation seed 123 (fixed)
+[data] atc-20130707_corridor_1.0s.h5: 38437 frames, observation seed 123 (fixed)
+[data] atc-20130714_corridor_1.0s.h5: 40457 frames, observation seed 123 (fixed)
+[data] atc-20130721_corridor_1.0s.h5: 37413 frames, observation seed 123 (fixed)
+[data] atc-20130728_corridor_1.0s.h5: 36979 frames, observation seed 123 (fixed)
+[select] epoch   0  blind walkable RMSE 0.21470
+[select] epoch   1  blind walkable RMSE 0.20787
+[select] epoch   2  blind walkable RMSE 0.20167
+[select] epoch   3  blind walkable RMSE 0.19936
+[select] epoch   4  blind walkable RMSE 0.19795
+[select] epoch   5  blind walkable RMSE 0.19807
+[select] epoch   6  blind walkable RMSE 0.19658
+[select] epoch   7  blind walkable RMSE 0.19607
+[select] epoch   8  blind walkable RMSE 0.19525
+[select] epoch   9  blind walkable RMSE 0.19468
+[select] selected epoch 9 (RMSE 0.19468) -> select_valid_part_000_009.json

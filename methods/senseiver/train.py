@@ -232,8 +232,14 @@ def main():
                         continue
         print(f"[resume] continuing from epoch {start_epoch} (best={best:.5f})", flush=True)
 
-    rng = np.random.default_rng(args.seed + start_epoch)
     for ep in range(start_epoch, args.epochs):
+        # Re-seeded every epoch from (seed, epoch), not once per segment. The batch order then
+        # depends only on the epoch number, so a run split into several chained segments draws
+        # exactly the order an uninterrupted run would. It used to be seeded once per process
+        # as `args.seed + start_epoch`, which started a fresh stream on every resume and made
+        # the training batch order a function of how many times the queue happened to interrupt
+        # the run -- two runs of the same recipe differed by nothing but their queue luck.
+        rng = np.random.default_rng([args.seed, ep])
         t0, tot, nel, nstep = time.perf_counter(), 0.0, 0, 0
         for i, idx in enumerate(train_bank.batches(args.batch, rng)):
             if args.steps and i >= args.steps:

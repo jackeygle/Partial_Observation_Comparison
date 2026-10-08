@@ -1,0 +1,112 @@
+{
+ "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd",
+ "split": "valid",
+ "days": [
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "frames": "all but the first and last of each day",
+ "trajectory_mode": "per_day",
+ "observation_base_seed": 0,
+ "scope": "walkable (blind cells inside the walkable region, four channels, clipped)",
+ "rows": [
+  {
+   "epoch": 45,
+   "ckpt": "epoch_045.pt",
+   "mse": 0.035443326749797784,
+   "rmse": 0.18826398155196278
+  },
+  {
+   "epoch": 46,
+   "ckpt": "epoch_046.pt",
+   "mse": 0.035314645008230866,
+   "rmse": 0.187921911995996
+  },
+  {
+   "epoch": 47,
+   "ckpt": "epoch_047.pt",
+   "mse": 0.03542834491111965,
+   "rmse": 0.18822418790134188
+  },
+  {
+   "epoch": 48,
+   "ckpt": "epoch_048.pt",
+   "mse": 0.03533420755201039,
+   "rmse": 0.1879739544511696
+  },
+  {
+   "epoch": 49,
+   "ckpt": "epoch_049.pt",
+   "mse": 0.03533607873243442,
+   "rmse": 0.18797893161850457
+  },
+  {
+   "epoch": 50,
+   "ckpt": "epoch_050.pt",
+   "mse": 0.03581202124893119,
+   "rmse": 0.1892406437553286
+  },
+  {
+   "epoch": 51,
+   "ckpt": "epoch_051.pt",
+   "mse": 0.03528486400147318,
+   "rmse": 0.18784265756604165
+  },
+  {
+   "epoch": 52,
+   "ckpt": "epoch_052.pt",
+   "mse": 0.03552888561870045,
+   "rmse": 0.18849107570041732
+  },
+  {
+   "epoch": 53,
+   "ckpt": "epoch_053.pt",
+   "mse": 0.03534631250332259,
+   "rmse": 0.18800615017419667
+  },
+  {
+   "epoch": 54,
+   "ckpt": "epoch_054.pt",
+   "mse": 0.03518767941331929,
+   "rmse": 0.18758379304545286
+  },
+  {
+   "epoch": 55,
+   "ckpt": "epoch_055.pt",
+   "mse": 0.03530254055206393,
+   "rmse": 0.18788970315603762
+  },
+  {
+   "epoch": 56,
+   "ckpt": "epoch_056.pt",
+   "mse": 0.035406738884285284,
+   "rmse": 0.18816678475300916
+  },
+  {
+   "epoch": 57,
+   "ckpt": "epoch_057.pt",
+   "mse": 0.035225405817633185,
+   "rmse": 0.18768432491189344
+  },
+  {
+   "epoch": 58,
+   "ckpt": "epoch_058.pt",
+   "mse": 0.035259651003562556,
+   "rmse": 0.18777553355952037
+  },
+  {
+   "epoch": 59,
+   "ckpt": "epoch_059.pt",
+   "mse": 0.03529889166298818,
+   "rmse": 0.1878799927160638
+  }
+ ],
+ "selected_epoch": 54,
+ "selected_ckpt": "epoch_054.pt",
+ "selected_rmse": 0.18758379304545286
+}
