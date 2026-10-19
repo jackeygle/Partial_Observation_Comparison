@@ -1,0 +1,61 @@
+{
+  "split": "valid",
+  "scope": "all_walkable",
+  "batch": 1,
+  "window_frames": 200,
+  "days": [
+    "atc-20130612_corridor_1.0s.h5",
+    "atc-20130616_corridor_1.0s.h5",
+    "atc-20130619_corridor_1.0s.h5",
+    "atc-20130623_corridor_1.0s.h5",
+    "atc-20130626_corridor_1.0s.h5",
+    "atc-20130630_corridor_1.0s.h5",
+    "atc-20130703_corridor_1.0s.h5",
+    "atc-20130707_corridor_1.0s.h5",
+    "atc-20130710_corridor_1.0s.h5",
+    "atc-20130714_corridor_1.0s.h5",
+    "atc-20130717_corridor_1.0s.h5",
+    "atc-20130721_corridor_1.0s.h5",
+    "atc-20130724_corridor_1.0s.h5",
+    "atc-20130728_corridor_1.0s.h5"
+  ],
+  "frames": "gap mask ON (aligned 200-frame blocks with an unreliable frame + the next block; flags /scratch/work/zhangx29/data_all92/frame_reliability)",
+  "candidates": [
+    {
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/ckpt_00080.pt",
+      "sha256": "dd348b21c189e4a0f69de59c3bbfebfa219272d79bd5894e1352bc56b792ae4c",
+      "epoch": 80,
+      "mse": 0.030651362866254733
+    },
+    {
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/ckpt_00090.pt",
+      "sha256": "8e45023c4c5ab49f2e7871cd18dc7b8224ca719a1100c3594217329697a46894",
+      "epoch": 90,
+      "mse": 0.03073048084429606
+    },
+    {
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/ckpt_00100.pt",
+      "sha256": "abbbb3d90f08923f3a107276c59ac87cd4526f289283a749d8931e301243ac2d",
+      "epoch": 100,
+      "mse": 0.030761556229652515
+    },
+    {
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/varnet_best.pt",
+      "sha256": "08e7ae8a6879072df8e10af98795e281a1e6c606b7c0b898e3bc1b8053eb4605",
+      "epoch": 100,
+      "mse": 0.030761628380174075
+    },
+    {
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/varnet_last.pt",
+      "sha256": "c1628d3cd81a9a075142c502bdf562c09bd9c6c27b79142d6ea9143bd906c75d",
+      "epoch": 104,
+      "mse": 0.030737159491063717
+    }
+  ],
+  "selected": {
+    "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92/ckpt_00080.pt",
+    "sha256": "dd348b21c189e4a0f69de59c3bbfebfa219272d79bd5894e1352bc56b792ae4c",
+    "epoch": 80,
+    "mse": 0.030651362866254733
+  }
+}

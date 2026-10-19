@@ -1,0 +1,16 @@
+[frames] gap mask ON (aligned 200-frame blocks with an unreliable frame + the next block; flags /scratch/work/zhangx29/data_all92/frame_reliability)
+[valid] 6 senseiver checkpoints scored on atc-20130612_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130616_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130619_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130623_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130626_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130630_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130703_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130707_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130710_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130714_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130717_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130721_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130724_corridor_1.0s.h5
+[valid] 6 senseiver checkpoints scored on atc-20130728_corridor_1.0s.h5
+[selected] {'epoch': 57, 'checkpoint': '/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_057.pt', 'sha256': '9e0cdf9be0459c57926eedb57a93be50edbaa141797c2d53dbe84069150a141f', 'mse': 0.014064289672910868, 'rmse': 0.11859295793979872}

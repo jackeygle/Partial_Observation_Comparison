@@ -1,0 +1,32 @@
+{
+  "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3_all92",
+  "split": "valid",
+  "min_epoch": 80,
+  "n_iter": 20,
+  "days": [
+    "atc-20130612_corridor_1.0s.h5",
+    "atc-20130616_corridor_1.0s.h5",
+    "atc-20130619_corridor_1.0s.h5",
+    "atc-20130623_corridor_1.0s.h5",
+    "atc-20130626_corridor_1.0s.h5",
+    "atc-20130630_corridor_1.0s.h5",
+    "atc-20130703_corridor_1.0s.h5",
+    "atc-20130707_corridor_1.0s.h5",
+    "atc-20130710_corridor_1.0s.h5",
+    "atc-20130714_corridor_1.0s.h5",
+    "atc-20130717_corridor_1.0s.h5",
+    "atc-20130721_corridor_1.0s.h5",
+    "atc-20130724_corridor_1.0s.h5",
+    "atc-20130728_corridor_1.0s.h5"
+  ],
+  "scope": "all_walkable",
+  "mse_by_epoch": {
+    "80": 0.030652227634376455,
+    "90": 0.03073068483821673,
+    "100": 0.030760741395920537
+  },
+  "selected_epoch": 80,
+  "selected_mse": 0.030652227634376455,
+  "selected_ckpt": "ckpt_00080.pt",
+  "early_stopped": true
+}

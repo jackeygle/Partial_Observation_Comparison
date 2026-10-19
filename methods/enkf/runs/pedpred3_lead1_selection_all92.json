@@ -1,0 +1,284 @@
+[
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_00.pt",
+  "lead1_loss_clipped": 0.031067049090920496,
+  "lead1_rmse_enkf": 0.11971713969737018,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_01.pt",
+  "lead1_loss_clipped": 0.029347660936971037,
+  "lead1_rmse_enkf": 0.11800851027227563,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_02.pt",
+  "lead1_loss_clipped": 0.028864642215575623,
+  "lead1_rmse_enkf": 0.11694717357970222,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_03.pt",
+  "lead1_loss_clipped": 0.028442107235692498,
+  "lead1_rmse_enkf": 0.11624804910902113,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_04.pt",
+  "lead1_loss_clipped": 0.02823028662466616,
+  "lead1_rmse_enkf": 0.11540213917906297,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_05.pt",
+  "lead1_loss_clipped": 0.027974146611351947,
+  "lead1_rmse_enkf": 0.11594834732361137,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_06.pt",
+  "lead1_loss_clipped": 0.027860518079686574,
+  "lead1_rmse_enkf": 0.11534396955706544,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_07.pt",
+  "lead1_loss_clipped": 0.027727735599326866,
+  "lead1_rmse_enkf": 0.11579757621945694,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_08.pt",
+  "lead1_loss_clipped": 0.027646242951215462,
+  "lead1_rmse_enkf": 0.11436722188918766,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_09.pt",
+  "lead1_loss_clipped": 0.0275083254013004,
+  "lead1_rmse_enkf": 0.1152196538824687,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_10.pt",
+  "lead1_loss_clipped": 0.027790024136444942,
+  "lead1_rmse_enkf": 0.11608828928333496,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_11.pt",
+  "lead1_loss_clipped": 0.027336957560436803,
+  "lead1_rmse_enkf": 0.11605443052812829,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_12.pt",
+  "lead1_loss_clipped": 0.027264491790539313,
+  "lead1_rmse_enkf": 0.11526485807343777,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_13.pt",
+  "lead1_loss_clipped": 0.02724180398510871,
+  "lead1_rmse_enkf": 0.11465918758445182,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_14.pt",
+  "lead1_loss_clipped": 0.027313422633913568,
+  "lead1_rmse_enkf": 0.11530754895571468,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_15.pt",
+  "lead1_loss_clipped": 0.027155335069015036,
+  "lead1_rmse_enkf": 0.1148123721104735,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_16.pt",
+  "lead1_loss_clipped": 0.027266826191815162,
+  "lead1_rmse_enkf": 0.11459578055956975,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_17.pt",
+  "lead1_loss_clipped": 0.027158692332157983,
+  "lead1_rmse_enkf": 0.11450595931607264,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_18.pt",
+  "lead1_loss_clipped": 0.02709379171966782,
+  "lead1_rmse_enkf": 0.1142079694366383,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_19.pt",
+  "lead1_loss_clipped": 0.027264851671233267,
+  "lead1_rmse_enkf": 0.11460950324525683,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_20.pt",
+  "lead1_loss_clipped": 0.02706839164864824,
+  "lead1_rmse_enkf": 0.11528492512537837,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_21.pt",
+  "lead1_loss_clipped": 0.026977348090954086,
+  "lead1_rmse_enkf": 0.11521815128882498,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_22.pt",
+  "lead1_loss_clipped": 0.027008034550819585,
+  "lead1_rmse_enkf": 0.11439652887814492,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_00.pt",
+  "lead1_loss_clipped": 0.027356720964385326,
+  "lead1_rmse_enkf": 0.11507542600346769,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_01.pt",
+  "lead1_loss_clipped": 0.027177527589770805,
+  "lead1_rmse_enkf": 0.11487456059990285,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_02.pt",
+  "lead1_loss_clipped": 0.027550443643194485,
+  "lead1_rmse_enkf": 0.11532444375379633,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_03.pt",
+  "lead1_loss_clipped": 0.02716787549415116,
+  "lead1_rmse_enkf": 0.11427699773343965,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_04.pt",
+  "lead1_loss_clipped": 0.027545299121901345,
+  "lead1_rmse_enkf": 0.11409693798159846,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_05.pt",
+  "lead1_loss_clipped": 0.03479527711730574,
+  "lead1_rmse_enkf": 0.11476106813478663,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_06.pt",
+  "lead1_loss_clipped": 0.04776797296863756,
+  "lead1_rmse_enkf": 0.11386967233444921,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_07.pt",
+  "lead1_loss_clipped": 0.050829680833781546,
+  "lead1_rmse_enkf": 0.11531480078578088,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_08.pt",
+  "lead1_loss_clipped": 0.027031620865967495,
+  "lead1_rmse_enkf": 0.11316014893594309,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_09.pt",
+  "lead1_loss_clipped": 0.026907497525043428,
+  "lead1_rmse_enkf": 0.11456775229965192,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_10.pt",
+  "lead1_loss_clipped": 0.027034042547876457,
+  "lead1_rmse_enkf": 0.11466605508245689,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_11.pt",
+  "lead1_loss_clipped": 0.026827549840154927,
+  "lead1_rmse_enkf": 0.11519511938275752,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_12.pt",
+  "lead1_loss_clipped": 0.02649915846341638,
+  "lead1_rmse_enkf": 0.11371779471050092,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_13.pt",
+  "lead1_loss_clipped": 0.026479524745485695,
+  "lead1_rmse_enkf": 0.11324671467363265,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_14.pt",
+  "lead1_loss_clipped": 0.026504144155162106,
+  "lead1_rmse_enkf": 0.1136011189078575,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_15.pt",
+  "lead1_loss_clipped": 0.026498007025974907,
+  "lead1_rmse_enkf": 0.11336816369823133,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_16.pt",
+  "lead1_loss_clipped": 0.02647015721331771,
+  "lead1_rmse_enkf": 0.11328093788027487,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_17.pt",
+  "lead1_loss_clipped": 0.02652460075001252,
+  "lead1_rmse_enkf": 0.11375414642000867,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_18.pt",
+  "lead1_loss_clipped": 0.026475720844871046,
+  "lead1_rmse_enkf": 0.11328600380846629,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_19.pt",
+  "lead1_loss_clipped": 0.026432103362501135,
+  "lead1_rmse_enkf": 0.11339846158510095,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_20.pt",
+  "lead1_loss_clipped": 0.026476348843074485,
+  "lead1_rmse_enkf": 0.11398634079622148,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_21.pt",
+  "lead1_loss_clipped": 0.026474189776762795,
+  "lead1_rmse_enkf": 0.1144752340319483,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_22.pt",
+  "lead1_loss_clipped": 0.02643739425608315,
+  "lead1_rmse_enkf": 0.11368594381360361,
+  "nonfinite_samples": 0
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_23.pt",
+  "lead1_loss_clipped": 0.026272272570974902,
+  "lead1_rmse_enkf": 0.11309899258803961,
+  "nonfinite_samples": 0
+ }
+]

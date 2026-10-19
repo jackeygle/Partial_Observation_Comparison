@@ -1,0 +1,29 @@
+{
+ "scores": {
+  "80": 0.030652227634376455,
+  "90": 0.03073068483821673,
+  "100": 0.030760741395920537
+ },
+ "gap_mask": true,
+ "days": [
+  "atc-20130612_corridor_1.0s.h5",
+  "atc-20130616_corridor_1.0s.h5",
+  "atc-20130619_corridor_1.0s.h5",
+  "atc-20130623_corridor_1.0s.h5",
+  "atc-20130626_corridor_1.0s.h5",
+  "atc-20130630_corridor_1.0s.h5",
+  "atc-20130703_corridor_1.0s.h5",
+  "atc-20130707_corridor_1.0s.h5",
+  "atc-20130710_corridor_1.0s.h5",
+  "atc-20130714_corridor_1.0s.h5",
+  "atc-20130717_corridor_1.0s.h5",
+  "atc-20130721_corridor_1.0s.h5",
+  "atc-20130724_corridor_1.0s.h5",
+  "atc-20130728_corridor_1.0s.h5"
+ ],
+ "min_epoch": 80,
+ "patience": 20,
+ "best_epoch": 80,
+ "newest_epoch": 100,
+ "stop": true
+}

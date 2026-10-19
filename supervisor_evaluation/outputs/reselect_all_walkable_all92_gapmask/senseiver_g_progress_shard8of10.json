@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "epoch": 8,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_008.pt",
+      "sha256": "1b36a435ddd420394ccc6a318369d64f5770ba41e65801c36eb4a596df187375",
+      "mse": 0.014890651885333273,
+      "rmse": 0.12202725877988603
+    },
+    {
+      "epoch": 18,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_018.pt",
+      "sha256": "b8af5955f6ef0dff2f52971696e9acc675f63b741d420d5ab86e442303e3e1d6",
+      "mse": 0.014373396018526694,
+      "rmse": 0.1198890988310726
+    },
+    {
+      "epoch": 28,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_028.pt",
+      "sha256": "c787e5f6f596a4b55fea68f64ff88a8a8fb7e52bd65e45217ec2ac8570552651",
+      "mse": 0.01422704523842069,
+      "rmse": 0.11927717819608531
+    },
+    {
+      "epoch": 38,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_038.pt",
+      "sha256": "aa47a82d37b4f6b5f7d2abf43abdaed57b6c15c155a0307f5d8ea22fc2c18cb4",
+      "mse": 0.014177404952855613,
+      "rmse": 0.11906890842220573
+    },
+    {
+      "epoch": 48,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_048.pt",
+      "sha256": "f2d2a79e74df0c2d042c6a496758dd4cee123f09393d4cb6e184d6596c806f4f",
+      "mse": 0.014177266697112216,
+      "rmse": 0.11906832785049186
+    },
+    {
+      "epoch": 58,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_058.pt",
+      "sha256": "0a1d4418be454217810cfb1063574ad2d25324a58c9ce917bdf8d4602eacdfb0",
+      "mse": 0.014085492370805062,
+      "rmse": 0.11868231700975955
+    }
+  ]
+}

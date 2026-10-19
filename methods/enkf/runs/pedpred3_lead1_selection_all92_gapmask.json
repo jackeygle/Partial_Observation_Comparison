@@ -1,0 +1,378 @@
+[
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_00.pt",
+  "lead1_loss_clipped": 0.030886161547097224,
+  "lead1_rmse_enkf": 0.11948354321199686,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_01.pt",
+  "lead1_loss_clipped": 0.029246635543974588,
+  "lead1_rmse_enkf": 0.11773261108825238,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_02.pt",
+  "lead1_loss_clipped": 0.028789711104441763,
+  "lead1_rmse_enkf": 0.11669816509161832,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_03.pt",
+  "lead1_loss_clipped": 0.028332125176193636,
+  "lead1_rmse_enkf": 0.11596295198088707,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_04.pt",
+  "lead1_loss_clipped": 0.028164768075737538,
+  "lead1_rmse_enkf": 0.11515307933138018,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_05.pt",
+  "lead1_loss_clipped": 0.0278903728463425,
+  "lead1_rmse_enkf": 0.11566081373400726,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_06.pt",
+  "lead1_loss_clipped": 0.027773783562156727,
+  "lead1_rmse_enkf": 0.11507212223040303,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_07.pt",
+  "lead1_loss_clipped": 0.027668019347317,
+  "lead1_rmse_enkf": 0.11551561093107103,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_08.pt",
+  "lead1_loss_clipped": 0.027542468437716208,
+  "lead1_rmse_enkf": 0.11407398413830423,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_09.pt",
+  "lead1_loss_clipped": 0.027407177296678985,
+  "lead1_rmse_enkf": 0.11493567682534696,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_10.pt",
+  "lead1_loss_clipped": 0.027715977107241118,
+  "lead1_rmse_enkf": 0.11576627604057793,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_11.pt",
+  "lead1_loss_clipped": 0.027248803038974947,
+  "lead1_rmse_enkf": 0.11574021819019888,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_12.pt",
+  "lead1_loss_clipped": 0.027220129180799284,
+  "lead1_rmse_enkf": 0.11500643848101082,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_13.pt",
+  "lead1_loss_clipped": 0.02715703997567373,
+  "lead1_rmse_enkf": 0.11437682763333015,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_14.pt",
+  "lead1_loss_clipped": 0.027203470949451337,
+  "lead1_rmse_enkf": 0.11505757842143803,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_15.pt",
+  "lead1_loss_clipped": 0.02705458745850355,
+  "lead1_rmse_enkf": 0.11453101283122334,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_16.pt",
+  "lead1_loss_clipped": 0.027167921459850183,
+  "lead1_rmse_enkf": 0.11426113888560335,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_17.pt",
+  "lead1_loss_clipped": 0.027080700550807725,
+  "lead1_rmse_enkf": 0.11421501163721072,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_18.pt",
+  "lead1_loss_clipped": 0.027011448446613948,
+  "lead1_rmse_enkf": 0.11393355646416557,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_19.pt",
+  "lead1_loss_clipped": 0.02715051772458254,
+  "lead1_rmse_enkf": 0.11433620107404725,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_20.pt",
+  "lead1_loss_clipped": 0.026981162052149944,
+  "lead1_rmse_enkf": 0.11499625948807808,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_21.pt",
+  "lead1_loss_clipped": 0.0268445363914141,
+  "lead1_rmse_enkf": 0.11493137008365398,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_s0_all92/epoch_22.pt",
+  "lead1_loss_clipped": 0.02689036382763714,
+  "lead1_rmse_enkf": 0.11410727962316766,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_00.pt",
+  "lead1_loss_clipped": 0.027214786781365727,
+  "lead1_rmse_enkf": 0.11476901102210522,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_01.pt",
+  "lead1_loss_clipped": 0.02704719753786559,
+  "lead1_rmse_enkf": 0.11456820149523315,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_02.pt",
+  "lead1_loss_clipped": 0.027432634368142587,
+  "lead1_rmse_enkf": 0.11505690124921397,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_03.pt",
+  "lead1_loss_clipped": 0.02684987281814226,
+  "lead1_rmse_enkf": 0.11394143919669932,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_04.pt",
+  "lead1_loss_clipped": 0.02686919772358831,
+  "lead1_rmse_enkf": 0.11384996693470445,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_05.pt",
+  "lead1_loss_clipped": 0.026837928267327924,
+  "lead1_rmse_enkf": 0.11445586733480681,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_06.pt",
+  "lead1_loss_clipped": 0.02679440394715999,
+  "lead1_rmse_enkf": 0.11359237129447547,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_07.pt",
+  "lead1_loss_clipped": 0.026894066149407675,
+  "lead1_rmse_enkf": 0.11501224081563084,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_08.pt",
+  "lead1_loss_clipped": 0.026820079925675772,
+  "lead1_rmse_enkf": 0.11286647580258419,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_09.pt",
+  "lead1_loss_clipped": 0.026726726065252015,
+  "lead1_rmse_enkf": 0.11427189703244081,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_10.pt",
+  "lead1_loss_clipped": 0.026887531412675438,
+  "lead1_rmse_enkf": 0.11434521532188531,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_11.pt",
+  "lead1_loss_clipped": 0.026627040864260744,
+  "lead1_rmse_enkf": 0.11490147404390665,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_12.pt",
+  "lead1_loss_clipped": 0.02637636809096529,
+  "lead1_rmse_enkf": 0.11345474857056324,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_13.pt",
+  "lead1_loss_clipped": 0.026320604680195273,
+  "lead1_rmse_enkf": 0.11299307279334912,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_14.pt",
+  "lead1_loss_clipped": 0.0263048024601896,
+  "lead1_rmse_enkf": 0.11333043403748332,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_15.pt",
+  "lead1_loss_clipped": 0.026319524357779938,
+  "lead1_rmse_enkf": 0.11309799430088024,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_16.pt",
+  "lead1_loss_clipped": 0.026299794069285797,
+  "lead1_rmse_enkf": 0.11296543480127529,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_17.pt",
+  "lead1_loss_clipped": 0.02635508984812027,
+  "lead1_rmse_enkf": 0.11346542249372646,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_18.pt",
+  "lead1_loss_clipped": 0.02630740211892982,
+  "lead1_rmse_enkf": 0.11302330698058738,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_19.pt",
+  "lead1_loss_clipped": 0.02627807113992032,
+  "lead1_rmse_enkf": 0.1130968189085777,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_20.pt",
+  "lead1_loss_clipped": 0.02631959683395269,
+  "lead1_rmse_enkf": 0.11373320658221048,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_21.pt",
+  "lead1_loss_clipped": 0.026315345461555607,
+  "lead1_rmse_enkf": 0.11418185107868213,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_22.pt",
+  "lead1_loss_clipped": 0.026255749611384927,
+  "lead1_rmse_enkf": 0.11339618018129113,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ },
+ {
+  "ckpt": "runs/pedpred3_5to5_clip_s0_all92/epoch_23.pt",
+  "lead1_loss_clipped": 0.02608107512016444,
+  "lead1_rmse_enkf": 0.11281832796865876,
+  "nonfinite_samples": 0,
+  "scored_pairs": 520284,
+  "gap_mask": true
+ }
+]

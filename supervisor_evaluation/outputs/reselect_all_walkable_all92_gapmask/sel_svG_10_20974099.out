@@ -1,0 +1,18 @@
+[frames] gap mask ON (aligned 200-frame blocks with an unreliable frame + the next block; flags /scratch/work/zhangx29/data_all92/frame_reliability)
+[verify] 185863c05252: shared-token score == cached score [645812.4797645522, 44872280]
+[verify] 4220905edd72: shared-token score == cached score [499614.31446961424, 44872280]
+[valid] 6 senseiver checkpoints scored on atc-20130612_corridor_1.0s.h5
+[valid] 4 senseiver checkpoints scored on atc-20130616_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130619_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130623_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130626_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130630_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130703_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130707_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130710_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130714_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130717_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130721_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130724_corridor_1.0s.h5
+[valid] 5 senseiver checkpoints scored on atc-20130728_corridor_1.0s.h5
+[shard 0/10] done; 6/60 scored so far

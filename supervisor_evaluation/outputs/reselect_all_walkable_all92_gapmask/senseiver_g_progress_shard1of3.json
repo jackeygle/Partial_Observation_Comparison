@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "epoch": 1,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_001.pt",
+      "sha256": "54e09b33664ea0669e5e9108272bd700b3357991d6bf93439fb73b9fc1b18503",
+      "mse": 0.01654750027008228,
+      "rmse": 0.12863708745957472
+    },
+    {
+      "epoch": 4,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_004.pt",
+      "sha256": "b51832e0505a5ceb7ee40cc0f17a931880113710f5300c1888141a4b955cd579",
+      "mse": 0.01536532423271612,
+      "rmse": 0.12395694507657133
+    },
+    {
+      "epoch": 7,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_007.pt",
+      "sha256": "cab22b6e63259a1f5d3cd9a36febf4a3ea63a6b3f4213970e1b6c61efaefd9c9",
+      "mse": 0.014866238390136916,
+      "rmse": 0.1219271847872201
+    }
+  ]
+}

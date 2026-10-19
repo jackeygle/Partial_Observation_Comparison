@@ -1,0 +1,29 @@
+[frames] gap mask ON (aligned 200-frame blocks with an unreliable frame + the next block; flags /scratch/work/zhangx29/data_all92/frame_reliability)
+[valid] senseiver_g epoch 0: atc-20130612_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130616_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130619_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130623_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130626_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130630_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130703_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130707_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130710_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130714_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130717_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130721_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130724_corridor_1.0s.h5
+[valid] senseiver_g epoch 0: atc-20130728_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130612_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130616_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130619_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130623_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130626_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130630_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130703_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130707_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130710_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130714_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130717_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130721_corridor_1.0s.h5
+[valid] senseiver_g epoch 3: atc-20130724_corridor_1.0s.h5
+[2026-10-15T14:58:12.352] error: *** JOB 20973510 ON dgx26 CANCELLED AT 2026-10-15T14:58:12 DUE to SIGNAL Terminated ***

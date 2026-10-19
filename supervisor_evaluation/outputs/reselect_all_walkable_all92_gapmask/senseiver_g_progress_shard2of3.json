@@ -1,0 +1,18 @@
+{
+  "candidates": [
+    {
+      "epoch": 2,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_002.pt",
+      "sha256": "6b51d7e4bc1d1d9a6e5b71ab2d2e676f40b1c340c2ef6ef1ee9b4f73f9d566a3",
+      "mse": 0.015849257771957056,
+      "rmse": 0.12589383532150036
+    },
+    {
+      "epoch": 5,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_005.pt",
+      "sha256": "c2449cb93f36c6a91363353f6f47677556e84d545682d891660a2d6f64ce7a62",
+      "mse": 0.015053908242923304,
+      "rmse": 0.12269436923886648
+    }
+  ]
+}

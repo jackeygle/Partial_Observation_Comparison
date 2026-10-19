@@ -1,0 +1,11 @@
+{
+  "candidates": [
+    {
+      "epoch": 0,
+      "checkpoint": "/scratch/work/zhangx29/Thesis_Project/methods/senseiver/runs/sv_G_k16_pd_all92/epoch_000.pt",
+      "sha256": "185863c052524ab40b42b02c508e5918261c4a6f41eea409b3e415865d3b8870",
+      "mse": 0.018682474262692948,
+      "rmse": 0.136683847848577
+    }
+  ]
+}
