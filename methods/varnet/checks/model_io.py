@@ -125,7 +125,9 @@ def load_solver(ckpt_path, device="cpu", strict=True, n_iter=None):
                         var_head=_VAR_HEAD(sd),
                         # not visible in the weights: forgetting it would silently evaluate
                         # an obs-NLL model with the plain observation term
-                        obs_nll=a.get("obs_nll", False)).to(device)
+                        obs_nll=a.get("obs_nll", False),
+                        # checkpoints before 2026-10-10 carry no normg_scope: batch-wide
+                        normg_scope=a.get("normg_scope", "batch")).to(device)
     solver.load_state_dict(sd, strict=strict)
     solver.eval()
     return solver, a, ck

@@ -64,6 +64,7 @@ import torch
 # be inserted at the front (so this directory's losses.py takes priority),
 # 4dvarnet_enkf can only be appended (it also has a losses.py, and inserting it
 # at the front would shadow this directory's).
+from crowdcore import frame_reliability as fr                                     # noqa: E402
 from crowdcore import observation_model as om                                    # noqa: E402
 from crowdcore import paths as repo_paths   # aliased: `paths` is a local variable below
 
@@ -119,6 +120,10 @@ def load_models(run_dir, ckpt_glob, dev, allow_average=False):
     for p in paths:
         st = torch.load(repo_paths.require_ckpt(p, "DINCAE checkpoint"), map_location=dev)
         a = st["args"]
+        from methods.dincae.state import VAR_TRANSFORM
+        if a.get("var_transform", "log1p") != VAR_TRANSFORM:
+            raise SystemExit(f"{p} was trained with var_transform={a.get('var_transform', 'log1p')!r}; "
+                             f"set DINCAE_VAR_TRANSFORM to match (now {VAR_TRANSFORM!r})")
         m = DINCAE(N_IN, NCH, enc_internal=tuple(a["enc"]),
                    loss_weights=tuple(a["loss_weights"]), pool=a["pool"]).to(dev)
         m.load_state_dict(st["model"]); m.eval()
@@ -349,6 +354,11 @@ def main():
         timing_start = len(inference_timing)
         Xt, rec, mu_n, sd_n, M = predict_day(models, stats, fp, dev, args.frames, args.batch,
                                               timing=inference_timing)
+        # rows are frames lo..lo+len-1; leave out the tracker-gap blocks (all kept if the mask is off)
+        lo_f, hi_f = -min(FRESH_OFFSETS), max(FRESH_OFFSETS)
+        keep = fr.scorable_frames(fp, len(Xt) + lo_f + hi_f)[lo_f:lo_f + len(Xt)]
+        if not keep.all():
+            Xt, rec, mu_n, sd_n, M = (x[keep] for x in (Xt, rec, mu_n, sd_n, M))
         # this day's ours_blind MSE (recorded per day, to see stability)
         cv = channel_valid(Xt); walk = stats.valid[None]
         day_mse = {}

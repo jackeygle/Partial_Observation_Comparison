@@ -232,8 +232,21 @@ class GradSolver(nn.Module):
 
     def __init__(self, phi, n_channels=4, dT=7, n_iter=15, hidden_ch=64, dropout=0.0,
                  var_eps=1e-6,
-                 augmented_var=False, obs_nll=False, var_head=False):
+                 augmented_var=False, obs_nll=False, var_head=False, normg_scope="batch"):
         super().__init__()
+        if normg_scope not in ("batch", "window"):
+            raise ValueError(f"normg_scope must be 'batch' or 'window', got {normg_scope!r}")
+        # How the first cost gradient is scaled before it enters the ConvLSTM (alpha in Eq. 11
+        # of Fablet et al., a scalar). "batch": one RMS over the whole batch tensor plus 1e-12,
+        # the behaviour every checkpoint before 2026-10-10 was trained with. The cost is a mean
+        # over the batch, so each window's gradient carries a factor 1/B, and at the gradient
+        # sizes of this problem (RMS^2 ~1e-11 for one window, ~1e-13 at B=16) the 1e-12 does not
+        # cancel it: the solver's input depends on the batch size (blind RMSE 0.237 at B=16,
+        # 0.293 at B=1 for the same weights). 4dvarnet-core adds 0, so there the 1/B cancels.
+        # "window": each window's gradient is multiplied by B (the gradient of its own mean
+        # cost) and divided by its own RMS, with a 1e-30 guard that never dominates. Each
+        # window is then solved exactly as if it were alone, whatever the batch size.
+        self.normg_scope = normg_scope
         if obs_nll and not augmented_var:
             raise ValueError("obs_nll needs augmented_var: the observation NLL uses the iterated "
                              "log sigma^2, which only the augmented solver has")
@@ -282,6 +295,11 @@ class GradSolver(nn.Module):
         gx, gs = torch.autograd.grad(J, (x, s_logvar), create_graph=self.training)
         return J, gx, gs
 
+    def _normg(self, g):
+        if self.normg_scope == "window":                       # one RMS per window
+            return torch.sqrt((g ** 2).mean(dim=tuple(range(1, g.dim())), keepdim=True) + 1e-30)
+        return torch.sqrt((g ** 2).mean() + 1e-12)              # one RMS for the whole batch
+
     def solve(self, x0, y, mask, return_var=False):
         """Iterate n_iter times from x0 and return the reconstruction.
 
@@ -306,13 +324,15 @@ class GradSolver(nn.Module):
             for _ in range(self.n_iter):
                 J, gx, gs = self._cost_and_grad(x, y, mask, s_lv)
                 g = torch.cat([gx, gs], dim=1)                   # (B, 2C, T, H, W)
+                if self.normg_scope == "window":
+                    g = g * B
                 if normg is None:
-                    normg = torch.sqrt((g ** 2).mean() + 1e-12)
+                    normg = self._normg(g)
                 upd_2d, state, h_last = self.grad_net(
                     (g / normg).reshape(B, 2 * C * T, H, W), state)
                 if self.var_head:
-                    # x enters the variance head DETACHED: mu and sigma^2 are siblings off a
-                    # shared representation, never one feeding the other.
+                    # The head uses x as a feature; detach blocks only its direct gradient
+                    # path back through that feature. The shared solver and cost still couple x/s.
                     upd_s_2d = self.grad_net.out_var(
                         torch.cat([h_last, x.reshape(B, C * T, H, W).detach()], dim=1))
                     x = x - upd_2d.reshape(B, C, T, H, W) / self.n_iter
@@ -333,8 +353,10 @@ class GradSolver(nn.Module):
             # Subsequent x is non-leaf (x - upd), already in the graph and requires
             # grad automatically — no need to toggle again
             J, grad, _ = self._cost_and_grad(x, y, mask)
+            if self.normg_scope == "window":
+                grad = grad * B              # gradient of each window's own mean cost
             if normg is None:                # reference: normgrad_ = sqrt(mean(grad**2)) at step 0
-                normg = torch.sqrt((grad ** 2).mean() + 1e-12)
+                normg = self._normg(grad)
             grad_2d = (grad / normg).reshape(B, C * T, H, W)
             upd_2d, state, h_last = self.grad_net(grad_2d, state)
             upd = upd_2d.reshape(B, C, T, H, W) / self.n_iter   # reference: grad *= 1/n_grad

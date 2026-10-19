@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from compare import plotstyle as ps
-from thesis_figures.common import FS, FS_SMALL, GREY, method_color
+from thesis_figures.common import RESULTS, AUG_LABELS, FIVE_METHODS, OUT_DIR, FS, FS_SMALL, GREY, method_color
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -33,10 +33,11 @@ MARK = {"Senseiver-A": "o", "Senseiver-G": "s", "DINCAE": "^", "4DVarNet": "D",
 
 def main() -> None:
     src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
-        ROOT, "supervisor_evaluation/outputs/full/breakdown")
+        ROOT, RESULTS, "breakdown")
     S = json.load(open(os.path.join(src, "summary.json")))
     F = np.load(os.path.join(src, "per_frame.npz"))
     methods = S["methods"]
+    shown = [(i, m) for i, m in enumerate(methods) if not (FIVE_METHODS and m in AUG_LABELS)]
     ps.use(dpi=300)
     plt.rcParams.update({"font.size": FS, "axes.labelsize": FS, "axes.titlesize": FS,
                          "xtick.labelsize": FS_SMALL, "ytick.labelsize": FS_SMALL,
@@ -56,7 +57,7 @@ def main() -> None:
     a2.bar(x, share, 0.62, color="#e3e3e3", zorder=0)
     a2.set_ylim(0, 1.0); a2.set_yticks([]); a2.spines[:].set_visible(False)
     a.set_zorder(a2.get_zorder() + 1); a.patch.set_visible(False)
-    for m in methods:
+    for _, m in shown:
         a.plot(x, S["age_rmse"][m][:-1], marker=MARK[m], color=method_color(LABEL[m]), **kw)
     for xi, s_ in zip(x, share):
         a2.text(xi, s_ + 0.015, f"{100 * s_:.0f}%", ha="center", va="bottom", fontsize=FS_SMALL - 1.5,
@@ -72,7 +73,7 @@ def main() -> None:
     edges = np.quantile(people, np.linspace(0, 1, 6))
     grp = np.clip(np.searchsorted(edges, people, side="right") - 1, 0, 4)
     xs = [float(np.mean(people[grp == g])) for g in range(5)]
-    for i, m in enumerate(methods):
+    for i, m in shown:
         se = F[f"se_{i}"]
         y = [np.sqrt(se[grp == g].sum() / (4 * nb[grp == g].sum())) for g in range(5)]
         b.plot(xs, y, marker=MARK[m], color=method_color(LABEL[m]), **kw)
@@ -83,19 +84,25 @@ def main() -> None:
     # (c) per test day ----------------------------------------------------------------------
     days = sorted(set(F["day"].tolist()))
     xd = np.arange(len(days))
-    for i, m in enumerate(methods):
+    for i, m in shown:
         se = F[f"se_{i}"]
         y = [np.sqrt(se[F["day"] == d].sum() / (4 * nb[F["day"] == d].sum())) for d in days]
         c.plot(xd, y, marker=MARK[m], color=method_color(LABEL[m]), label=LABEL[m], **kw)
     mon = {"08": "Aug", "09": "Sep"}
-    c.set_xticks(xd, [f"{int(d[10:12])}\n{mon[d[8:10]]}" for d in days])
+    if len(days) > 8:          # many days: the month only under the first day of each month
+        ticks = [f"{int(d[10:12])}" + (f"\n{mon[d[8:10]]}" if k == 0 or d[8:10] != days[k - 1][8:10] else "")
+                 for k, d in enumerate(days)]
+    else:
+        ticks = [f"{int(d[10:12])}\n{mon[d[8:10]]}" for d in days]
+    c.set_xticks(xd, ticks)
     c.set_xlabel("test day (2013)")
     c.set_title("(c) by test day", loc="left")
     c.set_ylim(0, None)
 
-    fig.legend(*c.get_legend_handles_labels(), loc="outside upper center", ncol=6,
+    fig.legend(*c.get_legend_handles_labels(), loc="outside upper center", ncol=len(shown),
                handlelength=1.6, columnspacing=1.0, handletextpad=0.4)
-    out = os.path.join(HERE, "out", "breakdown")
+    out = os.path.join(HERE, OUT_DIR, "breakdown")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     fig.savefig(out + ".pdf"); fig.savefig(out + ".png")
     print(f"[figure] {out}.pdf", flush=True)
 

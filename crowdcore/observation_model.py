@@ -152,6 +152,8 @@ def split_files(split="train", suffix="_corridor_1.0s.h5"):
             gc = os.path.join(GRID_CACHE, stem + suffix)
             if os.path.exists(gc):
                 paths.append(gc)
+            elif config.DATA_VARIANT:          # route 2: a missing day is an error, not a skip
+                raise FileNotFoundError(f"{lst} lists {stem}, but {gc} does not exist")
     return paths
 
 

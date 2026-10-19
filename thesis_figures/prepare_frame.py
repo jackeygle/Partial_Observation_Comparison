@@ -15,13 +15,14 @@ import numpy as np
 
 DAY, FRAME = "atc-20130811", 32778
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SEL = os.path.join(ROOT, "supervisor_evaluation/outputs/full/images/selected_predictions.npz")
-OUT = os.path.join(ROOT, "thesis_figures/data/example_frame.npz")
+from thesis_figures.common import DATA_ROOT, FRAME_FILE, RESULTS  # noqa: E402
+SEL = os.path.join(ROOT, RESULTS, "images/selected_predictions.npz")
+OUT = os.path.join(ROOT, "thesis_figures/data", FRAME_FILE)
 
 
 def main() -> None:
     from crowdcore import config
-    config.CFG["data"]["root"] = "/scratch/work/zhangx29/data"
+    config.CFG["data"]["root"] = DATA_ROOT
     from crowdcore import navigation, observation_model as om
     from methods.senseiver import dataset as senseiver_ds
 

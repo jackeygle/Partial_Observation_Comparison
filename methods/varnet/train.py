@@ -214,6 +214,12 @@ def main():
                     help="robot routes per training day: per_day = data seed + the day's date, fixed = "
                          "the same routes every day (all runs before 2026-09-17). Default: config "
                          "observation.trajectory_mode")
+    ap.add_argument("--normg-scope", choices=("batch", "window"), default="batch",
+                    help="scaling of the first cost gradient before the ConvLSTM: 'batch' = one "
+                         "RMS over the batch tensor (+1e-12), the behaviour of every earlier run, "
+                         "which makes a window's reconstruction depend on the batch size; "
+                         "'window' = each window's own-cost gradient over its own RMS, so every "
+                         "window is solved as if alone. See GradSolver.")
     ap.add_argument("--fold-axes", choices=("ct", "legacy"), default="ct",
                     help="how the coarse branch of the GENN prior folds the time axis into "
                          "the batch axis before its 2-D pooling and transposed convolution. "
@@ -301,6 +307,11 @@ def main():
                 f"ABORT: {_last} was trained with fold_axes={_pf!r} but this run would use "
                 f"{args.fold_axes!r}. The weights would load but the coarse branch would mix a "
                 f"different axis. Pass --fold-axes {_pf} to continue it, or use a new --outdir.")
+        _pn = torch.load(_last, map_location="cpu").get("args", {}).get("normg_scope", "batch")
+        if _pn != args.normg_scope:
+            raise SystemExit(
+                f"ABORT: {_last} was trained with normg_scope={_pn!r} but this run would use "
+                f"{args.normg_scope!r}. Pass --normg-scope {_pn} to continue it, or use a new --outdir.")
     torch.manual_seed(init_seed)                            # weights only
 
     # ---- data ----
@@ -333,7 +344,8 @@ def main():
                         var_eps=args.var_eps,
                         augmented_var=args.augmented_var,
                         obs_nll=args.obs_nll,
-                        var_head=args.var_head).to(dev)
+                        var_head=args.var_head,
+                        normg_scope=args.normg_scope).to(dev)
     params = list(solver.parameters())
     opt = torch.optim.Adam(params, lr=args.lr)
     n_param = sum(p.numel() for p in solver.parameters())

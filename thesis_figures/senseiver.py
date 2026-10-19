@@ -19,7 +19,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS, FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
+from thesis_figures.common import (FRAME_FILE, FS, FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
                                    grid_icon, method_color, save, text, thumbnail, token_icon)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +27,7 @@ OUT_CELL = 0.05
 
 
 def main() -> None:
-    d = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    d = np.load(os.path.join(HERE, "data", FRAME_FILE))
     names = list(d["method_names"])
     walk = d["walkable"]
     vmax = float(np.percentile(d["truth"][0][walk], 99))

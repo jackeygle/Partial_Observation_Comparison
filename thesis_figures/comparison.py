@@ -18,15 +18,18 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS, FS_SMALL, GREY, LINE, canvas, field_rgb, method_color,
-                                   nice_top, save, sub_axes, text, thumbnail)
+from thesis_figures.common import (RESULTS, AUG_LABELS, FIVE_METHODS, FS, FS_SMALL, GREY, LINE, canvas,
+                                   field_rgb, method_color, nice_top, save, sub_axes, text,
+                                   thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SEL = os.path.join(ROOT, "supervisor_evaluation/outputs/full/images/selected_predictions.npz")
+SEL = os.path.join(ROOT, RESULTS, "images/selected_predictions.npz")
 ORDER = [("Senseiver-A", "Senseiver-A"), ("Senseiver-G", "Senseiver-G (ours)"),
          ("DINCAE", "DINCAE"), ("4DVarNet MSE", "4DVarNet"),
          ("4DVarNet aughead_obs (single)", "4DVarNet aug. var. (ours)"), ("EnKF", "EnKF")]
+if FIVE_METHODS:
+    ORDER = [o for o in ORDER if o[1] not in AUG_LABELS]
 SEEN = "#a9c9ee"                                                 # as in the observation figure
 FRAMES = [("atc-20130811", 32778), ("atc-20130811", 13551)]      # a busy and a quieter frame
 CELL = 0.1
@@ -86,7 +89,7 @@ def draw(day: str, frame: int) -> None:
          "(white in the mask). Test-set results over all frames are in the accuracy table.",
          FS_SMALL - 0.5, color=GREY, va="bottom", linespacing=1.3)
     # colour bars at the right
-    cb_x = col_x(8) - gap + 0.25
+    cb_x = col_x(len(ORDER) + 2) - gap + 0.25
     for (y, cmap, vm, lab) in ((ytop, ps.CMAP["density"], vmax, r"people/m$^2$"),
                                (ybot, ps.CMAP["abs_error"], emax, r"people/m$^2$")):
         cax = sub_axes(fig, *page, cb_x, y, 0.12, 36 * CELL)

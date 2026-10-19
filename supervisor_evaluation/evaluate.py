@@ -37,6 +37,7 @@ TEST_DATES = (
     "20130811", "20130818", "20130825", "20130901",
     "20130915", "20130922", "20130929",
 )
+TEST_LIST = "sunday_atc_test.lst"          # the split list TEST_DATES must equal
 
 # No experiment choice is read from a second config file.  Keep this small and
 # explicit so a reviewer can audit the complete comparison at the top of the
@@ -68,17 +69,20 @@ FINAL_CONFIG: dict[str, dict[str, Any]] = {
     },
     "varnet_mse": {
         "label": "4DVarNet MSE",
-        "source": "methods/varnet/runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt",
-        "file": "varnet_mse_pd_s3_epoch80.pt",
+        "run_dir": "methods/varnet/runs/varnet_mse5_h96_pdfold_s3",
+        "selection": "select_valid.json",
+        "file": "varnet_mse_fold_s3.pt",
+        "required_fold_axes": "ct",
         "temporal_context": "200-frame window",
         "causal": False,
         "uncertainty": False,
     },
     "varnet_aughead": {
         "label": "4DVarNet aughead_obs (single)",
-        "run_dir": "methods/varnet/runs/varnet_aughead_obs_h96_s0",
+        "run_dir": "methods/varnet/runs/varnet_aughead_obs_h96_fold_s0",
         "selection": "select_valid.json",
-        "file": "varnet_aughead_obs_s0.pt",
+        "file": "varnet_aughead_fold_s0.pt",
+        "required_fold_axes": "ct",
         "temporal_context": "200-frame window",
         "causal": False,
         "uncertainty": True,
@@ -120,6 +124,116 @@ ACCURACY_METHODS = ("senseiver_a", "senseiver_g", "dincae", "varnet_mse",
                     "varnet_aughead", "enkf")
 UNCERTAINTY_METHODS = ("varnet_aughead", "dincae", "enkf")
 
+# EVAL_VARIANT=five_allwalk: the five-method thesis. Checkpoints selected on ALL walkable
+# validation cells (outputs/reselect_all_walkable_20261010), the aug. var. model removed, and
+# the 4DVarNet with per-window gradient normalisation and a 3x3x3 prior kernel. Its files sit
+# beside the original ones under models/ with their own manifest; unset, nothing changes.
+VARIANT = os.environ.get("EVAL_VARIANT", "")
+MANIFEST_NAME = "manifest.json"
+# DINCAE's normalisation statistics (packaged name, source) and its channel transforms.
+DINCAE_STATS = ("dincae_state_stats.npz", "methods/dincae/artifacts/state_stats.npz")
+DINCAE_TRANSFORMS = (None, None, None, "log1p")
+# EVAL_VARIANT=six_allwalk: the same five models plus the aug. var. 4DVarNet retrained on the
+# final 4DVarNet's solver (kt 3, per-window normalisation, seed 3), selected on all walkable
+# validation cells with checks/final_wink3.py (K=20 snapshots, training-monitor best and last).
+AUG_SELECTION = HERE / "outputs/dev/varnet_augwink3_200_20261012/selection.json"
+if VARIANT in ("five_allwalk", "six_allwalk"):
+    if VARIANT == "five_allwalk":
+        FINAL_CONFIG.pop("varnet_aughead")
+    else:
+        _sel = json.loads(AUG_SELECTION.read_text())["selected"]
+        _src = Path(_sel["checkpoint"]).resolve().relative_to(ROOT)
+        FINAL_CONFIG["varnet_aughead"] = {
+            **{k: v for k, v in FINAL_CONFIG["varnet_aughead"].items()
+               if k not in ("run_dir", "selection", "file")},
+            "source": str(_src),
+            "file": f"varnet_augwink3_allwalk_epoch{int(_sel['epoch']):03d}.pt",
+            "expected_sha256": _sel["sha256"],
+            "required_normg_scope": "window",
+        }
+    FINAL_CONFIG["senseiver_a"].update(
+        source="methods/senseiver/runs/senseiver_A_pd/epoch_096.pt",
+        file="senseiver_A_pd_allwalk_epoch096.pt")
+    # DINCAE without the log1p of the velocity variance: all four channels Gaussian, its own
+    # normalisation statistics; DINCAE_VAR_TRANSFORM must be `none` for the whole run.
+    if os.environ.setdefault("DINCAE_VAR_TRANSFORM", "none") != "none":
+        raise SystemExit(f"EVAL_VARIANT={VARIANT} needs DINCAE_VAR_TRANSFORM=none")
+    FINAL_CONFIG["dincae"].update(
+        source="methods/dincae/runs/dincae_ff_pd_varnone_all150/ckpt_00093.pt",
+        file="dincae_varnone_allwalk_epoch093.pt")
+    DINCAE_STATS = ("dincae_state_stats_none.npz", "methods/dincae/artifacts/state_stats_none.npz")
+    DINCAE_TRANSFORMS = (None, None, None, None)
+    FINAL_CONFIG["varnet_mse"] = {
+        "label": "4DVarNet MSE",
+        "source": "methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3/ckpt_00080.pt",
+        "file": "varnet_kt3_window_allwalk_epoch080.pt",
+        "required_fold_axes": "ct",
+        "required_normg_scope": "window",
+        "temporal_context": "200-frame window",
+        "causal": False,
+        "uncertainty": False,
+    }
+    if VARIANT == "five_allwalk":
+        ACCURACY_METHODS = tuple(k for k in ACCURACY_METHODS if k != "varnet_aughead")
+        UNCERTAINTY_METHODS = ("dincae", "enkf")
+    MANIFEST_NAME = f"manifest_{VARIANT}.json"
+elif VARIANT == "six_allwalk_all92":
+    # Route 2: the six methods retrained on all 92 ATC days (63/14/15, DATA_VARIANT=all92),
+    # each checkpoint read from its validation selection on all walkable cells with the
+    # tracker-gap blocks excluded (crowdcore/frame_reliability.py); same recipes, labels and
+    # EnKF configuration (E2) as six_allwalk. Packaged files carry _all92 and their own manifest.
+    if os.environ.get("DATA_VARIANT") != "all92":
+        raise SystemExit("EVAL_VARIANT=six_allwalk_all92 needs DATA_VARIANT=all92")
+    if os.environ.setdefault("DINCAE_VAR_TRANSFORM", "none") != "none":
+        raise SystemExit(f"EVAL_VARIANT={VARIANT} needs DINCAE_VAR_TRANSFORM=none")
+    _SEL = HERE / "outputs/reselect_all_walkable_all92_gapmask"
+    _DEV = HERE / "outputs/dev"
+
+    def _selected(path: Path, stem: str) -> dict[str, Any]:
+        sel = json.loads(path.read_text())["selected"]
+        src = Path(sel["checkpoint"]).resolve().relative_to(ROOT)
+        return {"source": str(src), "file": f"{stem}_epoch{int(sel['epoch']):03d}.pt",
+                "expected_sha256": sel["sha256"]}
+
+    FINAL_CONFIG["senseiver_a"].update(_selected(_SEL / "senseiver_a_selection.json",
+                                                 "senseiver_A_pd_all92"))
+    FINAL_CONFIG["senseiver_g"].update(_selected(_SEL / "senseiver_g_selection.json",
+                                                 "senseiver_G_k16_pd_all92"))
+    FINAL_CONFIG["dincae"].update(_selected(_SEL / "dincae_varnone_selection.json",
+                                            "dincae_varnone_all92"))
+    DINCAE_STATS = ("dincae_state_stats_none_all92.npz",
+                    "methods/dincae/artifacts/state_stats_none_all92.npz")
+    DINCAE_TRANSFORMS = (None, None, None, None)
+    FINAL_CONFIG["varnet_mse"] = {
+        "label": "4DVarNet MSE",
+        **_selected(_DEV / "varnet_wink3_all92_gapmask_20261015/selection.json", "varnet_kt3_window_all92"),
+        "required_fold_axes": "ct", "required_normg_scope": "window",
+        "temporal_context": "200-frame window", "causal": False, "uncertainty": False,
+    }
+    FINAL_CONFIG["varnet_aughead"] = {
+        **{k: v for k, v in FINAL_CONFIG["varnet_aughead"].items()
+           if k not in ("run_dir", "selection", "file")},
+        **_selected(_DEV / "varnet_augwink3_all92_gapmask_20261015/selection.json", "varnet_augwink3_all92"),
+        "required_normg_scope": "window",
+    }
+    # PedPred3: lowest lead-1 clipped validation loss on the scorable frames; the residual
+    # bank was built from it (its metadata hash is checked by `verify`).
+    _pp = json.loads((ROOT / "methods/enkf/runs/pedpred3_lead1_selection_all92_gapmask.json").read_text())
+    _pp = min((r for r in _pp if r["lead1_loss_clipped"] == r["lead1_loss_clipped"]),
+              key=lambda r: r["lead1_loss_clipped"])
+    FINAL_CONFIG["enkf"].update(
+        source=str(Path("methods/enkf") / _pp["ckpt"]),
+        file=f"pedpred3_5to5_all92_{Path(_pp['ckpt']).stem}.pt",
+        bank_source="methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192_all92.npz",
+        bank_file="enkf_residual_q_bank_all92.npz")
+    TEST_LIST = "atc_all_test.lst"
+    TEST_DATES = tuple(ln.strip().rsplit("atc-", 1)[-1].split(".")[0]
+                       for ln in Path("/scratch/work/zhangx29/data_all92", TEST_LIST).read_text().splitlines()
+                       if ln.strip())
+    MANIFEST_NAME = f"manifest_{VARIANT}.json"
+elif VARIANT:
+    raise SystemExit(f"unknown EVAL_VARIANT {VARIANT!r}")
+
 
 def sha256(path: Path, block: int = 8 << 20) -> str:
     h = hashlib.sha256()
@@ -129,28 +243,51 @@ def sha256(path: Path, block: int = 8 << 20) -> str:
     return h.hexdigest()
 
 
-def _aughead_source() -> Path:
-    cfg = FINAL_CONFIG["varnet_aughead"]
+def _selected_varnet_source(key: str) -> Path:
+    cfg = FINAL_CONFIG[key]
     run = ROOT / cfg["run_dir"]
     selection = run / cfg["selection"]
     if not selection.exists():
         raise FileNotFoundError(
-            f"{selection} is missing. Select aughead_obs on the validation split before packaging."
+            f"{selection} is missing. Select {key} on the validation split before packaging."
         )
-    picked = json.loads(selection.read_text())["selected_ckpt"]
-    return run / picked
+    chosen = json.loads(selection.read_text())
+    if chosen.get("split") != "valid" or chosen.get("n_iter") != 20:
+        raise ValueError(f"{selection}: final models require validation selection at 20 iterations")
+    epoch = int(chosen["selected_epoch"])
+    if chosen.get("candidate_rule") != "all_saved_corrected_K20" or epoch < 75:
+        raise ValueError(f"{selection}: final selection must use the approved existing K20 candidates")
+    source = run / chosen["selected_ckpt"]
+    if not source.resolve().is_relative_to(run.resolve()):
+        raise ValueError(f"{selection}: checkpoint is outside the selected run")
+    candidates = chosen.get("candidates", [])
+    if not any(c["epoch"] == epoch and c["checkpoint"] == chosen["selected_ckpt"]
+               and c["sha256"] == chosen.get("checkpoint_sha256") for c in candidates):
+        raise ValueError(f"{selection}: selected checkpoint is absent from the frozen candidate set")
+    if sha256(source) != chosen["checkpoint_sha256"]:
+        raise ValueError(f"{source}: selected checkpoint hash changed")
+    import torch
+    checkpoint = torch.load(source, map_location="cpu", weights_only=True)
+    if checkpoint["args"].get("fold_axes", "legacy") != cfg["required_fold_axes"]:
+        raise ValueError(f"{source}: final 4DVarNet must use the corrected channel/time axes")
+    if checkpoint.get("n_iter_eff") != 20 or checkpoint.get("epoch") != epoch:
+        raise ValueError(f"{source}: checkpoint epoch/depth does not match validation selection")
+    scores = chosen["mse_by_epoch"]
+    if chosen["selected_mse"] != min(scores.values()) or scores[str(epoch)] != chosen["selected_mse"]:
+        raise ValueError(f"{selection}: selected checkpoint does not minimize validation error")
+    return source
 
 
 def source_files() -> dict[str, Path]:
     out: dict[str, Path] = {}
     for name, cfg in FINAL_CONFIG.items():
-        if name == "varnet_aughead":
-            out[cfg["file"]] = _aughead_source()
+        if "selection" in cfg:
+            out[cfg["file"]] = _selected_varnet_source(name)
         else:
             out[cfg["file"]] = ROOT / cfg["source"]
         if name == "enkf":
             out[cfg["bank_file"]] = ROOT / cfg["bank_source"]
-    out["dincae_state_stats.npz"] = ROOT / "methods/dincae/artifacts/state_stats.npz"
+    out[DINCAE_STATS[0]] = ROOT / DINCAE_STATS[1]
     return out
 
 
@@ -164,11 +301,11 @@ def prepare_models(allow_incomplete: bool = False) -> int:
         print(f"[incomplete] {exc}")
         sources = {}
         for name, cfg in FINAL_CONFIG.items():
-            if name != "varnet_aughead":
+            if "source" in cfg:
                 sources[cfg["file"]] = ROOT / cfg["source"]
             if name == "enkf":
                 sources[cfg["bank_file"]] = ROOT / cfg["bank_source"]
-        sources["dincae_state_stats.npz"] = ROOT / "methods/dincae/artifacts/state_stats.npz"
+        sources[DINCAE_STATS[0]] = ROOT / DINCAE_STATS[1]
 
     manifest: dict[str, Any] = {"created": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "files": {}}
     missing = 0
@@ -178,6 +315,10 @@ def prepare_models(allow_incomplete: bool = False) -> int:
             missing += 1
             continue
         target = MODELS / destination
+        expected = next((c.get("expected_sha256") for c in FINAL_CONFIG.values()
+                         if c.get("file") == destination), None)
+        if expected and sha256(source) != expected:
+            raise SystemExit(f"{source}: hash differs from its validation selection")
         if not target.exists() or sha256(target) != sha256(source):
             print(f"[copy] {source.relative_to(ROOT)} -> models/{destination}")
             shutil.copy2(source, target)
@@ -186,15 +327,15 @@ def prepare_models(allow_incomplete: bool = False) -> int:
             "sha256": sha256(target),
             "source": str(source.relative_to(ROOT)),
         }
-    (MODELS / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    print(f"[out] {MODELS / 'manifest.json'}")
+    (MODELS / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2) + "\n")
+    print(f"[out] {MODELS / MANIFEST_NAME}")
     if missing and not allow_incomplete:
         raise SystemExit(f"{missing} final artifacts are missing")
     return 1 if missing else 0
 
 
 def _load_manifest() -> dict[str, Any]:
-    path = MODELS / "manifest.json"
+    path = MODELS / MANIFEST_NAME
     if not path.exists():
         raise SystemExit(f"{path} is missing; run `evaluate.py prepare` first")
     return json.loads(path.read_text())
@@ -225,7 +366,7 @@ def verify(data_root: Path, full_checksum: bool, require_complete: bool = True) 
     except SystemExit as exc:
         report["errors"].append(str(exc)); manifest = {"files": {}}
     expected = {cfg["file"] for cfg in FINAL_CONFIG.values()}
-    expected |= {FINAL_CONFIG["enkf"]["bank_file"], "dincae_state_stats.npz"}
+    expected |= {FINAL_CONFIG["enkf"]["bank_file"], DINCAE_STATS[0]}
     for filename in sorted(expected):
         path = MODELS / filename
         entry: dict[str, Any] = {"exists": path.exists()}
@@ -242,6 +383,28 @@ def verify(data_root: Path, full_checksum: bool, require_complete: bool = True) 
         else:
             report["warnings"].append(f"missing unfinished artifact: {filename}")
         report["models"][filename] = entry
+
+    # Hash agreement alone would also accept a mistakenly packaged legacy solver.
+    for key in ("varnet_mse", "varnet_aughead"):
+        if key not in FINAL_CONFIG:
+            continue
+        cfg = FINAL_CONFIG[key]
+        path = MODELS / cfg["file"]
+        if path.exists() and importlib.util.find_spec("torch"):
+            try:
+                import torch
+                ck = torch.load(path, map_location="cpu", weights_only=True)
+                fold = ck["args"].get("fold_axes", "legacy")
+                report["models"][path.name].update(fold_axes=fold, n_iter=ck.get("n_iter_eff"),
+                                                  epoch=ck.get("epoch"))
+                if fold != cfg["required_fold_axes"] or ck.get("n_iter_eff") != 20:
+                    report["errors"].append(f"{path.name}: expected corrected axes and 20 iterations")
+                if "required_normg_scope" in cfg and \
+                        ck["args"].get("normg_scope", "batch") != cfg["required_normg_scope"]:
+                    report["errors"].append(f"{path.name}: expected normg_scope "
+                                            f"{cfg['required_normg_scope']}")
+            except Exception as exc:
+                report["errors"].append(f"cannot verify {path.name} architecture: {exc}")
 
     bank_path = MODELS / FINAL_CONFIG["enkf"]["bank_file"]
     dynamics_path = MODELS / FINAL_CONFIG["enkf"]["file"]
@@ -289,7 +452,7 @@ def verify(data_root: Path, full_checksum: bool, require_complete: bool = True) 
             # The methods read the test list; the EnKF loop and reporting use TEST_DATES.
             # They must name exactly the same days, or the methods are scored on
             # different days without any error.
-            lst = data_root / "sunday_atc_test.lst"
+            lst = data_root / TEST_LIST
             if lst.exists():
                 listed = sorted(ln.strip().rsplit("atc-", 1)[-1].split(".")[0]
                                 for ln in lst.read_text().splitlines() if ln.strip())
@@ -349,24 +512,24 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
 
     if "senseiver_a" in methods:
         _python_module("compare.compare5", [
-            "--senseiver", str(MODELS / "senseiver_A_pd.pt"), "--arms", "",
+            "--senseiver", str(MODELS / FINAL_CONFIG["senseiver_a"]["file"]), "--arms", "",
             "--no-with-ensemble", "--days", days, "--frames", frames,
             "--out", str(raw / "senseiver_a_accuracy.json"),
         ], ROOT, data_root)
     if "senseiver_g" in methods:
         _python_module("compare.compare5", [
-            "--senseiver", str(MODELS / "senseiver_G_k16_pd.pt"), "--arms", "",
+            "--senseiver", str(MODELS / FINAL_CONFIG["senseiver_g"]["file"]), "--arms", "",
             "--no-with-ensemble", "--days", days, "--frames", frames,
             "--out", str(raw / "senseiver_g_accuracy.json"),
         ], ROOT, data_root)
     if "dincae" in methods:
-        dargs = ["--run-dir", str(MODELS), "--ckpt-glob", str(MODELS / "dincae_pd_epoch140.pt"),
+        dargs = ["--run-dir", str(MODELS), "--ckpt-glob", str(MODELS / FINAL_CONFIG["dincae"]["file"]),
                  "--split", "test", "--days", days, "--frames", frames,
                  "--out", str(raw / "dincae_accuracy")]
         _python_module("methods.dincae.checks.evaluate", dargs, ROOT, data_root)
     if "varnet_mse" in methods:
-        args = ["--senseiver", str(MODELS / "senseiver_A_pd.pt"),
-                "--varnet-checkpoints", f"MSE={MODELS / 'varnet_mse_pd_s3_epoch80.pt'}",
+        args = ["--senseiver", str(MODELS / FINAL_CONFIG["senseiver_a"]["file"]),
+                "--varnet-checkpoints", f"MSE={MODELS / FINAL_CONFIG['varnet_mse']['file']}",
                 "--arms", "", "--no-with-ensemble",
                 "--days", days, "--frames", frames,
                 "--out", str(raw / "varnet_mse_accuracy.json")]
@@ -374,8 +537,8 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
     if "varnet_aughead" in methods:
         # Score the same single checkpoint's mean on the common physical-space
         # reconstruction protocol used by the other deterministic methods.
-        args = ["--senseiver", str(MODELS / "senseiver_A_pd.pt"),
-                "--varnet-checkpoints", f"aughead_obs={MODELS / 'varnet_aughead_obs_s0.pt'}",
+        args = ["--senseiver", str(MODELS / FINAL_CONFIG["senseiver_a"]["file"]),
+                "--varnet-checkpoints", f"aughead_obs={MODELS / FINAL_CONFIG['varnet_aughead']['file']}",
                 "--arms", "", "--no-with-ensemble",
                 "--days", days, "--frames", frames,
                 "--out", str(raw / "varnet_aughead_accuracy.json")]
@@ -397,10 +560,20 @@ def run_available(mode: str, data_root: Path, output_dir: Path, methods: set[str
             "--outdir", str(obs_dir), "--obs-every-k", "1",
         ]
         if mode == "smoke":
-            export_args += ["--only", "atc-20130811"]
-        _python_module("methods.enkf.checks.export_obs_for_enkf", export_args, ROOT, data_root)
+            export_args += ["--only", f"atc-{TEST_DATES[0]}"]
         cfg = FINAL_CONFIG["enkf"]
         dates = TEST_DATES[:1] if mode == "smoke" else TEST_DATES
+        # EVAL_ENKF_SHARD=k/n: only every n-th test day from the k-th (parallel jobs); each job
+        # exports the observations of its own days only, so jobs never write the same file.
+        shard = os.environ.get("EVAL_ENKF_SHARD")
+        if shard and mode != "smoke":
+            k, n = (int(x) for x in shard.split("/"))
+            dates = dates[k::n]
+            for date in dates:
+                _python_module("methods.enkf.checks.export_obs_for_enkf",
+                               export_args + ["--only", f"atc-{date}"], ROOT, data_root)
+        else:
+            _python_module("methods.enkf.checks.export_obs_for_enkf", export_args, ROOT, data_root)
         for date in dates:
             day = f"atc-{date}"
             args = [
@@ -483,20 +656,26 @@ def collect(output_dir: Path) -> None:
     enkf_exports = sorted((raw / "enkf_exports").glob("atc-*.npz"))
     if enkf_exports:
         import numpy as np
+        from crowdcore import frame_reliability as fr
         se = np.zeros(4, dtype=np.float64); count = np.zeros(4, dtype=np.int64)
         se_all = 0.0; count_all = 0
         for fp in enkf_exports:
             with np.load(fp) as z:
                 mu, truth = z["mean"], z["truth"]
                 observed, walk = z["observed"].astype(bool), z["walkable"].astype(bool)
-                walk4 = np.broadcast_to(walk[None, None], mu.shape)
-                delta = np.square(mu - truth)
-                se_all += delta[walk4].sum(dtype=np.float64)
-                count_all += int(walk4.sum())
-                for c in range(4):
-                    sel = (~observed) & walk[None]
-                    se[c] += delta[:, c][sel].sum(dtype=np.float64)
-                    count[c] += int(sel.sum())
+            # the export starts at the EnKF warmup; leave out the tracker-gap blocks
+            warmup = int(json.loads((raw / "enkf" / f"{fp.stem}.json").read_text())["config"]["warmup"])
+            keep = fr.scorable_after_warmup(fp, warmup, len(mu))
+            if not keep.all():
+                mu, truth, observed = mu[keep], truth[keep], observed[keep]
+            walk4 = np.broadcast_to(walk[None, None], mu.shape)
+            delta = np.square(mu - truth)
+            se_all += delta[walk4].sum(dtype=np.float64)
+            count_all += int(walk4.sum())
+            for c in range(4):
+                sel = (~observed) & walk[None]
+                se[c] += delta[:, c][sel].sum(dtype=np.float64)
+                count[c] += int(sel.sum())
         pc = se / np.maximum(count, 1)
         accuracy_rows.append({
             "method": FINAL_CONFIG["enkf"]["label"],
@@ -541,6 +720,28 @@ def collect(output_dir: Path) -> None:
     if uncertainty_rows:
         with (output_dir / "uncertainty.csv").open("w", newline="") as f:
             w = csv.DictWriter(f, list(uncertainty_rows[0])); w.writeheader(); w.writerows(uncertainty_rows)
+    # The same scores on all walkable cells, observed ones included, when computed.
+    if up.exists() and all("walkable_all" in doc["methods"][k]["results"] for k in UNCERTAINTY_METHODS):
+        rows_all, ch_all = [], []
+        for key in UNCERTAINTY_METHODS:
+            r = doc["methods"][key]["results"]
+            metric = r["walkable_all"]
+            rows_all.append({"method": FINAL_CONFIG[key]["label"], "rmse": metric["rmse"],
+                             "spread": metric["spread"], "spread_rmse": metric["spread_skill"],
+                             "crps": metric["crps"]})
+            if len(doc["methods"][key].get("per_day_all_walkable") or []) >= 2:
+                ci = _bootstrap_days(doc["methods"][key]["per_day_all_walkable"])
+                for m in ("crps", "spread_rmse"):
+                    rows_all[-1][f"{m}_lo"], rows_all[-1][f"{m}_hi"] = ci[m]
+            for c in CHANNELS:
+                metric = r[f"all_channel_{c}"]
+                ch_all.append({"method": FINAL_CONFIG[key]["label"], "channel": c,
+                               "rmse": metric["rmse"], "spread": metric["spread"],
+                               "spread_rmse": metric["spread_skill"], "crps": metric["crps"]})
+        for name, rows in (("uncertainty_all_walkable.csv", rows_all),
+                           ("uncertainty_by_channel_all_walkable.csv", ch_all)):
+            with (output_dir / name).open("w", newline="") as f:
+                w = csv.DictWriter(f, list(rows[0])); w.writeheader(); w.writerows(rows)
     (output_dir / "calibration.csv").unlink(missing_ok=True)   # interval coverage: no longer reported
     timing_rows = []
     import numpy as np
@@ -729,7 +930,7 @@ def plot_summary(output_dir: Path) -> None:
         x = np.arange(len(groups)); w = 0.8 / len(names)
         for ax, key, ylabel, ref, letter in (
                 (ax_c, "crps", "CRPS (lower is better)", 0.0, "a"),
-                (ax_d, "spread_rmse", "Spread / RMSE\n" r"($>1$: $\hat{\sigma}$ too large, $<1$: too small)",
+                (ax_d, "spread_rmse", "RMS spread / RMSE\n(reference scale: 1)",
                  1.0, "b")):
             for i, m in enumerate(names):
                 v = np.array([float(pooled[m][key])] +
@@ -755,12 +956,14 @@ def plot_summary(output_dir: Path) -> None:
         captions.append(
             "**uncertainty_summary** — Predictive uncertainty on unobserved walkable cells, all "
             "methods scored in physical units on common frames; 'All' pools the four channels. "
-            "(a) CRPS in each channel's physical unit (lower is better). (b) Spread / RMSE, "
-            "spread = root-mean-square predictive SD; dashed line = 1, below it the method is "
-            "overconfident. " + ("Error bars on 'All': 95% bootstrap intervals over the "
+            "(a) Per-channel CRPS has the channel's physical unit; the pooled numerical "
+            "score has no single physical unit (lower is better). (b) RMS spread / point-estimate "
+            "RMSE; spread = root-mean-square predictive SD and the dashed line at 1 marks "
+            "equal overall scale. " + ("Error bars on 'All': 95% bootstrap intervals over the "
             f"{len(TEST_DATES)} test days (resampling days). " if has_ci else "") +
             "DINCAE's velocity-variance channel is log-normal in physical units and scored "
-            "with the closed-form log-normal CRPS; all other channels are Gaussian.")
+            "with the closed-form shifted-log-normal CRPS. Its other channels and augmented "
+            "4DVarNet use Gaussian CRPS; EnKF uses empirical ensemble CRPS.")
 
     # ---- 3. Inference time ------------------------------------------------------
     controlled_timing = output_dir / "inference_time_controlled.csv"
@@ -772,26 +975,33 @@ def plot_summary(output_dir: Path) -> None:
             names = [r["method"] for r in timing]
             median = [float(r["median_ms_per_frame"]) for r in timing]
             p95 = [float(r["p95_ms_per_frame"]) for r in timing]
-            fig, ax = ps.figure(rows_h=2.4, width=ps.TEXT_W * 0.7, constrained_layout=True)
-            xs = np.arange(len(names))
-            ax.bar(xs, median, 0.62, color=[ps.method_color(m) for m in names])
-            for xi, v in zip(xs, median):
-                ax.annotate(f"{v:.2g}", (xi, v), xytext=(0, 2), textcoords="offset points",
-                            ha="center", va="bottom", fontsize=fs_tick)
-            ax.set_yscale("log")
-            ax.set_ylim(min(median) / 3, max(median) * 3)
-            ax.set_xticks(xs, [short.get(m, m).replace(" aug. var.", "\naug. var.").replace(" (", "\n(")
-                                for m in names],
-                          fontsize=fs_tick)
-            ax.tick_params(axis="x", length=0)
-            ax.set_ylabel("GPU time per frame (ms, log scale)")
+            fig, ax = ps.figure(rows_h=2.6, width=ps.TEXT_W, constrained_layout=True)
+            ys = np.arange(len(names))
+            # A zero-based linear axis makes bar lengths proportional to time.
+            # Direct labels keep the fastest methods readable on the shared scale.
+            ax.barh(ys, median, 0.58, color=[ps.method_color(m) for m in names])
+            for yi, v in zip(ys, median):
+                ax.annotate(f"{v:.3f}", (v, yi), xytext=(5, 0), textcoords="offset points",
+                            ha="left", va="center", fontsize=ps.FS_LABEL)
+            ax.set_xlim(0, max(median) * 1.16)
+            ax.set_xticks(np.arange(0, np.floor(max(median)) + 2))
+            ax.set_yticks(ys, [short.get(m, m) for m in names], fontsize=ps.FS_LABEL)
+            ax.invert_yaxis()
+            ax.tick_params(axis="y", length=0)
+            ax.tick_params(axis="x", labelsize=ps.FS_TICK)
+            ax.grid(False, axis="y")
+            ax.grid(True, axis="x")
+            ax.set_xlabel("Compute time per reconstructed frame (ms)", fontsize=ps.FS_LABEL)
             save(fig, "inference_latency")
             spread_pct = 100 * max((b - a) / a for a, b in zip(median, p95))
             gpu = timing[0].get("gpu", "")
             captions.append(
-                "**inference_latency** — Median GPU compute time per reconstructed frame"
-                + (f" on one {gpu}" if gpu else "") + ", prebuilt inputs, same frames for all "
-                "methods; 4DVarNet solves 200-frame windows and EnKF runs 100 members. The 95th "
+                "**inference_latency** — Median compute time per reconstructed frame"
+                + (f" on one {gpu}" if gpu else "") + ", prebuilt inputs from the same held-out "
+                "600-frame block with the context required by each method. Bar lengths use a "
+                "zero-based linear scale; labels give milliseconds to three decimal places. "
+                "4DVarNet solves 200-frame windows and EnKF runs 100 members. These are "
+                "per-frame compute costs, not the waiting time for an individual result. The 95th "
                 f"percentile over repeats is within {spread_pct:.1f}% of the median for every "
                 "method and is not drawn.")
 
@@ -847,22 +1057,27 @@ def _choose_image_samples(files: list[Path], count: int, walk: Any,
             density = np.asarray(f["grid"][lo:hi, 0], dtype=np.float32)
             times = np.asarray(f["time"][lo:hi]) if "time" in f else np.arange(lo, hi)
         density_mean = density[:, walk].mean(axis=1)
+        from crowdcore import frame_reliability as fr
+        keep = fr.scorable_frames(fp, hi)[lo:]                  # never draw a tracker-gap frame
         target_quantiles = np.linspace(0.02, 0.98, quota)
-        target_density = np.quantile(density_mean, target_quantiles)
+        target_density = np.quantile(density_mean[keep], target_quantiles)
         edges = np.linspace(0, hi - lo, quota + 1, dtype=int)
         day = fp.name.split("_")[0]
         for slot in range(quota):
             left, right = int(edges[slot]), int(edges[slot + 1])
             left, right = max(left, 0), min(max(right, left + 1), hi - lo)
-            local = density_mean[left:right]
-            chosen_local = left + int(np.argmin(np.abs(local - target_density[slot])))
+            local = np.where(keep[left:right], np.abs(density_mean[left:right] - target_density[slot]),
+                             np.inf)
+            if not np.isfinite(local).any():
+                raise RuntimeError(f"no scorable frame in image slot {slot} of {fp.name}")
+            chosen_local = left + int(np.argmin(local))
             frame = lo + chosen_local
             samples.append({
                 "day": day, "frame": frame,
                 "time": str(times[chosen_local].item() if hasattr(times[chosen_local], "item")
                              else times[chosen_local]),
                 "density_mean_walkable": float(density_mean[chosen_local]),
-                "density_quantile": float((density_mean <= density_mean[chosen_local]).mean()),
+                "density_quantile": float((density_mean[keep] <= density_mean[chosen_local]).mean()),
                 "selection_quantile": float(target_quantiles[slot]),
                 "slot_in_day": slot,
             })
@@ -1027,13 +1242,16 @@ def _render_image_set(samples: list[dict[str, Any]], arrays: dict[str, Any],
 
 def _render_spread_comparison(samples: list[dict[str, Any]], truth: Any,
                               predictions: Any, density_spread: Any,
-                              walk: Any, path: Path) -> None:
+                              walk: Any, path: Path, pred_names: Any = None,
+                              spread_names: Any = None) -> None:
     """Compare native predictive density SD and density error on one common frame."""
     import numpy as np
     import matplotlib.pyplot as plt
 
     index = int(np.argmax(np.where(walk[None], truth[:, 0], 0).sum(axis=(1, 2))))
     methods = (("DINCAE", 2), ("4DVarNet aughead_obs (single)", 4), ("EnKF", 5))
+    if pred_names is not None and spread_names is not None:
+        methods = tuple((m, list(pred_names).index(m)) for m in spread_names)
     vmax_density = max(0.3, float(np.percentile(truth[index, 0][walk], 98)))
     vmax_error = max(1e-6, float(np.max([
         np.max(np.abs(predictions[index, pred_i, 0][walk] - truth[index, 0][walk]))
@@ -1096,27 +1314,54 @@ def generate_comparison_images(data_root: Path, output_dir: Path, count: int) ->
     sense_g = Senseiver(**sense_ck["hparams"]).to(device)
     sense_g.load_state_dict(sense_ck["model"]); sense_g.eval()
     var_solver, var_args, _ = load_solver(MODELS / FINAL_CONFIG["varnet_mse"]["file"], device)
-    aug_solver, aug_args, _ = load_solver(
-        MODELS / FINAL_CONFIG["varnet_aughead"]["file"], device)
+    has_aug = "varnet_aughead" in FINAL_CONFIG
     dT = int(var_args["dT"])
-    if dT != 200 or int(aug_args["dT"]) != dT or not aug_solver.augmented_var:
-        raise RuntimeError("packaged 4DVarNet mean/uncertainty solvers have incompatible layouts")
+    if has_aug:
+        aug_solver, aug_args, _ = load_solver(
+            MODELS / FINAL_CONFIG["varnet_aughead"]["file"], device)
+        if dT != 200 or int(aug_args["dT"]) != dT or not aug_solver.augmented_var:
+            raise RuntimeError("packaged 4DVarNet mean/uncertainty solvers have incompatible layouts")
+    elif dT != 200:
+        raise RuntimeError("packaged 4DVarNet solver must use 200-frame windows")
+    pred_names = (("Senseiver-A", "Senseiver-G", "DINCAE", "4DVarNet MSE")
+                  + (("4DVarNet aughead_obs (single)",) if has_aug else ()) + ("EnKF",))
+    spread_names = ("DINCAE",) + (("4DVarNet aughead_obs (single)",) if has_aug else ()) + ("EnKF",)
     dincae_models, _, _ = dincae_eval.load_models(
         str(MODELS), str(MODELS / FINAL_CONFIG["dincae"]["file"]), device)
     dincae_stats = dincae_eval.StateStats()
 
     warmup = int(FINAL_CONFIG["enkf"].get("warmup", 500))
     samples = _choose_image_samples(files, count, walk, dT, warmup)
+    # EVAL_EXTRA_FRAMES="atc-YYYYMMDD:frame,...": also predict these frames (the thesis's fixed
+    # example frames), appended after the evenly chosen ones.
+    for item in filter(None, os.environ.get("EVAL_EXTRA_FRAMES", "").split(",")):
+        import h5py
+        from crowdcore import frame_reliability as fr
+        day, frame = item.split(":"); frame = int(frame)
+        fp = next(p for p in files if p.name.startswith(day + "_"))
+        with h5py.File(fp, "r") as f:
+            n_day = int(f["grid"].shape[0])
+            dens = np.asarray(f["grid"][max(1, warmup):min(n_day - 1, (n_day // dT) * dT), 0], np.float32)
+            t_frame = f["time"][frame]
+        if not (max(1, warmup) <= frame < min(n_day - 1, (n_day // dT) * dT)) or \
+                not fr.scorable_frames(fp, n_day)[frame]:
+            raise ValueError(f"extra frame {item} is outside the common scored frames")
+        dmean = dens[:, walk].mean(axis=1)
+        dm = float(dens[frame - max(1, warmup)][walk].mean())
+        samples.append({"day": day, "frame": frame, "time": str(t_frame.item()),
+                        "density_mean_walkable": dm,
+                        "density_quantile": float((dmean <= dm).mean()),
+                        "selection_quantile": float("nan"), "slot_in_day": -1})
     sample_by_day: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for row_id, sample in enumerate(samples):
         sample_by_day.setdefault(sample["day"], []).append((row_id, sample))
 
-    n, c, h, w = count, *STATE_SHAPE
+    n, c, h, w = len(samples), *STATE_SHAPE
     truth_out = np.empty((n, c, h, w), dtype=np.float32)
     obs_out = np.empty_like(truth_out)
     observed_out = np.empty((n, h, w), dtype=bool)
-    pred_out = np.empty((n, 6, c, h, w), dtype=np.float32)
-    spread_out = np.empty((n, 3, h, w), dtype=np.float32)
+    pred_out = np.empty((n, len(pred_names), c, h, w), dtype=np.float32)
+    spread_out = np.empty((n, len(spread_names), h, w), dtype=np.float32)
     obs_cfg = senseiver_ds.obs_config()
 
     for fp in files:
@@ -1150,8 +1395,8 @@ def generate_comparison_images(data_root: Path, output_dir: Path, count: int) ->
         X0 = om.fill_missing_state(Y, Omc, method=obs_cfg["init_method"])
         pv_by_frame = _predict_varnet_selected(
             var_solver, dT, Y, Omc, X0, ids, device)
-        aug_by_frame = _predict_varnet_selected(
-            aug_solver, dT, Y, Omc, X0, ids, device, with_spread=True)
+        aug_by_frame = (_predict_varnet_selected(aug_solver, dT, Y, Omc, X0, ids, device,
+                                                 with_spread=True) if has_aug else None)
 
         # DINCAE's tested prediction helper includes its exact temporal context.
         # Its observation construction is deterministic; assert it matches ours.
@@ -1187,17 +1432,21 @@ def generate_comparison_images(data_root: Path, output_dir: Path, count: int) ->
                 truth_out[row_id] = X[t]
                 obs_out[row_id] = Y[t]
                 observed_out[row_id] = Omask[t]
-                pred_out[row_id, 0] = pa[local]
-                pred_out[row_id, 1] = pg[local]
-                pred_out[row_id, 2] = rec[di]
-                pred_out[row_id, 3] = pv_by_frame[t]
-                pred_out[row_id, 4] = aug_by_frame[t][0]
-                pred_out[row_id, 5] = emean[ei]
+                pi = pred_names.index
+                pred_out[row_id, pi("Senseiver-A")] = pa[local]
+                pred_out[row_id, pi("Senseiver-G")] = pg[local]
+                pred_out[row_id, pi("DINCAE")] = rec[di]
+                pred_out[row_id, pi("4DVarNet MSE")] = pv_by_frame[t]
+                if has_aug:
+                    pred_out[row_id, pi("4DVarNet aughead_obs (single)")] = aug_by_frame[t][0]
+                pred_out[row_id, pi("EnKF")] = emean[ei]
                 # DINCAE density has no nonlinear channel transform: its
                 # normalised SD converts to physical units with std[density].
-                spread_out[row_id, 0] = dincae_sd[di, 0] * dincae_stats.std[0]
-                spread_out[row_id, 1] = aug_by_frame[t][1][0]
-                spread_out[row_id, 2] = espread[ei, 0]
+                si = spread_names.index
+                spread_out[row_id, si("DINCAE")] = dincae_sd[di, 0] * dincae_stats.std[0]
+                if has_aug:
+                    spread_out[row_id, si("4DVarNet aughead_obs (single)")] = aug_by_frame[t][1][0]
+                spread_out[row_id, si("EnKF")] = espread[ei, 0]
                 sample["observed_fraction_walkable"] = float(Omask[t][walk].mean())
                 sample["timestamp"] = str(times[t].item() if hasattr(times[t], "item")
                                            else times[t])
@@ -1213,18 +1462,16 @@ def generate_comparison_images(data_root: Path, output_dir: Path, count: int) ->
         out_dir / "selected_predictions.npz", truth=truth_out, observation=obs_out,
         observed=observed_out, walkable=walk, predictions=pred_out,
         density_spread=spread_out,
-        method_names=np.asarray(("Senseiver-A", "Senseiver-G", "DINCAE",
-                                 "4DVarNet MSE", "4DVarNet aughead_obs (single)", "EnKF")),
-        spread_method_names=np.asarray(("DINCAE", "4DVarNet aughead_obs (single)", "EnKF")),
+        method_names=np.asarray(pred_names),
+        spread_method_names=np.asarray(spread_names),
         day=np.asarray([x["day"] for x in samples]),
         frame=np.asarray([x["frame"] for x in samples], dtype=np.int32))
     _render_image_set(samples, {"truth": truth_out, "observation": obs_out,
                                 "observed": observed_out, "walkable": walk,
                                 "predictions": pred_out,
-                                "method_names": ("Senseiver-A", "Senseiver-G", "DINCAE",
-                                                 "4DVarNet MSE", "4DVarNet aughead_obs (single)", "EnKF")}, out_dir)
+                                "method_names": pred_names}, out_dir)
     _render_spread_comparison(samples, truth_out, pred_out, spread_out, walk,
-                              out_dir / "spread_comparison.png")
+                              out_dir / "spread_comparison.png", pred_names, spread_names)
     print(f"[images] wrote {len(samples)} comparison boards to {out_dir}", flush=True)
 
 
@@ -1251,11 +1498,14 @@ def redraw_comparison_images(output_dir: Path) -> None:
                    "method_names")}
         if "density_spread" in z:
             arrays["density_spread"] = z["density_spread"].copy()
+        spread_names = tuple(str(x) for x in z["spread_method_names"]) \
+            if "spread_method_names" in z else None
     _render_image_set(samples, arrays, out_dir)
     if "density_spread" in arrays:
         _render_spread_comparison(samples, arrays["truth"], arrays["predictions"],
                                   arrays["density_spread"], arrays["walkable"],
-                                  out_dir / "spread_comparison.png")
+                                  out_dir / "spread_comparison.png",
+                                  tuple(str(x) for x in arrays["method_names"]), spread_names)
     print(f"[redraw] refreshed {len(samples)} boards under {out_dir}", flush=True)
 
 
@@ -1272,8 +1522,9 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                              export carries it, else N(ensemble mean, spread^2); RMSE,
                              spread/RMSE and coverage always from (mean, spread)
       DINCAE                 N in its standardised space mapped back: density/vx/vy
-                             are Gaussian with sd * std[c]; var goes through log1p,
-                             so its physical predictive is a shifted log-normal
+                             are Gaussian with sd * std[c]; with the log1p of var
+                             (DINCAE_TRANSFORMS) var's physical predictive is a
+                             shifted log-normal, without it Gaussian like the others
 
     No physical clipping: the scored distribution is each method's own.  Reported:
     RMSE, spread = sqrt(mean sigma^2), spread/RMSE and CRPS.
@@ -1284,7 +1535,7 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
 
     from crowdcore import config
     config.CFG["data"]["root"] = str(data_root.resolve())
-    from crowdcore import navigation, observation_model as om
+    from crowdcore import frame_reliability as fr, navigation, observation_model as om
     from methods.senseiver import dataset as senseiver_ds
     from methods.varnet.checks.model_io import load_solver
     from methods.dincae.checks import evaluate as dincae_eval
@@ -1300,10 +1551,16 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
         print("!! no GPU -- run this through sbatch/gpu-debug", flush=True)
     walk = navigation.build_valid_mask_from_config().astype(bool)
 
-    aug_solver, aug_args, _ = load_solver(MODELS / FINAL_CONFIG["varnet_aughead"]["file"], device)
+    has_aug = "varnet_aughead" in UNCERTAINTY_METHODS
+    # The common frames keep ending at the last complete 4DVarNet window, also without the
+    # aug. var. model, so the scored frames are those of the six-method protocol.
+    aug_solver, aug_args, _ = load_solver(
+        MODELS / FINAL_CONFIG["varnet_aughead" if has_aug else "varnet_mse"]["file"], device)
     dT = int(aug_args["dT"])
-    if not aug_solver.augmented_var:
+    if has_aug and not aug_solver.augmented_var:
         raise RuntimeError("packaged 4DVarNet aughead solver has no variance head")
+    if not has_aug:
+        del aug_solver
     obs_cfg = senseiver_ds.obs_config()
     if aug_args.get("obs_every_k") not in (None, obs_cfg["obs_every_k"]):
         raise RuntimeError(f"4DVarNet was trained with obs_every_k={aug_args['obs_every_k']}, "
@@ -1313,15 +1570,20 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     dstats = dincae_eval.StateStats()
     if not np.array_equal(dstats.valid, walk):
         raise RuntimeError("DINCAE's walkable mask differs from the navigation mask")
-    if tuple(CHANNEL_TRANSFORM) != (None, None, None, "log1p"):
+    if tuple(CHANNEL_TRANSFORM) != DINCAE_TRANSFORMS:
         raise RuntimeError(f"unexpected DINCAE channel transforms {CHANNEL_TRANSFORM}")
 
-    keys = ("varnet_aughead", "dincae", "enkf")
+    keys = tuple(UNCERTAINTY_METHODS)
+    # Two scopes on the same frames: the blind walkable cells (keys as before) and all
+    # walkable cells, observed ones included ("walkable_all", "all_channel_*").
     acc = {k: {"walkable_blind": su.Accumulator(),
-               **{f"channel_{c}": su.Accumulator() for c in CHANNELS}} for k in keys}
+               **{f"channel_{c}": su.Accumulator() for c in CHANNELS},
+               "walkable_all": su.Accumulator(),
+               **{f"all_channel_{c}": su.Accumulator() for c in CHANNELS}} for k in keys}
     per_day = []
     # One accumulator per method and day, for day-level bootstrap intervals.
     day_acc: dict[str, list[Any]] = {k: [] for k in keys}
+    day_acc_all: dict[str, list[Any]] = {k: [] for k in keys}
     enkf_family: str | None = None
 
     for fp in files:
@@ -1349,12 +1611,14 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
         truth = X[lo:hi]
 
         # 4DVarNet: every complete window that touches the common range, unclipped.
-        Omc = np.repeat(Omask[:, None], len(CHANNELS), axis=1)
-        X0 = om.fill_missing_state(Y, Omc, method=obs_cfg["init_method"])
-        vr = _predict_varnet_selected(aug_solver, dT, Y, Omc, X0, list(t_idx), device,
-                                      with_spread=True, clip=False)
-        v_mean = np.stack([vr[t][0] for t in t_idx]); v_sd = np.stack([vr[t][1] for t in t_idx])
-        del vr, X0, Omc
+        v_mean = v_sd = None
+        if has_aug:
+            Omc = np.repeat(Omask[:, None], len(CHANNELS), axis=1)
+            X0 = om.fill_missing_state(Y, Omc, method=obs_cfg["init_method"])
+            vr = _predict_varnet_selected(aug_solver, dT, Y, Omc, X0, list(t_idx), device,
+                                          with_spread=True, clip=False)
+            v_mean = np.stack([vr[t][0] for t in t_idx]); v_sd = np.stack([vr[t][1] for t in t_idx])
+            del vr, X0, Omc
 
         # DINCAE: predicts original frames 1..n-2, so frame t is row t-1.
         Xt, _rec, mu_n, sd_n, dmask = dincae_eval.predict_day(
@@ -1392,27 +1656,39 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                     not np.allclose(en["truth"][lo - warmup:hi - warmup], truth, rtol=0, atol=1e-6):
                 raise RuntimeError(f"EnKF export alignment check failed on {day}")
 
-        sel = walk[None] & ~Omask[lo:hi]                          # (T,H,W), same for all channels
+        sel_blind = walk[None] & ~Omask[lo:hi]                    # (T,H,W), same for all channels
+        sel_all = np.broadcast_to(walk[None], sel_blind.shape)
+        keep = fr.scorable_frames(fp, n)[lo:hi]                   # tracker-gap blocks left out
+        if not keep.all():
+            sel_blind = sel_blind & keep[:, None, None]
+            sel_all = sel_all & keep[:, None, None]
         for k in keys:
             day_acc[k].append(su.Accumulator())
-        for c, name in enumerate(CHANNELS):
-            x = truth[:, c][sel]
-            parts = {
-                "varnet_aughead": ("gauss", v_mean[:, c][sel], np.maximum(v_sd[:, c][sel], 1e-12)),
-                "enkf": ("gauss", e_mean[:, c][sel], np.maximum(e_sd[:, c][sel], 1e-12)),
-                "dincae": ("lognormal1p" if CHANNEL_TRANSFORM[c] == "log1p" else "gauss",
-                           d_loc[:, c][sel], d_scale[:, c][sel]),
-            }
-            for k, (family, loc, scale) in parts.items():
-                for a in (acc[k]["walkable_blind"], acc[k][f"channel_{name}"], day_acc[k][-1]):
-                    if k == "enkf" and e_crps is not None:
-                        a.add_ensemble_crps(e_crps[:, c][sel], loc, scale, x)
-                    elif family == "lognormal1p":
-                        a.add_lognormal1p(loc, scale, x)
-                    else:
-                        a.add(loc, scale, x)
-        per_day.append({"day": day, "frames": [int(lo), int(hi)],
-                        "scored_cells_per_channel": int(sel.sum())})
+            day_acc_all[k].append(su.Accumulator())
+        for sel, prefix, total, days_k in ((sel_blind, "channel_", "walkable_blind", day_acc),
+                                           (sel_all, "all_channel_", "walkable_all", day_acc_all)):
+            for c, name in enumerate(CHANNELS):
+                x = truth[:, c][sel]
+                parts = {
+                    "enkf": ("gauss", e_mean[:, c][sel], np.maximum(e_sd[:, c][sel], 1e-12)),
+                    "dincae": ("lognormal1p" if CHANNEL_TRANSFORM[c] == "log1p" else "gauss",
+                               d_loc[:, c][sel], d_scale[:, c][sel]),
+                }
+                if has_aug:
+                    parts = {"varnet_aughead": ("gauss", v_mean[:, c][sel],
+                                                np.maximum(v_sd[:, c][sel], 1e-12)), **parts}
+                for k, (family, loc, scale) in parts.items():
+                    for a in (acc[k][total], acc[k][f"{prefix}{name}"], days_k[k][-1]):
+                        if k == "enkf" and e_crps is not None:
+                            a.add_ensemble_crps(e_crps[:, c][sel], loc, scale, x)
+                        elif family == "lognormal1p":
+                            a.add_lognormal1p(loc, scale, x)
+                        else:
+                            a.add(loc, scale, x)
+        sel = sel_blind
+        per_day.append({"day": day, "frames": [int(lo), int(hi)], "frames_scored": int(keep.sum()),
+                        "scored_cells_per_channel": int(sel.sum()),
+                        "scored_cells_per_channel_all_walkable": int(sel_all.sum())})
         print(f"[uncertainty] {day}: frames [{lo}, {hi}), {int(sel.sum())} cells/channel",
               flush=True)
         del X, Y, obs, truth, v_mean, v_sd, d_loc, d_scale, e_mean, e_sd
@@ -1424,24 +1700,34 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
         res = {t: a.result() for t, a in acc[k].items()}
         # Per-day sums, so that any subset of days reproduces the pooled values
         # (used for the bootstrap intervals).
-        days_out = []
+        days_out, days_all = [], []
         for d, a in enumerate(day_acc[k]):
             r = a.result()
             days_out.append({"day": per_day[d]["day"], "n": r["n"], "crps": r["crps"],
                              "rmse": r["rmse"], "spread": r["spread"]})
-        methods[k] = {"label": FINAL_CONFIG[k]["label"], "results": res, "per_day": days_out}
+        for d, a in enumerate(day_acc_all[k]):
+            r = a.result()
+            days_all.append({"day": per_day[d]["day"], "n": r["n"], "crps": r["crps"],
+                             "rmse": r["rmse"], "spread": r["spread"]})
+        methods[k] = {"label": FINAL_CONFIG[k]["label"], "results": res, "per_day": days_out,
+                      "per_day_all_walkable": days_all}
         r = res["walkable_blind"]
         print(f"[uncertainty] {FINAL_CONFIG[k]['label']:<32} rmse {r['rmse']:.4f}  "
+              f"crps {r['crps']:.4f}  spread {r['spread']:.4f}  "
+              f"spread/rmse {r['spread_skill']:.3f}", flush=True)
+        r = res["walkable_all"]
+        print(f"[uncertainty] {'  all walkable cells':<32} rmse {r['rmse']:.4f}  "
               f"crps {r['crps']:.4f}  spread {r['spread']:.4f}  "
               f"spread/rmse {r['spread_skill']:.3f}", flush=True)
 
     doc = {"space": "physical units, all methods",
            "cells": "walkable and not observed at that frame; all four channels pooled",
            "frames": "common support: DINCAE t-1/t+1, complete 4DVarNet windows, after EnKF warmup",
-           "families": {"varnet_aughead": "gaussian", "enkf": enkf_family,
+           "families": {**({"varnet_aughead": "gaussian"} if has_aug else {}), "enkf": enkf_family,
                         "dincae": {c: ("log1p-lognormal" if CHANNEL_TRANSFORM[i] == "log1p"
                                        else "gaussian") for i, c in enumerate(CHANNELS)}},
            "clipping": "none",
+           **({"frames_excluded": fr.describe()} if fr.ENABLED else {}),
            "n_days": len(files), "frames_limit": frames, "per_day": per_day,
            "methods": methods}
     raw.mkdir(parents=True, exist_ok=True)
@@ -1510,6 +1796,10 @@ def main() -> None:
         return
     chosen = set(a.methods or FINAL_CONFIG)
     run_available(a.command, a.data_root, a.output_dir, chosen)
+    if os.environ.get("EVAL_NO_SUMMARY") == "1":
+        # one method of a parallel evaluation: the summary job collects and plots
+        print("[full] EVAL_NO_SUMMARY=1: raw outputs written, no collect/plot", flush=True)
+        return
     if set(UNCERTAINTY_METHODS) <= chosen:
         # smoke: one day, the same 600 frames the EnKF smoke run covers
         evaluate_uncertainty(a.data_root, a.output_dir, *((1, 600) if a.command == "smoke" else (0, 0)))

@@ -65,7 +65,10 @@ compare/results/_*.json
 # ============================================================
 !supervisor_evaluation/models/*.pt
 !supervisor_evaluation/models/*.npz
-supervisor_evaluation/outputs/dev/
+supervisor_evaluation/outputs/dev/*
+# ...except the route-2 4DVarNet selections, which EVAL_VARIANT=six_allwalk_all92 reads
+!supervisor_evaluation/outputs/dev/varnet_wink3_all92_gapmask_20261015/
+!supervisor_evaluation/outputs/dev/varnet_augwink3_all92_gapmask_20261015/
 
 # pptxgenjs install used by slides/build_enkf_deck.js
 slides/node_modules/
@@ -74,3 +77,16 @@ slides/package-lock.json
 # thesis figure caches (small; let the figures be redrawn without the data)
 !thesis_figures/data/*.npz
 supervisor_evaluation/outputs/full_before_reselect/
+
+# ============================================================
+# Published results are route 2 (all 92 ATC days, outputs/full_6m_all92/).
+# Route-1 (Sunday-only) results and the archive stay on the cluster, not in git.
+# ============================================================
+supervisor_evaluation/outputs/_archive/
+supervisor_evaluation/outputs/logs/
+supervisor_evaluation/outputs/full_6m_allwalk/
+supervisor_evaluation/outputs/full_5m_allwalk_20261011/
+supervisor_evaluation/outputs/full_5m_allwalk_gaussdincae_20261011/
+supervisor_evaluation/outputs/reselect_all_walkable_20261010/
+supervisor_evaluation/outputs/reselect/
+thesis_figures/out_5methods/

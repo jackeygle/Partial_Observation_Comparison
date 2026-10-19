@@ -3,12 +3,15 @@
     python3 -m thesis_figures.dincae            # -> thesis_figures/out/dincae.{pdf,png}
 
 Input (information form, 2.0 sec. 2.3): for each of the frames t-1, t, t+1 and each of the
-four variables, the scaled residual y/sigma^2 and the precision 1/sigma^2 (0 where not
-observed), plus the two cell coordinates and the cos/sin of the daily and weekly cycle:
+four variables, the normalised observed residual and mask (unit encoding variance),
+plus the two cell coordinates and the cos/sin of the daily and weekly cycle:
 30 channels. A U-Net with three mean-pooling levels (36x12 -> 18x6 -> 9x3 -> 5x2, 32/64/96
 filters) and additive skips; a second, identical U-Net refines from [input, first output].
-The output per variable is (m/sigma^2, log 1/sigma^2), i.e. a mean and a sigma-hat,
-trained with a Gaussian negative log-likelihood on both outputs (weights 0.3 and 0.7). Thumbnails: DINCAE on the example frame.
+Network outputs encode a Gaussian mean and variance in the normalised space.
+After undoing normalisation, density and velocity use their predictive means;
+velocity variance uses its shifted-log-normal median. Training uses a Gaussian
+negative log-likelihood on both network outputs (weights 0.3 and 0.7).
+Thumbnails: DINCAE on the example frame.
 """
 from __future__ import annotations
 
@@ -18,7 +21,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS, FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
+from thesis_figures.common import (FRAME_FILE, FS, FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
                                    method_color, save, text, thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +56,7 @@ def unet(ax, x0, yc, scale=1.0, labels=True):
 
 
 def main() -> None:
-    d = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    d = np.load(os.path.join(HERE, "data", FRAME_FILE))
     walk, seen = d["walkable"], d["observed"]
     vmax = float(np.percentile(d["truth"][0][walk], 99))
     fig, ax = canvas(16.0, 4.6)
@@ -66,9 +69,9 @@ def main() -> None:
         x, y = 0.3 + k * 0.16, yc - 0.9 + k * 0.16
         ax.add_patch(Rectangle((x, y), 12 * cell, 36 * cell, fc="white", ec=LINE, lw=0.5, zorder=1))
     thumbnail(ax, obs, 0.3, yc - 0.9, cell)
-    text(ax, 0.9, yc + 1.3, r"$y/\sigma^2,\ 1/\sigma^2$" "\n" r"at $t-1,\,t,\,t+1$", FS_SMALL,
+    text(ax, 1.1, yc + 1.3, "residual and mask\n" r"at $t-1,\,t,\,t+1$", FS_SMALL,
          ha="center", va="bottom", linespacing=1.1)
-    text(ax, 0.9, yc - 1.05, "+ coordinates,\ntime of day, weekday", FS_SMALL - 0.5, color=GREY,
+    text(ax, 1.1, yc - 1.05, "+ coordinates,\ntime of day, weekday", FS_SMALL - 0.5, color=GREY,
          ha="center", va="top", linespacing=1.1)
     text(ax, 0.9, yc - 1.6, "30 channels", FS_SMALL - 0.5, color=GREY, ha="center", va="top")
 
@@ -83,14 +86,14 @@ def main() -> None:
     arrow(ax, (u1 + 0.1, yc), (r0 - 0.1, yc))
     text(ax, (r0 + r1) / 2, yc + rh / 2 + 0.2, "refinement\n(same U-Net)", FS_SMALL, ha="center",
          va="bottom", linespacing=1.1)
-    text(ax, (r0 + r1) / 2, yc - rh / 2 - 0.15, "input: [$x$, first output]", FS_SMALL - 0.5,
+    text(ax, (r0 + r1) / 2, yc - rh / 2 - 0.15, "input + first output", FS_SMALL - 0.5,
          color=GREY, ha="center", va="top")
     ly = 0.2                                           # the input also feeds the refinement
     ax.plot([u0 - 0.45, u0 - 0.45, (r0 + r1) / 2], [yc, ly, ly], color=GREY, lw=0.5,
             ls=(0, (2, 1.2)))
     arrow(ax, ((r0 + r1) / 2, ly), ((r0 + r1) / 2, yc - rh / 2 - 0.5), color=GREY, lw=0.5)
 
-    # ---- output: mean and sigma-hat ------------------------------------------------------------
+    # ---- output: point estimate and sigma-hat --------------------------------------------------
     ox = r1 + 1.0
     arrow(ax, (r1 + 0.1, yc), (ox - 0.1, yc))
     e1 = thumbnail(ax, field_rgb(d["dincae_mean"][0], walk, ps.CMAP["density"], vmax), ox, yc - 0.9, cell)
@@ -99,7 +102,7 @@ def main() -> None:
                    e1[1] + 0.2, yc - 0.9, cell)
     text(ax, (e1[0] + e1[1]) / 2, e1[2] - 0.08, r"$\hat{x}_t$", 9, ha="center")
     text(ax, (e2[0] + e2[1]) / 2, e2[2] - 0.08, r"$\hat{\sigma}_t$", 9, ha="center")
-    text(ax, (e1[0] + e2[1]) / 2, e1[3] + 0.15, "mean and\nuncertainty", FS_SMALL, ha="center",
+    text(ax, (e1[0] + e2[1]) / 2, e1[3] + 0.15, "estimate and\nuncertainty", FS_SMALL, ha="center",
          va="bottom", linespacing=1.1)
     block(ax, e2[1] + 0.45, yc - 0.5, 2.5, 1.0, "Gaussian NLL", "both outputs,\n" r"weights 0.3, 0.7")
     arrow(ax, (e2[1] + 0.08, yc), (e2[1] + 0.4, yc), color=GREY)

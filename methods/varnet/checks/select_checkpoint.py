@@ -49,6 +49,7 @@ import re
 import numpy as np
 import torch
 
+from crowdcore import frame_reliability as fr
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from methods.varnet.train import build_windows
@@ -72,8 +73,12 @@ def candidates(run_dir, min_epoch):
     return sorted(out)
 
 
-def score_day(solvers, fp, args_by_ckpt, walk, dev, batch):
+def score_day(solvers, fp, args_by_ckpt, walk, dev, batch, scope="blind_walkable"):
     """Squared error and cell count on blind-walkable cells, for every checkpoint.
+
+    Only scorable frames count (crowdcore.frame_reliability; the dT=200 windows start at frame
+    0 like its blocks). With the gap mask off (default outside DATA_VARIANT=all92) every frame
+    of every complete window counts, as before.
 
     The day is loaded ONCE and every checkpoint is scored on it, so all of them see
     byte-identical observations -- with a per-checkpoint reload the robot routes would
@@ -93,6 +98,13 @@ def score_day(solvers, fp, args_by_ckpt, walk, dev, batch):
     blind = (M < 0.5).numpy()                      # (N,C,dT,H,W); the mask is 1.0/0.0 float
     # walk is (H,W): broadcast over windows, channels and frames
     sel = blind & walk[None, None, None]
+    if scope == "all_walkable":
+        sel = np.broadcast_to(walk[None, None, None], blind.shape)
+    elif scope != "blind_walkable":
+        raise ValueError(f"unknown scoring scope: {scope}")
+    if fr.ENABLED:
+        keep = fr.scorable_frames(fp, X.shape[0] * X.shape[2]).reshape(X.shape[0], 1, X.shape[2], 1, 1)
+        sel = sel & keep
     Xn = X.numpy()
     res = {}
     for ep, sol in solvers.items():

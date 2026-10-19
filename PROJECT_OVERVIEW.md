@@ -1,5 +1,7 @@
 # Partial Observation Comparison — project overview
 
+> **Final results:** the reported comparison uses all 92 ATC days (route 2, `DATA_VARIANT=all92`); see [README.md](README.md). The history below was developed on the Sundays alone.
+
 > **To run the final evaluation, or to see how the data is split, read
 > [README.md](README.md) first.** This file is the background: what each method
 > is, where its final model came from, how to retrain it, and which older

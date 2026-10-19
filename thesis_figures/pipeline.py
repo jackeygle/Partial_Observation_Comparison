@@ -15,15 +15,16 @@ import numpy as np
 from matplotlib.patches import Circle, Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS_SMALL, GREY, LINE, arrow, canvas, cell_centre,
-                                   field_rgb, frame_box, method_color, save, text, thumbnail)
+from thesis_figures.common import (FRAME_FILE, FS_SMALL, GREY, LINE, arrow, canvas, cell_centre,
+                                   field_rgb, frame_box, method_color, save, text, thumbnail,
+                                   AUG_LABELS, FIVE_METHODS)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CELL = 0.075                      # cm per grid cell in the thumbnails
 
 
 def main() -> None:
-    d = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    d = np.load(os.path.join(HERE, "data", FRAME_FILE))
     walk, seen = d["walkable"], d["observed"]
     dens = d["truth"][0]
     vmax = float(np.percentile(dens[walk], 99))
@@ -76,6 +77,8 @@ def main() -> None:
             ("4DVarNet", "200 s", False),
             ("4DVarNet aug. var. (ours)", "200 s", True),
             ("EnKF", "all past", True)]
+    if FIVE_METHODS:
+        rows = [r for r in rows if r[0] not in AUG_LABELS]
     step = (my1 - my0 - 0.55) / (len(rows) - 1)
     for i, (name, window, sig) in enumerate(rows):
         y = my1 - 0.3 - i * step

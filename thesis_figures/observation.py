@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib.patches import Circle, Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS_SMALL, GREY, LINE, WALL, canvas, cell_centre,
+from thesis_figures.common import (FRAME_FILE, FS_SMALL, GREY, LINE, WALL, canvas, cell_centre,
                                    colorbar_under, field_rgb, save, sub_axes, text, thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +28,7 @@ SEEN = "#a9c9ee"
 
 
 def main() -> None:
-    f = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    f = np.load(os.path.join(HERE, "data", FRAME_FILE))
     g = np.load(os.path.join(HERE, "data", "example_day.npz"))
     walk, seen = f["walkable"], f["observed"]
     H, W = walk.shape

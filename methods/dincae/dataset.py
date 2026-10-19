@@ -37,7 +37,7 @@ import torch
 from crowdcore import config as cfg4d                                            # noqa: E402
 from crowdcore import observation_model as om                                     # noqa: E402
 
-from methods.dincae.state import StateStats, NCH                           # noqa: E402
+from methods.dincae.state import StateStats, NCH, VAR_TRANSFORM            # noqa: E402
 from methods.dincae.encoding import (FRESH_OFFSETS, N_IN, N_STATIC, encode_target,  # noqa: E402
                       observed_pair, static_channels)
 
@@ -110,7 +110,9 @@ def cache_key(stats: StateStats, stride, full_field=False, fp=None):
             # full-field targets are a DIFFERENT encoding of the same days, so they need
             # their own key -- otherwise they would silently reuse (or overwrite) the 13 GB
             # of information-form cache already on disk.
-            + ("_ff1" if full_field else ""))
+            + ("_ff1" if full_field else "")
+            # the var channel's transform changes the encoding too (log1p is the old default)
+            + ("" if VAR_TRANSFORM == "log1p" else f"_v{VAR_TRANSFORM}"))
 
 
 def encode_day_cached(fp, stats, stride, max_frames, cache_dir, full_field=False):

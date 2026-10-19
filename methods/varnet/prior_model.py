@@ -37,22 +37,16 @@ Architecture (paper §3.2)
     Φ(x)=x (the paper's only stated requirement). two_scale is ON by default to
     match the paper.
 
-    One honest caveat on the two-scale form: strict pixel-level independence
-    Φ(x)(s) ⊥ x(s) holds EXACTLY only for a single branch (measured: exactly 0.0). With
-    two scales, Dw pools x(s) into a coarse cell and Up spreads that cell back over a
-    neighbourhood, so x(s) re-enters Φ(x)(s) through the coarse branch.
+    With fold_axes="ct", spatial pooling and upsampling operate independently at each
+    time. The transposed convolution has kernel=stride=scale, so each fine output uses
+    exactly one coarse output. That coarse output excludes its own coarse space-time
+    input, including every fine input pooled into that cell. Thus the two-scale form
+    also excludes dependence on the input at the output's own space-time point.
 
-    Measured on the trained models, d|Φ(x)(s)|/dx(s) is 2e-2 to 4e-2 — i.e. 2-4% of what
-    the identity Φ(x)=x would give (b0_k1 2.1e-2, b0_k4 4.2e-2, a2_k1 1.8e-2, a4_k1
-    3.7e-2). The same architecture UNTRAINED leaks ~8e-4, so training increases the leak
-    by roughly 25x: the optimiser does exploit this channel. The identity is still far
-    from reachable, but "effectively excluded" is the honest phrasing, not "excluded".
-    This is a property of Eq.10 itself, not of this implementation — the paper's own
-    two-scale form has it too, and the paper does not quantify it.
-
-    Reproduce with checks/check_paper_conformance.py; do not trust this number from
-    memory, an earlier version of this docstring quoted ~3e-5, which came from an
-    untrained model and was wrong by three orders of magnitude for the trained one.
+    fold_axes="legacy" preserves the incorrect channel/time reshape for old checkpoints.
+    Its transposed convolution mixes time planes and can reintroduce self-dependence.
+    Earlier measurements of that dependence describe the legacy implementation, not
+    an inherent property of the corrected two-scale GENN.
 
 State tensor convention
 -----------------------

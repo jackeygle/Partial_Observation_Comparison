@@ -22,6 +22,7 @@ python3 -m thesis_figures.<name>            # -> out/<name>.pdf, out/<name>.png
 | `senseiver` | Senseiver-A and Senseiver-G (ours) |
 | `dincae` | DINCAE: information-form input, U-Net, refinement, mean and sigma-hat |
 | `varnet` | 4DVarNet (variational cost, learned gradient descent) and the aug. var. model (ours) |
+| `genn` | the two-scale GENN prior of 4DVarNet and its zero-centre kernel |
 | `enkf` | the EnKF cycle with structured process noise |
 | `comparison` | the six density reconstructions and their errors on one test frame (two frames) |
 | `uncertainty_maps` | error against predicted sigma-hat for the three probabilistic methods |
@@ -34,4 +35,9 @@ The example frame is test day 2013-08-11, frame 32778 (a busy second); `comparis
 `uncertainty_maps` also draw frame 13551. Reconstructions come from the evaluation's saved
 selection, `supervisor_evaluation/outputs/full/images/selected_predictions.npz`
 (`evaluate.py images`, final models); rerun `prepare_frame` after regenerating it.
+Five-method thesis (`Thesis_paper_5methods`, no aug. var. model): run the scripts with
+`THESIS_VARIANT=5methods`; they then leave that model out and write to `out_5methods/`.
+`python3 -m thesis_figures.five_methods_results` redraws the accuracy, uncertainty and
+latency figures from the evaluation CSVs without it.
+
 `common.py` holds the shared page, block, thumbnail and colour-bar helpers.

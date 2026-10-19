@@ -19,13 +19,15 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS, FS_SMALL, canvas, field_rgb, method_color, nice_top,
+from thesis_figures.common import (AUG_LABELS, FIVE_METHODS, FS, FS_SMALL, canvas, field_rgb, method_color, nice_top,
                                    save, sub_axes, text, thumbnail)
 from thesis_figures.comparison import FRAMES, SEL
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 METHODS = [("DINCAE", "DINCAE"), ("4DVarNet aughead_obs (single)", "4DVarNet aug. var. (ours)"),
            ("EnKF", "EnKF")]
+if FIVE_METHODS:
+    METHODS = [m for m in METHODS if m[1] not in AUG_LABELS]
 CELL = 0.1
 
 

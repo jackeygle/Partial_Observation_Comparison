@@ -98,6 +98,16 @@ def channel_valid(X):
 #: "just output the per-cell mean field"), i.e. the reconstruction is an order
 #: of magnitude worse than doing nothing.
 CHANNEL_TRANSFORM = (None, None, None, "log1p")
+#: DINCAE_VAR_TRANSFORM=none: the ablation without the log1p of `var` (2026-10-11). It is
+#: read by training, statistics and evaluation alike and stored in each checkpoint's args;
+#: its statistics live in their own file and its encoded days under their own cache key.
+VAR_TRANSFORM = os.environ.get("DINCAE_VAR_TRANSFORM", "log1p")
+if VAR_TRANSFORM not in ("log1p", "none"):
+    raise SystemExit(f"DINCAE_VAR_TRANSFORM must be 'log1p' or 'none', got {VAR_TRANSFORM!r}")
+if VAR_TRANSFORM == "none":
+    CHANNEL_TRANSFORM = (None, None, None, None)
+STATS_STEM = ("state_stats" if VAR_TRANSFORM == "log1p" else "state_stats_none") \
+    + __import__("crowdcore.config", fromlist=["VARIANT_SUFFIX"]).VARIANT_SUFFIX   # _all92 for DATA_VARIANT=all92
 
 
 def fwd_channel(v, c):
@@ -156,7 +166,7 @@ class StateStats:
     `normalize2` (`data.jl:111-120`) does.
     """
 
-    def __init__(self, path=os.path.join(HERE, "artifacts", "state_stats.npz")):
+    def __init__(self, path=os.path.join(HERE, "artifacts", STATS_STEM + ".npz")):
         z = np.load(path, allow_pickle=False)
         self.mean = z["mean"].astype(np.float32)          # (NCH,H,W)
         self.std = z["std"].astype(np.float32)            # (NCH,)  residual standard deviation
@@ -170,7 +180,7 @@ class StateStats:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=0, help="use only the first N training days (smoke test)")
-    ap.add_argument("--out", default=os.path.join(HERE, "artifacts", "state_stats"))
+    ap.add_argument("--out", default=os.path.join(HERE, "artifacts", STATS_STEM))
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
 

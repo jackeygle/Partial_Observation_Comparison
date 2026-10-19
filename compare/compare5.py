@@ -106,7 +106,7 @@ import argparse
 import json
 import os
 import time
-from crowdcore import paths
+from crowdcore import frame_reliability as fr, paths
 import sys
 
 import numpy as np
@@ -453,6 +453,9 @@ def main():
 
         lo, hi = FRAME_LO, n - FRAME_HI_PAD                  # the frame range DINCAE can be scored on
         sel_all = build_masks(Xf, Omf, walk, C)
+        keep = fr.scorable_frames(d, n)                      # tracker-gap blocks (all True if the mask is off)
+        if not keep.all():
+            sel_all = {k: v & keep[:, None, None, None] for k, v in sel_all.items()}
         cut = lambda m, a, b: {k: v[a:b] for k, v in m.items()}
         dacc = {k: Acc(C) for k in names}                    # accumulated separately for this day, to compute the day average
 
@@ -511,7 +514,7 @@ def main():
         else:
             print(f"  [warn] no EnKF export for {stem}", flush=True)
 
-        rec = {"day": stem, "frames_total": int(n), "frames_scored": int(hi - lo)}
+        rec = {"day": stem, "frames_total": int(n), "frames_scored": int(keep[lo:hi].sum())}
         for k, a in dacc.items():
             if a.n["full"].sum() == 0:
                 continue
@@ -563,6 +566,7 @@ def main():
         "checkpoints": {label: [{"run": r, "ckpt": c, "epoch": e, "n_iter": d}
                                 for r, c, e, d in rows] for label, rows in picked.items()},
         "pooling": "accumulate squared error and cell count per channel, divide once at the end",
+        **({"frames_excluded": fr.describe()} if fr.ENABLED else {}),
         "n_days": len(days)},
         "per_day": per_day, "channels": chans, "results": {}}
     res["inference"] = {

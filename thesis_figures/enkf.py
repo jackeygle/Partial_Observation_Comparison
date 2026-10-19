@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
+from thesis_figures.common import (FRAME_FILE, FS_SMALL, GREY, LINE, arrow, block, canvas, field_rgb,
                                    method_color, save, text, thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +32,7 @@ def cards(ax, x, y, w, h, n=3, off=0.1, color=LINE):
 
 
 def main() -> None:
-    d = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    d = np.load(os.path.join(HERE, "data", FRAME_FILE))
     names = list(d["method_names"]); snames = list(d["spread_method_names"])
     walk, seen = d["walkable"], d["observed"]
     vmax = float(np.percentile(d["truth"][0][walk], 99))

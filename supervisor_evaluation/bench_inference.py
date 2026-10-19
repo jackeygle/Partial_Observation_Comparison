@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import time
 from pathlib import Path
 
@@ -31,12 +32,15 @@ def run(output_dir: Path, data_root: Path, repeats: int = 3, frames: int = 600) 
 
     if not torch.cuda.is_available():
         raise RuntimeError("controlled GPU benchmark requires a CUDA allocation")
+    if repeats < 3:
+        raise ValueError("controlled GPU benchmark requires at least three measured repeats")
     if frames < 400 or frames % 200:
         raise ValueError("frames must be a multiple of 200 and at least 400")
     output_dir = output_dir.resolve()
     day = str(om.split_files("test")[0])
+    stem = Path(day).name.split("_")[0]                  # every method is timed on this day
     obs_dir = output_dir / "raw" / "enkf_observations"
-    obs_file = obs_dir / "obs_atc-20130811.npz"
+    obs_file = obs_dir / f"obs_{stem}.npz"
     if not obs_file.exists():
         raise FileNotFoundError(f"run the full EnKF evaluation first: {obs_file}")
     device = torch.device("cuda")
@@ -91,6 +95,8 @@ def run(output_dir: Path, data_root: Path, repeats: int = 3, frames: int = 600) 
         mask = np.repeat(z["Omega"][:frames, None], 4, axis=1).astype(np.float32)
 
     for key in ("varnet_mse", "varnet_aughead"):
+        if key not in FINAL_CONFIG:
+            continue
         solver, args, _ = load_solver(MODELS / FINAL_CONFIG[key]["file"], device)
         dt = int(args["dT"])
         if dt != 200:
@@ -137,30 +143,37 @@ def run(output_dir: Path, data_root: Path, repeats: int = 3, frames: int = 600) 
                 "--channel-scales", *map(str, cfg["channel_scales"]),
                 "--blind-channel-scales", *map(str, cfg["blind_channel_scales"]),
                 "--cross-channel-matrix", *map(str, cfg["cross_channel_matrix"]),
+                *(["--bank-native-std"] if cfg.get("bank_native_std") else []),
                 "--ensemble", str(cfg["ensemble"]),
                 "--radius", str(cfg["localization_radius"]),
                 "--frames", str(frames), "--warmup", "100",
-                "--day", "atc-20130811", "--obs-dir", str(obs_dir),
+                "--day", stem, "--obs-dir", str(obs_dir),
                 "--out", str(result_path)]
         _python_module("methods.enkf.enkf_opt.experiments.eval_structured_q_gpu",
                        args, ROOT, data_root)
         result = json.loads(result_path.read_text())
         if result["frames_used"] != frames or result["n_analysis_failures"]:
             raise RuntimeError("EnKF timing run did not produce the expected frames")
-        return 1000 * float(result["inference_seconds"]) / frames
+        return float(result["inference_seconds"])
 
     # One unreported EnKF warm-up run, then interleaved rounds on the same GPU.
     enkf_once(-1)
     measurements = {name: [] for name in prepared}
+    elapsed_seconds = {name: [] for name in prepared}
     enkf_name = cfg["label"]
     measurements[enkf_name] = []
+    elapsed_seconds[enkf_name] = []
     for rep in range(repeats):
         for name, (fn, n_frames, _) in prepared.items():
             torch.cuda.synchronize()
             start = time.perf_counter()
             fn()
-            measurements[name].append(1000 * (time.perf_counter() - start) / n_frames)
-        measurements[enkf_name].append(enkf_once(rep))
+            elapsed = time.perf_counter() - start
+            elapsed_seconds[name].append(elapsed)
+            measurements[name].append(1000 * elapsed / n_frames)
+        elapsed = enkf_once(rep)
+        elapsed_seconds[enkf_name].append(elapsed)
+        measurements[enkf_name].append(1000 * elapsed / frames)
         print(f"[benchmark] round {rep + 1}/{repeats}: "
               + ", ".join(f"{n}={v[-1]:.3f} ms/frame" for n, v in measurements.items()),
               flush=True)
@@ -181,8 +194,17 @@ def run(output_dir: Path, data_root: Path, repeats: int = 3, frames: int = 600) 
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader(); writer.writerows(rows)
     (output_dir / "inference_time_controlled_detail.json").write_text(json.dumps({
-        "gpu": gpu, "day": "atc-20130811", "frames": frames,
+        "gpu": gpu, "day": stem, "frames": frames,
         "repeats": repeats, "individual_ms_per_frame": measurements,
+        "individual_elapsed_seconds": elapsed_seconds,
+        "output_frames_by_method": {name: prepared[name][1] if name in prepared else frames
+                                    for name in measurements},
+        "batch_size_by_method": {name: (1 if block == 200 else 64)
+                                 for name, (_, _, block) in prepared.items()},
+        "node": os.environ.get("SLURMD_NODENAME"),
+        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+        "torch_version": torch.__version__, "cuda_version": torch.version.cuda,
+        "torch_num_threads": torch.get_num_threads(),
         "note": "compute throughput per output frame; windowed models require a 200-frame block"},
         indent=2) + "\n")
     print(f"[benchmark] controlled timing written to {output}", flush=True)

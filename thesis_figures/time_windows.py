@@ -15,7 +15,8 @@ import os
 
 from matplotlib.patches import FancyArrowPatch, Rectangle
 
-from thesis_figures.common import FS_SMALL, GREY, LINE, canvas, method_color, save, text
+from thesis_figures.common import (AUG_LABELS, FIVE_METHODS, FS_SMALL, GREY, LINE, canvas,
+                                   method_color, save, text)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LO, HI = -20, 4                    # displayed offsets relative to t
@@ -33,6 +34,8 @@ def main() -> None:
          r"fixed 200-s tile containing $t$"),
         ("EnKF", set(range(LO, 1)), True, False, True, True, "all past, carried by the ensemble"),
     ]
+    if FIVE_METHODS:
+        rows = [r for r in rows if r[0] not in AUG_LABELS]
     rh = 0.52
     page_h = 1.15 + len(rows) * rh + 0.2
     fig, ax = canvas(16.0, page_h)

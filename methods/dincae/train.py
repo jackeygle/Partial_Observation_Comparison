@@ -39,7 +39,7 @@ import torch
 # the front would shadow this directory's same-named module
 from crowdcore import observation_model as om                                    # noqa: E402
 
-from methods.dincae.state import CHANNELS, StateStats, NCH                # noqa: E402
+from methods.dincae.state import CHANNELS, StateStats, NCH, VAR_TRANSFORM  # noqa: E402
 from methods.dincae.dataset import ChunkedDays, obs_config                        # noqa: E402
 from methods.dincae.encoding import N_IN                                          # noqa: E402
 from methods.dincae.losses import residual_mse, dincae_loss                        # noqa: E402
@@ -66,9 +66,11 @@ def parse_args():
     p.add_argument("--max-frames", type=int, default=0, help="use only the first N frames per day (debug)")
     p.add_argument("--days-per-chunk", type=int, default=4)
     p.add_argument("--save-every", type=int, default=10)
-    p.add_argument("--save-from", type=int, default=0, help="which epoch to start saving from (default epochs/5)")
+    p.add_argument("--save-from", type=int, default=None,
+                   help="which epoch to start saving from (default epochs/5; 0 = from the first)")
     p.add_argument("--out", default=os.path.join(HERE, "runs", "dincae"))
-    p.add_argument("--cache-dir", default=os.path.join(HERE, "cache"),
+    p.add_argument("--cache-dir", default=os.path.join(
+                       HERE, "cache" + __import__("crowdcore.config", fromlist=["x"]).VARIANT_SUFFIX),
                    help="encoding cache directory (deterministic encoding, built once). Empty string = no cache")
     p.add_argument("--amp", action="store_true", help="bf16 autocast")
     p.add_argument("--resume", action="store_true")
@@ -124,11 +126,15 @@ def main():
             raise SystemExit(f"ABORT: {ckpt_last} was trained with trajectory_mode={prev!r}, "
                              f"config now gives {a.trajectory_mode!r}; resuming would switch the "
                              f"robot routes mid-training. Use a new --out.")
+        prev_vt = st.get("args", {}).get("var_transform", "log1p")
+        if prev_vt != VAR_TRANSFORM:
+            raise SystemExit(f"ABORT: {ckpt_last} was trained with var_transform={prev_vt!r}, "
+                             f"DINCAE_VAR_TRANSFORM is now {VAR_TRANSFORM!r}. Use a new --out.")
         model.load_state_dict(st["model"]); opt.load_state_dict(st["opt"])
         start_epoch = st["epoch"] + 1
         print(f"resume from epoch {start_epoch}")
 
-    save_from = a.save_from or max(1, a.epochs // 5)
+    save_from = max(1, a.epochs // 5) if a.save_from is None else a.save_from
     amp_dtype = torch.bfloat16 if a.amp else None
     metrics_path = os.path.join(a.out, "metrics.jsonl")
     mk = lambda files, stride, shuffle, seed: ChunkedDays(
@@ -189,9 +195,9 @@ def main():
             f.write(json.dumps(rec) + "\n")
 
         torch.save({"model": model.state_dict(), "opt": opt.state_dict(),
-                    "epoch": epoch, "args": vars(a)}, ckpt_last)
+                    "epoch": epoch, "args": {**vars(a), "var_transform": VAR_TRANSFORM}}, ckpt_last)
         if epoch >= save_from and (epoch - save_from) % a.save_every == 0:
-            torch.save({"model": model.state_dict(), "epoch": epoch, "args": vars(a)},
+            torch.save({"model": model.state_dict(), "epoch": epoch, "args": {**vars(a), "var_transform": VAR_TRANSFORM}},
                        os.path.join(a.out, f"ckpt_{epoch:05d}.pt"))
 
     print("done")

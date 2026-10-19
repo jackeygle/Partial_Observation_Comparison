@@ -8,6 +8,9 @@ The mean residual is removed because the EnKF process noise must be zero mean; i
 is stored separately for diagnosis.  A draw retains all cross-channel and spatial
 correlations of one real forecast error field, unlike independent Gaussian Q.
 Only TRAIN days are read, so the test-day evaluation cannot leak into this bank.
+Targets are drawn only from scorable frames (crowdcore.frame_reliability: under
+DATA_VARIANT=all92 the tracker-gap blocks and the block after each are left out; with the gap
+mask off the draw is unchanged).
 """
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..",
 OPT = os.path.join(ROOT, "methods", "enkf", "enkf_opt")
 sys.path.insert(0, OPT)
 
-from crowdcore import navigation, observation_model as om  # noqa: E402
+from crowdcore import frame_reliability as fr, navigation, observation_model as om  # noqa: E402
 from methods.enkf.lcskf.dynamics.model import load_pedpred3, surrogate_mean  # noqa: E402
 
 H, W, F = 36, 12, 4
@@ -89,6 +92,7 @@ def main() -> None:
             if grid.shape[1:] != (F, H, W):
                 raise ValueError(f"unexpected grid shape {grid.shape} in {path}")
             valid_idx = np.arange(a.input_frames - 1, grid.shape[0] - 1)
+            valid_idx = valid_idx[fr.scorable_frames(path, grid.shape[0])[valid_idx + 1]]
             idx = np.sort(rng.choice(valid_idx, size=count, replace=False))
             # Each forecast sees the same causal history convention as the final EnKF.
             # Reading these short slices explicitly avoids h5py's restriction on repeated
@@ -137,6 +141,7 @@ def main() -> None:
         "split": "train", "samples": a.samples, "seed": a.seed,
         "model": model_path, "model_sha256": model_sha256,
         "input_frames": a.input_frames, "device": device_name, "files": provenance,
+        "gap_mask": fr.describe(),
         "raw_bias_channel_rms": np.sqrt((raw_mean.reshape(F, -1) ** 2).mean(axis=1)).tolist(),
         "centered_channel_std": ch_std.tolist(), "reference_proc_std": PROC_STD.tolist(),
         "density_log_definition": "log1p(x_true_density[t+1]) - log1p(clipped_prediction_density)",

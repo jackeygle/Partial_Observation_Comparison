@@ -25,6 +25,19 @@ CONFIG_PATH = os.path.join(_ROOT, "config.yaml")
 with open(CONFIG_PATH) as _f:
     CFG = yaml.safe_load(_f)
 
+#: DATA_VARIANT=all92 (route 2, 2026-10-12): all 92 ATC days, Wednesdays and Sundays, with the
+#: same chronological boundaries as the Sunday split. It has its own data root (split lists,
+#: grid_cache, the walkable-mask cache) and every artifact fitted on the training days carries
+#: VARIANT_SUFFIX, so nothing of the Sunday-only setup is read or overwritten. Unset, nothing
+#: changes.
+DATA_VARIANT = os.environ.get("DATA_VARIANT", "")
+if DATA_VARIANT == "all92":
+    CFG["data"]["root"] = "/scratch/work/zhangx29/data_all92"
+    CFG["data"]["split_list"] = "atc_all_{split}.lst"
+elif DATA_VARIANT:
+    raise SystemExit(f"unknown DATA_VARIANT {DATA_VARIANT!r}")
+VARIANT_SUFFIX = "_all92" if DATA_VARIANT == "all92" else ""
+
 
 def get(*keys, default=None):
     """config.get('observation', 'sensing_range') -> 7; raises with the failing key when the path does not exist."""

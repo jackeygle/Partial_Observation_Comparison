@@ -22,6 +22,34 @@ FS_SMALL = 7.0      # secondary annotations
 LINE = "#1b1b1b"
 GREY = "#6b6b6b"
 WALL = "#bdbdbd"    # obstacle cells in every map thumbnail
+# THESIS_VARIANT=5methods: the separate five-method thesis (no aug. var. 4DVarNet); figures
+# go to out_5methods/ instead of out/, so the default figures are left untouched.
+FIVE_METHODS = os.environ.get("THESIS_VARIANT") == "5methods"
+# THESIS_VARIANT=6methods: the six-method thesis (Thesis_paper20260219) on the five-method
+# setup plus the retrained aug. var. 4DVarNet (kt 3, per-window normalisation); its own
+# evaluation, example frame and out_6methods/. Unset, the old six-method figures are unchanged.
+# THESIS_VARIANT=6methods_all92: the same six-method thesis on route 2 (all 92 ATC days,
+# outputs/full_6m_all92, gap blocks excluded); run with DATA_VARIANT=all92. Own example-frame
+# cache and out_6methods_all92/.
+ALL92 = os.environ.get("THESIS_VARIANT") == "6methods_all92"
+SIX_ALLWALK = os.environ.get("THESIS_VARIANT") in ("6methods", "6methods_all92")
+if ALL92 and os.environ.get("DATA_VARIANT") != "all92":
+    raise SystemExit("THESIS_VARIANT=6methods_all92 needs DATA_VARIANT=all92")
+AUG_LABELS = ("4DVarNet aug. var. (ours)", "4DVarNet aughead_obs (single)", "4DVarNet aug. var.")
+# Evaluation the figures read: the five-method thesis uses its own evaluation (checkpoints
+# selected on all walkable validation cells, EVAL_VARIANT=five_allwalk, DINCAE without the
+# log1p of the velocity variance), with its own cached example frame so the six-method
+# figures keep theirs.
+RESULTS = ("supervisor_evaluation/outputs/full_5m_allwalk_gaussdincae_20261011" if FIVE_METHODS
+           else "supervisor_evaluation/outputs/full_6m_all92" if ALL92
+           else "supervisor_evaluation/outputs/full_6m_allwalk" if SIX_ALLWALK
+           else "supervisor_evaluation/outputs/full")
+FRAME_FILE = ("example_frame_5methods.npz" if FIVE_METHODS
+              else "example_frame_6methods_all92.npz" if ALL92
+              else "example_frame_6methods.npz" if SIX_ALLWALK else "example_frame.npz")
+OUT_DIR = ("out_5methods" if FIVE_METHODS else "out_6methods_all92" if ALL92
+           else "out_6methods" if SIX_ALLWALK else "out")
+DATA_ROOT = "/scratch/work/zhangx29/data_all92" if ALL92 else "/scratch/work/zhangx29/data"
 
 
 def canvas(width_cm: float, height_cm: float):
@@ -42,6 +70,10 @@ def canvas(width_cm: float, height_cm: float):
 
 def save(fig, stem: str) -> None:
     """Vector PDF for LaTeX, PNG for previewing. No tight bbox: the canvas is the page."""
+    if OUT_DIR != "out":
+        head, name = os.path.split(stem)
+        if os.path.basename(head) == "out":
+            stem = os.path.join(os.path.dirname(head), OUT_DIR, name)
     os.makedirs(os.path.dirname(stem), exist_ok=True)
     fig.savefig(stem + ".pdf", bbox_inches=None, pad_inches=0)
     fig.savefig(stem + ".png", bbox_inches=None, pad_inches=0, dpi=300)

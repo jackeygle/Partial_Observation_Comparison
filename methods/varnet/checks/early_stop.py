@@ -25,6 +25,7 @@ import sys
 import numpy as np
 import torch
 
+from crowdcore import frame_reliability as fr
 from crowdcore import navigation as nav
 from crowdcore import observation_model as om
 from methods.varnet.checks.model_io import load_solver
@@ -37,10 +38,15 @@ def main() -> int:
     ap.add_argument("--min-epoch", type=int, default=80)
     ap.add_argument("--patience", type=int, default=20)
     ap.add_argument("--batch", type=int, default=8)
+    ap.add_argument("--scope", choices=["blind_walkable", "all_walkable"], default="blind_walkable")
     a = ap.parse_args()
     run_dir = a.run_dir if os.path.isabs(a.run_dir) else os.path.join(ROOT, a.run_dir)
-    cache_p = os.path.join(run_dir, "early_stop.json")
-    cache = json.load(open(cache_p)) if os.path.exists(cache_p) else {"scores": {}}
+    suffix = "" if a.scope == "blind_walkable" else "_all_walkable"
+    cache_p = os.path.join(run_dir, f"early_stop{suffix}.json")
+    cache = json.load(open(cache_p)) if os.path.exists(cache_p) else {"scores": {}, "gap_mask": fr.ENABLED}
+    if cache.get("gap_mask", False) != fr.ENABLED:     # never mix masked and unmasked scores
+        raise SystemExit(f"{cache_p} was scored with gap_mask={cache.get('gap_mask', False)}, "
+                         f"now {fr.ENABLED}")
     cands = [(ep, p) for ep, p in candidates(run_dir, a.min_epoch)
              if str(ep) not in cache["scores"]]
     if cands:
@@ -58,12 +64,12 @@ def main() -> int:
         se = {ep: 0.0 for ep in solvers}
         n = {ep: 0 for ep in solvers}
         for fp in files:
-            for ep, (s, c) in score_day(solvers, fp, args_by_ckpt, walk, dev, a.batch).items():
+            for ep, (s, c) in score_day(solvers, fp, args_by_ckpt, walk, dev, a.batch, a.scope).items():
                 se[ep] += s
                 n[ep] += c
         for ep in solvers:
             cache["scores"][str(ep)] = se[ep] / max(n[ep], 1)
-            print(f"[early_stop] epoch {ep}: valid blind walkable RMSE "
+            print(f"[early_stop] epoch {ep}: valid {a.scope} RMSE "
                   f"{np.sqrt(cache['scores'][str(ep)]):.5f}", flush=True)
         cache["days"] = [os.path.basename(x) for x in files]
     if not cache["scores"]:
@@ -78,11 +84,11 @@ def main() -> int:
     json.dump(cache, open(cache_p, "w"), indent=1)
     json.dump({"run_dir": run_dir, "split": "valid", "min_epoch": a.min_epoch,
                "n_iter": FINAL_N_ITER, "days": cache.get("days", []),
-               "scope": "walkable (blind cells inside the walkable region, clipped)",
+               "scope": a.scope,
                "mse_by_epoch": cache["scores"], "selected_epoch": best,
                "selected_mse": cache["scores"][str(best)],
                "selected_ckpt": f"ckpt_{best:05d}.pt", "early_stopped": stop},
-              open(os.path.join(run_dir, "select_valid.json"), "w"), indent=2)
+              open(os.path.join(run_dir, f"select_valid{suffix}.json"), "w"), indent=2)
     print(f"[early_stop] best epoch {best} (RMSE {np.sqrt(cache['scores'][str(best)]):.5f}), "
           f"newest {newest}: {'STOP' if stop else 'continue'}", flush=True)
     return 3 if stop else 0

@@ -4,6 +4,35 @@ One entry point reproduces the frozen comparison.  There is no additional YAML
 configuration: model choices, scientific parameters, split dates, and output
 metrics are declared at the top of `evaluate.py`.
 
+The final 4DVarNet package uses the corrected channel/time-axis ordering in the
+GENN coarse branch. Both checkpoints come from validation selections in the
+`*_fold_*` runs; packaging and verification reject legacy-axis checkpoints and
+checkpoints with fewer than 20 solver iterations. The transition and unchanged
+training/selection recipe are recorded in `FOLD_CORRECTION_PROTOCOL.md`.
+
+## Final evaluation: all 92 days (route 2)
+
+The reported results use all 92 ATC days (`DATA_VARIANT=all92`,
+`EVAL_VARIANT=six_allwalk_all92`, data root `/scratch/work/zhangx29/data_all92`)
+and are written to `outputs/full_6m_all92/`; recording-gap blocks are excluded
+from every score (`crowdcore/frame_reliability.py`). The job scripts set the
+variables themselves:
+
+```bash
+sbatch sbatch/all92_smoke.sbatch                         # prepare + verify + smoke test (gpu-debug)
+sbatch --job-name=all92_<m> sbatch/all92_full_method.sbatch <m>   # m = senseiver_a senseiver_g dincae varnet_mse varnet_aughead
+sbatch --job-name=all92_enkf<k> sbatch/all92_full_method.sbatch enkf <k>/3   # k = 0 1 2
+sbatch sbatch/all92_summary.sbatch                       # uncertainty, images, breakdown, tables (V100-32G)
+sbatch sbatch/all92_bench.sbatch                         # inference time
+```
+
+(paths relative to `supervisor_evaluation/`; submit from the repository root).
+Checkpoint selection for this variant: `checks/reselect_all_walkable.py`
+(Senseiver, DINCAE), `checks/final_wink3.py` (4DVarNet) and
+`checks/pedpred_select_lead1.py` (PedPred3). `outputs/README.md` lists what each
+output folder holds. The sections below describe the earlier Sunday-only
+configuration, whose commands are unchanged.
+
 ## Quick start (Triton, GPU)
 
 Everything runs through `evaluate.py`, from the repository root; it needs the
@@ -115,7 +144,7 @@ run metadata that is kept off the figures themselves.
 - `uncertainty_summary` — pooled ("All") and per-channel (a) CRPS and (b)
   spread/RMSE; the pooled bars carry 95% bootstrap intervals over the seven test
   days. Per-channel numbers: `uncertainty_by_channel.csv`.
-- `inference_latency` — median GPU time per frame per method (bars, log scale).
+- `inference_latency` — median compute time per reconstructed frame (horizontal bars on a zero-based linear scale).
 
 `images` adds `images/comparison_*.png`, `sample_manifest.csv`,
 `selected_predictions.npz`, `spread_comparison.png`, `color_scales.json`, and a

@@ -6,108 +6,118 @@ reconstruct the **full** crowd state — density, velocity $(v_x, v_y)$ and
 velocity variance on a 36 × 12 grid, one frame per second — from those partial
 observations; three of them also predict their own uncertainty.
 
-This README covers **how the final comparison is evaluated and how the data is
-split**. Background on the methods, training, and the experiment history is in
-[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
+This README covers **how the final comparison is evaluated, how the data is
+split, and the results**. Background on the methods, training, and the
+experiment history is in [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md); the
+command reference is in [supervisor_evaluation/README.md](supervisor_evaluation/README.md).
+
+The final comparison uses **all 92 days** of the ATC dataset (Wednesdays and
+Sundays) and is selected with `DATA_VARIANT=all92` and
+`EVAL_VARIANT=six_allwalk_all92`. An earlier, Sunday-only configuration (46 days)
+was used during development, where the designs and configuration constants were
+chosen; its code paths are still in the repository (`DATA_VARIANT` unset,
+`EVAL_VARIANT=six_allwalk`), but its results are not part of it.
 
 ## Quick start
 
-On Aalto Triton, from the repository root:
+On Aalto Triton, from the repository root (each job script sets
+`DATA_VARIANT=all92 EVAL_VARIANT=six_allwalk_all92` itself):
 
 ```bash
-sbatch supervisor_evaluation/sbatch/smoke.sbatch   # ~2 min on gpu-debug: end-to-end check, not results
-sbatch supervisor_evaluation/sbatch/full.sbatch    # complete evaluation -> supervisor_evaluation/outputs/full/
+E=supervisor_evaluation/sbatch
+sbatch $E/all92_smoke.sbatch            # package + verify the models, ~3 min end-to-end check (not results)
+for m in senseiver_a senseiver_g dincae varnet_mse varnet_aughead; do
+    sbatch --job-name=all92_$m $E/all92_full_method.sbatch $m          # one method, all 15 test days
+done
+for k in 0 1 2; do
+    sbatch --job-name=all92_enkf$k $E/all92_full_method.sbatch enkf $k/3   # EnKF, a third of the days each
+done
+sbatch $E/all92_summary.sbatch          # after the above: uncertainty, image boards, error breakdown, tables
+sbatch $E/all92_bench.sbatch            # inference time of all six methods on one GPU
 ```
 
-Everything goes through one script, `supervisor_evaluation/evaluate.py`
-(`bench_inference.py` next to it is called by it, never run on its own). It
-imports code from the rest of the repository (`crowdcore/`, `compare/`,
-`methods/`), so it must be run inside this repository, from its root.
+Results go to `supervisor_evaluation/outputs/full_6m_all92/`.
 
 - **Environment:** `source sbatch/_env.sh` loads Triton's
   `scicomp-pytorch-env/2026.1` (Python 3.12) and sets `PYTHONPATH`; elsewhere,
   `pip install -r requirements.txt`. A GPU is required.
-- **Weights:** the eight files listed in `supervisor_evaluation/models/manifest.json`
-  (the weights of the six reported networks, DINCAE's normalisation statistics and
-  the EnKF's noise bank) are the frozen final models and are part of the
-  repository. The manifest records their SHA-256; every run checks them first and
-  refuses to start on a mismatch, and `evaluate.py` loads only these eight.
-  `senseiver_A.pt`, `senseiver_G_k16.pt`, `dincae_epoch60.pt` and
-  `varnet_mse_s3_epoch80.pt` sit in the same directory but are **not** used by any
-  reported result: they are the superseded checkpoints trained with one robot
-  route replayed across days, kept for provenance.
-- **Data:** not in the repository. Point `--data-root` (or `data.root` in
-  `crowdcore/config.yaml`) at a directory laid out as described
-  [below](#data-layout). The two job scripts use `/scratch/work/zhangx29/data`;
-  change that path to run on another copy.
-
-What `full` does, in order: verify packages, checkpoint hashes, data schema and
-test dates → score the six methods on the seven test days → run the EnKF →
-score uncertainty for the three probabilistic methods on one shared protocol →
-benchmark inference time on one GPU → write CSVs and figures. The command
-reference (single steps, reruns, image boards) is in
-[supervisor_evaluation/README.md](supervisor_evaluation/README.md).
+- **Weights:** the eight files listed in
+  `supervisor_evaluation/models/manifest_six_allwalk_all92.json` are the frozen
+  final models and are part of the repository: the five networks
+  (`senseiver_A_pd_all92_epoch097.pt`, `senseiver_G_k16_pd_all92_epoch057.pt`,
+  `dincae_varnone_all92_epoch006.pt`, `varnet_kt3_window_all92_epoch080.pt`,
+  `varnet_augwink3_all92_epoch104.pt`), the EnKF's forecast model
+  (`pedpred3_5to5_all92_epoch_23.pt`) and noise bank
+  (`enkf_residual_q_bank_all92.npz`), and DINCAE's normalisation statistics
+  (`dincae_state_stats_none_all92.npz`). `evaluate.py prepare` copies them from
+  the training runs as named by the validation selections
+  (`outputs/reselect_all_walkable_all92_gapmask/`,
+  `outputs/dev/varnet_*_all92_gapmask_20261015/`,
+  `methods/enkf/runs/pedpred3_lead1_selection_all92_gapmask.json`) and records
+  their SHA-256; every run checks them first and refuses to start on a mismatch.
+  The other files in `supervisor_evaluation/models/` belong to earlier
+  configurations and are not used by these results.
+- **Data:** not in the repository; see [Data layout](#data-layout). The job
+  scripts use `/scratch/work/zhangx29/data_all92`.
 
 ## Dataset split
 
-The ATC dataset records the corridor on Sundays and Wednesdays for about a
-year. **Only the 46 available Sundays are used** (one weekday pattern, so crowd
-behaviour is comparable between days). The split is **chronological, never
-shuffled** — training is the earliest stretch, validation the middle, test the
-latest — so no afternoon is seen from both sides of a boundary.
+The ATC dataset records the corridor on Wednesdays and Sundays for about a
+year, 92 days in total, and all of them are used. The split is **chronological,
+never shuffled** — training is the earliest stretch, validation the middle,
+test the latest — so no part of a day is seen from both sides of a boundary.
+Every split holds both weekdays.
 
-| Split | Days | Frames | Date range | Used for |
+| Split | Days (Wed + Sun) | Frames | Date range | Used for |
 |---|---|---|---|---|
-| train | 32 | 1,262,518 | 2012-10-28 → 2013-06-09 | fitting weights and all training-derived statistics |
-| valid | 7 | 269,743 | 2013-06-16 → 2013-07-28 | choosing checkpoints (every model's epoch on all seven days, every frame) and the EnKF's noise settings |
-| test | 7 | 277,543 | 2013-08-11 → 2013-09-29 | every reported number |
+| train | 63 (31 + 32) | 2,525,609 | 2012-10-24 → 2013-06-09 | fitting weights and all training-derived statistics |
+| valid | 14 (7 + 7) | 535,739 | 2013-06-12 → 2013-07-28 | choosing every model's checkpoint |
+| test | 15 (8 + 7) | 587,227 | 2013-08-07 → 2013-09-29 | every reported number |
 
-Test days: `20130811 20130818 20130825 20130901 20130915 20130922 20130929`.
-There is no recording for the Sundays 2013-08-04 and 2013-09-08 in the source
-data, which is why they are missing. All frames of every test day are scored
-(about 38,000–43,000 frames per day, ~11 hours), except the first and last frame
-of a day (DINCAE needs a neighbouring frame), the EnKF's 500-frame warm-up, and,
-for 4DVarNet, the frames after the last complete 200-frame window; nothing is
-subsampled.
+The designs and configuration constants (Senseiver-G's latent array and window,
+the 4DVarNet prior, the EnKF's process noise) were chosen earlier on the
+Sundays alone, with the same split boundaries, and kept fixed.
+
+**Recording gaps.** When the tracker's recording pauses, the one-second
+windowing does not skip the missing seconds: after the pause it emits one frame
+per sampling timestamp until it has caught up, so those frames hold a single
+snapshot under a lagging time label. They are kept in the data and in training
+but not scored. `supervisor_evaluation/checks/frame_reliability.py` flags every
+frame whose timestamps lie outside its labelled second (0.63% of all frames, on
+27 of the 92 days) and writes the flags to `<data-root>/frame_reliability/`;
+`crowdcore/frame_reliability.py` then excludes every aligned 200-frame block
+with a flagged frame, and the block after it, for every method, in checkpoint
+selection and in testing (2.9% of the validation and 1.5% of the test frames).
+This is on by default under `DATA_VARIANT=all92` (`GAP_MASK=0/1` overrides) and
+off otherwise.
 
 **Where the split is defined.** The code reads three list files from the data
-root, `sunday_atc_{train,valid,test}.lst` (one `ATC/Sundays/atc-YYYYMMDD.h5`
+root, `atc_all_{train,valid,test}.lst` (one `ATC/{Wednesdays,Sundays}/atc-YYYYMMDD.h5`
 per line; `crowdcore/observation_model.split_files`). Copies of the exact lists
-used are in [`supervisor_evaluation/data_split/`](supervisor_evaluation/data_split/).
-`evaluate.py` also pins the test dates in `TEST_DATES`; the `verify` step that
-starts every run fails unless the test list and `TEST_DATES` name exactly the
-same days.
-
-**Using a different split.**
-
-- *Different test days only:* put the new days in `sunday_atc_test.lst`, update
-  `TEST_DATES` in `evaluate.py` to match, and make sure their gridded files
-  exist (see below). The new test days must not appear in the train or valid
-  lists. No retraining is needed.
-- *Different train or valid days:* the packaged weights are no longer valid.
-  Besides the model weights, these are fitted on the training days and must be
-  rebuilt with the new split: the walkable-cell mask (besides the map, a cell must
-  have a density above 0.5 on some training day; cached as
-  `grid_cache/visited_union_train_tau0.5_corridor.npy` — delete it and it is
-  recomputed from the training list), DINCAE's normalisation statistics
-  (`methods/dincae/artifacts/state_stats.npz`), and the EnKF's residual noise
-  bank. Retraining is described in [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
+are in [`supervisor_evaluation/data_split/`](supervisor_evaluation/data_split/),
+next to the Sunday-only lists of the development configuration. The `verify`
+step that starts every run fails unless the test list and the test dates of the
+evaluation variant name exactly the same days.
 
 ## Data layout
 
 ```
-<data-root>/
-  sunday_atc_train.lst  sunday_atc_valid.lst  sunday_atc_test.lst
-  grid_cache/atc-YYYYMMDD_corridor_1.0s.h5        # one file per day
+<data-root>/                                   # /scratch/work/zhangx29/data_all92
+  atc_all_train.lst  atc_all_valid.lst  atc_all_test.lst
+  ATC/Sundays/atc-YYYYMMDD.h5  ATC/Wednesdays/atc-YYYYMMDD.h5   # trajectories (from the raw CSVs)
+  grid_cache/atc-YYYYMMDD_corridor_1.0s.h5     # one gridded file per day
   grid_cache/visited_union_train_tau0.5_corridor.npy   # training-day walkable evidence
+  frame_reliability/atc-YYYYMMDD.npy           # recording-gap flags, one bool per frame
 ```
 
 Each gridded day file holds `grid` — float32 `(N, 4, 36, 12)`, channels
 `[density, vx, vy, vel_var]`, 1 m cells, one frame per second — and `time`
 `(N,)`. They are produced from the raw ATC CSV files by
-`crowdcore/data/csv_to_h5.py` and `crowdcore/data/h5_to_grid.py`; the pipeline
-and its validation are documented in
+`crowdcore/data/csv_to_h5.py` and `crowdcore/data/h5_to_grid.py`
+(`sbatch/regrid_wednesdays.sbatch` for the Wednesdays); the pipeline and its
+validation are documented in
 [crowdcore/data/DOC_data_pipeline.md](crowdcore/data/DOC_data_pipeline.md).
+The walkable mask is the same 290 cells as with the Sundays alone.
 
 ## Observation protocol
 
@@ -116,17 +126,18 @@ three robots follow A* routes between random walkable goals, one cell per
 second; a walkable cell is observed at a frame if it is within 7 cells of a
 robot and in line of sight (obstacles from the real ATC map block sight).
 On average about 56% of walkable cells are observed at a frame; the other 44%
-are the blind cells the headline scores are computed on. Observations carry
-per-channel Gaussian noise. Robot routes are seeded by the day's date, so every
-day has its own routes and every script sees the same observations for a day.
-The final learned checkpoints were trained with this per-day route mode.
+are the blind cells. Observations carry per-channel Gaussian noise. Robot routes
+are seeded by the day's date, so every day has its own routes and every script
+sees the same observations for a day. All learned models were trained with
+these per-day routes.
 
 ## Results, and how to read them
 
-Accuracy and uncertainty numbers are over the seven test days, on **unobserved walkable cells**:
-cells inside the corridor that no robot sees at that frame (about 44% of
-walkable cells). Reconstructing them is the actual task; obstacle cells are
-never scored. The four quantities being reconstructed are:
+All numbers are over the 15 test days, with the recording-gap blocks excluded.
+Accuracy and uncertainty are reported on **all walkable cells** (observed and
+blind) and on the **blind cells** alone — the walkable cells that no robot sees
+at that frame, where the state must be inferred. Obstacle cells are never
+scored. The four quantities being reconstructed are:
 
 | Channel | Meaning | Unit |
 |---|---|---|
@@ -138,96 +149,74 @@ never scored. The four quantities being reconstructed are:
 
 **RMSE** (root-mean-square error): the typical size of the difference between
 the reconstructed value and the true value, in the channel's own unit. **Lower
-is better.** For example, a density RMSE of 0.13 means the reconstruction is off
-by about 0.13 people per m² in a typical cell. "All" pools the four channels
-into one number.
+is better.** "All" pools the four channels into one number.
 
-| Method | All | Density | $v_x$ | $v_y$ | Vel. var. |
-|---|---|---|---|---|---|
-| Senseiver-A | 0.223 | 0.156 | 0.372 | 0.155 | 0.107 |
-| **Senseiver-G (ours)** | **0.196** | **0.132** | **0.325** | **0.144** | **0.102** |
-| DINCAE | 0.226 | 0.155 | 0.378 | 0.161 | 0.108 |
-| 4DVarNet | 0.232 | 0.178 | 0.362 | 0.179 | 0.140 |
-| 4DVarNet aug. var. (ours) | 0.295 | 0.195 | 0.504 | 0.189 | 0.142 |
-| EnKF | 0.253 | 0.156 | 0.404 | 0.174 | 0.197 |
+| Method | All walkable: All | Density | $v_x$ | $v_y$ | Vel. var. | Blind: All | Density | $v_x$ | $v_y$ | Vel. var. |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Senseiver-A | 0.144 | 0.093 | 0.242 | 0.102 | 0.068 | 0.206 | 0.133 | 0.347 | 0.147 | 0.094 |
+| **Senseiver-G (ours)** | **0.125** | **0.077** | **0.209** | **0.094** | **0.064** | **0.182** | **0.113** | **0.303** | **0.137** | **0.091** |
+| DINCAE | 0.176 | 0.117 | 0.296 | 0.125 | 0.083 | 0.214 | 0.136 | 0.362 | 0.157 | 0.098 |
+| 4DVarNet | 0.181 | 0.108 | 0.307 | 0.136 | 0.085 | 0.212 | 0.152 | 0.335 | 0.172 | 0.124 |
+| 4DVarNet aug. var. (ours) | 0.226 | 0.114 | 0.407 | 0.138 | 0.085 | 0.276 | 0.162 | 0.481 | 0.178 | 0.125 |
+| EnKF | 0.199 | 0.112 | 0.334 | 0.139 | 0.126 | 0.235 | 0.131 | 0.382 | 0.170 | 0.171 |
 
-![Reconstruction accuracy](supervisor_evaluation/outputs/full/figures/accuracy_rmse.png)
+![Reconstruction accuracy (blind cells)](supervisor_evaluation/outputs/full_6m_all92/figures/accuracy_rmse.png)
 
 *How to read the figure:* each group of bars is one channel (the left group is
 all channels together); each colour is one method, the same colour in every
 figure. A shorter bar is a smaller error.
 
 *What it shows:* Senseiver-G has the smallest error overall and on every
-channel. Giving 4DVarNet an uncertainty output (aug. var.) costs accuracy,
-mostly on $v_x$. The EnKF is competitive on density but has by far the largest
-error on velocity variance.
-
-**Two references that need no model.** 79% of the scored blind cells are empty
-and the velocity of an empty cell is defined as zero, so the "All" column needs
-a floor to be read against. On the frames common to all six methods
-(`supervisor_evaluation/checks/trivial_baselines.py`, no GPU, no training):
-
-| Prediction | All | Density | $v_x$ | $v_y$ | Vel. var. |
-|---|---|---|---|---|---|
-| All zero | 0.248 | 0.188 | 0.413 | 0.166 | 0.114 |
-| Carry-forward (the 4DVarNet solver's initial state) | 0.355 | 0.211 | 0.618 | 0.236 | 0.149 |
-
-Predicting zero everywhere beats the EnKF (0.254) and the augmented 4DVarNet
-(0.296) on the pooled number, and the augmented model on all four channels; the
-other four methods beat it, by 6–20%. Carry-forward is the weaker reference and
-all six methods beat it — useful for the 4DVarNet models in particular, since it
-is where their solver starts: 0.355 to 0.233 for the plain model and to 0.296
-for the augmented one.
+channel, on both sets of cells. Giving 4DVarNet an uncertainty output (aug. var.)
+costs accuracy, mostly on $v_x$. On the blind cells the EnKF is the second most
+accurate method on density, but it has by far the largest error on velocity
+variance.
 
 ### 2. Uncertainty — does the method know how wrong it is?
 
-Three methods provide a predictive distribution for every cell. DINCAE and
-augmented 4DVarNet predict a value and standard deviation σ̂; the EnKF provides
-100 analysis members, whose spread supplies σ̂ for calibration. Two numbers
-judge their probabilistic predictions:
+Three methods provide a predictive distribution for every cell. DINCAE and the
+augmented 4DVarNet predict a value and a standard deviation σ̂; the EnKF provides
+100 analysis members, whose spread supplies σ̂. Two numbers judge their
+probabilistic predictions:
 
 **CRPS — the overall score of the predictive distribution. Lower is better.** The
 CRPS (continuous ranked probability score) scores each cell's predictive
 distribution in the channel's own unit: it is smallest when the prediction is
-accurate and its uncertainty matches the error. The EnKF is scored from its
-100 members directly; the other methods use their fitted distributions.
-Inflating or shrinking uncertainty alone cannot reliably improve this proper
-score. Because CRPS also scores the predicted value, it rates the probabilistic
-prediction as a whole.
+accurate and its uncertainty matches the error. Inflating or shrinking the
+uncertainty alone cannot reliably improve this proper score. Because CRPS also
+scores the predicted value, it rates the probabilistic prediction as a whole.
 
 **Spread / RMSE — is σ̂ the right size on average? 1 is ideal.** Spread is the
-root-mean-square of σ̂ over all scored cells, the usual definition for ensemble
-methods; RMSE is the actual error. Below 1: the method is overconfident (σ̂ too
-small). Above 1: it is too cautious (σ̂ too large). This only checks the overall
-size, not whether σ̂ is large in the right cells — that is what CRPS adds.
+root-mean-square of σ̂ over all scored cells; RMSE is the actual error. Below 1:
+the method is overconfident (σ̂ too small). Above 1: it is too cautious (σ̂ too
+large). This only checks the overall size, not whether σ̂ is large in the right
+cells — that is what CRPS adds.
 
 **The range in brackets (95% interval)** shows how much a number depends on
 which days happened to be the test days: the result is recomputed 10,000 times,
-each time on a random re-draw of the seven test days, and the range contains 95%
-of those results. These intervals describe sensitivity to the choice of test
-days; comparing two methods also calls for paired differences on the same
-resampled days.
+each time on a random re-draw of the 15 test days.
 
-| Method | CRPS (lower is better) | range over test days | Spread / RMSE (1 is ideal) | range over test days |
-|---|---|---|---|---|
-| **DINCAE** | **0.074** | 0.071–0.078 | **0.86** | 0.83–0.90 |
-| 4DVarNet aug. var. (ours) | 0.106 | 0.101–0.111 | 1.30 | 1.25–1.34 |
-| EnKF | 0.098 | 0.096–0.100 | 1.23 | 1.20–1.27 |
+| Method | Blind: CRPS | 95% range | Spread / RMSE | 95% range | All walkable: CRPS | Spread / RMSE |
+|---|---|---|---|---|---|---|
+| **DINCAE** | **0.069** | 0.062–0.075 | 0.83 | 0.80–0.87 | **0.055** | 0.57* |
+| 4DVarNet aug. var. (ours) | 0.096 | 0.089–0.103 | 1.08 | 1.04–1.12 | 0.084 | 1.17 |
+| EnKF | 0.086 | 0.082–0.090 | 1.27 | 1.23–1.32 | 0.072 | 1.26 |
 
-![Uncertainty](supervisor_evaluation/outputs/full/figures/uncertainty_summary.png)
+\* On all walkable cells, DINCAE's spread/RMSE (interval 0.39–0.81) is distorted
+by a few unclipped velocity-variance predictions on observed cells that lie far
+outside the physical range — 6,781 values, 0.007% of the scored ones, most of
+them in cells whose true velocity variance itself exceeds 2; its CRPS is hardly
+affected (`outputs/full_6m_all92/dincae_outliers_v2.json`,
+`supervisor_evaluation/checks/diag_dincae_outliers.py`).
 
-*How to read the figure:* (a) CRPS, (b) spread/RMSE; left group all channels
-together, then one group per channel. The small black bars on the "All" group are
-the 95% ranges above. In (b), the dashed line at 1 is the ideal size.
+![Uncertainty (blind cells)](supervisor_evaluation/outputs/full_6m_all92/figures/uncertainty_summary.png)
 
-*What it shows:* DINCAE has the lowest pooled CRPS (0.074) and leads on three
-of four channels; the EnKF leads on density. The EnKF has the next-lowest pooled
-CRPS (0.098), followed by augmented 4DVarNet (0.106). DINCAE's spread/RMSE is
-0.86, indicating overall underdispersion. Augmented 4DVarNet and the EnKF are
-overdispersed overall (1.30 and 1.23): for augmented 4DVarNet, the variance
-channel has spread/RMSE 3.29 while its other channels are near 1; for the EnKF,
-$v_x$ is 1.27 and $v_y$ is 1.55. Per-channel numbers:
-`uncertainty_by_channel.csv`.
+*What it shows:* DINCAE has the lowest CRPS on both sets of cells and on each of
+the 15 test days; the EnKF leads on density. On the blind cells DINCAE's spread
+is smaller than its error (0.83) and the EnKF's larger (1.27). The augmented
+4DVarNet's pooled ratio is closest to one (1.08), but its velocity-variance
+channel is at 2.54 while the other channels are near or slightly below 1.
+Per-channel numbers: `uncertainty_by_channel*.csv`.
 
 #### The math behind the two numbers
 
@@ -278,8 +267,8 @@ it is wrong. Spread/RMSE cannot tell them apart — both are a perfect 1.00. CRP
 rates A twice as good as B. This is why CRPS is the main uncertainty measure and
 spread/RMSE only a check on overall size.
 
-DINCAE's velocity-variance channel uses a shifted log-normal CRPS in physical
-units. The EnKF is scored with the **empirical CRPS of its 100 analysis members**
+DINCAE and the augmented 4DVarNet are scored with the Gaussian formula above,
+in physical units. The EnKF is scored with the **empirical CRPS of its 100 analysis members**
 $x_1,\dots,x_N$ ($N = 100$), so the Gaussian formula above is not applied to its
 ensemble:
 
@@ -289,31 +278,31 @@ $$
 
 with $y$ the truth in that cell. This form makes no assumption about the shape of
 the ensemble distribution, so it also charges the filter for the skewness and the
-clipping at zero that a mean-and-spread summary would hide; scoring the same runs
-through the Gaussian formula instead gives a pooled CRPS of 0.107 rather than
-0.098.
+clipping at zero that a mean-and-spread summary would hide.
 
 ### 3. Inference time — how fast is each method?
 
-The median GPU time to reconstruct one frame, measured for every method on the
-same GPU (one Tesla V100) and the same frames.
+The median GPU time to reconstruct one frame, measured for every method in one
+job on the same GPU (a Tesla V100-SXM2-16GB) and the same 600 frames of the first
+test day, with the inputs prepared beforehand.
 
-![Inference time](supervisor_evaluation/outputs/full/figures/inference_latency.png)
+| DINCAE | Senseiver-A | 4DVarNet | 4DVarNet aug. var. | Senseiver-G | EnKF |
+|---|---|---|---|---|---|
+| 0.030 ms | 0.145 ms | 0.31 ms | 0.39 ms | 0.82 ms | 7.3 ms |
 
-*How to read the figure:* the vertical axis is logarithmic — each grid line is
-10× the one below — because the methods differ by a factor of about 270. Read
-the value printed on each bar rather than comparing bar heights.
+![Inference time](supervisor_evaluation/outputs/full_6m_all92/figures/inference_latency.png)
 
-*What it shows:* DINCAE is the fastest (0.022 ms per frame) and the EnKF, which
-runs 100 forecast members, the slowest (5.9 ms). Every method is far faster than
-the data itself, which arrives at one frame per second.
+Every method is far faster than the data itself, which arrives at one frame per
+second. The two 4DVarNet models reconstruct 200-frame windows; their time is per
+frame. DINCAE and both 4DVarNet models also need observations after the frame
+they reconstruct.
 
 ### Files
 
-The numbers above are in `supervisor_evaluation/outputs/full/`:
-`accuracy.csv`, `uncertainty.csv`, `uncertainty_by_channel.csv` and
-`inference_time_controlled.csv`, plus a LaTeX table (`accuracy_table.tex`) and
-figure captions (`figures/captions.md`). The exact definitions and code are in
-`supervisor_evaluation/evaluate.py` and `compare/score_uncertainty.py`
-(CRPS in physical units; DINCAE's velocity-variance channel uses the log-normal
-form of the CRPS because the network predicts it on a log scale).
+The numbers above are in `supervisor_evaluation/outputs/full_6m_all92/`:
+`accuracy.csv` and `accuracy_all_walkable.csv`, `uncertainty.csv` and
+`uncertainty_all_walkable.csv` (with their per-channel versions),
+`inference_time_controlled.csv`, the error breakdown in `breakdown/`, image
+boards in `images/`, and figure captions in `figures/captions.md`. The exact
+definitions and code are in `supervisor_evaluation/evaluate.py`,
+`compare/score_uncertainty.py` and `supervisor_evaluation/breakdown.py`.

@@ -15,7 +15,7 @@ import os
 import numpy as np
 
 from compare import plotstyle as ps
-from thesis_figures.common import (FS_SMALL, GREY, LINE, canvas, colorbar_under, field_rgb,
+from thesis_figures.common import (FRAME_FILE, FS_SMALL, GREY, LINE, canvas, colorbar_under, field_rgb,
                                    save, sub_axes, text, thumbnail)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +34,7 @@ def main() -> None:
     from crowdcore import navigation as nav
     from crowdcore.data.h5_to_grid import SUBSETS, rotation_matrix
 
-    d = np.load(os.path.join(HERE, "data", "example_frame.npz"))
+    d = np.load(os.path.join(HERE, "data", FRAME_FILE))
     walk, x = d["walkable"], d["truth"]
     fig, ax = canvas(*PAGE)
 

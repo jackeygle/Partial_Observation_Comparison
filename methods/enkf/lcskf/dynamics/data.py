@@ -20,6 +20,7 @@ import torch
 import h5py
 
 from crowdcore import config, navigation
+from crowdcore import frame_reliability as fr
 from crowdcore import observation_model as om
 
 
@@ -96,6 +97,7 @@ class PairFrames:
         targets = [np.arange(start + input_frames, stop - output_frames + 1, dtype=np.int64)
                    for start, stop in zip(starts, stops)]
         self.split, self.n_days, self.n_frames = split, len(files), len(frames)
+        self.files, self.lengths = list(files), lengths
         self.input_frames = input_frames
         self.output_frames = output_frames
         self.frames = torch.from_numpy(frames).to(device)
@@ -120,6 +122,14 @@ class PairFrames:
             self.background = torch.from_numpy(np.concatenate(backgrounds)).to(device)
             self.observed = torch.from_numpy(np.concatenate(observed)).to(device)
             del backgrounds, observed
+
+    def scorable_pairs(self) -> torch.Tensor:
+        """Bool per pair: every target frame is scorable under crowdcore.frame_reliability
+        (all True when the gap mask is off). For selection/scoring only; training is unchanged."""
+        ok = np.concatenate([fr.scorable_frames(fp, n) for fp, n in zip(self.files, self.lengths)])
+        ok = torch.from_numpy(ok).to(self.index.device)
+        offsets = torch.arange(self.output_frames, device=self.index.device)
+        return ok[self.index[:, None] + offsets[None]].all(1)
 
     @property
     def n_pairs(self) -> int:
