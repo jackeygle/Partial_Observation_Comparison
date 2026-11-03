@@ -1,0 +1,425 @@
+@article{beauchamp2024spde,
+  author  = {Beauchamp, Maxime and Fablet, Ronan and Benaichouche, Simon and Tandeo, Pierre and Desassis, Nicolas and Chapron, Bertrand},
+  title   = {Neural Variational Data Assimilation with Uncertainty Quantification Using {SPDE} Priors},
+  journal = {Artificial Intelligence for the Earth Systems},
+  volume  = {4},
+  number  = {3},
+  year    = {2025},
+  doi     = {10.1175/AIES-D-24-0060.1}
+}
+
+%% =======================================================================
+%% Thesis-specific references (30-entry literature review list)
+%% Used by Introduction and Related Work sections of thesis.tex.
+%% Entries marked TODO have incomplete bibliographic data in the source
+%% literature-review list and must be verified/completed by the author.
+%% =======================================================================
+
+%% ---- Layer 1: core literature ----
+
+@article{brscic2013atc,
+  author  = {Br{\v{s}}\v{c}i\'{c}, Dra\v{z}en and Kanda, Takayuki and Ikeda, Tetsushi and Miyashita, Takahiro},
+  title   = {Person Tracking in Large Public Spaces Using 3-{D} Range Sensors},
+  journal = {IEEE Transactions on Human-Machine Systems},
+  volume  = {43},
+  number  = {6},
+  pages   = {522--534},
+  year    = {2013},
+  doi     = {10.1109/THMS.2013.2283945}
+}
+
+@article{barth2020dincae1,
+  author  = {Barth, Alexander and Alvera-Azc\'{a}rate, Aida and Licer, Matjaz and Beckers, Jean-Marie},
+  title   = {{DINCAE} 1.0: a convolutional neural network with error estimates to reconstruct sea surface temperature satellite observations},
+  journal = {Geoscientific Model Development},
+  volume  = {13},
+  number  = {3},
+  pages   = {1609--1622},
+  year    = {2020},
+  doi     = {10.5194/gmd-13-1609-2020}
+}
+
+@article{barth2022dincae2,
+  author  = {Barth, Alexander and Alvera-Azc\'{a}rate, Aida and Troupin, Charles and Beckers, Jean-Marie},
+  title   = {{DINCAE} 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations},
+  journal = {Geoscientific Model Development},
+  volume  = {15},
+  number  = {5},
+  pages   = {2183--2196},
+  year    = {2022},
+  doi     = {10.5194/gmd-15-2183-2022}
+}
+
+@article{santos2023senseiver,
+  author  = {Santos, Javier E. and Fox, Zachary R. and Mohan, Arvind and O'Malley, Daniel and Viswanathan, Hari and Lubbers, Nicholas},
+  title   = {Development of the {Senseiver} for efficient field reconstruction from sparse observations},
+  journal = {Nature Machine Intelligence},
+  volume  = {5},
+  number  = {11},
+  pages   = {1317--1325},
+  year    = {2023},
+  doi     = {10.1038/s42256-023-00746-x}
+}
+
+@article{fablet2020fourdvarnet,
+  author  = {Fablet, Ronan and Chapron, Bertrand and Drumetz, Lucas and M\'{e}min, Etienne and Pannekoucke, Olivier and Rousseau, Fran\c{c}ois},
+  title   = {Learning Variational Data Assimilation Models and Solvers},
+  journal = {Journal of Advances in Modeling Earth Systems},
+  volume  = {13},
+  number  = {10},
+  pages   = {e2021MS002572},
+  year    = {2021},
+  doi     = {10.1029/2021MS002572},
+}
+
+@inproceedings{lakshminarayanan2017deepensembles,
+  author    = {Lakshminarayanan, Balaji and Pritzel, Alexander and Blundell, Charles},
+  title     = {Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+  eprint  = {1612.01474},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{gal2016mcdropout,
+  author    = {Gal, Yarin and Ghahramani, Zoubin},
+  title     = {Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning},
+  booktitle = {Proceedings of the 33rd International Conference on Machine Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {48},
+  pages     = {1050--1059},
+  year      = {2016},
+  eprint  = {1506.02142},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{vaswani2017attention,
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  title     = {Attention Is All You Need},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+  eprint  = {1706.03762},
+  archivePrefix = {arXiv}
+}
+
+%% ---- Layer 2: background knowledge ----
+
+@inproceedings{ronneberger2015unet,
+  author    = {Ronneberger, Olaf and Fischer, Philipp and Brox, Thomas},
+  title     = {{U-Net}: Convolutional Networks for Biomedical Image Segmentation},
+  booktitle = {Medical Image Computing and Computer-Assisted Intervention (MICCAI 2015)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9351},
+  pages     = {234--241},
+  publisher = {Springer},
+  year      = {2015},
+  doi       = {10.1007/978-3-319-24574-4_28},
+}
+
+@inproceedings{jaegle2021perceiver,
+  author    = {Jaegle, Andrew and Borgeaud, Sebastian and Alayrac, Jean-Baptiste and Doersch, Carl and Ionescu, Catalin and Ding, David and Koppula, Skanda and Zoran, Daniel and Brock, Andrew and Shelhamer, Evan and H\'{e}naff, Olivier and Botvinick, Matthew M. and Zisserman, Andrew and Vinyals, Oriol and Carreira, Jo\~{a}o},
+  title     = {Perceiver {IO}: A General Architecture for Structured Inputs \& Outputs},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022},
+  eprint  = {2107.14795},
+  archivePrefix = {arXiv}
+}
+
+%% ---- Layer 3: extended supplementary ----
+
+@article{fukami2021voronoi,
+  author  = {Fukami, Kai and Maulik, Romit and Ramachandra, Nesar and Fukagata, Koji and Taira, Kunihiko},
+  title   = {Global field reconstruction from sparse sensors with {Voronoi} tessellation-assisted deep learning},
+  journal = {Nature Machine Intelligence},
+  volume  = {3},
+  number  = {11},
+  pages   = {945--951},
+  year    = {2021},
+  doi     = {10.1038/s42256-021-00402-2},
+}
+
+@inproceedings{kendall2017uncertainties,
+  author    = {Kendall, Alex and Gal, Yarin},
+  title     = {What Uncertainties Do We Need in {Bayesian} Deep Learning for Computer Vision?},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+  eprint  = {1703.04977},
+  archivePrefix = {arXiv}
+}
+
+@article{revach2022kalmannet,
+  author  = {Revach, Guy and Shlezinger, Nir and Ni, Xiaoyong and Escoriza, Adri\`{a} L\'{o}pez and van Sloun, Ruud J. G. and Eldar, Yonina C.},
+  title   = {{KalmanNet}: Neural Network Aided {Kalman} Filtering for Partially Known Dynamics},
+  journal = {IEEE Transactions on Signal Processing},
+  volume  = {70},
+  pages   = {1532--1547},
+  year    = {2022},
+  doi     = {10.1109/TSP.2022.3158588},
+}
+
+@inproceedings{haarnoja2016backpropkf,
+  author    = {Haarnoja, Tuomas and Ajay, Anurag and Levine, Sergey and Abbeel, Pieter},
+  title     = {Backprop {KF}: Learning Discriminative Deterministic State Estimators},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {29},
+  year      = {2016},
+  eprint  = {1605.07148},
+  archivePrefix = {arXiv}
+}
+
+@article{mei2024mobile,
+  author  = {Mei, Jiazhong and Brunton, Steven L. and Kutz, J. Nathan},
+  title   = {Mobile Sensor Path Planning for {K}alman Filter Spatiotemporal Estimation},
+  journal = {Sensors},
+  volume  = {24},
+  number  = {12},
+  eid     = {3727},
+  year    = {2024},
+  doi     = {10.3390/s24123727},
+}
+
+@article{fablet2021james,
+  author  = {Fablet, Ronan and Beauchamp, Maxime and Drumetz, Lucas and Rousseau, Fran\c{c}ois},
+  title   = {Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields},
+  journal = {Frontiers in Applied Mathematics and Statistics},
+  volume  = {7},
+  eid     = {655224},
+  year    = {2021},
+  doi     = {10.3389/fams.2021.655224}
+}
+
+@article{gneiting2007scoring,
+  author  = {Gneiting, Tilmann and Raftery, Adrian E.},
+  title   = {Strictly Proper Scoring Rules, Prediction, and Estimation},
+  journal = {Journal of the American Statistical Association},
+  volume  = {102},
+  number  = {477},
+  pages   = {359--378},
+  year    = {2007},
+  doi     = {10.1198/016214506000001437}
+}
+
+%% ---- Layer 4: newly added extensions ----
+
+@article{beauchamp2023ssh,
+  author  = {Beauchamp, Maxime and Febvre, Quentin and Georgenthum, Hugo and Fablet, Ronan},
+  title   = {{4DVarNet-SSH}: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry},
+  journal = {Geoscientific Model Development},
+  volume  = {16},
+  number  = {8},
+  pages   = {2119--2147},
+  year    = {2023},
+  doi     = {10.5194/gmd-16-2119-2023},
+}
+
+@article{beauchamp2023en4dvarnet,
+  author  = {Beauchamp, Maxime and Febvre, Quentin and Fablet, Ronan},
+  title   = {Ensemble-based {4DVarNet} uncertainty quantification for the reconstruction of sea surface height dynamics},
+  journal = {Environmental Data Science},
+  volume  = {2},
+  pages   = {e18},
+  year    = {2023},
+  doi     = {10.1017/eds.2023.19}
+}
+
+@inproceedings{fablet2018bilinear,
+  author    = {Fablet, Ronan and Ouala, Said and Herzet, C\'{e}dric},
+  title     = {Bilinear Residual Neural Network for the Identification and Forecasting of Geophysical Dynamics},
+  booktitle = {26th European Signal Processing Conference (EUSIPCO)},
+  pages     = {1477--1481},
+  year      = {2018},
+  doi       = {10.23919/EUSIPCO.2018.8553492}
+}
+
+@article{barth2014divand,
+  author  = {Barth, Alexander and Beckers, Jean-Marie and Troupin, Charles and Alvera-Azc\'{a}rate, Aida and Vandenbulcke, Luc},
+  title   = {divand-1.0: $n$-dimensional variational data analysis for ocean observations},
+  journal = {Geoscientific Model Development},
+  volume  = {7},
+  number  = {1},
+  pages   = {225--241},
+  year    = {2014},
+  doi     = {10.5194/gmd-7-225-2014}
+}
+
+@article{burgers1998enkf,
+  author  = {Burgers, Gerrit and van Leeuwen, Peter Jan and Evensen, Geir},
+  title   = {Analysis Scheme in the Ensemble {K}alman Filter},
+  journal = {Monthly Weather Review},
+  volume  = {126},
+  number  = {6},
+  pages   = {1719--1724},
+  year    = {1998},
+  doi     = {10.1175/1520-0493(1998)126<1719:ASITEK>2.0.CO;2}
+}
+
+@article{baran2015lognormal,
+  author  = {Baran, S\'{a}ndor and Lerch, Sebastian},
+  title   = {Log-normal distribution based Ensemble Model Output Statistics models for probabilistic wind-speed forecasting},
+  journal = {Quarterly Journal of the Royal Meteorological Society},
+  volume  = {141},
+  number  = {691},
+  pages   = {2289--2299},
+  year    = {2015},
+  doi     = {10.1002/qj.2521},
+  eprint  = {1407.3252},
+  archivePrefix = {arXiv}
+}
+
+@article{efron1979bootstrap,
+  author  = {Efron, Bradley},
+  title   = {Bootstrap Methods: Another Look at the Jackknife},
+  journal = {The Annals of Statistics},
+  volume  = {7},
+  number  = {1},
+  pages   = {1--26},
+  year    = {1979},
+  doi     = {10.1214/aos/1176344552}
+}
+
+@inproceedings{kingma2015adam,
+  author    = {Kingma, Diederik P. and Ba, Jimmy},
+  title     = {Adam: A Method for Stochastic Optimization},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2015},
+  eprint  = {1412.6980},
+  archivePrefix = {arXiv}
+}
+
+@article{ledimet1986,
+  author  = {Le Dimet, Fran\c{c}ois-Xavier and Talagrand, Olivier},
+  title   = {Variational algorithms for analysis and assimilation of meteorological observations: theoretical aspects},
+  journal = {Tellus A},
+  volume  = {38},
+  number  = {2},
+  pages   = {97--110},
+  year    = {1986},
+  doi     = {10.1111/j.1600-0870.1986.tb00459.x}
+}
+
+@article{hochreiter1997lstm,
+  author  = {Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
+  title   = {Long Short-Term Memory},
+  journal = {Neural Computation},
+  volume  = {9},
+  number  = {8},
+  pages   = {1735--1780},
+  year    = {1997},
+  doi     = {10.1162/neco.1997.9.8.1735}
+}
+
+@inproceedings{shi2015convlstm,
+  author    = {Shi, Xingjian and Chen, Zhourong and Wang, Hao and Yeung, Dit-Yan and Wong, Wai-kin and Woo, Wang-chun},
+  title     = {Convolutional {LSTM} Network: A Machine Learning Approach for Precipitation Nowcasting},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {28},
+  year      = {2015},
+  eprint  = {1506.04214},
+  archivePrefix = {arXiv}
+}
+
+@article{roth2017enkf,
+  author  = {Roth, Michael and Hendeby, Gustaf and Fritsche, Carsten and Gustafsson, Fredrik},
+  title   = {The Ensemble {Kalman} Filter: A Signal Processing Perspective},
+  journal = {EURASIP Journal on Advances in Signal Processing},
+  volume  = {2017},
+  number  = {1},
+  eid     = {56},
+  year    = {2017},
+  doi     = {10.1186/s13634-017-0492-x},
+}
+
+@misc{dirkson2025spread,
+  author       = {Dirkson, Arlan and Buehner, Mark},
+  title        = {Are we misdiagnosing ensemble forecast reliability? On the insufficiency of Spread-Error and rank-based reliability metrics},
+  year         = {2025},
+  eprint       = {2512.02160},
+  archivePrefix = {arXiv},
+}
+
+@article{williams2024shred,
+  author  = {Williams, Jan P. and Zahn, Olivia and Kutz, J. Nathan},
+  title   = {Sensing with shallow recurrent decoder networks},
+  journal = {Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences},
+  volume  = {480},
+  number  = {2298},
+  eid     = {20240054},
+  year    = {2024},
+  doi     = {10.1098/rspa.2024.0054}
+}
+
+@article{ebers2024mobileshred,
+  author  = {Ebers, Megan R. and Williams, Jan P. and Steele, Katherine M. and Kutz, J. Nathan},
+  title   = {Leveraging arbitrary mobile sensor trajectories with shallow recurrent decoder networks for full-state reconstruction},
+  journal = {IEEE Access},
+  volume  = {12},
+  pages   = {97428--97439},
+  year    = {2024},
+  doi     = {10.1109/ACCESS.2024.3423679}
+}
+
+@inproceedings{kim2019anp,
+  author    = {Kim, Hyunjik and Mnih, Andriy and Schwarz, Jonathan and Garnelo, Marta and Eslami, Ali and Rosenbaum, Dan and Vinyals, Oriol and Teh, Yee Whye},
+  title     = {Attentive Neural Processes},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019},
+  eprint    = {1901.05761},
+  archivePrefix = {arXiv}
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
+@inproceedings{cho2014gru,
+  author    = {Cho, Kyunghyun and van Merri{\"e}nboer, Bart and Gulcehre, Caglar and Bahdanau, Dzmitry and Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
+  title     = {Learning Phrase Representations using {RNN} Encoder--Decoder for Statistical Machine Translation},
+  booktitle = {Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {1724--1734},
+  year      = {2014},
+  doi       = {10.3115/v1/D14-1179}
+}
+
+@misc{hendrycks2016gelu,
+  author        = {Hendrycks, Dan and Gimpel, Kevin},
+  title         = {Gaussian Error Linear Units ({GELUs})},
+  year          = {2016},
+  eprint        = {1606.08415},
+  archivePrefix = {arXiv}
+}
+
+@misc{ba2016layernorm,
+  author        = {Ba, Jimmy Lei and Kiros, Jamie Ryan and Hinton, Geoffrey E.},
+  title         = {Layer Normalization},
+  year          = {2016},
+  eprint        = {1607.06450},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{he2016resnet,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  title     = {Deep Residual Learning for Image Recognition},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {770--778},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.90}
+}
+
+@inproceedings{reddi2018amsgrad,
+  author    = {Reddi, Sashank J. and Kale, Satyen and Kumar, Sanjiv},
+  title     = {On the Convergence of {Adam} and Beyond},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018},
+  eprint    = {1904.09237},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{shi2017nowcasting,
+  author        = {Shi, Xingjian and Gao, Zhihan and Lausen, Leonard and Wang, Hao and Yeung, Dit-Yan and Wong, Wai-kin and Woo, Wang-chun},
+  title         = {Deep Learning for Precipitation Nowcasting: A Benchmark and a New Model},
+  booktitle     = {Advances in Neural Information Processing Systems},
+  volume        = {30},
+  year          = {2017},
+  eprint        = {1706.03458},
+  archivePrefix = {arXiv}
+}
