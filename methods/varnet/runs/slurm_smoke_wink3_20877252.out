@@ -1,0 +1,60 @@
+Tesla V100-SXM2-16GB
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 403 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,082,518 (GENN prior 40,396 = 1.94%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=3  data=0
+[schedule] ep0→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 20, lr -> 0.0003
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/train.py", line 510, in <module>
+    main()
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/train.py", line 438, in main
+    xr, var = solver(x0b, yb, mb), None
+              ^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/variational_solver.py", line 370, in forward
+    return self.solve(x0, y, mask, return_var=return_var)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/variational_solver.py", line 355, in solve
+    J, grad, _ = self._cost_and_grad(x, y, mask)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/variational_solver.py", line 290, in _cost_and_grad
+    dx = x - self.phi(x)
+             ^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/prior_model.py", line 202, in forward
+    return up + self.branch_fine(x)                                     # + Φ₂(x)
+                ^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/prior_model.py", line 126, in forward
+    return self.phi(F.relu(self.psi(x)))
+                           ^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appl/scibuilder-mamba/aalto-rhel9/prod/software/scicomp-pytorch-env/2026.1/354b404/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/work/zhangx29/Thesis_Project/methods/varnet/prior_model.py", line 104, in forward
+    return F.conv3d(x, w, self.conv.bias, padding=self.conv.padding)  # -> (B, out_ch, T, H, W)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 508.00 MiB. GPU 0 has a total capacity of 15.77 GiB of which 418.50 MiB is free. Including non-PyTorch memory, this process has 15.35 GiB memory in use. Of the allocated memory 14.88 GiB is allocated by PyTorch, and 95.80 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[smoke] wall seconds: 54

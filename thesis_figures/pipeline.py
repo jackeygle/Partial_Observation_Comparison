@@ -107,12 +107,12 @@ def main() -> None:
     frame_box(ax, ex0, my0, ex1, my1)
     stage((ex0 + ex1) / 2, "Evaluation")
     lines = [("accuracy", "RMSE"), ("uncertainty", "CRPS"), ("", "spread/RMSE"),
-             ("speed", "ms per frame")]
+             ("", "coverage"), ("cost", "ms per frame")]
     for j, (k, v) in enumerate(lines):
-        y = my1 - 0.35 - j * 0.42
+        y = my1 - 0.3 - j * 0.36
         text(ax, ex0 + 0.12, y, k, FS_SMALL, color=GREY, va="center")
         text(ax, ex0 + 1.6, y, v, va="center")
-    text(ax, ex0 + 0.15, my0 + 0.55, "on unobserved\nwalkable cells", FS_SMALL, color=GREY, va="center")
+    text(ax, ex0 + 0.15, my0 + 0.3, "on all walkable cells\nand on unobserved ones", FS_SMALL, color=GREY, va="center")
     arrow(ax, (ed2[1] + 0.12, ty + th / 2), (ex0 - 0.1, ty + th / 2))
 
     # ground truth to the evaluation -------------------------------------------------------

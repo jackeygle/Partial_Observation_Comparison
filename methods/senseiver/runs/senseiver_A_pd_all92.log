@@ -1,0 +1,75 @@
+[config] observation config = {'sensing_range': 7, 'num_agents': 3, 'add_noise': True, 'obs_every_k': 1, 'init_method': 'prev'}
+[data] loading train split ...
+  [1/63] atc-20121024: 10006 frames, observed cells/frame 202.4, observation seed 734800
+  [2/63] atc-20121028: 10112 frames, observed cells/frame 201.5, observation seed 734804
+  [3/63] atc-20121031: 10600 frames, observed cells/frame 202.2, observation seed 734807
+  [4/63] atc-20121104: 10071 frames, observed cells/frame 202.7, observation seed 734811
+  [5/63] atc-20121107: 9918 frames, observed cells/frame 201.8, observation seed 734814
+  [6/63] atc-20121111: 9685 frames, observed cells/frame 201.5, observation seed 734818
+  [7/63] atc-20121114: 9796 frames, observed cells/frame 202.1, observation seed 734821
+  [8/63] atc-20121118: 9821 frames, observed cells/frame 202.7, observation seed 734825
+  [9/63] atc-20121121: 10431 frames, observed cells/frame 201.4, observation seed 734828
+  [10/63] atc-20121125: 9960 frames, observed cells/frame 202.3, observation seed 734832
+  [11/63] atc-20121128: 9935 frames, observed cells/frame 202.9, observation seed 734835
+  [12/63] atc-20121202: 9599 frames, observed cells/frame 202.8, observation seed 734839
+  [13/63] atc-20121205: 9875 frames, observed cells/frame 202.0, observation seed 734842
+  [14/63] atc-20121209: 9295 frames, observed cells/frame 202.4, observation seed 734846
+  [15/63] atc-20121212: 10386 frames, observed cells/frame 202.3, observation seed 734849
+  [16/63] atc-20121216: 10176 frames, observed cells/frame 202.0, observation seed 734853
+  [17/63] atc-20121219: 9605 frames, observed cells/frame 202.1, observation seed 734856
+  [18/63] atc-20121223: 9994 frames, observed cells/frame 203.1, observation seed 734860
+  [19/63] atc-20121226: 10598 frames, observed cells/frame 202.2, observation seed 734863
+  [20/63] atc-20130106: 9612 frames, observed cells/frame 202.9, observation seed 734874
+  [21/63] atc-20130109: 10924 frames, observed cells/frame 202.6, observation seed 734877
+  [22/63] atc-20130113: 9701 frames, observed cells/frame 202.2, observation seed 734881
+  [23/63] atc-20130116: 10072 frames, observed cells/frame 202.1, observation seed 734884
+  [24/63] atc-20130120: 9817 frames, observed cells/frame 201.6, observation seed 734888
+  [25/63] atc-20130123: 9532 frames, observed cells/frame 202.4, observation seed 734891
+  [26/63] atc-20130127: 10379 frames, observed cells/frame 202.7, observation seed 734895
+  [27/63] atc-20130130: 9842 frames, observed cells/frame 201.6, observation seed 734898
+  [28/63] atc-20130203: 9646 frames, observed cells/frame 201.6, observation seed 734902
+  [29/63] atc-20130206: 11502 frames, observed cells/frame 203.4, observation seed 734905
+  [30/63] atc-20130210: 9788 frames, observed cells/frame 202.8, observation seed 734909
+  [31/63] atc-20130213: 9940 frames, observed cells/frame 201.6, observation seed 734912
+  [32/63] atc-20130217: 9776 frames, observed cells/frame 201.6, observation seed 734916
+  [33/63] atc-20130220: 11849 frames, observed cells/frame 201.3, observation seed 734919
+  [34/63] atc-20130224: 9872 frames, observed cells/frame 202.6, observation seed 734923
+  [35/63] atc-20130227: 9625 frames, observed cells/frame 202.8, observation seed 734926
+  [36/63] atc-20130303: 8798 frames, observed cells/frame 202.8, observation seed 734930
+  [37/63] atc-20130306: 10198 frames, observed cells/frame 202.3, observation seed 734933
+  [38/63] atc-20130310: 9930 frames, observed cells/frame 202.0, observation seed 734937
+  [39/63] atc-20130317: 9704 frames, observed cells/frame 202.9, observation seed 734944
+  [40/63] atc-20130320: 9798 frames, observed cells/frame 201.7, observation seed 734947
+  [41/63] atc-20130324: 10354 frames, observed cells/frame 203.3, observation seed 734951
+  [42/63] atc-20130327: 12190 frames, observed cells/frame 202.4, observation seed 734954
+  [43/63] atc-20130331: 9920 frames, observed cells/frame 201.0, observation seed 734958
+  [44/63] atc-20130403: 12196 frames, observed cells/frame 202.5, observation seed 734961
+  [45/63] atc-20130407: 9704 frames, observed cells/frame 201.5, observation seed 734965
+  [46/63] atc-20130410: 9605 frames, observed cells/frame 202.1, observation seed 734968
+  [47/63] atc-20130414: 9907 frames, observed cells/frame 201.9, observation seed 734972
+  [48/63] atc-20130417: 10008 frames, observed cells/frame 202.2, observation seed 734975
+  [49/63] atc-20130421: 10207 frames, observed cells/frame 201.9, observation seed 734979
+  [50/63] atc-20130424: 9624 frames, observed cells/frame 202.3, observation seed 734982
+  [51/63] atc-20130428: 10002 frames, observed cells/frame 202.8, observation seed 734986
+  [52/63] atc-20130501: 9438 frames, observed cells/frame 202.1, observation seed 734989
+  [53/63] atc-20130505: 9926 frames, observed cells/frame 202.0, observation seed 734993
+  [54/63] atc-20130508: 9723 frames, observed cells/frame 201.3, observation seed 734996
+  [55/63] atc-20130512: 9535 frames, observed cells/frame 202.8, observation seed 735000
+  [56/63] atc-20130515: 9419 frames, observed cells/frame 201.6, observation seed 735003
+  [57/63] atc-20130519: 10080 frames, observed cells/frame 203.2, observation seed 735007
+  [58/63] atc-20130522: 9420 frames, observed cells/frame 202.0, observation seed 735010
+  [59/63] atc-20130526: 10247 frames, observed cells/frame 201.9, observation seed 735014
+  [60/63] atc-20130529: 9476 frames, observed cells/frame 202.4, observation seed 735017
+  [61/63] atc-20130602: 10012 frames, observed cells/frame 202.5, observation seed 735021
+  [62/63] atc-20130605: 10256 frames, observed cells/frame 201.9, observation seed 735024
+  [63/63] atc-20130609: 10013 frames, observed cells/frame 202.2, observation seed 735028
+[data] 631430 training frames
+  [1/3] atc-20130612: 2015 frames, observed cells/frame 203.3, observation seed 735031
+  [2/3] atc-20130616: 1757 frames, observed cells/frame 203.3, observation seed 735035
+  [3/3] atc-20130619: 1913 frames, observed cells/frame 201.6, observation seed 735038
+[data] 5685 validation frames
+[data] model_seed=123  train_obs_seed=0 train_trajectory_mode=per_day  valid_obs_seed=0 valid_trajectory_mode=per_day
+[stats] encoder input standardisation mean=[0.05429551 0.00415028 0.0001422  0.01810019] std=[0.18132286 0.5142868  0.17688218 0.10380819]
+[model] 65,892 parameters  latent=abstract  readout=decoder  time_window=1  share_blocks=True  seed=123
+[resume] continuing from epoch 100 (best=0.01914)
+[done]

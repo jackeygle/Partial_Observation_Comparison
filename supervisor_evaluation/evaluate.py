@@ -1543,6 +1543,10 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     from compare import score_uncertainty as su
 
     raw = output_dir / "raw"
+    # EVAL_ENKF_RAW: read the EnKF exports from another evaluation's raw/ (read-only);
+    # EVAL_COVERAGE_DIR: per-day <day>.npz with the members' ens_in50 / ens_in90.
+    enkf_raw = Path(os.environ.get("EVAL_ENKF_RAW", str(raw)))
+    cov_dir = os.environ.get("EVAL_COVERAGE_DIR")
     files = [Path(p) for p in om.split_files("test")]
     if days:
         files = files[:days]
@@ -1585,6 +1589,12 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
     day_acc: dict[str, list[Any]] = {k: [] for k in keys}
     day_acc_all: dict[str, list[Any]] = {k: [] for k in keys}
     enkf_family: str | None = None
+    # Central-interval coverage (Gaussian methods: mean +- z sd; EnKF: empirical quantiles of
+    # the members, exported by --ensemble-coverage). Counts per method, scope and channel.
+    Z50, Z90 = 0.6744897501960817, 1.6448536269514722
+    cov = {k: {sc: {c: [0, 0, 0] for c in CHANNELS} for sc in ("walkable_blind", "walkable_all")}
+           for k in keys}
+    enkf_cov = True
 
     for fp in files:
         day = fp.name.split("_")[0]
@@ -1599,8 +1609,8 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
             obs_every_k=obs_cfg["obs_every_k"])
         Y, Omask = obs["Y"].astype(np.float32), obs["Omega"].astype(bool)
 
-        enkf_npz = raw / "enkf_exports" / f"{day}.npz"
-        enkf_json = raw / "enkf" / f"{day}.json"
+        enkf_npz = enkf_raw / "enkf_exports" / f"{day}.npz"
+        enkf_json = enkf_raw / "enkf" / f"{day}.json"
         if not enkf_npz.exists() or not enkf_json.exists():
             raise FileNotFoundError(f"EnKF export is required (run `full` first): {enkf_npz}")
         warmup = int(json.loads(enkf_json.read_text())["config"]["warmup"])
@@ -1646,6 +1656,20 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                 enkf_family = day_family
             elif enkf_family != day_family:
                 raise RuntimeError("EnKF exports mix empirical-ensemble and Gaussian CRPS")
+            e_in50 = e_in90 = None
+            if cov_dir:
+                with np.load(Path(cov_dir) / f"{day}.npz") as cz:
+                    if int(cz["warmup"]) != warmup or \
+                            not np.array_equal(cz["observed"][lo - warmup:hi - warmup], Omask[lo:hi]) or \
+                            not np.allclose(cz["truth"][lo - warmup:hi - warmup], truth, rtol=0, atol=1e-6):
+                        raise RuntimeError(f"coverage export alignment check failed on {day}")
+                    e_in50 = cz["ens_in50"][lo - warmup:hi - warmup].astype(bool)
+                    e_in90 = cz["ens_in90"][lo - warmup:hi - warmup].astype(bool)
+            elif "ens_in50" in en.files and "ens_in90" in en.files:
+                e_in50 = en["ens_in50"][lo - warmup:hi - warmup].astype(bool)
+                e_in90 = en["ens_in90"][lo - warmup:hi - warmup].astype(bool)
+            else:
+                enkf_cov = False
             e_crps = None
             if has_mae:
                 if "ens_members" not in en.files or int(en["ens_members"]) != FINAL_CONFIG["enkf"]["ensemble"]:
@@ -1678,6 +1702,17 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                     parts = {"varnet_aughead": ("gauss", v_mean[:, c][sel],
                                                 np.maximum(v_sd[:, c][sel], 1e-12)), **parts}
                 for k, (family, loc, scale) in parts.items():
+                    cnt = cov[k][total][name]
+                    if k == "enkf":
+                        if e_in50 is not None:
+                            cnt[0] += x.size
+                            cnt[1] += int(e_in50[:, c][sel].sum())
+                            cnt[2] += int(e_in90[:, c][sel].sum())
+                    elif family == "gauss":
+                        d = np.abs(x - loc)
+                        cnt[0] += x.size
+                        cnt[1] += int((d <= Z50 * scale).sum())
+                        cnt[2] += int((d <= Z90 * scale).sum())
                     for a in (acc[k][total], acc[k][f"{prefix}{name}"], days_k[k][-1]):
                         if k == "enkf" and e_crps is not None:
                             a.add_ensemble_crps(e_crps[:, c][sel], loc, scale, x)
@@ -1691,7 +1726,7 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
                         "scored_cells_per_channel_all_walkable": int(sel_all.sum())})
         print(f"[uncertainty] {day}: frames [{lo}, {hi}), {int(sel.sum())} cells/channel",
               flush=True)
-        del X, Y, obs, truth, v_mean, v_sd, d_loc, d_scale, e_mean, e_sd
+        del X, Y, obs, truth, v_mean, v_sd, d_loc, d_scale, e_mean, e_sd, e_in50, e_in90
         if device.type == "cuda":
             torch.cuda.empty_cache()
 
@@ -1732,6 +1767,29 @@ def evaluate_uncertainty(data_root: Path, output_dir: Path, days: int = 0, frame
            "methods": methods}
     raw.mkdir(parents=True, exist_ok=True)
     (raw / "uncertainty_unified.json").write_text(json.dumps(doc, indent=2))
+    # Coverage of the central 50% and 90% prediction intervals, per channel and for the
+    # velocity components pooled; nominal values 0.5 and 0.9.
+    cov_doc = {"nominal": [0.5, 0.9], "intervals": {
+                   "gaussian": "mean +- z sd, z = 0.674 / 1.645",
+                   "enkf": "empirical member quantiles 0.25-0.75 / 0.05-0.95, bounds inclusive"},
+               "frames_and_cells": "as raw/uncertainty_unified.json", "methods": {}}
+    for k in keys:
+        if k == "enkf" and not enkf_cov:
+            continue
+        out = {}
+        for sc, per in cov[k].items():
+            groups = {c: per[c] for c in CHANNELS}
+            groups["velocity"] = [sum(per[c][i] for c in ("vx", "vy")) for i in range(3)]
+            out[sc] = {g: {"n": v[0], "cov50": v[1] / max(v[0], 1), "cov90": v[2] / max(v[0], 1)}
+                       for g, v in groups.items()}
+        cov_doc["methods"][k] = {"label": FINAL_CONFIG[k]["label"], **out}
+        for sc in ("walkable_blind", "walkable_all"):
+            o = out[sc]
+            print(f"[coverage] {FINAL_CONFIG[k]['label']:<32} {sc:<15} "
+                  f"density {o['density']['cov50']:.3f}/{o['density']['cov90']:.3f}  "
+                  f"velocity {o['velocity']['cov50']:.3f}/{o['velocity']['cov90']:.3f}", flush=True)
+    (output_dir / "coverage.json").write_text(json.dumps(cov_doc, indent=2))
+    print(f"[coverage] wrote {output_dir / 'coverage.json'}", flush=True)
     print(f"[uncertainty] wrote {raw / 'uncertainty_unified.json'}", flush=True)
 
 

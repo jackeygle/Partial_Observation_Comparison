@@ -1,0 +1,185 @@
+{
+  "varnet_mse": {
+    "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96_pdfold_s3",
+    "candidate_rule": "all_saved_corrected_K20",
+    "split": "valid",
+    "min_epoch": 75,
+    "n_iter": 20,
+    "batch": 8,
+    "days": [
+      "atc-20130616_corridor_1.0s.h5",
+      "atc-20130623_corridor_1.0s.h5",
+      "atc-20130630_corridor_1.0s.h5",
+      "atc-20130707_corridor_1.0s.h5",
+      "atc-20130714_corridor_1.0s.h5",
+      "atc-20130721_corridor_1.0s.h5",
+      "atc-20130728_corridor_1.0s.h5"
+    ],
+    "scope": "walkable (blind cells inside the walkable region, clipped)",
+    "candidates": [
+      {
+        "epoch": 76,
+        "checkpoint": "frozen_candidates_20261009/epoch_00076.pt",
+        "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+        "aliases": [
+          "varnet_best.pt"
+        ],
+        "cached_score": {
+          "mse": 0.06404071009249462,
+          "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/precrash_full_validation_diagnostic.json"
+        }
+      },
+      {
+        "epoch": 80,
+        "checkpoint": "frozen_candidates_20261009/epoch_00080.pt",
+        "sha256": "3c7aaac03c46d98149acef17bbcbdde0e4bb996f95e14b96675e0b116e30a100",
+        "aliases": [
+          "ckpt_00080.pt"
+        ],
+        "cached_score": {
+          "mse": 0.11405683621331013,
+          "sha256": "3c7aaac03c46d98149acef17bbcbdde0e4bb996f95e14b96675e0b116e30a100",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        }
+      },
+      {
+        "epoch": 90,
+        "checkpoint": "frozen_candidates_20261009/epoch_00090.pt",
+        "sha256": "d78315cc2d5724ab80f32b75ed509add69b5599d97d72b6f41d893151be9895f",
+        "aliases": [
+          "ckpt_00090.pt",
+          "varnet_last.pt"
+        ],
+        "cached_score": {
+          "mse": 0.10865317813455391,
+          "sha256": "d78315cc2d5724ab80f32b75ed509add69b5599d97d72b6f41d893151be9895f",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        }
+      }
+    ],
+    "score_provenance": {
+      "76": {
+        "kind": "reused_verified_validation_score",
+        "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/precrash_full_validation_diagnostic.json"
+      },
+      "80": {
+        "kind": "reused_verified_validation_score",
+        "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+      },
+      "90": {
+        "kind": "reused_verified_validation_score",
+        "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+      }
+    },
+    "mse_by_epoch": {
+      "76": 0.06404071009249462,
+      "80": 0.11405683621331013,
+      "90": 0.10865317813455391
+    },
+    "selected_epoch": 76,
+    "selected_mse": 0.06404071009249462,
+    "selected_ckpt": "frozen_candidates_20261009/epoch_00076.pt",
+    "checkpoint_sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+    "training_stopped_by_user": true,
+    "gpu_for_new_scores": "Tesla V100-SXM2-32GB"
+  },
+  "varnet_aughead": {
+    "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_aughead_obs_h96_fold_s0",
+    "candidate_rule": "all_saved_corrected_K20",
+    "split": "valid",
+    "min_epoch": 75,
+    "n_iter": 20,
+    "batch": 8,
+    "days": [
+      "atc-20130616_corridor_1.0s.h5",
+      "atc-20130623_corridor_1.0s.h5",
+      "atc-20130630_corridor_1.0s.h5",
+      "atc-20130707_corridor_1.0s.h5",
+      "atc-20130714_corridor_1.0s.h5",
+      "atc-20130721_corridor_1.0s.h5",
+      "atc-20130728_corridor_1.0s.h5"
+    ],
+    "scope": "walkable (blind cells inside the walkable region, clipped)",
+    "candidates": [
+      {
+        "epoch": 80,
+        "checkpoint": "frozen_candidates_20261009/epoch_00080.pt",
+        "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+        "aliases": [
+          "ckpt_00080.pt"
+        ],
+        "cached_score": {
+          "mse": 0.08343801129309343,
+          "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        }
+      },
+      {
+        "epoch": 88,
+        "checkpoint": "frozen_candidates_20261009/epoch_00088.pt",
+        "sha256": "34ed7841b519f4f891002ebb1d052a0435706f56f33b2c10a87b6ee68de98045",
+        "aliases": [
+          "varnet_last.pt"
+        ],
+        "cached_score": null
+      }
+    ],
+    "score_provenance": {
+      "80": {
+        "kind": "reused_verified_validation_score",
+        "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+      },
+      "88": {
+        "kind": "full_validation_scoring",
+        "per_day": [
+          {
+            "day": "atc-20130616_corridor_1.0s.h5",
+            "squared_error_sum": 1376108.625,
+            "scored_count": 17775036
+          },
+          {
+            "day": "atc-20130623_corridor_1.0s.h5",
+            "squared_error_sum": 1640657.25,
+            "scored_count": 20939596
+          },
+          {
+            "day": "atc-20130630_corridor_1.0s.h5",
+            "squared_error_sum": 1506363.5,
+            "scored_count": 20581760
+          },
+          {
+            "day": "atc-20130707_corridor_1.0s.h5",
+            "squared_error_sum": 1717554.75,
+            "scored_count": 19543008
+          },
+          {
+            "day": "atc-20130714_corridor_1.0s.h5",
+            "squared_error_sum": 1945399.5,
+            "scored_count": 20539444
+          },
+          {
+            "day": "atc-20130721_corridor_1.0s.h5",
+            "squared_error_sum": 1782501.75,
+            "scored_count": 18937248
+          },
+          {
+            "day": "atc-20130728_corridor_1.0s.h5",
+            "squared_error_sum": 1481822.5,
+            "scored_count": 18618576
+          }
+        ]
+      }
+    },
+    "mse_by_epoch": {
+      "80": 0.08343801129309343,
+      "88": 0.08361949564883014
+    },
+    "selected_epoch": 80,
+    "selected_mse": 0.08343801129309343,
+    "selected_ckpt": "frozen_candidates_20261009/epoch_00080.pt",
+    "checkpoint_sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+    "training_stopped_by_user": true,
+    "gpu_for_new_scores": "Tesla V100-SXM2-32GB"
+  }
+}

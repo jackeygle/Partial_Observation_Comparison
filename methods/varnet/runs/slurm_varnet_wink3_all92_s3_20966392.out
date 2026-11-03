@@ -1,0 +1,3 @@
+[early_stop] epoch 100: valid all_walkable RMSE 0.17539
+[early_stop] best epoch 80 (RMSE 0.17508), newest 100: STOP
+[chain] early stop -- no resume, no successor.

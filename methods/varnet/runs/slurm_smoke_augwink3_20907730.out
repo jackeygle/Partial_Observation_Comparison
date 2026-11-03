@@ -1,0 +1,25 @@
+NVIDIA A100-SXM4-80GB
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 403 windows of (4, 200, 36, 12)  device=cuda
+[model] params=4,616,918 (GENN prior 40,396 = 0.87%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual; observation term too (shared sigma); sigma^2 update from its own head on [h, x]   eps=1e-06
+[schedule] ep0→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 20, lr -> 0.0003
+[epoch   0] loss=-0.9630  blind_MSE=0.0760  density=0.0222 vx=0.2373 vy=0.0350 var=0.0097
+           ↑ new best (0.0760) -> varnet_best.pt
+[done] checkpoints + metrics in runs/smoke_aughead_wink3_dev
+[smoke] wall seconds: 128
+/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/checks/batch_independence_var.py:48: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /home/conda/feedstock_root/build_artifacts/libtorch_1769685314817/work/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  "max_abs_diff_mean": float((m8 - m1).abs().max()),
+{
+ "ckpt": "methods/varnet/runs/smoke_aughead_wink3_dev/varnet_last.pt",
+ "normg_scope": "window",
+ "windows": 8,
+ "max_abs_diff_mean": 1.33514404296875e-05,
+ "max_abs_diff_var": 7.562339305877686e-07,
+ "max_rel_diff_var": 1.4531035049003549e-05,
+ "finite": true
+}

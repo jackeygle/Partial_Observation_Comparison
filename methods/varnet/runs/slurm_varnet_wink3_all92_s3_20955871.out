@@ -1,0 +1,32 @@
+[early_stop] epoch 80: valid all_walkable RMSE 0.17508
+[early_stop] best epoch 80 (RMSE 0.17508), newest 80: continue
+[chain] submitted successor 20963796 (afterany:20955871); 200 frames, H200, 4 hours
+NVIDIA H100 80GB HBM3
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 12596 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,082,518 (GENN prior 40,396 = 1.94%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=3  data=0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_mse5_h96k3_win_pdfold_s3_all92/varnet_last.pt: continuing from epoch 82 (step 32308)
+[best] previous best blind MSE = 0.0212
+[schedule] epoch 82: n_iter -> 20, lr -> 0.0003
+[epoch  82] loss=0.0253  blind_MSE=0.0212  density=0.0104 vx=0.0520 vy=0.0169 var=0.0055
+           ↑ new best (0.0212) -> varnet_best.pt
+[epoch  83] loss=0.0217  blind_MSE=0.0212  density=0.0104 vx=0.0519 vy=0.0168 var=0.0055
+           ↑ new best (0.0212) -> varnet_best.pt
+[epoch  84] loss=0.0234  blind_MSE=0.0212  density=0.0104 vx=0.0519 vy=0.0169 var=0.0055
+[epoch  85] loss=0.0227  blind_MSE=0.0212  density=0.0104 vx=0.0519 vy=0.0168 var=0.0055
+           ↑ new best (0.0212) -> varnet_best.pt
+[epoch  86] loss=0.0258  blind_MSE=0.0212  density=0.0104 vx=0.0519 vy=0.0168 var=0.0055
+[epoch  87] loss=0.0258  blind_MSE=0.0212  density=0.0104 vx=0.0519 vy=0.0168 var=0.0055
+[epoch  88] loss=0.0233  blind_MSE=0.0211  density=0.0104 vx=0.0518 vy=0.0168 var=0.0055
+           ↑ new best (0.0211) -> varnet_best.pt
+[epoch  89] loss=0.0238  blind_MSE=0.0211  density=0.0104 vx=0.0517 vy=0.0168 var=0.0055
+           ↑ new best (0.0211) -> varnet_best.pt
+[epoch  90] loss=0.0236  blind_MSE=0.0211  density=0.0104 vx=0.0518 vy=0.0168 var=0.0055
+[epoch  91] loss=0.0230  blind_MSE=0.0211  density=0.0104 vx=0.0518 vy=0.0168 var=0.0055
+           ↑ new best (0.0211) -> varnet_best.pt
+[epoch  92] loss=0.0256  blind_MSE=0.0211  density=0.0104 vx=0.0517 vy=0.0168 var=0.0055
+           ↑ new best (0.0211) -> varnet_best.pt
+[2026-10-15T00:31:03.006] error: *** JOB 20955871 ON gpu48 CANCELLED AT 2026-10-15T00:31:03 DUE TO TIME LIMIT ***

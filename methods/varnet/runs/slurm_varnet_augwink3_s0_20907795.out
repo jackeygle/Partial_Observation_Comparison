@@ -1,0 +1,36 @@
+[early_stop] no checkpoint at or after epoch 80 yet: keep training
+[chain] submitted successor 20909514 (afterany:20907795); 200 frames, H200, 4 hours
+NVIDIA A100-SXM4-80GB
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=4,616,918 (GENN prior 40,396 = 0.87%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=0  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual; observation term too (shared sigma); sigma^2 update from its own head on [h, x]   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 5, lr -> 0.001
+[epoch   0] loss=-1.3056  blind_MSE=0.0761  density=0.0228 vx=0.2345 vy=0.0379 var=0.0091
+           ↑ new best (0.0761) -> varnet_best.pt
+[epoch   1] loss=-1.4945  blind_MSE=0.0751  density=0.0229 vx=0.2314 vy=0.0368 var=0.0092
+           ↑ new best (0.0751) -> varnet_best.pt
+[epoch   2] loss=-1.6585  blind_MSE=0.0741  density=0.0227 vx=0.2283 vy=0.0361 var=0.0091
+           ↑ new best (0.0741) -> varnet_best.pt
+[epoch   3] loss=-1.8305  blind_MSE=0.0729  density=0.0224 vx=0.2239 vy=0.0361 var=0.0091
+           ↑ new best (0.0729) -> varnet_best.pt
+[epoch   4] loss=-1.8686  blind_MSE=0.0708  density=0.0226 vx=0.2175 vy=0.0339 var=0.0091
+           ↑ new best (0.0708) -> varnet_best.pt
+[epoch   5] loss=-1.8624  blind_MSE=0.0689  density=0.0225 vx=0.2111 vy=0.0330 var=0.0091
+           ↑ new best (0.0689) -> varnet_best.pt
+[epoch   6] loss=-1.8591  blind_MSE=0.0680  density=0.0224 vx=0.2085 vy=0.0322 var=0.0091
+           ↑ new best (0.0680) -> varnet_best.pt
+[epoch   7] loss=-1.9905  blind_MSE=0.0656  density=0.0221 vx=0.2019 vy=0.0292 var=0.0091
+           ↑ new best (0.0656) -> varnet_best.pt
+[epoch   8] loss=-1.9557  blind_MSE=0.0629  density=0.0218 vx=0.1918 vy=0.0289 var=0.0091
+           ↑ new best (0.0629) -> varnet_best.pt
+[epoch   9] loss=-2.0011  blind_MSE=0.0594  density=0.0216 vx=0.1782 vy=0.0288 var=0.0091
+           ↑ new best (0.0594) -> varnet_best.pt
+[epoch  10] loss=-1.9401  blind_MSE=0.0581  density=0.0211 vx=0.1737 vy=0.0286 var=0.0091
+           ↑ new best (0.0581) -> varnet_best.pt
+[epoch  11] loss=-2.0375  blind_MSE=0.0569  density=0.0208 vx=0.1694 vy=0.0285 var=0.0091
+           ↑ new best (0.0569) -> varnet_best.pt
+[2026-10-12T15:09:32.176] error: *** JOB 20907795 ON gpu14 CANCELLED AT 2026-10-12T15:09:32 DUE to SIGNAL Terminated ***

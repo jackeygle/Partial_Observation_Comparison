@@ -37,29 +37,29 @@ def main() -> None:
     walk, seen = d["walkable"], d["observed"]
     vmax = float(np.percentile(d["truth"][0][walk], 99))
     cell = 0.05
-    fig, ax = canvas(16.0, 5.1)
-    yc = 2.05
-    bh = 1.25
+    fig, ax = canvas(16.0, 5.3)
+    yc = 2.15
+    bh = 1.45
 
     # ensemble of analysed states
-    en = cards(ax, 0.3, yc - 0.4, 0.8, 0.6, n=4, off=0.08, color=C)
-    text(ax, (en[0] + en[2]) / 2, en[3] + 0.1, "ensemble\n" r"$x_i^{a}$, $i = 1..100$", FS_SMALL,
+    en = cards(ax, 0.3, yc - 0.4, 0.8, 0.6, n=4, off=0.08)
+    text(ax, (en[0] + en[2]) / 2, en[3] + 0.1, "ensemble\n" r"$x^{a,(i)}$, $i = 1..100$", FS_SMALL,
          ha="center", va="bottom", linespacing=1.1)
 
-    fc = block(ax, en[2] + 0.5, yc - bh / 2, 2.5, bh, "forecast",
-               "PedPred3 on the last\n" r"5 analyses, $-$ bias")
+    fc = block(ax, en[2] + 0.5, yc - bh / 2, 2.8, bh, "forecast",
+               "PedPred3 on the last 5\n" r"analyses; zero $v_x, v_y, \nu$" "\n" r"on empty cells; $-$ bias $b$")
     arrow(ax, (en[2] + 0.08, yc), (fc[0] - 0.05, yc))
 
-    nz = block(ax, fc[2] + 0.45, yc - bh / 2, 3.05, bh, r"$+$ process noise $q_i$",
-               "real error map,\n" "AR(1), " r"$\times1.5$", edge=C, lw=0.9)
+    nz = block(ax, fc[2] + 0.45, yc - bh / 2, 2.7, bh, r"$+$ process noise $q^{(i)}$",
+               "error map from the bank,\n" "AR(1) in time, " r"$\times1.5$")
     arrow(ax, (fc[2] + 0.05, yc), (nz[0] - 0.05, yc))
     bank = cards(ax, nz[0] + 0.35, nz[3] + 0.4, 0.9, 0.45, n=4, off=0.07)
-    text(ax, bank[2] + 0.12, (bank[1] + bank[3]) / 2, "8,192 one-step\nforecast errors\n(training days)",
+    text(ax, bank[2] + 0.12, (bank[1] + bank[3]) / 2, "8$\\,$192 one-step\nforecast errors\n(training days)",
          FS_SMALL - 0.5, color=GREY, va="center", linespacing=1.1)
     arrow(ax, ((bank[0] + bank[2]) / 2, bank[1] - 0.03), ((bank[0] + bank[2]) / 2, nz[3] + 0.03))
 
-    ku = block(ax, nz[2] + 0.45, yc - bh / 2, 2.75, bh, "Kalman update",
-               "localised (7 cells),\ncross-channel weights")
+    ku = block(ax, nz[2] + 0.45, yc - bh / 2, 2.9, bh, "Kalman update",
+               "localised (7 cells),\ncross-channel weights,\n" r"inflation $\times1.02$; updates $b$")
     arrow(ax, (nz[2] + 0.05, yc), (ku[0] - 0.05, yc))
     oc = 0.035                                         # robot observations, from above
     ob = thumbnail(ax, field_rgb(d["observation"][0], walk, ps.CMAP["density"], vmax, hide=~seen),
@@ -87,10 +87,10 @@ def main() -> None:
     ax.plot([xk, xk], [ku[1], ly], color=LINE, lw=0.7)
     ax.plot([xk, (en[0] + en[2]) / 2], [ly, ly], color=LINE, lw=0.7)
     arrow(ax, ((en[0] + en[2]) / 2, ly), ((en[0] + en[2]) / 2, en[1] - 0.03))
-    text(ax, (fc[0] + ku[2]) / 2, ly - 0.08, r"analysis ensemble $x_i^a$ $\rightarrow$ next second",
+    text(ax, (fc[0] + ku[2]) / 2, ly - 0.08, r"analysis ensemble $x^{a,(i)}$ and bias $b$ $\rightarrow$ next second",
          FS_SMALL, color=GREY, ha="center", va="top")
-    text(ax, 0.3, 0.0, r"bias $\leftarrow 0.95\,$bias$\,+\,0.05\,(\bar{x}^f - y_t)$ on observed cells,"
-         " updated at every analysis", FS_SMALL, color=GREY, va="bottom")
+    text(ax, 0.3, 0.0, "start of each day: members drawn at random, their five-frame history filled "
+         "with them; the first 500 s are not scored", FS_SMALL, color=GREY, va="bottom")
 
     save(fig, os.path.join(HERE, "out", "enkf"))
 

@@ -1,0 +1,37 @@
+[early_stop] epoch 90: valid all_walkable RMSE 0.29550
+[early_stop] epoch 100: valid all_walkable RMSE 0.26850
+[early_stop] epoch 110: valid all_walkable RMSE 0.30300
+[early_stop] epoch 120: valid all_walkable RMSE 0.27175
+[early_stop] epoch 130: valid all_walkable RMSE 0.25628
+[early_stop] best epoch 130 (RMSE 0.25628), newest 130: continue
+[chain] submitted successor 20923582 (afterany:20918981); 200 frames, H200/H100/A100, 8 hours
+NVIDIA H100 80GB HBM3
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=4,616,918 (GENN prior 40,396 = 0.87%; the rest is the solver's ConvLSTM)  loss=nll  n_iter=15  amp=True
+[seed] init=3  data=0
+[var] AUGMENTED STATE: log sigma^2 iterated with x over 15 steps; prior term of J is a Gaussian log-likelihood of the prior residual; observation term too (shared sigma); sigma^2 update from its own head on [h, x]   eps=1e-06
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[resume] loaded runs/varnet_aughead_obs_h96k3_win_pdfold_s3/varnet_last.pt: continuing from epoch 132 (step 26004)
+[best] previous best blind MSE = 0.0585
+[schedule] epoch 132: n_iter -> 20, lr -> 0.0003
+[epoch 132] loss=-1.6543  blind_MSE=0.0682  density=0.0224 vx=0.2064 vy=0.0343 var=0.0097
+[epoch 133] loss=-1.7699  blind_MSE=0.0667  density=0.0216 vx=0.2028 vy=0.0330 var=0.0094
+[epoch 134] loss=-1.7055  blind_MSE=0.0661  density=0.0217 vx=0.2005 vy=0.0329 var=0.0094
+[epoch 135] loss=-1.1209  blind_MSE=0.0688  density=0.0236 vx=0.2057 vy=0.0357 var=0.0103
+[epoch 136] loss=-1.2855  blind_MSE=0.0686  density=0.0241 vx=0.2049 vy=0.0348 var=0.0107
+[epoch 137] loss=-1.5522  blind_MSE=0.0669  density=0.0232 vx=0.2008 vy=0.0336 var=0.0100
+[epoch 138] loss=-1.5888  blind_MSE=0.0680  density=0.0237 vx=0.2050 vy=0.0336 var=0.0098
+[epoch 139] loss=-1.4736  blind_MSE=0.0696  density=0.0230 vx=0.2113 vy=0.0345 var=0.0096
+[epoch 140] loss=-1.5979  blind_MSE=0.0694  density=0.0227 vx=0.2111 vy=0.0340 var=0.0096
+[epoch 141] loss=-1.4822  blind_MSE=0.0726  density=0.0236 vx=0.2217 vy=0.0353 var=0.0100
+[epoch 142] loss=-1.3998  blind_MSE=0.0752  density=0.0256 vx=0.2254 vy=0.0388 var=0.0109
+[epoch 143] loss=-1.4876  blind_MSE=0.0729  density=0.0245 vx=0.2193 vy=0.0377 var=0.0099
+[epoch 144] loss=-1.6318  blind_MSE=0.0705  density=0.0231 vx=0.2150 vy=0.0342 var=0.0094
+[epoch 145] loss=-1.7017  blind_MSE=0.0695  density=0.0226 vx=0.2128 vy=0.0330 var=0.0096
+[epoch 146] loss=-1.6515  blind_MSE=0.0706  density=0.0224 vx=0.2164 vy=0.0334 var=0.0100
+[epoch 147] loss=-1.5154  blind_MSE=0.0706  density=0.0231 vx=0.2145 vy=0.0345 var=0.0105
+[epoch 148] loss=-1.6375  blind_MSE=0.0700  density=0.0229 vx=0.2119 vy=0.0346 var=0.0105
+[epoch 149] loss=-1.5756  blind_MSE=0.0724  density=0.0229 vx=0.2222 vy=0.0349 var=0.0099
+[done] checkpoints + metrics in runs/varnet_aughead_obs_h96k3_win_pdfold_s3

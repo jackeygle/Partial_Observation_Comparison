@@ -1,0 +1,682 @@
+{
+  "checks": [
+    "validation-only selection, frozen winners and all eight packaged artifact checksums",
+    "all six accuracy table rows match accuracy.csv",
+    "pooled uncertainty intervals and all channel table rows match CSV",
+    "all occupancy table rows match common-support breakdown",
+    "independent native-support breakdown reproduces accuracy within 0.0005 RMSE",
+    "six-method timing uses one GPU and three repetitions",
+    "LaTeX references, labels, environment counts, braces and 17 figure paths",
+    "all 8 refreshed thesis PDFs match regenerated source assets"
+  ],
+  "validation_selection": {
+    "varnet_mse": {
+      "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96_pdfold_s3",
+      "candidate_rule": "all_saved_corrected_K20",
+      "split": "valid",
+      "min_epoch": 75,
+      "n_iter": 20,
+      "batch": 8,
+      "days": [
+        "atc-20130616_corridor_1.0s.h5",
+        "atc-20130623_corridor_1.0s.h5",
+        "atc-20130630_corridor_1.0s.h5",
+        "atc-20130707_corridor_1.0s.h5",
+        "atc-20130714_corridor_1.0s.h5",
+        "atc-20130721_corridor_1.0s.h5",
+        "atc-20130728_corridor_1.0s.h5"
+      ],
+      "scope": "walkable (blind cells inside the walkable region, clipped)",
+      "candidates": [
+        {
+          "epoch": 76,
+          "checkpoint": "frozen_candidates_20261009/epoch_00076.pt",
+          "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+          "aliases": [
+            "varnet_best.pt"
+          ],
+          "cached_score": {
+            "mse": 0.06404071009249462,
+            "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+            "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/precrash_full_validation_diagnostic.json"
+          }
+        },
+        {
+          "epoch": 80,
+          "checkpoint": "frozen_candidates_20261009/epoch_00080.pt",
+          "sha256": "3c7aaac03c46d98149acef17bbcbdde0e4bb996f95e14b96675e0b116e30a100",
+          "aliases": [
+            "ckpt_00080.pt"
+          ],
+          "cached_score": {
+            "mse": 0.11405683621331013,
+            "sha256": "3c7aaac03c46d98149acef17bbcbdde0e4bb996f95e14b96675e0b116e30a100",
+            "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+          }
+        },
+        {
+          "epoch": 90,
+          "checkpoint": "frozen_candidates_20261009/epoch_00090.pt",
+          "sha256": "d78315cc2d5724ab80f32b75ed509add69b5599d97d72b6f41d893151be9895f",
+          "aliases": [
+            "ckpt_00090.pt",
+            "varnet_last.pt"
+          ],
+          "cached_score": {
+            "mse": 0.10865317813455391,
+            "sha256": "d78315cc2d5724ab80f32b75ed509add69b5599d97d72b6f41d893151be9895f",
+            "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+          }
+        }
+      ],
+      "score_provenance": {
+        "76": {
+          "kind": "reused_verified_validation_score",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/precrash_full_validation_diagnostic.json"
+        },
+        "80": {
+          "kind": "reused_verified_validation_score",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        },
+        "90": {
+          "kind": "reused_verified_validation_score",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        }
+      },
+      "mse_by_epoch": {
+        "76": 0.06404071009249462,
+        "80": 0.11405683621331013,
+        "90": 0.10865317813455391
+      },
+      "selected_epoch": 76,
+      "selected_mse": 0.06404071009249462,
+      "selected_ckpt": "frozen_candidates_20261009/epoch_00076.pt",
+      "checkpoint_sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+      "training_stopped_by_user": true,
+      "gpu_for_new_scores": "Tesla V100-SXM2-32GB"
+    },
+    "varnet_aughead": {
+      "run_dir": "/scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_aughead_obs_h96_fold_s0",
+      "candidate_rule": "all_saved_corrected_K20",
+      "split": "valid",
+      "min_epoch": 75,
+      "n_iter": 20,
+      "batch": 8,
+      "days": [
+        "atc-20130616_corridor_1.0s.h5",
+        "atc-20130623_corridor_1.0s.h5",
+        "atc-20130630_corridor_1.0s.h5",
+        "atc-20130707_corridor_1.0s.h5",
+        "atc-20130714_corridor_1.0s.h5",
+        "atc-20130721_corridor_1.0s.h5",
+        "atc-20130728_corridor_1.0s.h5"
+      ],
+      "scope": "walkable (blind cells inside the walkable region, clipped)",
+      "candidates": [
+        {
+          "epoch": 80,
+          "checkpoint": "frozen_candidates_20261009/epoch_00080.pt",
+          "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+          "aliases": [
+            "ckpt_00080.pt"
+          ],
+          "cached_score": {
+            "mse": 0.08343801129309343,
+            "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+            "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+          }
+        },
+        {
+          "epoch": 88,
+          "checkpoint": "frozen_candidates_20261009/epoch_00088.pt",
+          "sha256": "34ed7841b519f4f891002ebb1d052a0435706f56f33b2c10a87b6ee68de98045",
+          "aliases": [
+            "varnet_last.pt"
+          ],
+          "cached_score": null
+        }
+      ],
+      "score_provenance": {
+        "80": {
+          "kind": "reused_verified_validation_score",
+          "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/dev/fold_diagnostics_20261009/checkpoint_audit.json"
+        },
+        "88": {
+          "kind": "full_validation_scoring",
+          "per_day": [
+            {
+              "day": "atc-20130616_corridor_1.0s.h5",
+              "squared_error_sum": 1376108.625,
+              "scored_count": 17775036
+            },
+            {
+              "day": "atc-20130623_corridor_1.0s.h5",
+              "squared_error_sum": 1640657.25,
+              "scored_count": 20939596
+            },
+            {
+              "day": "atc-20130630_corridor_1.0s.h5",
+              "squared_error_sum": 1506363.5,
+              "scored_count": 20581760
+            },
+            {
+              "day": "atc-20130707_corridor_1.0s.h5",
+              "squared_error_sum": 1717554.75,
+              "scored_count": 19543008
+            },
+            {
+              "day": "atc-20130714_corridor_1.0s.h5",
+              "squared_error_sum": 1945399.5,
+              "scored_count": 20539444
+            },
+            {
+              "day": "atc-20130721_corridor_1.0s.h5",
+              "squared_error_sum": 1782501.75,
+              "scored_count": 18937248
+            },
+            {
+              "day": "atc-20130728_corridor_1.0s.h5",
+              "squared_error_sum": 1481822.5,
+              "scored_count": 18618576
+            }
+          ]
+        }
+      },
+      "mse_by_epoch": {
+        "80": 0.08343801129309343,
+        "88": 0.08361949564883014
+      },
+      "selected_epoch": 80,
+      "selected_mse": 0.08343801129309343,
+      "selected_ckpt": "frozen_candidates_20261009/epoch_00080.pt",
+      "checkpoint_sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+      "training_stopped_by_user": true,
+      "gpu_for_new_scores": "Tesla V100-SXM2-32GB"
+    }
+  },
+  "accuracy": [
+    {
+      "method": "Senseiver-A",
+      "blind_rmse": "0.22263931186507993",
+      "all_walkable_rmse": "0.15702450220227834",
+      "density_rmse": "0.15646172799661545",
+      "vx_rmse": "0.37221750202975556",
+      "vy_rmse": "0.15453677373671093",
+      "variance_rmse": "0.10660814776139747"
+    },
+    {
+      "method": "Senseiver-G Temporal (ours)",
+      "blind_rmse": "0.19640956387842914",
+      "all_walkable_rmse": "0.13622529843343714",
+      "density_rmse": "0.13246615548552207",
+      "vx_rmse": "0.3247047802591322",
+      "vy_rmse": "0.14431148868575192",
+      "variance_rmse": "0.10247236062819674"
+    },
+    {
+      "method": "DINCAE",
+      "blind_rmse": "0.22622729913646777",
+      "all_walkable_rmse": "0.18432146062312638",
+      "density_rmse": "0.1554038004442174",
+      "vx_rmse": "0.37830375221792045",
+      "vy_rmse": "0.1605581946499034",
+      "variance_rmse": "0.1080377688330489"
+    },
+    {
+      "method": "4DVarNet MSE",
+      "blind_rmse": "0.23684694978667842",
+      "all_walkable_rmse": "0.19675350237446565",
+      "density_rmse": "0.178544283747743",
+      "vx_rmse": "0.37266813177843355",
+      "vy_rmse": "0.18412464791584163",
+      "variance_rmse": "0.14044367846456587"
+    },
+    {
+      "method": "4DVarNet aughead_obs (single)",
+      "blind_rmse": "0.30399030564416263",
+      "all_walkable_rmse": "0.2397149486728111",
+      "density_rmse": "0.20118627976150777",
+      "vx_rmse": "0.5182113694155241",
+      "vy_rmse": "0.2007631858561367",
+      "variance_rmse": "0.14253288866655134"
+    },
+    {
+      "method": "Localized EnKF (100 members)",
+      "blind_rmse": "0.25339164123984614",
+      "all_walkable_rmse": "0.21545928578959472",
+      "density_rmse": "0.1557849934766117",
+      "vx_rmse": "0.404424818327549",
+      "vy_rmse": "0.1740874891503321",
+      "variance_rmse": "0.19670903296606795"
+    }
+  ],
+  "uncertainty": [
+    {
+      "method": "4DVarNet aughead_obs (single)",
+      "rmse": "0.3063164737182941",
+      "spread": "0.38535587281047023",
+      "spread_rmse": "1.2580318261461354",
+      "crps": "0.10515318866423534",
+      "crps_lo": "0.09987880348868303",
+      "crps_hi": "0.11025563709746522",
+      "spread_rmse_lo": "1.2458821652923169",
+      "spread_rmse_hi": "1.2703104691694882"
+    },
+    {
+      "method": "DINCAE",
+      "rmse": "0.22762000861212467",
+      "spread": "0.1957862304038551",
+      "spread_rmse": "0.8601450795017065",
+      "crps": "0.07430785041781707",
+      "crps_lo": "0.07082387802327197",
+      "crps_hi": "0.07780117150530433",
+      "spread_rmse_lo": "0.8320899466926763",
+      "spread_rmse_hi": "0.900451222466062"
+    },
+    {
+      "method": "Localized EnKF (100 members)",
+      "rmse": "0.2535279188774622",
+      "spread": "0.31190388559152155",
+      "spread_rmse": "1.2302545888142373",
+      "crps": "0.09799364574129002",
+      "crps_lo": "0.09566232803371942",
+      "crps_hi": "0.10014868496065586",
+      "spread_rmse_lo": "1.199762687072827",
+      "spread_rmse_hi": "1.2680754045483191"
+    }
+  ],
+  "timing": [
+    {
+      "method": "Senseiver-A",
+      "median_ms_per_frame": "0.09030887003367145",
+      "p95_ms_per_frame": "0.09311073211332162",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "1",
+      "repeats": "3"
+    },
+    {
+      "method": "Senseiver-G Temporal (ours)",
+      "median_ms_per_frame": "0.8574715784440438",
+      "p95_ms_per_frame": "0.8578574578665817",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "1",
+      "repeats": "3"
+    },
+    {
+      "method": "DINCAE",
+      "median_ms_per_frame": "0.017751439978989463",
+      "p95_ms_per_frame": "0.01799471895598496",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "1",
+      "repeats": "3"
+    },
+    {
+      "method": "4DVarNet MSE",
+      "median_ms_per_frame": "0.3519905434222892",
+      "p95_ms_per_frame": "0.35199958068551496",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "200",
+      "repeats": "3"
+    },
+    {
+      "method": "4DVarNet aughead_obs (single)",
+      "median_ms_per_frame": "0.3997629601508379",
+      "p95_ms_per_frame": "0.4009843995445408",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "200",
+      "repeats": "3"
+    },
+    {
+      "method": "Localized EnKF (100 members)",
+      "median_ms_per_frame": "5.9860146045684814",
+      "p95_ms_per_frame": "6.036802768707275",
+      "gpu": "Tesla V100-PCIE-32GB",
+      "scope": "predictor compute, prebuilt inputs; same GPU and frames",
+      "min_output_block_frames": "1",
+      "repeats": "3"
+    }
+  ],
+  "breakdown_accuracy_differences": {
+    "Senseiver-A": -1.6112715051086468e-09,
+    "Senseiver-G": -6.322329326735598e-10,
+    "DINCAE": 6.098909710594569e-10,
+    "4DVarNet": -4.653197285903188e-06,
+    "4DVarNet aug. var.": -3.4104138657564675e-07,
+    "EnKF": 2.760101591725572e-10
+  },
+  "refreshed_figure_sha256": {
+    "accuracy.pdf": "7d75b3773f37b0f37c049c7206531e8e802214130ed5de372521ff55ddbf2bde",
+    "uncertainty.pdf": "e1cfbcf3f4b84581c4b24c189c966cb2f91353d760c601c34bba48df5c31d5f3",
+    "latency.pdf": "32bceaca9de4528b9a093ab055c8bd830d19b03e16d5bbd933b6f602881ca33f",
+    "breakdown.pdf": "ddd7b4b59842bcac9e8dbefb98fc19cc398cef02c07e83cc82bd9849dc6d8ce8",
+    "comparison.pdf": "655ac6302f5ddba36701ac68a4246c9d3f63d55b6543280ec98de02f5187e08f",
+    "uncertainty_maps.pdf": "a59e994d80f6f674f2e888fd4ec337a218b826fee3ab80d7dd71423f04b8c013",
+    "varnet.pdf": "252a0024a30b9d3dcf9eeb1aab2f6e4d9652fc441d32d0eadddda42707254a7a",
+    "dincae.pdf": "d7c2299679c2aaf820dfee5c669d3a107feb699ea23affe02f5669b6121d9d9f"
+  },
+  "n_thesis_figures": 17,
+  "pdf_compiled": true,
+  "new_training_performed": false,
+  "new_baseline_or_jitter_experiments": false,
+  "latency_visualization": {
+    "scale": "linear",
+    "origin": 0,
+    "labels_decimal_places": 3,
+    "csv_unchanged": true,
+    "six_bars_and_labels_checked_against_csv": true,
+    "png_visually_inspected": true,
+    "thesis_asset_synchronized": true
+  },
+  "clarity_revision": {
+    "status": "complete",
+    "review_items": [
+      {
+        "id": "C01",
+        "status": "complete",
+        "description": "统一研究对象为四通道宏观场，改写个体状态逆问题的表述。",
+        "line": 286
+      },
+      {
+        "id": "C02",
+        "status": "complete",
+        "description": "固定使用 Senseiver-A、plain 4DVarNet，区分文献架构和先导实现。",
+        "line": 1304
+      },
+      {
+        "id": "C03",
+        "status": "complete",
+        "description": "说明一次完整求解调用包含 20 次梯度计算和学习更新，全文同步。",
+        "line": 1586
+      },
+      {
+        "id": "C04",
+        "status": "complete",
+        "description": "CRPS 评价完整预测分布，单模型方差称条件预测方差，不宣称分离了来源。",
+        "line": 899
+      },
+      {
+        "id": "C05",
+        "status": "complete",
+        "description": "pooled 指标按既定单位的数值等权汇总，无单一物理单位。",
+        "line": 1884
+      },
+      {
+        "id": "C06",
+        "status": "complete",
+        "description": "统一 RMS spread / point-estimate RMSE，限定预测均值的二阶矩校准条件。",
+        "line": 679
+      },
+      {
+        "id": "C07",
+        "status": "complete",
+        "description": "DINCAE 先在 log1p 空间反标准化，再得到物理空间中位数，图文同步。",
+        "line": 1486
+      },
+      {
+        "id": "C08",
+        "status": "complete",
+        "description": "区分 MAP 动机与固定深度近似重建，明确先验输出为同形窗口。",
+        "line": 578
+      },
+      {
+        "id": "C09",
+        "status": "complete",
+        "description": "删除未定义的先验层符号，说明范数、系数平方及归一化范围。",
+        "line": 1528
+      },
+      {
+        "id": "C10",
+        "status": "complete",
+        "description": "增强 ConvLSTM 接收对 x、s 的梯度，明确两个模型分别训练且权重独立。",
+        "line": 1689
+      },
+      {
+        "id": "C11",
+        "status": "complete",
+        "description": "说明初始场按整天生成，窗口初始化可能含更早观测。",
+        "line": 1558
+      },
+      {
+        "id": "C12",
+        "status": "complete",
+        "description": "限定重建模型使用 ground truth 的方式，明确 PedPred3 的真实历史输入和加权损失。",
+        "line": 1739
+      },
+      {
+        "id": "C13",
+        "status": "complete",
+        "description": "区分先导设计、一个最终逐日路线训练运行及验证选型；先验表改为配置选择。",
+        "line": 1973
+      },
+      {
+        "id": "C14",
+        "status": "complete",
+        "description": "区分导航、观测 footprint、训练损失和 blind/all-walkable 评分范围。",
+        "line": 1130
+      },
+      {
+        "id": "C15",
+        "status": "complete",
+        "description": "明确验证 batch=8、准确度 batch=16、不确定性及示例 batch=1，以及日汇总 bootstrap。",
+        "line": 1981
+      },
+      {
+        "id": "C16",
+        "status": "complete",
+        "description": "单位输入方差是编码设定；UQ 不额外裁剪，EnKF 保留内部成员裁剪。",
+        "line": 1901
+      },
+      {
+        "id": "C17",
+        "status": "complete",
+        "description": "补齐经验 CRPS 两个汇总分量的保存说明，删除仅导出均值/spread 的限定。",
+        "line": 2712
+      },
+      {
+        "id": "C18",
+        "status": "complete",
+        "description": "近期观测收益不写成机制证明，occupied RMSE 不推出定位能力；盲格无直接观测。",
+        "line": 2239
+      },
+      {
+        "id": "C19",
+        "status": "complete",
+        "description": "sigma 图仅作空间诊断，删去由 coverage/RMS 推断分布机制的定论。",
+        "line": 2406
+      },
+      {
+        "id": "C20",
+        "status": "complete",
+        "description": "14% 为完整配置差异，明确每帧平均计算成本；保留原计时数值和图。",
+        "line": 2506
+      },
+      {
+        "id": "C21",
+        "status": "complete",
+        "description": "研究空缺限于所审阅文献，稳定性限于七个测试日，未来效果使用可能性措辞。",
+        "line": 80
+      },
+      {
+        "id": "C22",
+        "status": "complete",
+        "description": "区分代码基线与最终源码版本，生成 164 项归档及 SHA-256 清单。",
+        "line": 2678
+      },
+      {
+        "id": "C23",
+        "status": "complete",
+        "description": "同步精简两个摘要、UQ 背景、EnKF 推导和结论重复，删除未使用符号。",
+        "line": 2601
+      },
+      {
+        "id": "C24",
+        "status": "complete",
+        "description": "明确逐格四维噪声、时间采样数/记录数及 DINCAE 损失索引范围。",
+        "line": 1101
+      }
+    ],
+    "before_sha256": "c784c551455b8f759234d77ddd00eaf55458d8a56a8ae9c14c8566f1c2423ebf",
+    "after_sha256": "999bf4b34135411056fed75069a134eadd1aabbb7eb1d038182274ea19bb34fe",
+    "before_lines": 2754,
+    "after_lines": 2731,
+    "source_tokens_before": 22538,
+    "source_tokens_after": 21514,
+    "existing_result_check_groups_passed": 8,
+    "protected_asset_hashes_unchanged": 21,
+    "source_snapshot_entries_verified": 164,
+    "citation_keys_verified": 31,
+    "edited_thesis_figures": [
+      "dincae.pdf",
+      "uncertainty.pdf"
+    ],
+    "timing_figure_unchanged": true,
+    "experiment_data_unchanged": true,
+    "new_training_or_model_evaluation": false,
+    "pdf_compiled": true,
+    "report": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/review_20261009/clarity_revision_status_zh.md",
+    "latex_compile_fix": {
+      "status": "complete",
+      "date": "2026-10-09",
+      "cause": "Blank lines in the PDF metadata abstract become paragraph tokens; pdfx xmp parser rejects them.",
+      "reproduced_error": "thesis.xmpdata:6: Paragraph ended before \\xmp@doparse was complete.",
+      "changed": "Removed paragraph breaks only from the metadata abstract and added an explanatory comment.",
+      "visible_abstract_unchanged": true,
+      "abstract_wording_unchanged": true,
+      "before_sha256": "939f3049458d117002b921cd15ca02492b978c68c6a45460ba17d3c30f82f96a",
+      "after_sha256": "999bf4b34135411056fed75069a134eadd1aabbb7eb1d038182274ea19bb34fe",
+      "pdf_compiled": true,
+      "pdf_pages": 60,
+      "pdf_sha256": "57be7ba0aa2afe19f9513130ed4a121cdd9ec9b700a88028a58550ad1d13ddf9",
+      "build_steps": [
+        {
+          "step": "pdflatex_1",
+          "exit": 0,
+          "seconds": 2.75
+        },
+        {
+          "step": "biber",
+          "exit": 0,
+          "seconds": 9.58
+        },
+        {
+          "step": "pdflatex_2",
+          "exit": 0,
+          "seconds": 2.91
+        },
+        {
+          "step": "pdflatex_3",
+          "exit": 0,
+          "seconds": 2.84
+        }
+      ],
+      "final_project_directory_pdflatex_exit_code": 0,
+      "undefined_references": false,
+      "unresolved_citations": false,
+      "protected_asset_hashes_unchanged": 21,
+      "compile_log": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/thesis.log",
+      "backup": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/review_20261009/before_metadata_compile_fix_20261009",
+      "new_training_or_model_evaluation": false
+    }
+  },
+  "source_snapshot_manifest": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full/source_snapshot_manifest_20261009.json",
+  "latex_compile_fix": {
+    "status": "complete",
+    "date": "2026-10-09",
+    "cause": "Blank lines in the PDF metadata abstract become paragraph tokens; pdfx xmp parser rejects them.",
+    "reproduced_error": "thesis.xmpdata:6: Paragraph ended before \\xmp@doparse was complete.",
+    "changed": "Removed paragraph breaks only from the metadata abstract and added an explanatory comment.",
+    "visible_abstract_unchanged": true,
+    "abstract_wording_unchanged": true,
+    "before_sha256": "939f3049458d117002b921cd15ca02492b978c68c6a45460ba17d3c30f82f96a",
+    "after_sha256": "999bf4b34135411056fed75069a134eadd1aabbb7eb1d038182274ea19bb34fe",
+    "pdf_compiled": true,
+    "pdf_pages": 60,
+    "pdf_sha256": "57be7ba0aa2afe19f9513130ed4a121cdd9ec9b700a88028a58550ad1d13ddf9",
+    "build_steps": [
+      {
+        "step": "pdflatex_1",
+        "exit": 0,
+        "seconds": 2.75
+      },
+      {
+        "step": "biber",
+        "exit": 0,
+        "seconds": 9.58
+      },
+      {
+        "step": "pdflatex_2",
+        "exit": 0,
+        "seconds": 2.91
+      },
+      {
+        "step": "pdflatex_3",
+        "exit": 0,
+        "seconds": 2.84
+      }
+    ],
+    "final_project_directory_pdflatex_exit_code": 0,
+    "undefined_references": false,
+    "unresolved_citations": false,
+    "protected_asset_hashes_unchanged": 21,
+    "compile_log": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/thesis.log",
+    "backup": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/review_20261009/before_metadata_compile_fix_20261009",
+    "new_training_or_model_evaluation": false
+  },
+  "qualitative_abstract_revision": {
+    "date": "2026-10-09",
+    "status": "complete",
+    "abstracts_synchronized": true,
+    "quantitative_experiment_details_removed": true,
+    "model_name_4DVarNet_retained": true,
+    "manuscript_sha256": "989737b8f47321dd305c04d466e7a548bbaeefcc1a0d312a03b7941915dbbc40",
+    "pdf_compiled": true,
+    "pdf_pages": 60,
+    "pdf_sha256": "d16f128f5585466a211330aecde34be3dc9c97c3f533ee00c113b7261760a7b5",
+    "source_snapshot_updated": true
+  },
+  "training_clarification": {
+    "status": "complete",
+    "date": "2026-10-09",
+    "changes": [
+      "Exact 4DVarNet iteration and learning-rate schedule",
+      "PedPred3 training loss linked to exact appendix definition",
+      "Target subsampling, context frequency and training sample construction",
+      "Common final checkpoint criterion separated from training loss and monitor scores",
+      "Training table initial learning rates, batch meaning and epoch convention",
+      "Initial learning-rate column heading",
+      "Plain model initial learning rate",
+      "Augmented model initial learning rate",
+      "Precise PedPred3 loss label",
+      "Constant learning rates and actual PedPred3 optimizer/scheduler",
+      "Exact implementation of density-weighted PedPred3 forecast loss"
+    ],
+    "manuscript_before_sha256": "989737b8f47321dd305c04d466e7a548bbaeefcc1a0d312a03b7941915dbbc40",
+    "manuscript_after_sha256": "d382861dee8f4612c2e0aaba79e3c74b22dc2bc9379696fc8cd9f779ac6e3d54",
+    "abstract_and_front_matter_unchanged": true,
+    "results_and_conclusions_unchanged": true,
+    "selected_checkpoints_unchanged": true,
+    "experiment_data_unchanged": true,
+    "pdf_compiled": true,
+    "pdf_pages": 60,
+    "pdf_sha256": "a2f333bba75c1eba2ff314b376f4376eff2e9b803e5f1c6fbd2620b70576c2a6",
+    "result_check_groups_passed": 8,
+    "unresolved_references": false,
+    "unresolved_citations": false,
+    "new_training_or_model_evaluation": false,
+    "report": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/review_20261009/training_clarification_status_zh.md",
+    "backup": "/scratch/work/zhangx29/Thesis_writing/Thesis_paper20260219/review_20261009/before_training_clarification_20261009",
+    "locations": {
+      "varnet_schedule": 1594,
+      "sampling": 1980,
+      "selection": 1992,
+      "training_table": 2059,
+      "pedpred_schedule": 2082,
+      "pedpred_loss": 2733
+    }
+  }
+}

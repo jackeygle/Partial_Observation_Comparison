@@ -1,0 +1,8 @@
+########## runs/varnet_mse5_h96_pdfold_s3
+no such directory: /scratch/work/zhangx29/Thesis_Project/methods/varnet/methods/varnet/runs/varnet_mse5_h96_pdfold_s3
+--run-dir is relative to /scratch/work/zhangx29/Thesis_Project/methods/varnet (e.g. runs/varnet_mse5_h96_s0), or give an absolute path.
+[fail] runs/varnet_mse5_h96_pdfold_s3
+########## runs/varnet_aughead_obs_h96_fold_s0
+no such directory: /scratch/work/zhangx29/Thesis_Project/methods/varnet/methods/varnet/runs/varnet_aughead_obs_h96_fold_s0
+--run-dir is relative to /scratch/work/zhangx29/Thesis_Project/methods/varnet (e.g. runs/varnet_mse5_h96_s0), or give an absolute path.
+[fail] runs/varnet_aughead_obs_h96_fold_s0

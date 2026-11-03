@@ -1,0 +1,5 @@
+[early_stop] epoch 90: valid all_walkable RMSE 0.18763
+[early_stop] epoch 100: valid all_walkable RMSE 0.18753
+[early_stop] best epoch 80 (RMSE 0.18714), newest 100: STOP
+[chain] early stop -- no resume, no successor.
+[chain] training finished; released validation/test job 20877615

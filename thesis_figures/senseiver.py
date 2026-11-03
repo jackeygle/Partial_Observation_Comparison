@@ -44,12 +44,12 @@ def main() -> None:
         # input tokens
         tk = token_icon(ax, 0.35, yc - 0.33, 6, color=c_new)
         if is_g:
-            text(ax, 0.6, yc - 0.55, r"$[\,y_i,\ \mathrm{PE}(\chi_i),\ \tau(\Delta_i)\,]$", FS_SMALL,
+            text(ax, 0.6, yc - 0.55, r"$[\,\tilde{y}_i,\ \mathrm{PE}(\chi_i),\ \tau(\Delta_i)\,]$", FS_SMALL,
                  ha="center", color=c_new)
             text(ax, 0.6, yc - 0.9, r"observed cells of $t-15..t$", FS_SMALL - 0.5, color=GREY,
                  ha="center")
         else:
-            text(ax, 0.6, yc - 0.55, r"$[\,y_i,\ \mathrm{PE}(\chi_i)\,]$", FS_SMALL, ha="center")
+            text(ax, 0.6, yc - 0.55, r"$[\,\tilde{y}_i,\ \mathrm{PE}(\chi_i)\,]$", FS_SMALL, ha="center")
             text(ax, 0.6, yc - 0.9, r"observed cells of $t$", FS_SMALL - 0.5, color=GREY, ha="center")
         text(ax, 0.6, tk[3] + 0.08, "sensor\ntokens", FS_SMALL - 0.5, color=GREY, ha="center",
              va="bottom", linespacing=1.1)
@@ -92,7 +92,7 @@ def main() -> None:
             arrow(ax, (sa[2] + 0.05, yc), (z[0] - 0.05, yc))
             de = block(ax, z[2] + 0.35, yc - bh / 2, 2.2, bh, "cross-attention", "decoder")
             arrow(ax, (z[2] + 0.05, yc), (de[0] - 0.05, yc))
-            text(ax, (de[0] + de[2]) / 2, de[1] - 0.45, r"queries: $[\mathrm{PE}(\chi),\ q]$ for all 432 cells",
+            text(ax, (de[0] + de[2]) / 2, de[1] - 0.45, r"queries: $[\mathrm{PE}(\chi),\ w]$ for all 432 cells",
                  FS_SMALL - 0.5, color=GREY, ha="center", va="center")
             arrow(ax, ((de[0] + de[2]) / 2, de[1] - 0.3), ((de[0] + de[2]) / 2, de[1] - 0.02))
             li = block(ax, de[2] + 0.35, yc - bh / 2, 0.95, bh, "linear")

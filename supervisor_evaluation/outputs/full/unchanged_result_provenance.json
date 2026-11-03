@@ -1,0 +1,75 @@
+{
+  "records": [
+    {
+      "path": "raw/senseiver_a_accuracy.json",
+      "sha256": "525c7bffbea2610894bfb5002675ea22d5fe0378c21e82668718fc5b3d443f2b",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/senseiver_a_accuracy.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/senseiver_g_accuracy.json",
+      "sha256": "62b577351cb552068fcabe4e4fc795dd23edc7a607e98e9e774b9a0995b1ce73",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/senseiver_g_accuracy.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/dincae_accuracy/dincae_metrics_test.json",
+      "sha256": "ee1c432517b82b76691ee5cabaf16a5a44cf6ee1d252c1b1f6696d6b3a14d95f",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/dincae_accuracy/dincae_metrics_test.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130811.json",
+      "sha256": "f8200d5c11bcb98879fc80dbed69b9da9a13a48ce8ca6a79a751d6dc15a5b3d3",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130811.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130818.json",
+      "sha256": "b7b5467a1b5dd2416b64dc0a1115d23a56ac8d1ba546cac7fa2d414ff9b3b8ba",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130818.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130825.json",
+      "sha256": "0e33f9b901024c3b4bda0b19ff1751d028ecc10e637b58215300e34056f7d5f7",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130825.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130901.json",
+      "sha256": "4223d2ee2ec6b9909e354e7d0ec3b3bcbac7b04d3ea5237b912829450a90d5d7",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130901.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130915.json",
+      "sha256": "2b0cc8970c5689aefc21c19aaed2931deeb2eb7f883411e77597b14791b80f9f",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130915.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130922.json",
+      "sha256": "ef621c0357eb6470543fe441dafcb912504e13d98b8115f197ab482c0c2477d9",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130922.json",
+      "recomputed": false
+    },
+    {
+      "path": "raw/enkf/atc-20130929.json",
+      "sha256": "e1c4f7c84bbe77ac371736040be2c4e1e028d8824003d5b0a3c27527914be217",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf/atc-20130929.json",
+      "recomputed": false
+    },
+    {
+      "path": "trivial_baselines.json",
+      "sha256": "3f038af382c114183fcf57aaeef840d0e20f659326eaeb008f56cba28bb1d243",
+      "source": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/trivial_baselines.json",
+      "recomputed": false
+    }
+  ],
+  "large_cache_links": {
+    "enkf_exports": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf_exports",
+    "enkf_observations": "/scratch/work/zhangx29/Thesis_Project/supervisor_evaluation/outputs/full_legacy_before_ct_20261009/raw/enkf_observations"
+  },
+  "new_baseline_experiments": false
+}

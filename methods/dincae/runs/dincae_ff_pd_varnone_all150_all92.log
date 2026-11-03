@@ -1,0 +1,5 @@
+observation config (from 4dvarnet_enkf/config.yaml): num_agents=3 range=7 every_k=1 seed=0 trajectory_mode=per_day
+train 63 days, dev 14 days, per-cell statistics from 63 days, walkable=290
+n_in=30 n_var=4 levels=2 params=319,696
+resume from epoch 150
+done

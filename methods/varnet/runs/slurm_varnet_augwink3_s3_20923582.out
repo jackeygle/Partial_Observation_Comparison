@@ -1,0 +1,4 @@
+[early_stop] epoch 140: valid all_walkable RMSE 0.25496
+[early_stop] epoch 149: valid all_walkable RMSE 0.26573
+[early_stop] best epoch 140 (RMSE 0.25496), newest 149: continue
+[chain] target 150 epochs reached -- stopping chain.

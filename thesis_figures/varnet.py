@@ -145,7 +145,7 @@ def main() -> None:
     arrow(ax, (vh[2] + 0.05, yv), (ups[0] - 0.05, yv), color=AUG)
     text(ax, (hd[2] + upx[0]) / 2, yh + 0.08, r"$u_k$", FS_SMALL, ha="center", va="bottom")
     text(ax, (vh[2] + ups[0]) / 2, yv + 0.08, r"$v_k$", FS_SMALL, color=AUG, ha="center", va="bottom")
-    text(ax, (vh[0] + vh[2]) / 2, vh[1] - 0.07, r"input $[h_k,\ x]$, $x$ detached",
+    text(ax, (vh[0] + vh[2]) / 2 - 0.3, vh[1] - 0.07, r"input $[h_k,\ x]$, $x$ detached",
          FS_SMALL - 0.5, color=AUG, ha="center", va="top")
     ly = ups[1] - 0.55                                  # loop: the new [x, s] goes back to J
     ux = (ups[0] + ups[2]) / 2

@@ -1,5 +1,5 @@
 {
-  "created": "2026-10-07T18:08:25+0300",
+  "created": "2026-10-09T15:24:29+0300",
   "files": {
     "senseiver_A_pd.pt": {
       "bytes": 425611,
@@ -16,15 +16,15 @@
       "sha256": "2859009285d3654a3327ac7684f3a5cd6f459241e511b1518f534465d65d05a2",
       "source": "methods/dincae/runs/dincae_ff_pd/ckpt_00140.pt"
     },
-    "varnet_mse_pd_s3_epoch80.pt": {
-      "bytes": 25184373,
-      "sha256": "0b0f9aa8c6b42ceab8224409428e947c3eba5f6ef0c8278f6f4827db1265ebc2",
-      "source": "methods/varnet/runs/varnet_mse5_h96_pd_s3/ckpt_00080.pt"
+    "varnet_mse_fold_s3.pt": {
+      "bytes": 25184529,
+      "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+      "source": "methods/varnet/runs/varnet_mse5_h96_pdfold_s3/frozen_candidates_20261009/epoch_00076.pt"
     },
-    "varnet_aughead_obs_s0.pt": {
-      "bytes": 55598389,
-      "sha256": "272abccc188e2e47ff79d922101ba91c1c945cac9610624f5e792d7d8b04cb57",
-      "source": "methods/varnet/runs/varnet_aughead_obs_h96_s0/ckpt_00090.pt"
+    "varnet_aughead_fold_s0.pt": {
+      "bytes": 55598453,
+      "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+      "source": "methods/varnet/runs/varnet_aughead_obs_h96_fold_s0/frozen_candidates_20261009/epoch_00080.pt"
     },
     "pedpred3_5to5_epoch38.pt": {
       "bytes": 3575885,

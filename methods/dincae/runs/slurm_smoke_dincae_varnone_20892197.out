@@ -1,0 +1,51 @@
+NVIDIA A100-SXM4-80GB
+train days 32, walkable 290/432, channels ('density', 'vx', 'vy', 'var')
+  1/32 atc-20121028_corridor_1.0s.h5
+  2/32 atc-20121104_corridor_1.0s.h5
+  3/32 atc-20121111_corridor_1.0s.h5
+  4/32 atc-20121118_corridor_1.0s.h5
+  5/32 atc-20121125_corridor_1.0s.h5
+  6/32 atc-20121202_corridor_1.0s.h5
+  7/32 atc-20121209_corridor_1.0s.h5
+  8/32 atc-20121216_corridor_1.0s.h5
+  9/32 atc-20121223_corridor_1.0s.h5
+  10/32 atc-20130106_corridor_1.0s.h5
+  11/32 atc-20130113_corridor_1.0s.h5
+  12/32 atc-20130120_corridor_1.0s.h5
+  13/32 atc-20130127_corridor_1.0s.h5
+  14/32 atc-20130203_corridor_1.0s.h5
+  15/32 atc-20130210_corridor_1.0s.h5
+  16/32 atc-20130217_corridor_1.0s.h5
+  17/32 atc-20130224_corridor_1.0s.h5
+  18/32 atc-20130303_corridor_1.0s.h5
+  19/32 atc-20130310_corridor_1.0s.h5
+  20/32 atc-20130317_corridor_1.0s.h5
+  21/32 atc-20130324_corridor_1.0s.h5
+  22/32 atc-20130331_corridor_1.0s.h5
+  23/32 atc-20130407_corridor_1.0s.h5
+  24/32 atc-20130414_corridor_1.0s.h5
+  25/32 atc-20130421_corridor_1.0s.h5
+  26/32 atc-20130428_corridor_1.0s.h5
+  27/32 atc-20130505_corridor_1.0s.h5
+  28/32 atc-20130512_corridor_1.0s.h5
+  29/32 atc-20130519_corridor_1.0s.h5
+  30/32 atc-20130526_corridor_1.0s.h5
+  31/32 atc-20130602_corridor_1.0s.h5
+  32/32 atc-20130609_corridor_1.0s.h5
+
+Per-cell mean + residual std (for normalisation):
+  density  mean   0.07716   resid_std  0.19491   median samples/cell 1262518
+  vx       mean   0.01780   resid_std  0.84916   median samples/cell 382846
+  vy       mean  -0.00388   resid_std  0.33664   median samples/cell 382846
+  var      mean   0.07823   resid_std  0.22816   median samples/cell 370286
+
+wrote /scratch/work/zhangx29/Thesis_Project/methods/dincae/artifacts/state_stats_none.npz / .json
+observation config (from 4dvarnet_enkf/config.yaml): num_agents=3 range=7 every_k=1 seed=0 trajectory_mode=per_day
+train 2 days, dev 1 days, per-cell statistics from 32 days, walkable=290
+n_in=30 n_var=4 levels=2 params=319,696
+  [cache] wrote atc-20121028_corridor_1.0s x(10111, 30, 36, 12)
+  [cache] wrote atc-20121104_corridor_1.0s x(10070, 30, 36, 12)
+  [cache] wrote atc-20130616_corridor_1.0s x(2196, 30, 36, 12)
+{"epoch": 0, "lr": 0.001, "train_nll": -6.950071764037108, "train_nll_per_level": [-6.355624121389812, -7.204835031983219], "dev_nll": -7.69151998247419, "dev_resid_mse": {"density": 0.023246308836113092, "vx": 0.10609457219773256, "vy": 0.04224324541037693, "var": 0.01117883813874482}, "dev_resid_mse_norm": {"density": 0.6118986529963357, "vx": 0.14713567814656667, "vy": 0.3727510869503021, "var": 0.2147460114210844}, "batches": 316, "sec": 29.2}
+done
+[smoke] train wall seconds: 36

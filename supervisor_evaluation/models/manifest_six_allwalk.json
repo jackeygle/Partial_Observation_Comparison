@@ -1,0 +1,45 @@
+{
+  "created": "2026-10-13T13:53:00+0300",
+  "files": {
+    "senseiver_A_pd_allwalk_epoch096.pt": {
+      "bytes": 425611,
+      "sha256": "4e250b115e861ef7c89f779de7ef5b111097446775d799b0c48cb376748a8b79",
+      "source": "methods/senseiver/runs/senseiver_A_pd/epoch_096.pt"
+    },
+    "senseiver_G_k16_pd.pt": {
+      "bytes": 382795,
+      "sha256": "23358b5c9db500dd420a4300c95c0df2d5185a0f94cb92f87bbc298b499df62d",
+      "source": "methods/senseiver/runs/sv_G_k16_pd/epoch_054.pt"
+    },
+    "dincae_varnone_allwalk_epoch093.pt": {
+      "bytes": 1288501,
+      "sha256": "f7aec707b486f66a28e65f2bdbe10bfb37d3a63539cb0512f7a58e066c52c8fd",
+      "source": "methods/dincae/runs/dincae_ff_pd_varnone_all150/ckpt_00093.pt"
+    },
+    "varnet_kt3_window_allwalk_epoch080.pt": {
+      "bytes": 25018421,
+      "sha256": "7aaef5be0aa20503b4becde827d4af6017ff29cd0c1901b82085be539a665346",
+      "source": "methods/varnet/runs/varnet_mse5_h96k3_win_pdfold_s3/ckpt_00080.pt"
+    },
+    "varnet_augwink3_allwalk_epoch140.pt": {
+      "bytes": 55432501,
+      "sha256": "dc8c816adc77c996a908b42813658ce0ca24e161b1224ba42139951a19e44127",
+      "source": "methods/varnet/runs/varnet_aughead_obs_h96k3_win_pdfold_s3/ckpt_00140.pt"
+    },
+    "pedpred3_5to5_epoch38.pt": {
+      "bytes": 3575885,
+      "sha256": "4f3f261b28b6bff6e03b7b33e47b7df291cb650864357014bfbd0535eccb1491",
+      "source": "methods/enkf/runs/pedpred3_5to5_clip_s0/dyn150_best.pt"
+    },
+    "enkf_residual_q_bank.npz": {
+      "bytes": 38879874,
+      "sha256": "240772c0a9c7b6c30b583e8c36baed7262fdb8fb0914b8b1fbc664cd997d0e7f",
+      "source": "methods/enkf/enkf_opt/experiments/outputs/pedpred3_5to5_train_residual_q_8192.npz"
+    },
+    "dincae_state_stats_none.npz": {
+      "bytes": 16987,
+      "sha256": "cb3cbe23b9c37b2bd4d67f94d29c4c7cfa6011ebfdb1a2af43a2a5952e5d830a",
+      "source": "methods/dincae/artifacts/state_stats_none.npz"
+    }
+  }
+}

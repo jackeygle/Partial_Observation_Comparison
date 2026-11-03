@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import os
 
-from thesis_figures.common import FS_SMALL, GREY, arrow, block, canvas, save, text
+from thesis_figures.common import ALL92, FS_SMALL, GREY, arrow, block, canvas, save, text
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,7 +21,7 @@ def main() -> None:
     fig, ax = canvas(16.0, 2.75)
     bw, bh, gap, yc = 2.8, 1.3, 0.35, 1.8
     steps = [("tracking records", "one person at one instant:\nposition, speed, direction"),
-             ("units and velocity", "millimetres to metres; speed\nand direction to a vector"),
+             ("units and velocity", "mm to m; speed and\ndirection to a vector"),
              ("corridor frame", "shift and rotate into the\n" r"$36 \times 12$ m rectangle"),
              ("one frame per second", "all records of the second,\ntent kernel on 1 m cells"),
              (r"state $x_t$", r"$4 \times 36 \times 12$:" "\n" r"$\rho,\ v_x,\ v_y,\ \nu$")]
@@ -31,7 +31,9 @@ def main() -> None:
         if i:
             arrow(ax, (x - gap + 0.04, yc), (x - 0.04, yc))
         x = b[2] + gap
-    text(ax, 8.0, 0.75, "46 Sundays, split by date: 32 training, 7 validation, 7 test days."
+    split = ("92 days (Wednesdays and Sundays), split by date: 63 training, 14 validation, 15 test days."
+             if ALL92 else "46 Sundays, split by date: 32 training, 7 validation, 7 test days.")
+    text(ax, 8.0, 0.75, split +
          "   Walkable mask: 290 of the 432 cells,\nfrom the obstacle map and the training days;"
          " the same for every day and every method.", FS_SMALL, color=GREY, ha="center",
          va="top", linespacing=1.25)

@@ -11,6 +11,7 @@
 | `reselect_all_walkable_20261010/` | Route-1 checkpoint selection on all walkable cells | route-1 variants |
 | `reselect/` | Route-1 EnKF configuration selection (validation arrays) | `reselect_validation.py`, `checks/reselect_all_walkable.py` |
 | `full/` | Original default output directory of `evaluate.py` (oldest six-method results) | default `--output-dir`, default figure variant |
+| `dev/coverage_all92_20261031/` | Coverage of the 50% and 90% prediction intervals (advisor comment C022): rerun of the EnKF for its members, `coverage.json` read by the thesis table; the reported run is only read | `checks/coverage_run.py` |
 | `dev/` | Test runs, smoke tests and selection runs (not reported results) | — |
 | `logs/` | Slurm logs of the evaluation jobs | — |
 | `_archive/` | Superseded evaluations, kept for the record; nothing reads them | — |

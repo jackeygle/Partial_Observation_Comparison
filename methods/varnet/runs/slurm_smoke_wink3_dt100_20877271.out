@@ -1,0 +1,9 @@
+Tesla V100-PCIE-32GB
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 806 windows of (4, 100, 36, 12)  device=cuda
+[model] params=1,135,318 (GENN prior 40,396 = 3.56%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=3  data=0
+[schedule] ep0→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 20, lr -> 0.0003
+[2026-10-10T18:11:39.758] error: *** JOB 20877271 ON gpu3 CANCELLED AT 2026-10-10T18:11:39 DUE to SIGNAL Terminated ***

@@ -1,0 +1,122 @@
+[early_stop] no checkpoint at or after epoch 80 yet: keep training
+[chain] submitted successor 20878662 (afterany:20877720); 200 frames, H200, 4 hours
+NVIDIA H100 80GB HBM3
+[obs] obs_every_k = 1  (observed every frame, matching the EnKF project)
+[obs] trajectory_mode = per_day  (base data seed 0)
+[data] 6298 windows of (4, 200, 36, 12)  device=cuda
+[model] params=2,082,518 (GENN prior 40,396 = 1.94%; the rest is the solver's ConvLSTM)  loss=supervised  n_iter=15  amp=True
+[seed] init=3  data=0
+[schedule] ep0→5it@lr0.001  ep25→10it@lr0.0007  ep50→15it@lr0.0005  ep75→20it@lr0.0003
+[schedule] epoch 0: n_iter -> 5, lr -> 0.001
+[epoch   0] loss=0.0581  blind_MSE=0.0729  density=0.0228 vx=0.2219 vy=0.0379 var=0.0092
+           ↑ new best (0.0729) -> varnet_best.pt
+[epoch   1] loss=0.0466  blind_MSE=0.0618  density=0.0228 vx=0.1776 vy=0.0375 var=0.0092
+           ↑ new best (0.0618) -> varnet_best.pt
+[epoch   2] loss=0.0426  blind_MSE=0.0539  density=0.0227 vx=0.1475 vy=0.0365 var=0.0091
+           ↑ new best (0.0539) -> varnet_best.pt
+[epoch   3] loss=0.0417  blind_MSE=0.0471  density=0.0226 vx=0.1213 vy=0.0353 var=0.0090
+           ↑ new best (0.0471) -> varnet_best.pt
+[epoch   4] loss=0.0359  blind_MSE=0.0437  density=0.0223 vx=0.1098 vy=0.0335 var=0.0090
+           ↑ new best (0.0437) -> varnet_best.pt
+[epoch   5] loss=0.0341  blind_MSE=0.0409  density=0.0220 vx=0.1028 vy=0.0298 var=0.0088
+           ↑ new best (0.0409) -> varnet_best.pt
+[epoch   6] loss=0.0362  blind_MSE=0.0394  density=0.0219 vx=0.0983 vy=0.0282 var=0.0090
+           ↑ new best (0.0394) -> varnet_best.pt
+[epoch   7] loss=0.0351  blind_MSE=0.0378  density=0.0217 vx=0.0942 vy=0.0264 var=0.0088
+           ↑ new best (0.0378) -> varnet_best.pt
+[epoch   8] loss=0.0332  blind_MSE=0.0364  density=0.0201 vx=0.0910 vy=0.0259 var=0.0086
+           ↑ new best (0.0364) -> varnet_best.pt
+[epoch   9] loss=0.0333  blind_MSE=0.0376  density=0.0207 vx=0.0943 vy=0.0267 var=0.0088
+[epoch  10] loss=0.0332  blind_MSE=0.0360  density=0.0199 vx=0.0901 vy=0.0254 var=0.0088
+           ↑ new best (0.0360) -> varnet_best.pt
+[epoch  11] loss=0.0325  blind_MSE=0.0350  density=0.0196 vx=0.0870 vy=0.0247 var=0.0088
+           ↑ new best (0.0350) -> varnet_best.pt
+[epoch  12] loss=0.0320  blind_MSE=0.0341  density=0.0193 vx=0.0842 vy=0.0241 var=0.0088
+           ↑ new best (0.0341) -> varnet_best.pt
+[epoch  13] loss=0.0324  blind_MSE=0.0333  density=0.0189 vx=0.0821 vy=0.0236 var=0.0088
+           ↑ new best (0.0333) -> varnet_best.pt
+[epoch  14] loss=0.0280  blind_MSE=0.0329  density=0.0185 vx=0.0809 vy=0.0234 var=0.0089
+           ↑ new best (0.0329) -> varnet_best.pt
+[epoch  15] loss=0.0308  blind_MSE=0.0325  density=0.0182 vx=0.0799 vy=0.0232 var=0.0089
+           ↑ new best (0.0325) -> varnet_best.pt
+[epoch  16] loss=0.0307  blind_MSE=0.0321  density=0.0180 vx=0.0786 vy=0.0230 var=0.0089
+           ↑ new best (0.0321) -> varnet_best.pt
+[epoch  17] loss=0.0295  blind_MSE=0.0318  density=0.0178 vx=0.0775 vy=0.0229 var=0.0089
+           ↑ new best (0.0318) -> varnet_best.pt
+[epoch  18] loss=0.0295  blind_MSE=0.0315  density=0.0176 vx=0.0767 vy=0.0228 var=0.0089
+           ↑ new best (0.0315) -> varnet_best.pt
+[epoch  19] loss=0.0301  blind_MSE=0.0314  density=0.0175 vx=0.0763 vy=0.0228 var=0.0089
+           ↑ new best (0.0314) -> varnet_best.pt
+[epoch  20] loss=0.0271  blind_MSE=0.0311  density=0.0174 vx=0.0755 vy=0.0228 var=0.0089
+           ↑ new best (0.0311) -> varnet_best.pt
+[epoch  21] loss=0.0297  blind_MSE=0.0311  density=0.0173 vx=0.0753 vy=0.0228 var=0.0089
+           ↑ new best (0.0311) -> varnet_best.pt
+[epoch  22] loss=0.0261  blind_MSE=0.0308  density=0.0172 vx=0.0747 vy=0.0227 var=0.0089
+           ↑ new best (0.0308) -> varnet_best.pt
+[epoch  23] loss=0.0283  blind_MSE=0.0308  density=0.0172 vx=0.0745 vy=0.0226 var=0.0089
+           ↑ new best (0.0308) -> varnet_best.pt
+[epoch  24] loss=0.0277  blind_MSE=0.0305  density=0.0170 vx=0.0736 vy=0.0226 var=0.0089
+           ↑ new best (0.0305) -> varnet_best.pt
+[schedule] epoch 25: n_iter -> 10, lr -> 0.0007
+[epoch  25] loss=0.0288  blind_MSE=0.0300  density=0.0169 vx=0.0718 vy=0.0224 var=0.0089
+           ↑ new best (0.0300) -> varnet_best.pt
+[epoch  26] loss=0.0283  blind_MSE=0.0300  density=0.0168 vx=0.0717 vy=0.0224 var=0.0089
+           ↑ new best (0.0300) -> varnet_best.pt
+[epoch  27] loss=0.0291  blind_MSE=0.0297  density=0.0168 vx=0.0709 vy=0.0224 var=0.0089
+           ↑ new best (0.0297) -> varnet_best.pt
+[epoch  28] loss=0.0285  blind_MSE=0.0297  density=0.0167 vx=0.0708 vy=0.0224 var=0.0089
+           ↑ new best (0.0297) -> varnet_best.pt
+[epoch  29] loss=0.0271  blind_MSE=0.0295  density=0.0167 vx=0.0701 vy=0.0223 var=0.0089
+           ↑ new best (0.0295) -> varnet_best.pt
+[epoch  30] loss=0.0293  blind_MSE=0.0296  density=0.0166 vx=0.0705 vy=0.0223 var=0.0089
+[epoch  31] loss=0.0273  blind_MSE=0.0293  density=0.0166 vx=0.0695 vy=0.0222 var=0.0089
+           ↑ new best (0.0293) -> varnet_best.pt
+[epoch  32] loss=0.0278  blind_MSE=0.0293  density=0.0166 vx=0.0695 vy=0.0222 var=0.0089
+           ↑ new best (0.0293) -> varnet_best.pt
+[epoch  33] loss=0.0265  blind_MSE=0.0292  density=0.0166 vx=0.0693 vy=0.0222 var=0.0089
+           ↑ new best (0.0292) -> varnet_best.pt
+[epoch  34] loss=0.0278  blind_MSE=0.0291  density=0.0166 vx=0.0688 vy=0.0222 var=0.0089
+           ↑ new best (0.0291) -> varnet_best.pt
+[epoch  35] loss=0.0285  blind_MSE=0.0291  density=0.0165 vx=0.0687 vy=0.0222 var=0.0089
+           ↑ new best (0.0291) -> varnet_best.pt
+[epoch  36] loss=0.0277  blind_MSE=0.0291  density=0.0165 vx=0.0687 vy=0.0222 var=0.0089
+           ↑ new best (0.0291) -> varnet_best.pt
+[epoch  37] loss=0.0289  blind_MSE=0.0289  density=0.0165 vx=0.0681 vy=0.0221 var=0.0089
+           ↑ new best (0.0289) -> varnet_best.pt
+[epoch  38] loss=0.0270  blind_MSE=0.0289  density=0.0165 vx=0.0679 vy=0.0222 var=0.0089
+           ↑ new best (0.0289) -> varnet_best.pt
+[epoch  39] loss=0.0273  blind_MSE=0.0288  density=0.0165 vx=0.0679 vy=0.0221 var=0.0089
+           ↑ new best (0.0288) -> varnet_best.pt
+[epoch  40] loss=0.0285  blind_MSE=0.0288  density=0.0165 vx=0.0676 vy=0.0222 var=0.0089
+           ↑ new best (0.0288) -> varnet_best.pt
+[epoch  41] loss=0.0279  blind_MSE=0.0287  density=0.0165 vx=0.0672 vy=0.0221 var=0.0089
+           ↑ new best (0.0287) -> varnet_best.pt
+[epoch  42] loss=0.0256  blind_MSE=0.0287  density=0.0165 vx=0.0674 vy=0.0221 var=0.0089
+[epoch  43] loss=0.0291  blind_MSE=0.0286  density=0.0164 vx=0.0672 vy=0.0221 var=0.0089
+           ↑ new best (0.0286) -> varnet_best.pt
+[epoch  44] loss=0.0260  blind_MSE=0.0285  density=0.0164 vx=0.0667 vy=0.0221 var=0.0089
+           ↑ new best (0.0285) -> varnet_best.pt
+[epoch  45] loss=0.0275  blind_MSE=0.0285  density=0.0164 vx=0.0668 vy=0.0221 var=0.0089
+[epoch  46] loss=0.0292  blind_MSE=0.0284  density=0.0164 vx=0.0663 vy=0.0220 var=0.0089
+           ↑ new best (0.0284) -> varnet_best.pt
+[epoch  47] loss=0.0303  blind_MSE=0.0284  density=0.0164 vx=0.0662 vy=0.0220 var=0.0089
+           ↑ new best (0.0284) -> varnet_best.pt
+[epoch  48] loss=0.0265  blind_MSE=0.0284  density=0.0164 vx=0.0663 vy=0.0221 var=0.0089
+[epoch  49] loss=0.0280  blind_MSE=0.0283  density=0.0163 vx=0.0660 vy=0.0220 var=0.0089
+           ↑ new best (0.0283) -> varnet_best.pt
+[schedule] epoch 50: n_iter -> 15, lr -> 0.0005
+[epoch  50] loss=0.0287  blind_MSE=0.0281  density=0.0163 vx=0.0653 vy=0.0220 var=0.0089
+           ↑ new best (0.0281) -> varnet_best.pt
+[epoch  51] loss=0.0277  blind_MSE=0.0280  density=0.0163 vx=0.0651 vy=0.0219 var=0.0089
+           ↑ new best (0.0280) -> varnet_best.pt
+[epoch  52] loss=0.0289  blind_MSE=0.0280  density=0.0163 vx=0.0649 vy=0.0219 var=0.0089
+           ↑ new best (0.0280) -> varnet_best.pt
+[epoch  53] loss=0.0268  blind_MSE=0.0279  density=0.0163 vx=0.0647 vy=0.0219 var=0.0089
+           ↑ new best (0.0279) -> varnet_best.pt
+[epoch  54] loss=0.0297  blind_MSE=0.0279  density=0.0163 vx=0.0644 vy=0.0219 var=0.0089
+           ↑ new best (0.0279) -> varnet_best.pt
+[epoch  55] loss=0.0269  blind_MSE=0.0279  density=0.0163 vx=0.0645 vy=0.0219 var=0.0089
+           ↑ new best (0.0279) -> varnet_best.pt
+[epoch  56] loss=0.0280  blind_MSE=0.0278  density=0.0162 vx=0.0641 vy=0.0219 var=0.0089
+           ↑ new best (0.0278) -> varnet_best.pt
+[2026-10-11T00:36:46.005] error: *** JOB 20877720 ON gpu46 CANCELLED AT 2026-10-11T00:36:46 DUE TO TIME LIMIT ***

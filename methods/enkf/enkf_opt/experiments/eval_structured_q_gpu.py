@@ -332,6 +332,14 @@ def main():
     ap.add_argument("--frames", type=int, default=2000)
     ap.add_argument("--warmup", type=int, default=500)
     ap.add_argument("--ensemble", type=int, default=100)
+    ap.add_argument("--ensemble-coverage", action="store_true",
+                    help="per cell and frame, export whether the truth lies inside the central "
+                         "50%% and 90%% intervals of the analysis members (empirical quantiles "
+                         "0.25/0.75 and 0.05/0.95, linear interpolation, bounds inclusive); added "
+                         "to --calibration-export as ens_in50 / ens_in90")
+    ap.add_argument("--coverage-export", default=None,
+                    help="write only the coverage indicators (implies --ensemble-coverage) to "
+                         "this .npz: ens_in50, ens_in90, observed and truth from the warm-up on")
     ap.add_argument("--ensemble-crps", action="store_true",
                     help="also score the analysis ENSEMBLE itself, not the Gaussian summary of "
                          "it: per cell and frame, export the two components of the empirical "
@@ -479,6 +487,10 @@ def main():
     # (ensemble-size-corrected) estimators can both be formed later without re-running.
     ens_mae = (np.zeros_like(est) if a.ensemble_crps else None)
     ens_pair = (np.zeros_like(est) if a.ensemble_crps else None)
+    want_cov = bool(a.ensemble_coverage or a.coverage_export)
+    ens_in50 = (np.zeros(est.shape, np.uint8) if want_cov else None)
+    ens_in90 = (np.zeros(est.shape, np.uint8) if want_cov else None)
+    cov_q = (torch.tensor([0.25, 0.75, 0.05, 0.95], device=device) if want_cov else None)
     forecast_est = (np.zeros_like(est) if a.forecast_calibration_export else None)
     forecast_spread = (np.zeros_like(est) if a.forecast_calibration_export else None)
     snapshot_frames = (set(np.linspace(
@@ -639,6 +651,12 @@ def main():
                      - filt.n - 1.0)
                 ens_pair[t] = ((w[:, None] * xs).sum(0)
                                / (filt.n * filt.n)).reshape(F, H, W).cpu().numpy()
+            if ens_in50 is not None:
+                # Scoring only: is the truth inside the members' central 50% / 90% interval?
+                y_c = torch.as_tensor(x_true[t].reshape(-1), device=device, dtype=filt.x.dtype)
+                qs = torch.quantile(filt.x, cov_q.to(filt.x.dtype), dim=0)   # (4, STATE_DIM)
+                ens_in50[t] = ((y_c >= qs[0]) & (y_c <= qs[1])).reshape(F, H, W).cpu().numpy()
+                ens_in90[t] = ((y_c >= qs[2]) & (y_c <= qs[3])).reshape(F, H, W).cpu().numpy()
     torch.cuda.synchronize()
     inference_seconds = time.time() - t0
     raw_scores = None
@@ -694,8 +712,20 @@ def main():
             **({"ens_mae": ens_mae[a.warmup:].astype(np.float32),
                 "ens_pair": ens_pair[a.warmup:].astype(np.float32),
                 "ens_members": np.asarray(a.ensemble)} if ens_mae is not None else {}),
+            **({"ens_in50": ens_in50[a.warmup:], "ens_in90": ens_in90[a.warmup:]}
+               if ens_in50 is not None else {}),
         )
         result["calibration_export"] = os.path.abspath(a.calibration_export)
+    if a.coverage_export:
+        os.makedirs(os.path.dirname(os.path.abspath(a.coverage_export)), exist_ok=True)
+        np.savez_compressed(
+            a.coverage_export,
+            ens_in50=ens_in50[a.warmup:], ens_in90=ens_in90[a.warmup:],
+            observed=omega[a.warmup:].astype(bool),
+            truth=x_true[a.warmup:].astype(np.float32),
+            day=np.asarray(a.day), warmup=np.asarray(a.warmup),
+            ens_members=np.asarray(a.ensemble))
+        result["coverage_export"] = os.path.abspath(a.coverage_export)
     if a.forecast_calibration_export:
         export_dir = os.path.dirname(os.path.abspath(a.forecast_calibration_export))
         os.makedirs(export_dir, exist_ok=True)

@@ -50,17 +50,23 @@
       "sha256": "23358b5c9db500dd420a4300c95c0df2d5185a0f94cb92f87bbc298b499df62d",
       "hash_ok": true
     },
-    "varnet_aughead_obs_s0.pt": {
+    "varnet_aughead_fold_s0.pt": {
       "exists": true,
-      "bytes": 55598389,
-      "sha256": "272abccc188e2e47ff79d922101ba91c1c945cac9610624f5e792d7d8b04cb57",
-      "hash_ok": true
+      "bytes": 55598453,
+      "sha256": "fc46b476d8049ada78566dd4c6ead9d6d1042217984b767eb74f6f58d7df2e99",
+      "hash_ok": true,
+      "fold_axes": "ct",
+      "n_iter": 20,
+      "epoch": 80
     },
-    "varnet_mse_pd_s3_epoch80.pt": {
+    "varnet_mse_fold_s3.pt": {
       "exists": true,
-      "bytes": 25184373,
-      "sha256": "0b0f9aa8c6b42ceab8224409428e947c3eba5f6ef0c8278f6f4827db1265ebc2",
-      "hash_ok": true
+      "bytes": 25184529,
+      "sha256": "3c18dcbe1ddf922ad444c264084ff4ab9eb1e76448a880fa76148dec30b251d3",
+      "hash_ok": true,
+      "fold_axes": "ct",
+      "n_iter": 20,
+      "epoch": 76
     }
   },
   "data": {

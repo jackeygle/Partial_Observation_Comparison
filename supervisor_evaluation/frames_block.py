@@ -1,4 +1,4 @@
-"""Reconstruct one contiguous block of a test day with the five final methods and draw it.
+"""Reconstruct one contiguous block of a test day with the final methods and draw it.
 
     python3 -m supervisor_evaluation.frames_block [--day atc-20130811] [--start 30000] [--frames 5000]
 
@@ -6,11 +6,14 @@ For looking at the reconstructions, not for scoring: the reported numbers stay t
 `evaluate.py`. The prediction path is the one of `generate_comparison_images` (same
 packaged checkpoints, observations, 4DVarNet initial field and window split, DINCAE
 helper, saved EnKF export), so frame 32778 must reproduce `images/selected_predictions.npz`;
-that is checked. The aug. var. 4DVarNet is left out (five-method thesis).
+that is checked. The methods are those of the evaluation variant: with the aug. var.
+4DVarNet when EVAL_VARIANT has it (six methods), without it otherwise (five-method thesis).
+Under DATA_VARIANT=all92 the data root, the evaluation directory and the output directory
+default to route 2 (data_all92, outputs/full_6m_all92, outputs/dev/frames_<n>_all92).
 
-Writes to supervisor_evaluation/outputs/dev/frames_<n>/:
-    predictions.npz        truth, observation, mask, the five predictions (4 channels),
-                           DINCAE and EnKF density sigma, per-frame scores
+Writes to supervisor_evaluation/outputs/dev/frames_<n>[_all92]/:
+    predictions.npz        truth, observation, mask, the predictions (4 channels),
+                           the density sigma of the probabilistic methods, per-frame scores
     boards/board_*.png     every 25th frame: observation, truth, five reconstructions,
                            absolute error; one colour scale for the whole block
     animation.gif          every 5th frame, density only, the same scales
@@ -28,8 +31,12 @@ import numpy as np
 from supervisor_evaluation.evaluate import (FINAL_CONFIG, HERE, MODELS, STATE_SHAPE, _predict_senseiver_selected,
                                             _predict_varnet_selected)
 
-METHODS = ("Senseiver-A", "Senseiver-G (ours)", "DINCAE", "4DVarNet", "EnKF")
-COLORS = ("#e57a9f", "#4b3aa6", "#2a7ad5", "#eda100", "#1aae7a")
+HAS_AUG = "varnet_aughead" in FINAL_CONFIG
+METHODS = (("Senseiver-A", "Senseiver-G (ours)", "DINCAE", "4DVarNet")
+           + (("4DVarNet aug. var. (ours)",) if HAS_AUG else ()) + ("EnKF",))
+COLORS = (("#e57a9f", "#4b3aa6", "#2a7ad5", "#eda100") + (("#eb6834",) if HAS_AUG else ())
+          + ("#1aae7a",))
+SIGMA_METHODS = ("DINCAE",) + (("4DVarNet aug. var. (ours)",) if HAS_AUG else ()) + ("EnKF",)
 LO = np.asarray([0, -5, -5, 0], np.float32)[None, :, None, None]
 HI = np.asarray([5, 5, 5, 2], np.float32)[None, :, None, None]
 
@@ -84,7 +91,7 @@ def predict(day: str, start: int, n: int, data_root: Path, full_dir: Path) -> di
         raise RuntimeError("DINCAE frame/observation alignment check failed")
     rec = dincae_eval.clip_bounds(rec)
     pred[:, 2] = rec[start - 1:start - 1 + n]          # DINCAE row i is frame i + 1
-    sigma = np.empty((n, 2, h, w), np.float32)
+    sigma = np.empty((n, len(SIGMA_METHODS), h, w), np.float32)
     sigma[:, 0] = dsd[start - 1:start - 1 + n, 0] * stats.std[0]
     del Xt, rec, dsd, dmask
     print("[block] dincae done", flush=True)
@@ -97,8 +104,18 @@ def predict(day: str, start: int, n: int, data_root: Path, full_dir: Path) -> di
     X0 = om.fill_missing_state(Y, Omc, method=obs_cfg["init_method"])   # whole day, as evaluated
     pv = _predict_varnet_selected(solver, dT, Y, Omc, X0, frames, device)
     pred[:, 3] = np.stack([pv[t] for t in frames])
-    del pv, X0
+    del pv, solver
     print("[block] 4dvarnet done", flush=True)
+    if HAS_AUG:
+        aug, aug_args, _ = load_solver(MODELS / FINAL_CONFIG["varnet_aughead"]["file"], device)
+        if int(aug_args["dT"]) != dT or not aug.augmented_var:
+            raise RuntimeError("packaged aug. var. 4DVarNet has an incompatible layout")
+        pa = _predict_varnet_selected(aug, dT, Y, Omc, X0, frames, device, with_spread=True)
+        pred[:, 4] = np.stack([pa[t][0] for t in frames])
+        sigma[:, 1] = np.stack([pa[t][1][0] for t in frames])
+        del pa, aug
+        print("[block] 4dvarnet aug. var. done", flush=True)
+    del X0
 
     enkf_json = json.loads((full_dir / "raw" / "enkf" / f"{day}.json").read_text())
     warm = int(enkf_json["config"]["warmup"])
@@ -107,8 +124,8 @@ def predict(day: str, start: int, n: int, data_root: Path, full_dir: Path) -> di
         if start < warm or not np.array_equal(en["observed"][sl], Omask[start:start + n]) \
                 or not np.allclose(en["truth"][sl], X[start:start + n], rtol=0, atol=1e-6):
             raise RuntimeError("EnKF export alignment check failed")
-        pred[:, 4] = en["mean"][sl]
-        sigma[:, 1] = en["spread"][sl, 0]
+        pred[:, -1] = en["mean"][sl]
+        sigma[:, -1] = en["spread"][sl, 0]
     print("[block] enkf (saved export) done", flush=True)
 
     return dict(truth=X[start:start + n], observation=Y[start:start + n],
@@ -120,7 +137,8 @@ def check_against_selection(a: dict, day: str, full_dir: Path) -> dict:
     """The block's prediction of a frame drawn in the thesis must match the saved selection."""
     z = np.load(full_dir / "images" / "selected_predictions.npz")
     names = list(z["method_names"])
-    src = ("Senseiver-A", "Senseiver-G", "DINCAE", "4DVarNet MSE", "EnKF")
+    src = (("Senseiver-A", "Senseiver-G", "DINCAE", "4DVarNet MSE")
+           + (("4DVarNet aughead_obs (single)",) if HAS_AUG else ()) + ("EnKF",))
     out = {}
     for i in np.flatnonzero(z["day"] == day):
         f = int(z["frame"][i])
@@ -162,7 +180,8 @@ def _board_figure(a: dict, day: str):
     def masked(v, keep):
         return np.ma.masked_where(~keep, v)
 
-    fig, axes = plt.subplots(2, 7, figsize=(12, 6.4), constrained_layout=True)
+    ncol = 2 + len(METHODS)
+    fig, axes = plt.subplots(2, ncol, figsize=(1.7 * ncol, 6.4), constrained_layout=True)
     cm_d = plt.get_cmap("Blues").copy(); cm_d.set_bad("#bdbdbd")
     cm_e = plt.get_cmap("Reds").copy(); cm_e.set_bad("#bdbdbd")
     titles = ["observed", "truth"] + list(METHODS)
@@ -172,12 +191,12 @@ def _board_figure(a: dict, day: str):
     axes[0, 0].imshow(under)
     cm_o = plt.get_cmap("Blues").copy(); cm_o.set_bad((1, 1, 1, 0))
     ims = []
-    for col in range(7):
+    for col in range(ncol):
         ims.append(axes[0, col].imshow(np.zeros((36, 12)), cmap=cm_o if col == 0 else cm_d,
                                        vmin=0, vmax=vmax))
         axes[0, col].set_title(titles[col].replace(" (ours)", "\n(ours)"), fontsize=9)
     eims, etxt = [], []
-    for col in range(7):
+    for col in range(ncol):
         if col < 2:
             axes[1, col].axis("off")
             continue
@@ -196,7 +215,7 @@ def _board_figure(a: dict, day: str):
         o = a["observed"][i]
         ims[0].set_data(masked(a["observation"][i, 0], walk & o))
         ims[1].set_data(masked(truth[i, 0], walk))
-        for k in range(5):
+        for k in range(len(METHODS)):
             ims[2 + k].set_data(masked(pred[i, k, 0], walk))
             eims[k].set_data(masked(errs[i, k], walk))
             etxt[k].set_text(f"RMSE {pooled[i, k]:.3f}")
@@ -263,7 +282,7 @@ def draw(a: dict, out: Path, day: str, board_every: int, gif_every: int) -> dict
     ax3.plot(t, people, color="k", lw=0.8)
     ax1.set_ylabel("blind RMSE\n(4 channels pooled)"); ax2.set_ylabel("blind RMSE\n(density)")
     ax3.set_ylabel("people in\nthe corridor"); ax3.set_xlabel(f"minutes from frame {int(a['frame'][0])}")
-    ax1.legend(ncol=5, fontsize=8, loc="upper left")
+    ax1.legend(ncol=len(METHODS), fontsize=8, loc="upper left")
     ax1.set_title("thin: every frame; thick: one-minute moving average", fontsize=9)
     fig.savefig(out / "rmse_over_time.png", dpi=130)
     plt.close(fig)
@@ -277,13 +296,16 @@ def main() -> None:
     ap.add_argument("--frames", type=int, default=5000)
     ap.add_argument("--board-every", type=int, default=25)
     ap.add_argument("--gif-every", type=int, default=5)
-    ap.add_argument("--data-root", type=Path, default=Path("/scratch/work/zhangx29/data"))
-    ap.add_argument("--full-dir", type=Path, default=HERE / "outputs" / "full")
+    from crowdcore import config
+    all92 = config.DATA_VARIANT == "all92"
+    ap.add_argument("--data-root", type=Path, default=Path(
+        "/scratch/work/zhangx29/data_all92" if all92 else "/scratch/work/zhangx29/data"))
+    ap.add_argument("--full-dir", type=Path, default=HERE / "outputs" / ("full_6m_all92" if all92 else "full"))
     ap.add_argument("--redraw-boards", action="store_true",
                     help="only draw boards (every --board-every frames) from the saved predictions.npz")
     ap.add_argument("--workers", type=int, default=6)
     a = ap.parse_args()
-    out = a.full_dir.parent / "dev" / f"frames_{a.frames}"
+    out = a.full_dir.parent / "dev" / f"frames_{a.frames}{config.VARIANT_SUFFIX}"
     out.mkdir(parents=True, exist_ok=True)
     if a.redraw_boards:
         redraw_boards(out, a.day, a.board_every, a.workers)
@@ -293,9 +315,15 @@ def main() -> None:
     pooled, dens, tot = scores(arrays)
     np.savez_compressed(out / "predictions.npz", **arrays, pooled_rmse=pooled, density_rmse=dens,
                         method_names=np.asarray(METHODS),
-                        sigma_method_names=np.asarray(("DINCAE", "EnKF")))
+                        sigma_method_names=np.asarray(SIGMA_METHODS))
     scales = draw(arrays, out, a.day, a.board_every, a.gif_every)
+    from crowdcore import frame_reliability as fr, observation_model as om
+    fp = next(p for p in om.split_files("test") if Path(p).name.startswith(a.day))
+    import h5py
+    with h5py.File(fp, "r") as f:
+        keep = fr.scorable_frames(fp, int(f["grid"].shape[0]))[a.start:a.start + a.frames]
     summary = {"day": a.day, "start": a.start, "frames": a.frames, "block_rmse": tot,
+               "frames_in_recording_gap_blocks": int((~keep).sum()),
                "colour_scales": scales,
                "max_abs_diff_vs_selected_predictions": check,
                "note": "visual inspection only; reported scores are those of evaluate.py"}

@@ -1,0 +1,33 @@
+########## runs/varnet_mse5_h96_pdfold_s3
+[select] varnet_mse5_h96_pdfold_s3: 2 candidates (epochs 80..90, all at 20 iterations) | 7 valid days | walkable 290/432 | cuda
+  atc-20130616: best epoch 90 (0.101115)
+  atc-20130623: best epoch 90 (0.103971)
+  atc-20130630: best epoch 90 (0.097537)
+  atc-20130707: best epoch 90 (0.113782)
+  atc-20130714: best epoch 90 (0.121015)
+  atc-20130721: best epoch 90 (0.119609)
+  atc-20130728: best epoch 90 (0.103240)
+
+  epoch   walkable blind MSE      RMSE
+     80             0.114057    0.3377
+     90             0.108653    0.3296  <-- selected
+
+[select] epoch 90  MSE 0.108653  RMSE 0.3296
+[select] spread across the 2 candidates: 0.005404 (5.0% of the winner) -- if this is small, the choice of epoch barely matters and any of them would do.
+[select] wrote /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_mse5_h96_pdfold_s3/select_valid.json
+########## runs/varnet_aughead_obs_h96_fold_s0
+[select] varnet_aughead_obs_h96_fold_s0: 1 candidates (epochs 80..80, all at 20 iterations) | 7 valid days | walkable 290/432 | cuda
+  atc-20130616: best epoch 80 (0.077275)
+  atc-20130623: best epoch 80 (0.078209)
+  atc-20130630: best epoch 80 (0.072964)
+  atc-20130707: best epoch 80 (0.087754)
+  atc-20130714: best epoch 80 (0.094525)
+  atc-20130721: best epoch 80 (0.093933)
+  atc-20130728: best epoch 80 (0.079345)
+
+  epoch   walkable blind MSE      RMSE
+     80             0.083438    0.2889  <-- selected
+
+[select] epoch 80  MSE 0.083438  RMSE 0.2889
+[select] spread across the 1 candidates: 0.000000 (0.0% of the winner) -- if this is small, the choice of epoch barely matters and any of them would do.
+[select] wrote /scratch/work/zhangx29/Thesis_Project/methods/varnet/runs/varnet_aughead_obs_h96_fold_s0/select_valid.json

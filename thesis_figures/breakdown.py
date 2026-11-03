@@ -9,7 +9,7 @@ blind walkable cells, the same common frames for every method.
     blind cells in each bin.
 (b) by the number of people in the corridor at that second (frames split into five
     groups of equal size).
-(c) on each of the seven test days.
+(c) on each test day.
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ def main() -> None:
                                   constrained_layout=True)
     kw = dict(lw=0.9, ms=3.0, mew=0)
 
-    # (a) age of the blind cell -------------------------------------------------------------
+    # (a) time since last observed -------------------------------------------------------------
     labs = S["age_labels"][:-1]                          # "never" holds a handful of cells
     n = np.asarray(S["age_cells"][:-1]); share = n / n.sum()
     x = np.arange(len(labs))
@@ -65,7 +65,7 @@ def main() -> None:
     a.set_xticks(x, [r"$>$200" if l == ">200" else l for l in labs])
     a.set_xlabel("seconds since last observed")
     a.set_ylabel("RMSE")
-    a.set_title("(a) by age of the blind cell", loc="left")
+    a.set_title("(a) by time since last observed", loc="left")
     a.set_ylim(0, None)
 
     # (b) people in the corridor ------------------------------------------------------------

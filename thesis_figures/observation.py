@@ -111,7 +111,7 @@ def main() -> None:
     axc.set_xlabel("time of day (h)", fontsize=FS_SMALL + 0.5)
     axc.set_ylabel("walkable cells observed", fontsize=FS_SMALL + 0.5)
     axc.tick_params(labelsize=FS_SMALL)
-    axc.set_title("(c) coverage per second", loc="left", fontsize=FS_SMALL + 0.5)
+    axc.set_title("(c) observed share per second", loc="left", fontsize=FS_SMALL + 0.5)
 
     # ---- (d) how long unobserved cells have been unobserved -------------------------------
     hist = g["age_hist"].astype(float)
@@ -134,7 +134,7 @@ def main() -> None:
     axd.set_xlabel("seconds since last observed", fontsize=FS_SMALL + 0.5)
     axd.set_ylabel("share of blind cells seen within", fontsize=FS_SMALL + 0.5)
     axd.tick_params(labelsize=FS_SMALL)
-    axd.set_title("(d) age of blind cells", loc="left", fontsize=FS_SMALL + 0.5)
+    axd.set_title("(d) time since last observed", loc="left", fontsize=FS_SMALL + 0.5)
 
     save(fig, os.path.join(HERE, "out", "observation"))
 

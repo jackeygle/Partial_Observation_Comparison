@@ -4,7 +4,7 @@
 
 One row per method, one square per second relative to the reconstructed frame t.
 Filled = observations of that second are an input; the thick square is frame t.
-4DVarNet solves fixed 200-s tiles of the day ([0, 200), [200, 400), ...), so its window
+4DVarNet solves fixed 200-s windows of the day ([0, 200), [200, 400), ...), so its window
 reaches past both ends of the axis and t can sit anywhere in it. The EnKF carries all
 past observations forward in its ensemble; its forecast model reads the last five
 analysed states, not raw observations.
@@ -29,9 +29,9 @@ def main() -> None:
         ("Senseiver-G (ours)", set(range(-15, 1)), False, False, True, False, "last 16 s"),
         ("DINCAE", {-1, 0, 1}, False, False, False, True, "one second either side"),
         ("4DVarNet", set(range(LO, HI + 1)), True, True, False, False,
-         r"fixed 200-s tile containing $t$"),
+         r"fixed 200-s window containing $t$"),
         ("4DVarNet aug. var. (ours)", set(range(LO, HI + 1)), True, True, False, True,
-         r"fixed 200-s tile containing $t$"),
+         r"fixed 200-s window containing $t$"),
         ("EnKF", set(range(LO, 1)), True, False, True, True, "all past, carried by the ensemble"),
     ]
     if FIVE_METHODS:
