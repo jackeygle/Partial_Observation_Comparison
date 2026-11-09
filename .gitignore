@@ -69,6 +69,9 @@ supervisor_evaluation/outputs/dev/*
 # ...except the route-2 4DVarNet selections, which EVAL_VARIANT=six_allwalk_all92 reads
 !supervisor_evaluation/outputs/dev/varnet_wink3_all92_gapmask_20261015/
 !supervisor_evaluation/outputs/dev/varnet_augwink3_all92_gapmask_20261015/
+# ...and the 5000-frame visual comparison of the six final methods (boards, animation,
+# RMSE over time, summary); its predictions.npz (209 MB) stays out under the *.npz rule
+!supervisor_evaluation/outputs/dev/frames_5000_all92/
 
 # pptxgenjs install used by slides/build_enkf_deck.js
 slides/node_modules/

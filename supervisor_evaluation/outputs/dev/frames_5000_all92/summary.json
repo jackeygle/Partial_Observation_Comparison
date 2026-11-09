@@ -1,0 +1,47 @@
+{
+  "day": "atc-20130811",
+  "start": 30000,
+  "frames": 5000,
+  "block_rmse": {
+    "Senseiver-A": {
+      "pooled_rmse": 0.19804804363424205,
+      "density_rmse": 0.1325044104695852
+    },
+    "Senseiver-G (ours)": {
+      "pooled_rmse": 0.17636772440670342,
+      "density_rmse": 0.11344887724970416
+    },
+    "DINCAE": {
+      "pooled_rmse": 0.20453031144795253,
+      "density_rmse": 0.13293684036549594
+    },
+    "4DVarNet": {
+      "pooled_rmse": 0.20518214579109675,
+      "density_rmse": 0.14909153164522504
+    },
+    "4DVarNet aug. var. (ours)": {
+      "pooled_rmse": 0.2672053138742032,
+      "density_rmse": 0.15852660634467355
+    },
+    "EnKF": {
+      "pooled_rmse": 0.23155768804706892,
+      "density_rmse": 0.12989189397135062
+    }
+  },
+  "frames_in_recording_gap_blocks": 0,
+  "colour_scales": {
+    "density_vmax": 0.9494903683662415,
+    "error_vmax": 0.6198990941047668
+  },
+  "max_abs_diff_vs_selected_predictions": {
+    "32778": {
+      "Senseiver-A": 1.3589859008789062e-05,
+      "Senseiver-G (ours)": 0.0,
+      "DINCAE": 0.0,
+      "4DVarNet": 0.024801313877105713,
+      "4DVarNet aug. var. (ours)": 0.005199402570724487,
+      "EnKF": 0.0
+    }
+  },
+  "note": "visual inspection only; reported scores are those of evaluate.py"
+}
